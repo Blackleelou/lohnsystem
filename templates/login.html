@@ -1,7 +1,15 @@
 
+<!DOCTYPE html>
+<html>
+<head><title>Login</title></head>
+<body>
+<h2>Anmelden</h2>
 <form method="POST">
-  <input name="email" placeholder="E-Mail">
-  <input name="password" type="password" placeholder="Passwort">
-  <label><input type="checkbox" name="remember"> Angemeldet bleiben</label>
-  <button type="submit">Einloggen</button>
-  <p><a href="#">Passwort vergessen?</a> | <a href="/register">Registrieren</a></p>
+  <input name="username" placeholder="Benutzername" required><br>
+  <input name="password" type="password" placeholder="Passwort" required><br>
+  <label><input type="checkbox" name="remember"> Angemeldet bleiben</label><br>
+  <button type="submit">Einloggen</button><br>
+  <a href="#">Passwort vergessen?</a> | <a href="#">Registrieren</a>
+</form>
+</body>
+</html>

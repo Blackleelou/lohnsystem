@@ -1,1 +1,1 @@
-Dies ist die vollständige Version mit Benutzer-Login, Monatsauswertung und Adminfunktionen.
+Dies ist Version 1.0.0 des Lohnsystems mit Benutzerverwaltung, Schichteintrag, Feiertagslogik und Datenschutz.

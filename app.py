@@ -12,7 +12,7 @@ def home():
 @app.route('/login', methods=['GET', 'POST'])
 def login():
     if request.method == 'POST':
-        session['user'] = request.form['email']
+        session['user'] = request.form['username']
         return redirect(url_for('home'))
     return render_template('login.html')
 
@@ -20,6 +20,10 @@ def login():
 def logout():
     session.pop('user', None)
     return redirect(url_for('home'))
+
+@app.route('/admin')
+def admin():
+    return "Adminbereich (Platzhalter)"
 
 if __name__ == '__main__':
     import os
