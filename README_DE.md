@@ -1,1 +1,1 @@
-Dies ist eine erweiterte Demo mit Benutzer-Login und Dashboard.
+Dies ist die vollständige Version mit Benutzer-Login, Monatsauswertung und Adminfunktionen.
