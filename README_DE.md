@@ -1,1 +1,1 @@
-Lohnsystem v0.9.0 - Preview-Version mit responsivem Login und Session-Handling. Adminpanel, Schichtsystem, Zuschläge und Auswertung folgen.
+Lohnsystem v0.9.1 Preview – jetzt mit Registrierung und Benutzerdaten (Sprache, Bundesland).

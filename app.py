@@ -3,6 +3,8 @@ from flask import Flask, render_template, request, redirect, url_for, session
 app = Flask(__name__)
 app.secret_key = 'supersecret'
 
+users = {}
+
 @app.route('/')
 def index():
     if 'user' in session:
@@ -12,9 +14,25 @@ def index():
 @app.route('/login', methods=['GET', 'POST'])
 def login():
     if request.method == 'POST':
-        session['user'] = request.form['username']
-        return redirect(url_for('index'))
+        username = request.form['username']
+        if username in users and request.form['password'] == users[username]['password']:
+            session['user'] = username
+            return redirect(url_for('index'))
     return render_template('login.html')
+
+@app.route('/register', methods=['GET', 'POST'])
+def register():
+    if request.method == 'POST':
+        username = request.form['username']
+        if username not in users:
+            users[username] = {
+                'email': request.form['email'],
+                'password': request.form['password'],
+                'language': request.form['language'],
+                'state': request.form['state']
+            }
+            return redirect(url_for('login'))
+    return render_template('register.html')
 
 @app.route('/logout')
 def logout():
