@@ -1,10 +1,10 @@
 
-from flask import Flask, render_template, redirect, url_for, request, session
+from flask import Flask, render_template, request, redirect, url_for, session
 app = Flask(__name__)
 app.secret_key = 'supersecret'
 
 @app.route('/')
-def home():
+def index():
     if 'user' in session:
         return render_template('dashboard.html', user=session['user'])
     return render_template('index.html')
@@ -13,17 +13,17 @@ def home():
 def login():
     if request.method == 'POST':
         session['user'] = request.form['username']
-        return redirect(url_for('home'))
+        return redirect(url_for('index'))
     return render_template('login.html')
 
 @app.route('/logout')
 def logout():
     session.pop('user', None)
-    return redirect(url_for('home'))
+    return redirect(url_for('index'))
 
 @app.route('/admin')
 def admin():
-    return "Adminbereich (Platzhalter)"
+    return "Adminbereich – Version 1.1.0 (Platzhalter)"
 
 if __name__ == '__main__':
     import os

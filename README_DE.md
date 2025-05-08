@@ -1,1 +1,1 @@
-Dies ist Version 1.0.0 des Lohnsystems mit Benutzerverwaltung, Schichteintrag, Feiertagslogik und Datenschutz.
+Lohnsystem Version 1.1.0 – mit Benutzerverwaltung, Feiertagslogik, Schichten, Zuschlägen und Monatsauswertung (Platzhalter).
