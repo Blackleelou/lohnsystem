@@ -21,10 +21,6 @@ def logout():
     session.pop('user', None)
     return redirect(url_for('index'))
 
-@app.route('/admin')
-def admin():
-    return "Adminbereich – Version 1.1.0 (Platzhalter)"
-
 if __name__ == '__main__':
     import os
     port = int(os.environ.get('PORT', 5000))

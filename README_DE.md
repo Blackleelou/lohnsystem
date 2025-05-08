@@ -1,1 +1,1 @@
-Lohnsystem Version 1.1.0 – mit Benutzerverwaltung, Feiertagslogik, Schichten, Zuschlägen und Monatsauswertung (Platzhalter).
+Lohnsystem v0.9.0 - Preview-Version mit responsivem Login und Session-Handling. Adminpanel, Schichtsystem, Zuschläge und Auswertung folgen.

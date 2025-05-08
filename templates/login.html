@@ -1,15 +1,23 @@
 
 <!DOCTYPE html>
-<html>
-<head><title>Login</title></head>
+<html lang="de">
+<head>
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>Login</title>
+  <style>
+    body { font-family: Arial; padding: 1rem; }
+    form { max-width: 400px; margin: auto; display: flex; flex-direction: column; gap: 0.5rem; }
+    input, button { padding: 0.5rem; font-size: 1rem; }
+  </style>
+</head>
 <body>
-<h2>Anmeldung</h2>
+<h2>Login</h2>
 <form method="POST">
-  <input name="username" placeholder="Benutzername" required><br>
-  <input name="password" type="password" placeholder="Passwort" required><br>
-  <label><input type="checkbox" name="remember"> Angemeldet bleiben</label><br>
-  <button type="submit">Einloggen</button><br>
-  <a href="#">Passwort vergessen?</a> | <a href="#">Registrieren</a>
+  <input name="username" placeholder="Benutzername" required>
+  <input name="password" type="password" placeholder="Passwort" required>
+  <label><input type="checkbox" name="remember"> Angemeldet bleiben</label>
+  <button type="submit">Einloggen</button>
+  <p><a href="#">Passwort vergessen?</a> | <a href="#">Registrieren</a></p>
 </form>
 </body>
 </html>
