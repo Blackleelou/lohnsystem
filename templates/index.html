@@ -1,51 +1,90 @@
-
 <!DOCTYPE html>
 <html lang="de">
 <head>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <title>Lohnsystem v0.5.01</title>
+  <title>Lohnsystem v0.5.02</title>
   <style>
-    body { margin: 0; font-family: Arial; display: flex; min-height: 100vh; flex-direction: column; }
-    main { flex: 1; display: flex; }
-    .left { flex: 1; background: #f8f8f8; display: flex; align-items: center; justify-content: center; font-size: 1.5rem; padding: 1rem; }
-    .right { flex: 1; display: flex; align-items: center; justify-content: center; }
-    .card { width: 100%; max-width: 360px; padding: 2rem; border: 1px solid #ccc; border-radius: 8px; background: white; }
-    .flags { position: absolute; top: 1rem; right: 1rem; }
-    .flags select { font-size: 1rem; }
+    body { margin: 0; font-family: Arial; background: #f3f3f3; display: flex; flex-direction: column; min-height: 100vh; }
+    header { display: flex; justify-content: space-between; align-items: center; padding: 1rem 2rem; background: #fff; border-bottom: 1px solid #ccc; }
+    .title { font-weight: bold; font-size: 1.3rem; }
+    .lang-select { font-size: 1rem; }
+    main { display: flex; flex: 1; justify-content: center; align-items: center; padding: 2rem; }
+    .card { width: 100%; max-width: 400px; background: #fff; padding: 2rem; border-radius: 8px; box-shadow: 0 0 8px rgba(0,0,0,0.1); }
+    .card h2 { margin-top: 0; }
     .form input { width: 100%; padding: 0.5rem; margin-bottom: 0.5rem; }
-    .form button { width: 100%; padding: 0.5rem; }
+    .form button { width: 100%; padding: 0.5rem; margin-top: 0.5rem; }
+    .toggle { text-align: center; margin-top: 1rem; cursor: pointer; color: #0077cc; }
     footer { font-size: 0.8rem; color: #666; text-align: center; margin: 1rem 0; }
   </style>
+  <script>
+    function toggleForm(target) {
+      document.getElementById('login-form').style.display = (target === 'login') ? 'block' : 'none';
+      document.getElementById('register-form').style.display = (target === 'register') ? 'block' : 'none';
+    }
+    function changeLang(value) {
+      document.querySelectorAll('[data-lang]').forEach(el => {
+        el.textContent = translations[value][el.dataset.lang];
+      });
+    }
+    const translations = {
+      de: {
+        title: "Brutto-Netto Lohn im Blick",
+        login: "Einloggen",
+        register: "Registrieren",
+        switch_login: "Schon registriert? Jetzt einloggen",
+        switch_register: "Noch kein Konto? Jetzt registrieren"
+      },
+      en: {
+        title: "Gross-Net Pay at a Glance",
+        login: "Log in",
+        register: "Sign up",
+        switch_login: "Already registered? Log in now",
+        switch_register: "No account yet? Register now"
+      }
+    };
+    window.onload = () => changeLang('de');
+  </script>
 </head>
 <body>
-<div class="flags">
-  <select>
+<header>
+  <div class="title" data-lang="title">Brutto-Netto Lohn im Blick</div>
+  <select class="lang-select" onchange="changeLang(this.value)">
     <option value="de">🇩🇪 Deutsch</option>
     <option value="en">🇬🇧 English</option>
   </select>
-</div>
+</header>
 <main>
-  <div class="left">
-    <strong>Brutto-Netto Lohn im Blick</strong>
-  </div>
-  <div class="right">
-    <div class="card">
-      <form class="form" action="/login" method="post">
-        <input type="text" name="username" placeholder="E-Mail oder Benutzername" required />
-        <input type="password" name="password" placeholder="Passwort" required />
-        <button type="submit">Login</button>
-      </form>
-      <hr />
-      <form class="form" action="/register" method="post">
-        <input type="text" name="username" placeholder="Benutzername" required />
-        <input type="email" name="email" placeholder="E-Mail" required />
-        <input type="password" name="password" placeholder="Passwort" required />
-        <button type="submit">Registrieren</button>
-      </form>
-    </div>
+  <div class="card">
+    <form class="form" id="login-form" action="/login" method="post">
+      <h2 data-lang="login">Einloggen</h2>
+      <input type="text" name="username" placeholder="Benutzername oder E-Mail" required />
+      <input type="password" name="password" placeholder="Passwort" required />
+      <button type="submit" data-lang="login">Einloggen</button>
+    </form>
+    <form class="form" id="register-form" style="display:none" action="/register" method="post">
+      <h2 data-lang="register">Registrieren</h2>
+      <input type="text" name="username" placeholder="Benutzername" required />
+      <input type="email" name="email" placeholder="E-Mail" required />
+      <input type="password" name="password" placeholder="Passwort" required />
+      <button type="submit" data-lang="register">Registrieren</button>
+    </form>
+    <div class="toggle" onclick="toggleForm('register')" id="toRegister" data-lang="switch_register">Noch kein Konto? Jetzt registrieren</div>
+    <div class="toggle" onclick="toggleForm('login')" id="toLogin" style="display:none" data-lang="switch_login">Schon registriert? Jetzt einloggen</div>
   </div>
 </main>
-<footer>Lohnsystem Version v0.5.01</footer>
+<footer>Lohnsystem Version v0.5.02</footer>
+<script>
+  document.getElementById("toRegister").onclick = function() {
+    toggleForm('register');
+    this.style.display = 'none';
+    document.getElementById("toLogin").style.display = 'block';
+  };
+  document.getElementById("toLogin").onclick = function() {
+    toggleForm('login');
+    this.style.display = 'none';
+    document.getElementById("toRegister").style.display = 'block';
+  };
+</script>
 </body>
 </html>
