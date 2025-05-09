@@ -3,7 +3,7 @@
 <head>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <title>Lohnsystem v0.5.02</title>
+  <title>Lohnsystem v0.5.03</title>
   <style>
     body { margin: 0; font-family: Arial; background: #f3f3f3; display: flex; flex-direction: column; min-height: 100vh; }
     header { display: flex; justify-content: space-between; align-items: center; padding: 1rem 2rem; background: #fff; border-bottom: 1px solid #ccc; }
@@ -15,41 +15,19 @@
     .form input { width: 100%; padding: 0.5rem; margin-bottom: 0.5rem; }
     .form button { width: 100%; padding: 0.5rem; margin-top: 0.5rem; }
     .toggle { text-align: center; margin-top: 1rem; cursor: pointer; color: #0077cc; }
+    .password-wrapper { position: relative; }
+    .password-wrapper input { padding-right: 2.5rem; }
+    .password-wrapper span {
+      position: absolute; right: 10px; top: 50%; transform: translateY(-50%);
+      cursor: pointer; font-size: 1rem;
+    }
     footer { font-size: 0.8rem; color: #666; text-align: center; margin: 1rem 0; }
   </style>
-  <script>
-    function toggleForm(target) {
-      document.getElementById('login-form').style.display = (target === 'login') ? 'block' : 'none';
-      document.getElementById('register-form').style.display = (target === 'register') ? 'block' : 'none';
-    }
-    function changeLang(value) {
-      document.querySelectorAll('[data-lang]').forEach(el => {
-        el.textContent = translations[value][el.dataset.lang];
-      });
-    }
-    const translations = {
-      de: {
-        title: "Brutto-Netto Lohn im Blick",
-        login: "Einloggen",
-        register: "Registrieren",
-        switch_login: "Schon registriert? Jetzt einloggen",
-        switch_register: "Noch kein Konto? Jetzt registrieren"
-      },
-      en: {
-        title: "Gross-Net Pay at a Glance",
-        login: "Log in",
-        register: "Sign up",
-        switch_login: "Already registered? Log in now",
-        switch_register: "No account yet? Register now"
-      }
-    };
-    window.onload = () => changeLang('de');
-  </script>
 </head>
 <body>
 <header>
-  <div class="title" data-lang="title">Brutto-Netto Lohn im Blick</div>
-  <select class="lang-select" onchange="changeLang(this.value)">
+  <div class="title">Brutto-Netto Lohn im Blick</div>
+  <select class="lang-select">
     <option value="de">🇩🇪 Deutsch</option>
     <option value="en">🇬🇧 English</option>
   </select>
@@ -57,34 +35,40 @@
 <main>
   <div class="card">
     <form class="form" id="login-form" action="/login" method="post">
-      <h2 data-lang="login">Einloggen</h2>
+      <h2>Einloggen</h2>
       <input type="text" name="username" placeholder="Benutzername oder E-Mail" required />
-      <input type="password" name="password" placeholder="Passwort" required />
-      <button type="submit" data-lang="login">Einloggen</button>
+      <div class="password-wrapper">
+        <input type="password" id="login-pass" name="password" placeholder="Passwort" required />
+        <span onclick="togglePassword('login-pass')">👁️</span>
+      </div>
+      <button type="submit">Einloggen</button>
     </form>
     <form class="form" id="register-form" style="display:none" action="/register" method="post">
-      <h2 data-lang="register">Registrieren</h2>
+      <h2>Registrieren</h2>
       <input type="text" name="username" placeholder="Benutzername" required />
       <input type="email" name="email" placeholder="E-Mail" required />
-      <input type="password" name="password" placeholder="Passwort" required />
-      <button type="submit" data-lang="register">Registrieren</button>
+      <div class="password-wrapper">
+        <input type="password" id="reg-pass" name="password" placeholder="Passwort" required />
+        <span onclick="togglePassword('reg-pass')">👁️</span>
+      </div>
+      <button type="submit">Registrieren</button>
     </form>
-    <div class="toggle" onclick="toggleForm('register')" id="toRegister" data-lang="switch_register">Noch kein Konto? Jetzt registrieren</div>
-    <div class="toggle" onclick="toggleForm('login')" id="toLogin" style="display:none" data-lang="switch_login">Schon registriert? Jetzt einloggen</div>
+    <div class="toggle" onclick="toggleForm('register')" id="toRegister">Noch kein Konto? Jetzt registrieren</div>
+    <div class="toggle" onclick="toggleForm('login')" id="toLogin" style="display:none">Schon registriert? Jetzt einloggen</div>
   </div>
 </main>
-<footer>Lohnsystem Version v0.5.02</footer>
+<footer>Lohnsystem Version v0.5.03</footer>
 <script>
-  document.getElementById("toRegister").onclick = function() {
-    toggleForm('register');
-    this.style.display = 'none';
-    document.getElementById("toLogin").style.display = 'block';
-  };
-  document.getElementById("toLogin").onclick = function() {
-    toggleForm('login');
-    this.style.display = 'none';
-    document.getElementById("toRegister").style.display = 'block';
-  };
+  function toggleForm(target) {
+    document.getElementById('login-form').style.display = (target === 'login') ? 'block' : 'none';
+    document.getElementById('register-form').style.display = (target === 'register') ? 'block' : 'none';
+    document.getElementById('toLogin').style.display = (target === 'register') ? 'block' : 'none';
+    document.getElementById('toRegister').style.display = (target === 'login') ? 'block' : 'none';
+  }
+  function togglePassword(id) {
+    const input = document.getElementById(id);
+    input.type = input.type === "password" ? "text" : "password";
+  }
 </script>
 </body>
 </html>
