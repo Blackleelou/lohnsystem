@@ -7,35 +7,33 @@ users = {}
 
 @app.route('/')
 def index():
-    if 'user' in session:
-        return render_template('dashboard.html', user=session['user'])
     return render_template('index.html')
 
-@app.route('/login', methods=['GET', 'POST'])
+@app.route('/login', methods=['POST'])
 def login():
-    if request.method == 'POST':
-        username = request.form['username_or_email']
-        password = request.form['password']
-        for u, v in users.items():
-            if (username == u or username == v['email']) and password == v['password']:
-                session['user'] = u
-                return redirect(url_for('index'))
-    return render_template('login.html')
+    username = request.form['username']
+    password = request.form['password']
+    for u, v in users.items():
+        if (username == u or username == v['email']) and password == v['password']:
+            session['user'] = u
+            return redirect(url_for('dashboard'))
+    return redirect(url_for('index'))
 
-@app.route('/register', methods=['GET', 'POST'])
+@app.route('/register', methods=['POST'])
 def register():
-    if request.method == 'POST':
-        username = request.form['username']
-        if username not in users:
-            users[username] = {
-                'email': request.form['email'],
-                'password': request.form['password'],
-                'language': request.form['language'],
-                'state': request.form['state'],
-                'insurance': request.form['insurance']
-            }
-            return redirect(url_for('login'))
-    return render_template('register.html')
+    username = request.form['username']
+    if username not in users:
+        users[username] = {
+            'email': request.form['email'],
+            'password': request.form['password']
+        }
+    return redirect(url_for('index'))
+
+@app.route('/dashboard')
+def dashboard():
+    if 'user' in session:
+        return render_template('dashboard.html', user=session['user'])
+    return redirect(url_for('index'))
 
 @app.route('/logout')
 def logout():
