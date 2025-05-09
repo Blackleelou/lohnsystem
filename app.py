@@ -14,10 +14,12 @@ def index():
 @app.route('/login', methods=['GET', 'POST'])
 def login():
     if request.method == 'POST':
-        username = request.form['username']
-        if username in users and request.form['password'] == users[username]['password']:
-            session['user'] = username
-            return redirect(url_for('index'))
+        username = request.form['username_or_email']
+        password = request.form['password']
+        for u, v in users.items():
+            if (username == u or username == v['email']) and password == v['password']:
+                session['user'] = u
+                return redirect(url_for('index'))
     return render_template('login.html')
 
 @app.route('/register', methods=['GET', 'POST'])
@@ -29,7 +31,8 @@ def register():
                 'email': request.form['email'],
                 'password': request.form['password'],
                 'language': request.form['language'],
-                'state': request.form['state']
+                'state': request.form['state'],
+                'insurance': request.form['insurance']
             }
             return redirect(url_for('login'))
     return render_template('register.html')

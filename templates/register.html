@@ -1,8 +1,4 @@
 
-<!DOCTYPE html>
-<html lang="de">
-<head><meta name="viewport" content="width=device-width, initial-scale=1"><title>Registrieren</title></head>
-<body>
 <h2>Registrieren</h2>
 <form method="POST">
   <input name="username" placeholder="Benutzername" required><br>
@@ -13,11 +9,16 @@
     <option value="en">English</option>
   </select><br>
   <select name="state" required>
-    <option value="SN">Sachsen</option>
-    <option value="TH">Thueringen</option>
-    <option value="BY">Bayern</option>
+    <option value="Sachsen">Sachsen</option>
+    <option value="Thüringen">Thüringen</option>
+    <option value="Bayern">Bayern</option>
+  </select><br>
+  <select name="insurance" required>
+    <option value="TK">TK</option>
+    <option value="AOK">AOK</option>
+    <option value="Barmer">Barmer</option>
+    <option value="DAK">DAK</option>
+    <option value="IKK classic">IKK classic</option>
   </select><br>
   <button type="submit">Konto erstellen</button>
 </form>
-</body>
-</html>

@@ -1,1 +1,1 @@
-Lohnsystem v0.9.1 Preview – jetzt mit Registrierung und Benutzerdaten (Sprache, Bundesland).
+Lohnsystem v0.5-beta – vollständiger Inhalt inkl. Registrierung, Login, Sprache, Bundesland, Krankenkasse, mobiltaugliches Design.
