@@ -1,1 +1,1 @@
-Lohnsystem v0.5-beta – vollständiger Inhalt inkl. Registrierung, Login, Sprache, Bundesland, Krankenkasse, mobiltaugliches Design.
+Lohnsystem v0.9.0 - Preview-Version mit responsivem Login und Session-Handling. Adminpanel, Schichtsystem, Zuschläge und Auswertung folgen.
