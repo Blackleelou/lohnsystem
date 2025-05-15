@@ -51,7 +51,7 @@ export default function LoginPage() {
             style={{ width: '100%', padding: 10, paddingRight: 40, borderRadius: 4, border: '1px solid #ccc' }}
           />
           <img
-            src="/eye-icon.png"
+            src={showPassword ? "/eye-open.png" : "/eye-closed.png"}
             alt="Toggle visibility"
             onClick={() => setShowPassword(!showPassword)}
             style={{
