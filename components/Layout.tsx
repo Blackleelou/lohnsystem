@@ -1,7 +1,7 @@
-import React, { useState } from 'react';
-import { useRouter } from 'next/router';
+import React, { useState, useEffect } from 'react';
 import i18next from 'i18next';
 import Image from 'next/image';
+import { useRouter } from 'next/router';
 
 const languages = [
   { code: 'de', flag: '/flags/de.png', name: 'Deutsch' },
@@ -10,13 +10,17 @@ const languages = [
 
 export default function Layout({ children }: { children: React.ReactNode }) {
   const [dropdownOpen, setDropdownOpen] = useState(false);
-  const router = useRouter();
   const [isLoggedIn, setIsLoggedIn] = useState(false);
+  const router = useRouter();
 
-  React.useEffect(() => {
+  useEffect(() => {
     const cookieSet = document.cookie.includes("userId=");
-    setIsLoggedIn(cookieSet);
-  }, []);
+    if (cookieSet && router.pathname !== '/login') {
+      setIsLoggedIn(true);
+    } else {
+      setIsLoggedIn(false);
+    }
+  }, [router.pathname]);
 
   return (
     <div style={{ display: 'flex', flexDirection: 'column', minHeight: '100vh', background: '#f3f3f3' }}>
@@ -32,61 +36,76 @@ export default function Layout({ children }: { children: React.ReactNode }) {
           >
             <div style={{ cursor: 'pointer', fontSize: '1.2rem' }}>🌐</div>
             {dropdownOpen && (
-              <div style={{ position: 'absolute', top: '100%', right: 0, background: '#fff', border: '1px solid #ccc', borderRadius: '6px', padding: '0.5rem', display: 'flex', gap: '0.5rem', boxShadow: '0 2px 6px rgba(0,0,0,0.1)', zIndex: 100 }}>
-                {languages.map((lang) => (
-                  <div key={lang.code} title={lang.name} onClick={() => i18next.changeLanguage(lang.code)} style={{ cursor: 'pointer' }}>
+              <div style={{
+                position: 'absolute',
+                top: '100%',
+                right: 0,
+                background: '#fff',
+                border: '1px solid #ccc',
+                borderRadius: '6px',
+                padding: '0.5rem',
+                display: 'flex',
+                gap: '0.5rem',
+                boxShadow: '0 2px 6px rgba(0,0,0,0.1)',
+                zIndex: 100
+              }}>
+                {languages.map(lang => (
+                  <div
+                    key={lang.code}
+                    onClick={() => i18next.changeLanguage(lang.code)}
+                    title={lang.name}
+                    style={{ cursor: 'pointer' }}
+                  >
                     <Image src={lang.flag} alt={lang.name} width={24} height={24} />
                   </div>
                 ))}
               </div>
             )}
           </div>
-          
-{isLoggedIn && router.pathname !== '/login' && (
-  <div
-    style={{ position: 'relative' }}
-    onMouseEnter={() => setDropdownOpen(true)}
-    onMouseLeave={() => setDropdownOpen(false)}
-  >
-    <div style={{
-      border: '2px solid black',
-      color: '#000',
-      borderRadius: '50%',
-      width: '30px',
-      height: '30px',
-      display: 'flex',
-      alignItems: 'center',
-      justifyContent: 'center',
-      fontWeight: 'bold',
-      cursor: 'pointer'
-    }}>
-      J
-    </div>
-    {dropdownOpen && (
-      <div style={{
-        position: 'absolute',
-        top: '40px',
-        right: 0,
-        background: '#fff',
-        border: '1px solid #ccc',
-        borderRadius: '6px',
-        padding: '0.5rem',
-        minWidth: '100px',
-        boxShadow: '0 2px 6px rgba(0,0,0,0.1)',
-        zIndex: 100,
-      }}>
-        <div style={{ cursor: 'pointer', padding: '0.3rem 0.5rem' }}
-             onClick={() => {
-               document.cookie = "userId=; Max-Age=0; Path=/; SameSite=Lax; Secure";
-               window.location.href = "/";
-             }}>Logout</div>
-      </div>
-    )}
-  </div>
-)}
-
-            <div style={{ border: '2px solid black', color: '#000', borderRadius: '50%', width: '30px', height: '30px', display: 'flex', alignItems: 'center', justifyContent: 'center', fontWeight: 'bold', cursor: 'pointer' }}>
-              J
+          {isLoggedIn && (
+            <div
+              style={{ position: 'relative' }}
+              onMouseEnter={() => setDropdownOpen(true)}
+              onMouseLeave={() => setDropdownOpen(false)}
+            >
+              <div style={{
+                border: '2px solid black',
+                color: '#000',
+                borderRadius: '50%',
+                width: '30px',
+                height: '30px',
+                display: 'flex',
+                alignItems: 'center',
+                justifyContent: 'center',
+                fontWeight: 'bold',
+                cursor: 'pointer'
+              }}>
+                J
+              </div>
+              {dropdownOpen && (
+                <div style={{
+                  position: 'absolute',
+                  top: '40px',
+                  right: 0,
+                  background: '#fff',
+                  border: '1px solid #ccc',
+                  borderRadius: '6px',
+                  padding: '0.5rem',
+                  minWidth: '100px',
+                  boxShadow: '0 2px 6px rgba(0,0,0,0.1)',
+                  zIndex: 100
+                }}>
+                  <div
+                    style={{ cursor: 'pointer', padding: '0.3rem 0.5rem' }}
+                    onClick={() => {
+                      document.cookie = "userId=; Max-Age=0; Path=/; SameSite=Lax; Secure";
+                      window.location.href = "/";
+                    }}
+                  >
+                    Logout
+                  </div>
+                </div>
+              )}
             </div>
           )}
         </div>
