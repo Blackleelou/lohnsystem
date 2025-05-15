@@ -1,21 +1,15 @@
 import { useState } from 'react';
 import { useTranslation } from 'react-i18next';
 import { signOut } from 'next-auth/react';
-import { useRouter } from 'next/router';
 
 export default function MobileMenu() {
   const [open, setOpen] = useState(false);
   const { i18n } = useTranslation();
-  const router = useRouter();
 
   const toggleMenu = () => setOpen(!open);
   const changeLanguage = (lng: string) => {
     i18n.changeLanguage(lng);
     setOpen(false);
-  };
-
-  const logout = () => {
-    signOut({ callbackUrl: '/' });
   };
 
   return (
@@ -28,11 +22,15 @@ export default function MobileMenu() {
           backgroundColor: '#fff',
           border: '1px solid #ccc',
           padding: 10,
-          zIndex: 10
+          zIndex: 10,
+          minWidth: 120
         }}>
-          <div style={{ marginBottom: 10, cursor: 'pointer' }} onClick={() => changeLanguage('de')}>🇩🇪 Deutsch</div>
-          <div style={{ marginBottom: 10, cursor: 'pointer' }} onClick={() => changeLanguage('en')}>🇬🇧 English</div>
-          <div style={{ cursor: 'pointer', color: 'red' }} onClick={logout}>Logout</div>
+          <div onClick={() => signOut({ callbackUrl: '/' })}
+               style={{ cursor: 'pointer', color: 'red', marginBottom: 10 }}>Logout</div>
+          <div style={{ display: 'flex', justifyContent: 'space-around' }}>
+            <span style={{ cursor: 'pointer' }} onClick={() => changeLanguage('de')}>🇩🇪</span>
+            <span style={{ cursor: 'pointer' }} onClick={() => changeLanguage('en')}>🇬🇧</span>
+          </div>
         </div>
       )}
     </div>
