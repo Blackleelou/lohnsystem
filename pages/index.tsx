@@ -1,4 +1,5 @@
-import React, { useState } from 'react';
+"use client";
+import React, { useEffect, useState } from 'react';
 import Layout from '@/components/Layout';
 import { useTranslation } from 'react-i18next';
 
@@ -6,6 +7,12 @@ export default function LoginPage() {
   const { t } = useTranslation();
   const [passVisible, setPassVisible] = useState(false);
   const [error, setError] = useState("");
+
+  useEffect(() => {
+    if (document.cookie.includes("userId=")) {
+      window.location.href = "/dashboard";
+    }
+  }, []);
 
   const handleLogin = async (e: React.FormEvent<HTMLFormElement>) => {
     e.preventDefault();
