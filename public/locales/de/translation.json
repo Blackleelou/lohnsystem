@@ -1,1 +1,7 @@
-
+{
+  "welcome": "Willkommen",
+  "logout": "Abmelden",
+  "settings": "Einstellungen",
+  "dashboard": "Übersicht",
+  "language": "Sprache"
+}
