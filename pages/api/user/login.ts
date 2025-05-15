@@ -6,8 +6,8 @@ export default async function handler(req: NextApiRequest, res: NextApiResponse)
 
   const { email, password } = req.body;
 
-  // Dummy-Login-Logik für Test
-  if (email === 'test@example.com' && password === 'pass123') {
+  // Lokale Test-Login-Daten
+  if (email === 'test@user.de' && password === '12345678') {
     res.setHeader('Set-Cookie', serialize('userId', 'testuser', {
       path: '/',
       httpOnly: true,
