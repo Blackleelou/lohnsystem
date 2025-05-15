@@ -1,9 +1,10 @@
-import { signIn } from 'next-auth/react';
 import { useState } from 'react';
+import { signIn } from 'next-auth/react';
 
 export default function LoginPage() {
   const [email, setEmail] = useState('');
   const [password, setPassword] = useState('');
+  const [showPassword, setShowPassword] = useState(false);
 
   const handleLogin = async (e: React.FormEvent) => {
     e.preventDefault();
@@ -31,7 +32,7 @@ export default function LoginPage() {
         width: '100%',
         maxWidth: 400
       }}>
-        <h2 style={{ marginBottom: 20, textAlign: 'center' }}>Login</h2>
+        <h2 style={{ textAlign: 'center', marginBottom: 20 }}>Login</h2>
         <input
           type="email"
           placeholder="E-Mail"
@@ -40,16 +41,33 @@ export default function LoginPage() {
           required
           style={{ width: '100%', padding: 10, marginBottom: 10, borderRadius: 4, border: '1px solid #ccc' }}
         />
-        <input
-          type="password"
-          placeholder="Passwort"
-          value={password}
-          onChange={(e) => setPassword(e.target.value)}
-          required
-          style={{ width: '100%', padding: 10, marginBottom: 20, borderRadius: 4, border: '1px solid #ccc' }}
-        />
+        <div style={{ position: 'relative' }}>
+          <input
+            type={showPassword ? 'text' : 'password'}
+            placeholder="Passwort"
+            value={password}
+            onChange={(e) => setPassword(e.target.value)}
+            required
+            style={{ width: '100%', padding: 10, paddingRight: 40, borderRadius: 4, border: '1px solid #ccc' }}
+          />
+          <img
+            src="/eye-icon.png"
+            alt="Toggle visibility"
+            onClick={() => setShowPassword(!showPassword)}
+            style={{
+              position: 'absolute',
+              top: '50%',
+              right: 10,
+              width: 24,
+              height: 24,
+              cursor: 'pointer',
+              transform: 'translateY(-50%)'
+            }}
+          />
+        </div>
         <button type="submit" style={{
           width: '100%',
+          marginTop: 20,
           padding: 10,
           backgroundColor: '#0070f3',
           color: 'white',
@@ -64,5 +82,4 @@ export default function LoginPage() {
   );
 }
 
-// Kein Layout auf Login-Seite
 LoginPage.getLayout = (page: React.ReactNode) => page;
