@@ -2,7 +2,9 @@ import React, { useState, useEffect, useRef } from 'react';
 import { signOut, useSession } from 'next-auth/react';
 
 const UserMenu: React.FC = () => {
-  const { data: session } = useSession();
+  if (typeof window === 'undefined') return null;
+  const sessionData = useSession();
+  const session = sessionData?.data;
   const [isOpen, setIsOpen] = useState(false);
   const menuRef = useRef<HTMLDivElement>(null);
 

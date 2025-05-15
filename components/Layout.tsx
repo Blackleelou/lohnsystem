@@ -1,49 +1,34 @@
-"use client";
-import { useEffect, useState } from "react";
-import { useTranslation } from "react-i18next";
-import i18next from "i18next";
-import UserMenu from "@/components/UserMenu";
+import React from 'react';
+import { useSession } from 'next-auth/react';
+import UserMenu from './UserMenu';
+import LanguageSwitcher from './LanguageSwitcher';
+import MobileMenu from './MobileMenu';
 
-const languages = [
-  { code: 'de', flag: '/flags/de.png', name: 'Deutsch' },
-  { code: 'en', flag: '/flags/gb.png', name: 'English' },
-];
-
-export default function Layout({ children }: { children: React.ReactNode }) {
-  const { t } = useTranslation();
-  const [isLoggedIn, setIsLoggedIn] = useState(false);
-
-  useEffect(() => {
-    const cookieSet = document.cookie.includes("userId=");
-    setIsLoggedIn(cookieSet);
-  }, []);
+const Layout = ({ children }: { children: React.ReactNode }) => {
+  const sessionData = useSession();
+  const session = sessionData?.data;
 
   return (
-    <div style={{ margin: 0, fontFamily: "Arial", background: "#f3f3f3", minHeight: "100vh", display: "flex", flexDirection: "column" }}>
-      <header style={{ display: "flex", justifyContent: "space-between", alignItems: "center", padding: "1rem 2rem", background: "#fff", borderBottom: "1px solid #ccc" }}>
-        <div style={{ fontWeight: "bold", fontSize: "1.3rem" }}>{t('app.title') || 'Brutto-Netto Lohn im Blick'}</div>
-        <div style={{ display: "flex", alignItems: "center" }}>
-          <UserMenu />
-          <div style={{ display: "flex", gap: "0.5rem", alignItems: "center" }}>
-            {languages.map(lang => (
-              <img
-                key={lang.code}
-                src={lang.flag}
-                alt={lang.name}
-                style={{ width: "24px", height: "24px", cursor: "pointer" }}
-                onClick={() => i18next.changeLanguage(lang.code)}
-                title={lang.name}
-              />
-            ))}
-          </div>
+    <div style={{ padding: 20 }}>
+      <header style={{
+        display: 'flex',
+        justifyContent: 'space-between',
+        alignItems: 'center',
+        marginBottom: 20
+      }}>
+        <div style={{ display: 'flex', gap: 10, alignItems: 'center' }}>
+          {session && <MobileMenu />}
         </div>
+        {session && (
+          <div style={{ display: 'flex', alignItems: 'center', gap: 10 }}>
+            <LanguageSwitcher />
+            <UserMenu />
+          </div>
+        )}
       </header>
-      <main style={{ flex: 1, padding: "2rem" }}>
-        {children}
-      </main>
-      <footer style={{ fontSize: "0.8rem", color: "#666", textAlign: "center", margin: "1rem 0" }}>
-        v0.6.0
-      </footer>
+      <main>{children}</main>
     </div>
   );
-}
+};
+
+export default Layout;

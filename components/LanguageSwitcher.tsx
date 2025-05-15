@@ -1,24 +1,15 @@
-import React, { useState, useEffect } from 'react';
+import React, { useState } from 'react';
 import { useTranslation } from 'react-i18next';
 
 const LanguageSwitcher: React.FC = () => {
   const { i18n } = useTranslation();
   const [isOpen, setIsOpen] = useState(false);
-  const [isMobile, setIsMobile] = useState(false);
-
   const currentLang = i18n.language || 'de';
 
   const changeLanguage = (lng: string) => {
     i18n.changeLanguage(lng);
     setIsOpen(false);
   };
-
-  useEffect(() => {
-    const checkMobile = () => setIsMobile(window.innerWidth <= 480);
-    checkMobile();
-    window.addEventListener('resize', checkMobile);
-    return () => window.removeEventListener('resize', checkMobile);
-  }, []);
 
   return (
     <div
@@ -36,7 +27,7 @@ const LanguageSwitcher: React.FC = () => {
         <div style={{
           position: 'absolute',
           top: '100%',
-          [isMobile ? 'right' : 'left']: 0,
+          left: 0,
           marginTop: 4,
           background: 'white',
           border: '1px solid #ccc',
