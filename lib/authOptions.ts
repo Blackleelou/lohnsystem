@@ -1,4 +1,4 @@
-import { AuthOptions } from "next-auth";
+import type { AuthOptions } from "next-auth";
 import CredentialsProvider from "next-auth/providers/credentials";
 import { prisma } from "@/lib/prisma";
 import { compare } from "bcryptjs";
@@ -17,9 +17,7 @@ export const authOptions: AuthOptions = {
         });
 
         if (!user || !credentials?.password) return null;
-
         const isValid = await compare(credentials.password, user.password);
-	console.log("AUTH DEBUG", { email: credentials?.email, user, pw: credentials?.password });
         if (!isValid) return null;
 
         return {
@@ -30,7 +28,10 @@ export const authOptions: AuthOptions = {
       },
     }),
   ],
-  session: { strategy: "jwt" },
+  session: {
+    strategy: "jwt",
+    maxAge: 30 * 24 * 60 * 60, // 30 Tage
+  },
   callbacks: {
     async jwt({ token, user }) {
       if (user) token.id = user.id;
