@@ -1,71 +1,77 @@
-"use client";
-import { useState, useEffect } from "react";
-import { useRouter } from "next/router";
+import React, { useState, useEffect, useRef } from 'react';
+import { signOut, useSession } from 'next-auth/react';
 
-export default function UserMenu() {
-  const [dropdownOpen, setDropdownOpen] = useState(false);
-  const [isLoggedIn, setIsLoggedIn] = useState(false);
-  const router = useRouter();
+const UserMenu: React.FC = () => {
+  const { data: session } = useSession();
+  const [isOpen, setIsOpen] = useState(false);
+  const menuRef = useRef<HTMLDivElement>(null);
 
-  useEffect(() => {
-    const cookieSet = document.cookie.includes("userId=");
-    setIsLoggedIn(cookieSet);
-  }, []);
+  const userInitial = session?.user?.name?.charAt(0)?.toUpperCase() || '?';
 
-  const handleLogout = () => {
-    document.cookie = "userId=; Max-Age=0; Path=/; SameSite=Lax; Secure";
-    router.push("/login");
+  const handleClickOutside = (event: MouseEvent) => {
+    if (menuRef.current && !menuRef.current.contains(event.target as Node)) {
+      setIsOpen(false);
+    }
   };
 
-  if (!isLoggedIn) return null;
+  useEffect(() => {
+    document.addEventListener('mousedown', handleClickOutside);
+    return () => {
+      document.removeEventListener('mousedown', handleClickOutside);
+    };
+  }, []);
 
   return (
-    <div
-      onMouseEnter={() => setDropdownOpen(true)}
-      onMouseLeave={() => setDropdownOpen(false)}
-      style={{ position: "relative", marginRight: "1rem" }}
-    >
+    <div ref={menuRef} style={{ position: 'relative' }}>
       <div
+        onClick={() => setIsOpen(!isOpen)}
         style={{
-          border: "2px solid black",
-          borderRadius: "50%",
-          width: "40px",
-          height: "40px",
-          display: "flex",
-          alignItems: "center",
-          justifyContent: "center",
-          fontWeight: "bold",
-          cursor: "pointer",
-          userSelect: "none",
+          width: 32,
+          height: 32,
+          borderRadius: '50%',
+          backgroundColor: '#444',
+          color: 'white',
+          display: 'flex',
+          alignItems: 'center',
+          justifyContent: 'center',
+          cursor: 'pointer',
+          fontWeight: 'bold',
         }}
       >
-        J
+        {userInitial}
       </div>
-      {dropdownOpen && (
-        <div
-          style={{
-            position: "absolute",
-            top: "45px",
-            right: 0,
-            background: "#fff",
-            border: "1px solid #ccc",
-            borderRadius: "8px",
-            boxShadow: "0 2px 8px rgba(0, 0, 0, 0.1)",
-            padding: "0.5rem",
-            minWidth: "180px",
-            zIndex: 10,
-          }}
-        >
-          <div style={{ padding: "0.5rem", cursor: "pointer" }}>Persönliche Daten</div>
-          <div style={{ padding: "0.5rem", cursor: "pointer" }}>Einstellungen</div>
-          <div
-            onClick={handleLogout}
-            style={{ padding: "0.5rem", cursor: "pointer", color: "red" }}
+      {isOpen && (
+        <div style={{
+          position: 'absolute',
+          top: '100%',
+          right: 0,
+          marginTop: 4,
+          backgroundColor: 'white',
+          border: '1px solid #ccc',
+          borderRadius: 4,
+          boxShadow: '0 2px 8px rgba(0,0,0,0.1)',
+          zIndex: 1000,
+          minWidth: 120,
+          padding: 8,
+        }}>
+          <button
+            onClick={() => signOut()}
+            style={{
+              width: '100%',
+              padding: '6px 8px',
+              border: 'none',
+              background: 'none',
+              textAlign: 'left',
+              cursor: 'pointer',
+              fontSize: 14,
+            }}
           >
             Logout
-          </div>
+          </button>
         </div>
       )}
     </div>
   );
-}
+};
+
+export default UserMenu;
