@@ -2,16 +2,16 @@ import { signIn } from 'next-auth/react';
 import { useState } from 'react';
 
 export default function LoginPage() {
-  const [username, setUsername] = useState('');
+  const [email, setEmail] = useState('');
   const [password, setPassword] = useState('');
 
   const handleLogin = async (e: React.FormEvent) => {
     e.preventDefault();
     await signIn('credentials', {
-      redirect: true,
-      username,
+      email,
       password,
-      callbackUrl: '/dashboard',
+      redirect: true,
+      callbackUrl: '/dashboard'
     });
   };
 
@@ -33,10 +33,10 @@ export default function LoginPage() {
       }}>
         <h2 style={{ marginBottom: 20, textAlign: 'center' }}>Login</h2>
         <input
-          type="text"
-          placeholder="Benutzername"
-          value={username}
-          onChange={(e) => setUsername(e.target.value)}
+          type="email"
+          placeholder="E-Mail"
+          value={email}
+          onChange={(e) => setEmail(e.target.value)}
           required
           style={{ width: '100%', padding: 10, marginBottom: 10, borderRadius: 4, border: '1px solid #ccc' }}
         />
@@ -64,5 +64,5 @@ export default function LoginPage() {
   );
 }
 
-// Seite ohne Layout laden
+// Kein Layout auf Login-Seite
 LoginPage.getLayout = (page: React.ReactNode) => page;
