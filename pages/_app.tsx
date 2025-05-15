@@ -5,11 +5,11 @@ import { SessionProvider } from 'next-auth/react';
 import '@/lib/i18n';
 
 export default function App({ Component, pageProps: { session, ...pageProps } }: AppProps) {
+  const getLayout = (Component as any).getLayout || ((page: React.ReactNode) => <Layout>{page}</Layout>);
+
   return (
     <SessionProvider session={session}>
-      <Layout>
-        <Component {...pageProps} />
-      </Layout>
+      {getLayout(<Component {...pageProps} />)}
     </SessionProvider>
   );
 }
