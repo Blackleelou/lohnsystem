@@ -4,25 +4,12 @@ import { useRouter } from "next/router";
 
 export default function UserMenu() {
   const [dropdownOpen, setDropdownOpen] = useState(false);
-  const [showMenu, setShowMenu] = useState(false);
-  const [debugInfo, setDebugInfo] = useState("");
+  const [isLoggedIn, setIsLoggedIn] = useState(false);
   const router = useRouter();
 
   useEffect(() => {
-    const checkLogin = async () => {
-      try {
-        const res = await fetch("/api/auth/status");
-        const data = await res.json();
-        setShowMenu(data.loggedIn);
-        setDebugInfo("API: " + JSON.stringify(data) + "\nCookie: " + document.cookie);
-        alert("DEBUG: " + JSON.stringify(data) + "\nCookie: " + document.cookie);
-      } catch (err) {
-        setDebugInfo("Fehler: " + err);
-        console.error("Login-Status prüfen fehlgeschlagen", err);
-        setShowMenu(false);
-      }
-    };
-    checkLogin();
+    const cookieSet = document.cookie.includes("userId=");
+    setIsLoggedIn(cookieSet);
   }, []);
 
   const handleLogout = () => {
@@ -30,7 +17,7 @@ export default function UserMenu() {
     router.push("/login");
   };
 
-  if (!showMenu) return null;
+  if (!isLoggedIn) return null;
 
   return (
     <div
@@ -49,8 +36,8 @@ export default function UserMenu() {
           justifyContent: "center",
           fontWeight: "bold",
           cursor: "pointer",
+          userSelect: "none",
         }}
-        onClick={() => setDropdownOpen(!dropdownOpen)}
       >
         J
       </div>
@@ -77,7 +64,6 @@ export default function UserMenu() {
           >
             Logout
           </div>
-          <div style={{ marginTop: "1rem", fontSize: "0.8rem", color: "#666" }}>{debugInfo}</div>
         </div>
       )}
     </div>
