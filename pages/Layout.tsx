@@ -14,9 +14,11 @@ export default function Layout({ children }: { children: React.ReactNode }) {
   const router = useRouter();
 
   useEffect(() => {
-    const userId = document.cookie.includes("userId=");
-    if (userId && router.pathname !== '/login') {
+    const cookieSet = document.cookie.includes("userId=");
+    if (cookieSet && router.pathname !== '/login') {
       setIsLoggedIn(true);
+    } else {
+      setIsLoggedIn(false);
     }
   }, [router.pathname]);
 
@@ -60,7 +62,7 @@ export default function Layout({ children }: { children: React.ReactNode }) {
               </div>
             )}
           </div>
-          {isLoggedIn && router.pathname !== '/login' && (
+          {isLoggedIn && (
             <div
               style={{ position: 'relative' }}
               onMouseEnter={() => setDropdownOpen(true)}
