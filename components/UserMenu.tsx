@@ -8,11 +8,17 @@ export default function UserMenu() {
   const router = useRouter();
 
   useEffect(() => {
-    if (typeof window !== "undefined") {
-      const cookies = document.cookie.split(";").map(c => c.trim());
-      const userCookie = cookies.find(c => c.startsWith("userId="));
-      setShowMenu(!!userCookie);
-    }
+    const checkLogin = async () => {
+      try {
+        const res = await fetch("/api/auth/status");
+        const data = await res.json();
+        setShowMenu(data.loggedIn);
+      } catch (err) {
+        console.error("Login-Status prüfen fehlgeschlagen", err);
+        setShowMenu(false);
+      }
+    };
+    checkLogin();
   }, []);
 
   const handleLogout = () => {
@@ -39,8 +45,8 @@ export default function UserMenu() {
           justifyContent: "center",
           fontWeight: "bold",
           cursor: "pointer",
-          userSelect: "none",
         }}
+        onClick={() => setDropdownOpen(!dropdownOpen)}
       >
         J
       </div>
