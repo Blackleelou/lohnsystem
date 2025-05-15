@@ -1,3 +1,4 @@
+
 "use client";
 import { useEffect, useState } from "react";
 import { useTranslation } from "react-i18next";
@@ -23,8 +24,8 @@ export default function Layout({ children }: { children: React.ReactNode }) {
       <header style={{ display: "flex", justifyContent: "space-between", alignItems: "center", padding: "1rem 2rem", background: "#fff", borderBottom: "1px solid #ccc" }}>
         <div style={{ fontWeight: "bold", fontSize: "1.3rem" }}>{t('app.title') || 'Brutto-Netto Lohn im Blick'}</div>
         <div style={{ display: "flex", alignItems: "center" }}>
-          {isLoggedIn && <UserMenu />}
-          <div style={{ display: "flex", gap: "0.5rem", alignItems: "center", marginLeft: "1rem" }}>
+          <UserMenu />
+          <div style={{ display: "flex", gap: "0.5rem", alignItems: "center" }}>
             {languages.map(lang => (
               <img
                 key={lang.code}
@@ -38,11 +39,9 @@ export default function Layout({ children }: { children: React.ReactNode }) {
           </div>
         </div>
       </header>
-
       <main style={{ flex: 1, padding: "2rem" }}>
         {children}
       </main>
-
       <footer style={{ fontSize: "0.8rem", color: "#666", textAlign: "center", margin: "1rem 0" }}>
         v0.6.0
       </footer>
