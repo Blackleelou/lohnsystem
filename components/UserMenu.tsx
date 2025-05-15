@@ -23,6 +23,7 @@ export default function UserMenu() {
     <div
       onMouseEnter={() => setDropdownOpen(true)}
       onMouseLeave={() => setDropdownOpen(false)}
+      onClick={() => setDropdownOpen(prev => !prev)}
       style={{ position: "relative", marginRight: "1rem" }}
     >
       <div

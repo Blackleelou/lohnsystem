@@ -23,8 +23,8 @@ export default function Layout({ children }: { children: React.ReactNode }) {
       <header style={{ display: "flex", justifyContent: "space-between", alignItems: "center", padding: "1rem 2rem", background: "#fff", borderBottom: "1px solid #ccc" }}>
         <div style={{ fontWeight: "bold", fontSize: "1.3rem" }}>{t('app.title') || 'Brutto-Netto Lohn im Blick'}</div>
         <div style={{ display: "flex", alignItems: "center" }}>
-          <UserMenu />
-          <div style={{ display: "flex", gap: "0.5rem", alignItems: "center" }}>
+          {isLoggedIn && <UserMenu />}
+          <div style={{ display: "flex", gap: "0.5rem", alignItems: "center", marginLeft: "1rem" }}>
             {languages.map(lang => (
               <img
                 key={lang.code}
