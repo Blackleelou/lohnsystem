@@ -4,7 +4,8 @@ import UserMenu from './UserMenu';
 import LanguageSwitcher from './LanguageSwitcher';
 
 const Layout = ({ children }: { children: React.ReactNode }) => {
-  const { data: session } = useSession();
+  const sessionData = useSession();
+  const session = sessionData?.data;
 
   return (
     <div style={{ padding: 20 }}>
