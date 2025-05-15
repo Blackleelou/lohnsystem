@@ -5,6 +5,7 @@ import { useRouter } from "next/router";
 export default function UserMenu() {
   const [dropdownOpen, setDropdownOpen] = useState(false);
   const [showMenu, setShowMenu] = useState(false);
+  const [debugInfo, setDebugInfo] = useState("");
   const router = useRouter();
 
   useEffect(() => {
@@ -13,7 +14,10 @@ export default function UserMenu() {
         const res = await fetch("/api/auth/status");
         const data = await res.json();
         setShowMenu(data.loggedIn);
+        setDebugInfo("API: " + JSON.stringify(data) + "\nCookie: " + document.cookie);
+        alert("DEBUG: " + JSON.stringify(data) + "\nCookie: " + document.cookie);
       } catch (err) {
+        setDebugInfo("Fehler: " + err);
         console.error("Login-Status prüfen fehlgeschlagen", err);
         setShowMenu(false);
       }
@@ -73,6 +77,7 @@ export default function UserMenu() {
           >
             Logout
           </div>
+          <div style={{ marginTop: "1rem", fontSize: "0.8rem", color: "#666" }}>{debugInfo}</div>
         </div>
       )}
     </div>
