@@ -9,16 +9,13 @@ function isRateLimited(ip: string) {
   const now = Date.now();
   const entry = rateLimitMap.get(ip) || { count: 0, timestamp: now };
 
-  // Reset counter nach 60 Sekunden
   if (now - entry.timestamp > 60000) {
     rateLimitMap.set(ip, { count: 1, timestamp: now });
     return false;
   }
 
-  // Zu viele Anfragen?
   if (entry.count >= 5) return true;
 
-  // Zähle hoch
   rateLimitMap.set(ip, { count: entry.count + 1, timestamp: entry.timestamp });
   return false;
 }
@@ -29,7 +26,6 @@ export default async function handler(req: NextApiRequest, res: NextApiResponse)
   }
 
   const ip = req.headers['x-forwarded-for'] || req.socket.remoteAddress || 'unknown';
-
   if (isRateLimited(ip.toString())) {
     return res.status(429).json({ message: 'Zu viele Registrierungsversuche. Bitte warte einen Moment.' });
   }
@@ -60,7 +56,9 @@ export default async function handler(req: NextApiRequest, res: NextApiResponse)
 
     return res.status(201).json({ message: 'Benutzer erfolgreich registriert.', user: { id: user.id, email: user.email } });
   } catch (error) {
-    console.error('Fehler bei Registrierung:', error);
-    return res.status(500).json({ message: 'Serverfehler bei der Registrierung.' });
+    return res.status(500).json({
+      message: 'Serverfehler bei der Registrierung.',
+      detail: error instanceof Error ? error.message : String(error),
+    });
   }
 }
