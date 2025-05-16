@@ -5,10 +5,11 @@ export default function RegisterPage() {
   const [email, setEmail] = useState('');
   const [password, setPassword] = useState('');
   const [confirmPassword, setConfirmPassword] = useState('');
+  const [showPassword, setShowPassword] = useState(false);
+  const [showConfirmPassword, setShowConfirmPassword] = useState(false);
 
   const handleRegister = async (e: React.FormEvent) => {
     e.preventDefault();
-    // Registrierungslösung folgt später
     alert("Registrierung wurde abgesendet!");
   };
 
@@ -40,22 +41,54 @@ export default function RegisterPage() {
           required
           style={{ marginBottom: 10, width: '100%', padding: 10 }}
         />
-        <input
-          type="password"
-          placeholder="Passwort"
-          value={password}
-          onChange={(e) => setPassword(e.target.value)}
-          required
-          style={{ marginBottom: 10, width: '100%', padding: 10 }}
-        />
-        <input
-          type="password"
-          placeholder="Passwort wiederholen"
-          value={confirmPassword}
-          onChange={(e) => setConfirmPassword(e.target.value)}
-          required
-          style={{ marginBottom: 10, width: '100%', padding: 10 }}
-        />
+        <div style={{ position: 'relative', marginBottom: 10 }}>
+          <input
+            type={showPassword ? "text" : "password"}
+            placeholder="Passwort"
+            value={password}
+            onChange={(e) => setPassword(e.target.value)}
+            required
+            style={{ width: '100%', padding: 10, paddingRight: 40 }}
+          />
+          <span
+            onClick={() => setShowPassword(!showPassword)}
+            style={{
+              position: 'absolute',
+              right: 10,
+              top: '50%',
+              transform: 'translateY(-50%)',
+              cursor: 'pointer',
+              color: '#0070f3',
+              fontSize: 14
+            }}
+          >
+            {showPassword ? 'Verbergen' : 'Anzeigen'}
+          </span>
+        </div>
+        <div style={{ position: 'relative', marginBottom: 10 }}>
+          <input
+            type={showConfirmPassword ? "text" : "password"}
+            placeholder="Passwort wiederholen"
+            value={confirmPassword}
+            onChange={(e) => setConfirmPassword(e.target.value)}
+            required
+            style={{ width: '100%', padding: 10, paddingRight: 40 }}
+          />
+          <span
+            onClick={() => setShowConfirmPassword(!showConfirmPassword)}
+            style={{
+              position: 'absolute',
+              right: 10,
+              top: '50%',
+              transform: 'translateY(-50%)',
+              cursor: 'pointer',
+              color: '#0070f3',
+              fontSize: 14
+            }}
+          >
+            {showConfirmPassword ? 'Verbergen' : 'Anzeigen'}
+          </span>
+        </div>
         <button type="submit" style={{ width: '100%', padding: 10 }}>Registrieren</button>
         <p style={{ textAlign: 'center', marginTop: 20 }}>
           Schon ein Konto? <a href="/login" style={{ color: '#0070f3', textDecoration: 'none' }}>Zur Anmeldung</a>
