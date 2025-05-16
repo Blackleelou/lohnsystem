@@ -1,33 +1,53 @@
-import { useState } from 'react';
-import { useTranslation } from 'react-i18next';
+import React, { useState } from 'react';
+import { useRouter } from 'next/router';
 import { signOut } from 'next-auth/react';
 
-export default function MobileMenu() {
-  const [open, setOpen] = useState(false);
-  const { i18n } = useTranslation();
+const MobileMenu = () => {
+  const [menuOpen, setMenuOpen] = useState(false);
+  const router = useRouter();
 
-  const toggleMenu = () => setOpen(!open);
-  const changeLanguage = (lng: string) => {
-    i18n.changeLanguage(lng);
-    setOpen(false);
+  const toggleMenu = () => setMenuOpen(prev => !prev);
+  const changeLanguage = (lang: string) => {
+    router.push(router.pathname, router.asPath, { locale: lang });
+    setMenuOpen(false);
   };
 
   return (
     <div style={{ position: 'relative' }}>
-      <button onClick={toggleMenu} style={{ fontSize: 24 }}>≡</button>
-      {open && (
+      <button
+        onClick={toggleMenu}
+        style={{
+          backgroundColor: '#f0f0f0',
+          borderRadius: '50%',
+          border: 'none',
+          padding: '10px',
+          cursor: 'pointer'
+        }}
+        aria-label="Menü öffnen"
+      >
+        <span style={{ fontSize: '24px' }}>≡</span>
+      </button>
+      {menuOpen && (
         <div style={{
           position: 'absolute',
+          top: '100%',
           right: 0,
-          backgroundColor: '#fff',
+          backgroundColor: 'white',
           border: '1px solid #ccc',
-          padding: 10,
-          zIndex: 10,
-          minWidth: 120
+          borderRadius: '4px',
+          padding: '10px',
+          marginTop: '8px',
+          zIndex: 1000,
+          minWidth: '150px',
+          boxShadow: '0 2px 6px rgba(0,0,0,0.1)'
         }}>
-          <div onClick={() => signOut({ callbackUrl: '/' })}
-               style={{ cursor: 'pointer', color: 'red', marginBottom: 10 }}>Logout</div>
-          <div style={{ display: 'flex', justifyContent: 'space-around' }}>
+          <div
+            onClick={() => signOut()}
+            style={{ color: 'red', cursor: 'pointer', marginBottom: '10px' }}
+          >
+            Logout
+          </div>
+          <div style={{ display: 'flex', gap: '10px', justifyContent: 'center' }}>
             <span style={{ cursor: 'pointer' }} onClick={() => changeLanguage('de')}>🇩🇪</span>
             <span style={{ cursor: 'pointer' }} onClick={() => changeLanguage('en')}>🇬🇧</span>
           </div>
@@ -35,4 +55,6 @@ export default function MobileMenu() {
       )}
     </div>
   );
-}
+};
+
+export default MobileMenu;
