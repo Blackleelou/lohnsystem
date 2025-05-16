@@ -13,7 +13,7 @@ export default function LoginPage() {
   const handleLogin = async (e: React.FormEvent) => {
     e.preventDefault();
     setError('');
-    if (!/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email)) {
+    if (!/^[a-zA-Z0-9._%+-]+@[a-zA-Z0-9.-]+\.[a-zA-Z]{2,}$/.test(email)) {
       setError('Bitte eine gültige E-Mail-Adresse eingeben.');
       return;
     }
@@ -30,88 +30,18 @@ export default function LoginPage() {
   };
 
   return (
-    <div style={{
-      display: 'flex',
-      justifyContent: 'center',
-      alignItems: 'center',
-      height: '100vh',
-      background: '#f4f4f4',
-      margin: 0,
-      padding: 0,
-    }}>
-      <form onSubmit={handleLogin} style={{
-        background: 'white',
-        padding: 30,
-        borderRadius: 8,
-        boxShadow: '0 2px 8px rgba(0,0,0,0.1)',
-        width: '100%',
-        maxWidth: 400,
-        boxSizing: 'border-box'
-      }}>
+    <div style={{ display: 'flex', justifyContent: 'center', alignItems: 'center', height: '100vh', background: '#f4f4f4' }}>
+      <form onSubmit={handleLogin} style={{ background: 'white', padding: 30, borderRadius: 8, boxShadow: '0 2px 8px rgba(0,0,0,0.1)', width: '100%', maxWidth: 400 }}>
         <h2 style={{ textAlign: 'center', marginBottom: 20 }}>Anmelden</h2>
-
         <div style={{ position: 'relative', marginBottom: 10 }}>
-          <input
-            type="email"
-            placeholder="E-Mail"
-            value={email}
-            onChange={(e) => setEmail(e.target.value)}
-            required
-            style={{
-              width: '100%',
-              padding: 10,
-              paddingRight: 40,
-              borderRadius: 4,
-              border: '1px solid #ccc',
-              boxSizing: 'border-box'
-            }}
-          />
+          <input type="email" placeholder="E-Mail" value={email} onChange={(e) => setEmail(e.target.value)} required style={{ width: '100%', padding: 10, paddingRight: 40, boxSizing: 'border-box' }} />
         </div>
-
         <div style={{ position: 'relative', marginBottom: 10 }}>
-          <input
-            type={showPassword ? "text" : "password"}
-            placeholder="Passwort"
-            value={password}
-            onChange={(e) => setPassword(e.target.value)}
-            required
-            style={{
-              width: '100%',
-              padding: 10,
-              paddingRight: 40,
-              borderRadius: 4,
-              border: '1px solid #ccc',
-              boxSizing: 'border-box'
-            }}
-          />
-          <img
-            src={showPassword ? "/eye-open.png" : "/eye-closed.png"}
-            alt="Toggle visibility"
-            onClick={() => setShowPassword(!showPassword)}
-            style={{
-              position: 'absolute',
-              top: '50%',
-              right: 10,
-              width: 24,
-              height: 24,
-              cursor: 'pointer',
-              transform: 'translateY(-50%)'
-            }}
-          />
+          <input type={showPassword ? 'text' : 'password'} placeholder="Passwort" value={password} onChange={(e) => setPassword(e.target.value)} required style={{ width: '100%', padding: 10, paddingRight: 40, boxSizing: 'border-box' }} />
+          <img src={showPassword ? "/eye-open.png" : "/eye-closed.png"} alt="Toggle visibility" onClick={() => setShowPassword(!showPassword)} style={{ position: 'absolute', top: '50%', right: 10, width: 24, height: 24, cursor: 'pointer', transform: 'translateY(-50%)' }} />
         </div>
-
-        <button type="submit" style={{
-          width: '100%',
-          padding: 10,
-          backgroundColor: '#0070f3',
-          color: 'white',
-          border: 'none',
-          borderRadius: 4,
-          cursor: 'pointer'
-        }}>Login</button>
-
-        {error && <p style={{ color: 'red', marginTop: 10 }}>{error}</p>}
-
+        {error && <p style={{ color: 'red' }}>{error}</p>}
+        <button type="submit" style={{ width: '100%', padding: 10 }}>Login</button>
         <p style={{ textAlign: 'center', marginTop: 20 }}>
           Noch kein Konto? <a href="/register" style={{ color: '#0070f3', textDecoration: 'none' }}>Jetzt registrieren</a>
         </p>
