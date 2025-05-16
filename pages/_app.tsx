@@ -1,15 +1,14 @@
-import '@/styles/globals.css';
-import type { AppProps } from 'next/app';
-import Layout from '@/components/Layout';
-import { SessionProvider } from 'next-auth/react';
-import '@/lib/i18n';
+import { AppProps } from "next/app";
+import { SessionProvider } from "next-auth/react";
+import { ErrorBoundary } from "@/components/ErrorBoundary";
+import "@/styles/globals.css";
 
 export default function App({ Component, pageProps: { session, ...pageProps } }: AppProps) {
-  const getLayout = (Component as any).getLayout || ((page: React.ReactNode) => <Layout>{page}</Layout>);
-
   return (
     <SessionProvider session={session}>
-      {getLayout(<Component {...pageProps} />)}
+      <ErrorBoundary>
+        <Component {...pageProps} />
+      </ErrorBoundary>
     </SessionProvider>
   );
 }
