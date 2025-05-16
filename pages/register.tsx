@@ -33,14 +33,25 @@ export default function RegisterPage() {
         boxSizing: 'border-box'
       }}>
         <h2 style={{ textAlign: 'center', marginBottom: 20 }}>Registrieren</h2>
-        <input
-          type="email"
-          placeholder="E-Mail"
-          value={email}
-          onChange={(e) => setEmail(e.target.value)}
-          required
-          style={{ marginBottom: 10, width: '100%', padding: 10 }}
-        />
+
+        <div style={{ position: 'relative', marginBottom: 10 }}>
+          <input
+            type="email"
+            placeholder="E-Mail"
+            value={email}
+            onChange={(e) => setEmail(e.target.value)}
+            required
+            style={{
+              width: '100%',
+              padding: 10,
+              paddingRight: 40,
+              borderRadius: 4,
+              border: '1px solid #ccc',
+              boxSizing: 'border-box'
+            }}
+          />
+        </div>
+
         <div style={{ position: 'relative', marginBottom: 10 }}>
           <input
             type={showPassword ? "text" : "password"}
@@ -48,7 +59,14 @@ export default function RegisterPage() {
             value={password}
             onChange={(e) => setPassword(e.target.value)}
             required
-            style={{ width: '100%', padding: 10 }}
+            style={{
+              width: '100%',
+              padding: 10,
+              paddingRight: 40,
+              borderRadius: 4,
+              border: '1px solid #ccc',
+              boxSizing: 'border-box'
+            }}
           />
           <img
             src={showPassword ? "/eye-open.png" : "/eye-closed.png"}
@@ -65,6 +83,7 @@ export default function RegisterPage() {
             }}
           />
         </div>
+
         <div style={{ position: 'relative', marginBottom: 10 }}>
           <input
             type={showConfirmPassword ? "text" : "password"}
@@ -72,7 +91,14 @@ export default function RegisterPage() {
             value={confirmPassword}
             onChange={(e) => setConfirmPassword(e.target.value)}
             required
-            style={{ width: '100%', padding: 10 }}
+            style={{
+              width: '100%',
+              padding: 10,
+              paddingRight: 40,
+              borderRadius: 4,
+              border: '1px solid #ccc',
+              boxSizing: 'border-box'
+            }}
           />
           <img
             src={showConfirmPassword ? "/eye-open.png" : "/eye-closed.png"}
@@ -89,7 +115,17 @@ export default function RegisterPage() {
             }}
           />
         </div>
-        <button type="submit" style={{ width: '100%', padding: 10 }}>Registrieren</button>
+
+        <button type="submit" style={{
+          width: '100%',
+          padding: 10,
+          backgroundColor: '#0070f3',
+          color: 'white',
+          border: 'none',
+          borderRadius: 4,
+          cursor: 'pointer'
+        }}>Registrieren</button>
+
         <p style={{ textAlign: 'center', marginTop: 20 }}>
           Schon ein Konto? <a href="/login" style={{ color: '#0070f3', textDecoration: 'none' }}>Zur Anmeldung</a>
         </p>
