@@ -39,60 +39,94 @@ export default function RegisterPage() {
           value={email}
           onChange={(e) => setEmail(e.target.value)}
           required
-          style={{ marginBottom: 10, width: '100%', padding: 10 }}
+          style={{ width: '100%', padding: 10, marginBottom: 10, borderRadius: 4, border: '1px solid #ccc', boxSizing: 'border-box' }}
         />
-        <div style={{ position: 'relative', marginBottom: 10 }}>
+        <div style={{ position: 'relative', width: '100%', marginBottom: 10 }}>
           <input
-            type={showPassword ? "text" : "password"}
+            type={showPassword ? 'text' : 'password'}
             placeholder="Passwort"
             value={password}
             onChange={(e) => setPassword(e.target.value)}
             required
-            style={{ width: '100%', padding: 10, paddingRight: 40 }}
+            style={{
+              width: '100%',
+              padding: '10px 40px 10px 10px',
+              borderRadius: 4,
+              border: '1px solid #ccc',
+              boxSizing: 'border-box'
+            }}
           />
-          <span
+          <img
+            src={showPassword ? "/eye-open.png" : "/eye-closed.png"}
+            alt="Toggle visibility"
             onClick={() => setShowPassword(!showPassword)}
             style={{
               position: 'absolute',
-              right: 10,
               top: '50%',
-              transform: 'translateY(-50%)',
+              right: 10,
+              width: 24,
+              height: 24,
               cursor: 'pointer',
-              color: '#0070f3',
-              fontSize: 14
+              transform: 'translateY(-50%)'
             }}
-          >
-            {showPassword ? 'Verbergen' : 'Anzeigen'}
-          </span>
+          />
         </div>
-        <div style={{ position: 'relative', marginBottom: 10 }}>
+        <div style={{ position: 'relative', width: '100%', marginBottom: 10 }}>
           <input
-            type={showConfirmPassword ? "text" : "password"}
+            type={showConfirmPassword ? 'text' : 'password'}
             placeholder="Passwort wiederholen"
             value={confirmPassword}
             onChange={(e) => setConfirmPassword(e.target.value)}
             required
-            style={{ width: '100%', padding: 10, paddingRight: 40 }}
+            style={{
+              width: '100%',
+              padding: '10px 40px 10px 10px',
+              borderRadius: 4,
+              border: '1px solid #ccc',
+              boxSizing: 'border-box'
+            }}
           />
-          <span
+          <img
+            src={showConfirmPassword ? "/eye-open.png" : "/eye-closed.png"}
+            alt="Toggle visibility"
             onClick={() => setShowConfirmPassword(!showConfirmPassword)}
             style={{
               position: 'absolute',
-              right: 10,
               top: '50%',
-              transform: 'translateY(-50%)',
+              right: 10,
+              width: 24,
+              height: 24,
               cursor: 'pointer',
-              color: '#0070f3',
-              fontSize: 14
+              transform: 'translateY(-50%)'
             }}
-          >
-            {showConfirmPassword ? 'Verbergen' : 'Anzeigen'}
-          </span>
+          />
         </div>
-        <button type="submit" style={{ width: '100%', padding: 10 }}>Registrieren</button>
-        <p style={{ textAlign: 'center', marginTop: 20 }}>
-          Schon ein Konto? <a href="/login" style={{ color: '#0070f3', textDecoration: 'none' }}>Zur Anmeldung</a>
-        </p>
+        <div style={{ display: 'flex', gap: 10, marginTop: 20 }}>
+          <button type="submit" style={{
+            flex: 1,
+            padding: 10,
+            backgroundColor: '#0070f3',
+            color: 'white',
+            border: 'none',
+            borderRadius: 4,
+            cursor: 'pointer',
+            boxSizing: 'border-box'
+          }}>
+            Registrieren
+          </button>
+          <button type="button" onClick={() => window.location.href = '/login'} style={{
+            flex: 1,
+            padding: 10,
+            backgroundColor: '#e0e0e0',
+            color: '#000',
+            border: 'none',
+            borderRadius: 4,
+            cursor: 'pointer',
+            boxSizing: 'border-box'
+          }}>
+            Zur Anmeldung
+          </button>
+        </div>
       </form>
     </div>
   );
