@@ -25,7 +25,6 @@ export default function RegisterPage() {
     }}>
       <form onSubmit={handleRegister} style={{
         background: 'white',
-        padding: 30,
         borderRadius: 8,
         boxShadow: '0 2px 8px rgba(0,0,0,0.1)',
         width: '100%',
@@ -50,8 +49,6 @@ export default function RegisterPage() {
             required
             style={{
               width: '100%',
-              padding: '10px 40px 10px 10px',
-              borderRadius: 4,
               border: '1px solid #ccc',
               boxSizing: 'border-box'
             }}
@@ -80,9 +77,6 @@ export default function RegisterPage() {
             required
             style={{
               width: '100%',
-              padding: '10px 40px 10px 10px',
-              borderRadius: 4,
-              border: '1px solid #ccc',
               boxSizing: 'border-box'
             }}
           />
@@ -104,11 +98,8 @@ export default function RegisterPage() {
         <div style={{ display: 'flex', gap: 10, marginTop: 20 }}>
           <button type="submit" style={{
             flex: 1,
-            padding: 10, borderRadius: 4,
             backgroundColor: '#0070f3', borderRadius: 4,
             color: 'white',
-            border: 'none',
-            borderRadius: 4,
             cursor: 'pointer',
             boxSizing: 'border-box'
           }}>
@@ -116,11 +107,6 @@ export default function RegisterPage() {
           </button>
           <button type="button" onClick={() => window.location.href = '/login'} style={{
             flex: 1,
-            padding: 10, borderRadius: 4,
-            backgroundColor: '#e0e0e0', borderRadius: 4,
-            color: '#000',
-            border: 'none',
-            borderRadius: 4,
             cursor: 'pointer',
             boxSizing: 'border-box'
           }}>
