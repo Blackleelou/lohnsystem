@@ -6,23 +6,25 @@ export default function LoginPage() {
   const [email, setEmail] = useState('');
   const [password, setPassword] = useState('');
   const [showPassword, setShowPassword] = useState(false);
-  const [error, setError] = useState('');
+
+  const isValidEmail = (email: string) => {
+    return /^[^\s@]+@[^\s@]+\.[^\s@]{2,}$/.test(email);
+  };
 
   const handleLogin = async (e: React.FormEvent) => {
     e.preventDefault();
-    setError('');
 
-    const res = await signIn('credentials', {
+    if (!isValidEmail(email)) {
+      alert("Bitte gib eine gültige E-Mail-Adresse ein.");
+      return;
+    }
+
+    await signIn('credentials', {
       email,
       password,
-      redirect: false
+      redirect: true,
+      callbackUrl: '/dashboard'
     });
-
-    if (res?.error) {
-      setError('Benutzername oder Passwort ist ungültig.');
-    } else if (res?.ok) {
-      window.location.href = '/dashboard';
-    }
   };
 
   return (
@@ -83,7 +85,6 @@ export default function LoginPage() {
             }}
           />
         </div>
-        {error && <div style={{ color: 'red', marginTop: 10 }}>{error}</div>}
         <button type="submit" style={{
           width: '100%',
           marginTop: 20,
