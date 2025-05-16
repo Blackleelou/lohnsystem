@@ -121,7 +121,23 @@ export default function RegisterPage() {
           border: 'none',
           cursor: 'pointer'
         }}>Registrieren</button>
+      
+        <div style={{ display: 'flex', gap: 10, marginTop: 20 }}>
+          <button type="button" onClick={() => window.location.href = '/login'} style={{
+            flex: 1,
+            padding: 10,
+            backgroundColor: '#e0e0e0',
+            color: '#000',
+            border: 'none',
+            borderRadius: 4,
+            cursor: 'pointer',
+            boxSizing: 'border-box'
+          }}>
+            Zur Anmeldung
+          </button>
+        </div>
       </form>
+    
     </div>
   );
 }
