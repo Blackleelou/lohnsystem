@@ -1,35 +1,30 @@
 import { useState } from 'react';
 import { signIn } from 'next-auth/react';
+import { useRouter } from 'next/router';
 
 export default function LoginPage() {
   const [email, setEmail] = useState('');
   const [password, setPassword] = useState('');
   const [showPassword, setShowPassword] = useState(false);
   const [error, setError] = useState('');
-
-  const validateEmail = (email: string) => {
-    const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
-    return emailRegex.test(email);
-  };
+  const router = useRouter();
 
   const handleLogin = async (e: React.FormEvent) => {
     e.preventDefault();
-
-    if (!validateEmail(email)) {
-      setError('Bitte gib eine gültige E-Mail-Adresse ein.');
+    setError('');
+    if (!/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email)) {
+      setError('Bitte eine gültige E-Mail-Adresse eingeben.');
       return;
     }
-
     const res = await signIn('credentials', {
       email,
       password,
       redirect: false,
     });
-
-    if (res?.error) {
-      setError('Benutzername oder Passwort ist ungültig.');
+    if (res?.ok) {
+      router.push('/dashboard');
     } else {
-      window.location.href = '/dashboard';
+      setError('Benutzername oder Passwort ist ungültig.');
     }
   };
 
@@ -53,13 +48,6 @@ export default function LoginPage() {
         boxSizing: 'border-box'
       }}>
         <h2 style={{ textAlign: 'center', marginBottom: 20 }}>Login</h2>
-
-        {error && (
-          <div style={{ color: 'red', marginBottom: 10, textAlign: 'center' }}>
-            {error}
-          </div>
-        )}
-
         <input
           type="email"
           placeholder="E-Mail"
@@ -68,7 +56,6 @@ export default function LoginPage() {
           required
           style={{ width: '100%', padding: 10, marginBottom: 10, borderRadius: 4, border: '1px solid #ccc', boxSizing: 'border-box' }}
         />
-
         <div style={{ position: 'relative', width: '100%' }}>
           <input
             type={showPassword ? 'text' : 'password'}
@@ -99,20 +86,33 @@ export default function LoginPage() {
             }}
           />
         </div>
-
-        <button type="submit" style={{
-          width: '100%',
-          marginTop: 20,
-          padding: 10,
-          backgroundColor: '#0070f3',
-          color: 'white',
-          border: 'none',
-          borderRadius: 4,
-          cursor: 'pointer',
-          boxSizing: 'border-box'
-        }}>
-          Anmelden
-        </button>
+        {error && <p style={{ color: 'red', marginTop: 10 }}>{error}</p>}
+        <div style={{ display: 'flex', gap: 10, marginTop: 20 }}>
+          <button type="submit" style={{
+            flex: 1,
+            padding: 10,
+            backgroundColor: '#0070f3',
+            color: 'white',
+            border: 'none',
+            borderRadius: 4,
+            cursor: 'pointer',
+            boxSizing: 'border-box'
+          }}>
+            Anmelden
+          </button>
+          <button type="button" onClick={() => router.push('/register')} style={{
+            flex: 1,
+            padding: 10,
+            backgroundColor: '#e0e0e0',
+            color: '#000',
+            border: 'none',
+            borderRadius: 4,
+            cursor: 'pointer',
+            boxSizing: 'border-box'
+          }}>
+            Registrieren
+          </button>
+        </div>
       </form>
     </div>
   );
