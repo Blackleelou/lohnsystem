@@ -1,14 +1,10 @@
-import { Component, ReactNode } from 'react';
+import React from "react";
 
-interface Props {
-  children: ReactNode;
-}
+type Props = { children: React.ReactNode };
 
-interface State {
-  hasError: boolean;
-}
+type State = { hasError: boolean };
 
-class ErrorBoundary extends Component<Props, State> {
+export class ErrorBoundary extends React.Component<Props, State> {
   constructor(props: Props) {
     super(props);
     this.state = { hasError: false };
@@ -18,56 +14,16 @@ class ErrorBoundary extends Component<Props, State> {
     return { hasError: true };
   }
 
-  handleReload = () => {
-    window.location.reload();
-  };
+  componentDidCatch(error: Error, info: React.ErrorInfo) {
+    console.error("ErrorBoundary caught an error", error, info);
+  }
 
   render() {
     if (this.state.hasError) {
       return (
-        <div style={{
-          position: 'fixed',
-          top: 0,
-          left: 0,
-          width: '100vw',
-          height: '100vh',
-          backgroundColor: 'rgba(0, 0, 0, 0.7)',
-          color: 'white',
-          display: 'flex',
-          flexDirection: 'column',
-          justifyContent: 'center',
-          alignItems: 'center',
-          zIndex: 9999
-        }}>
-          <h1>Ups! Da ist etwas schiefgelaufen.</h1>
-          <p style={{ margin: '20px 0' }}>Bitte lade die Seite neu oder kontaktiere den Support.</p>
-          <div style={{ display: 'flex', gap: '10px' }}>
-            <button
-              onClick={this.handleReload}
-              style={{
-                padding: '10px 20px',
-                backgroundColor: '#0070f3',
-                color: 'white',
-                border: 'none',
-                borderRadius: '4px',
-                cursor: 'pointer'
-              }}
-            >
-              Seite neu laden
-            </button>
-            <a
-              href="mailto:support@lohnsystem.de"
-              style={{
-                padding: '10px 20px',
-                backgroundColor: '#ccc',
-                color: '#333',
-                textDecoration: 'none',
-                borderRadius: '4px'
-              }}
-            >
-              Support kontaktieren
-            </a>
-          </div>
+        <div style={{ padding: "2rem", textAlign: "center" }}>
+          <h1>Uups, da ist etwas schiefgelaufen</h1>
+          <p>Bitte versuch es später nochmal oder kontaktiere den Support.</p>
         </div>
       );
     }
@@ -75,5 +31,3 @@ class ErrorBoundary extends Component<Props, State> {
     return this.props.children;
   }
 }
-
-export default ErrorBoundary;

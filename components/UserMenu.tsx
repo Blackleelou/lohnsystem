@@ -1,79 +1,40 @@
-import React, { useState, useEffect, useRef } from 'react';
-import { signOut, useSession } from 'next-auth/react';
+import { useState } from "react";
+import { signOut } from "next-auth/react";
+import LanguageSwitcher from "./LanguageSwitcher";
 
-const UserMenu: React.FC = () => {
-  if (typeof window === 'undefined') return null;
-  const sessionData = useSession();
-  const session = sessionData?.data;
+export default function UserMenu() {
   const [isOpen, setIsOpen] = useState(false);
-  const menuRef = useRef<HTMLDivElement>(null);
-
-  const userInitial = session?.user?.name?.charAt(0)?.toUpperCase() || '?';
-
-  const handleClickOutside = (event: MouseEvent) => {
-    if (menuRef.current && !menuRef.current.contains(event.target as Node)) {
-      setIsOpen(false);
-    }
-  };
-
-  useEffect(() => {
-    document.addEventListener('mousedown', handleClickOutside);
-    return () => {
-      document.removeEventListener('mousedown', handleClickOutside);
-    };
-  }, []);
 
   return (
-    <div ref={menuRef} style={{ position: 'relative' }}>
-      <div
+    <div style={{ position: "relative" }}>
+      <button
         onClick={() => setIsOpen(!isOpen)}
         style={{
-          width: 32,
-          height: 32,
-          borderRadius: '50%',
-          backgroundColor: '#444',
-          color: 'white',
-          display: 'flex',
-          alignItems: 'center',
-          justifyContent: 'center',
-          cursor: 'pointer',
-          fontWeight: 'bold',
+          background: "none",
+          border: "none",
+          fontSize: "24px",
+          cursor: "pointer",
         }}
       >
-        {userInitial}
-      </div>
+        &#9776;
+      </button>
       {isOpen && (
         <div style={{
-          position: 'absolute',
-          top: '100%',
+          position: "absolute",
           right: 0,
-          marginTop: 4,
-          backgroundColor: 'white',
-          border: '1px solid #ccc',
-          borderRadius: 4,
-          boxShadow: '0 2px 8px rgba(0,0,0,0.1)',
+          top: "40px",
+          background: "white",
+          boxShadow: "0 2px 8px rgba(0,0,0,0.15)",
+          padding: "1rem",
           zIndex: 1000,
-          minWidth: 120,
-          padding: 8,
+          borderRadius: "8px",
         }}>
-          <button
-            onClick={() => signOut()}
-            style={{
-              width: '100%',
-              padding: '6px 8px',
-              border: 'none',
-              background: 'none',
-              textAlign: 'left',
-              cursor: 'pointer',
-              fontSize: 14,
-            }}
-          >
+          <div style={{ color: "red", cursor: "pointer", marginBottom: "0.5rem" }} onClick={() => signOut()}>
             Logout
-          </button>
+          </div>
+          <LanguageSwitcher />
         </div>
       )}
     </div>
   );
-};
-
-export default UserMenu;
+}
