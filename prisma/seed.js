@@ -1,10 +1,11 @@
+
 const { PrismaClient } = require('@prisma/client');
 const bcrypt = require('bcryptjs');
 
 const prisma = new PrismaClient();
 
 async function main() {
-  const password = await bcrypt.hash('12345678', 10);
+  const password = await bcrypt.hash('Test1234!', 10);
 
   await prisma.user.upsert({
     where: { email: 'test@user.de' },
@@ -16,7 +17,7 @@ async function main() {
     },
   });
 
-  console.log('✅ Testuser wurde angelegt oder aktualisiert: test@user.de / 12345678');
+  console.log('✅ Testuser wurde angelegt oder aktualisiert: test@user.de / Test1234!');
 }
 
 main()
