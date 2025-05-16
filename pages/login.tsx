@@ -49,14 +49,25 @@ export default function LoginPage() {
         boxSizing: 'border-box'
       }}>
         <h2 style={{ textAlign: 'center', marginBottom: 20 }}>Anmelden</h2>
-        <input
-          type="email"
-          placeholder="E-Mail"
-          value={email}
-          onChange={(e) => setEmail(e.target.value)}
-          required
-          style={{ marginBottom: 10, width: '100%', padding: 10 }}
-        />
+
+        <div style={{ position: 'relative', marginBottom: 10 }}>
+          <input
+            type="email"
+            placeholder="E-Mail"
+            value={email}
+            onChange={(e) => setEmail(e.target.value)}
+            required
+            style={{
+              width: '100%',
+              padding: 10,
+              paddingRight: 40,
+              borderRadius: 4,
+              border: '1px solid #ccc',
+              boxSizing: 'border-box'
+            }}
+          />
+        </div>
+
         <div style={{ position: 'relative', marginBottom: 10 }}>
           <input
             type={showPassword ? "text" : "password"}
@@ -64,7 +75,14 @@ export default function LoginPage() {
             value={password}
             onChange={(e) => setPassword(e.target.value)}
             required
-            style={{ width: '100%', padding: 10 }}
+            style={{
+              width: '100%',
+              padding: 10,
+              paddingRight: 40,
+              borderRadius: 4,
+              border: '1px solid #ccc',
+              boxSizing: 'border-box'
+            }}
           />
           <img
             src={showPassword ? "/eye-open.png" : "/eye-closed.png"}
@@ -81,8 +99,19 @@ export default function LoginPage() {
             }}
           />
         </div>
-        <button type="submit" style={{ width: '100%', padding: 10 }}>Login</button>
-        {error && <p style={{ color: 'red' }}>{error}</p>}
+
+        <button type="submit" style={{
+          width: '100%',
+          padding: 10,
+          backgroundColor: '#0070f3',
+          color: 'white',
+          border: 'none',
+          borderRadius: 4,
+          cursor: 'pointer'
+        }}>Login</button>
+
+        {error && <p style={{ color: 'red', marginTop: 10 }}>{error}</p>}
+
         <p style={{ textAlign: 'center', marginTop: 20 }}>
           Noch kein Konto? <a href="/register" style={{ color: '#0070f3', textDecoration: 'none' }}>Jetzt registrieren</a>
         </p>
