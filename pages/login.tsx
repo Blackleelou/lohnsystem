@@ -57,14 +57,30 @@ export default function LoginPage() {
           required
           style={{ marginBottom: 10, width: '100%', padding: 10 }}
         />
-        <input
-          type={showPassword ? "text" : "password"}
-          placeholder="Passwort"
-          value={password}
-          onChange={(e) => setPassword(e.target.value)}
-          required
-          style={{ marginBottom: 10, width: '100%', padding: 10 }}
-        />
+        <div style={{ position: 'relative', marginBottom: 10 }}>
+          <input
+            type={showPassword ? "text" : "password"}
+            placeholder="Passwort"
+            value={password}
+            onChange={(e) => setPassword(e.target.value)}
+            required
+            style={{ width: '100%', padding: '10px 40px 10px 10px' }}
+          />
+          <img
+            src={showPassword ? "/eye-open.png" : "/eye-closed.png"}
+            alt="Toggle visibility"
+            onClick={() => setShowPassword(!showPassword)}
+            style={{
+              position: 'absolute',
+              top: '50%',
+              right: 10,
+              width: 24,
+              height: 24,
+              cursor: 'pointer',
+              transform: 'translateY(-50%)'
+            }}
+          />
+        </div>
         <button type="submit" style={{ width: '100%', padding: 10 }}>Login</button>
         {error && <p style={{ color: 'red' }}>{error}</p>}
         <p style={{ textAlign: 'center', marginTop: 20 }}>
