@@ -5,9 +5,18 @@ export default function LoginPage() {
   const [email, setEmail] = useState('');
   const [password, setPassword] = useState('');
   const [showPassword, setShowPassword] = useState(false);
+  const [error, setError] = useState('');
+
+  const isValidEmail = (email: string) =>
+    /^[a-zA-Z0-9._%+-]+@[a-zA-Z0-9.-]+\.[a-zA-Z]{2,}$/.test(email);
 
   const handleLogin = async (e: React.FormEvent) => {
     e.preventDefault();
+    if (!isValidEmail(email)) {
+      setError('Bitte gib eine gültige E-Mail-Adresse ein.');
+      return;
+    }
+    setError('');
     await signIn('credentials', {
       email,
       password,
@@ -74,6 +83,9 @@ export default function LoginPage() {
             }}
           />
         </div>
+        {error && (
+          <p style={{ color: 'red', marginTop: 10 }}>{error}</p>
+        )}
         <button type="submit" style={{
           width: '100%',
           marginTop: 20,
