@@ -5,10 +5,11 @@ export default function RegisterPage() {
   const [email, setEmail] = useState('');
   const [password, setPassword] = useState('');
   const [confirmPassword, setConfirmPassword] = useState('');
+  const [showPassword, setShowPassword] = useState(false);
+  const [showConfirmPassword, setShowConfirmPassword] = useState(false);
 
   const handleRegister = async (e: React.FormEvent) => {
     e.preventDefault();
-    // Registrierungslösung folgt später
     alert("Registrierung wurde abgesendet!");
   };
 
@@ -32,34 +33,94 @@ export default function RegisterPage() {
         boxSizing: 'border-box'
       }}>
         <h2 style={{ textAlign: 'center', marginBottom: 20 }}>Registrieren</h2>
+
         <input
           type="email"
           placeholder="E-Mail"
           value={email}
           onChange={(e) => setEmail(e.target.value)}
           required
-          style={{ marginBottom: 10, width: '100%', padding: 10 }}
+          style={{
+            width: '100%',
+            padding: 10,
+            marginBottom: 10,
+            borderRadius: 4,
+            border: '1px solid #ccc',
+            boxSizing: 'border-box'
+          }}
         />
-        <input
-          type="password"
-          placeholder="Passwort"
-          value={password}
-          onChange={(e) => setPassword(e.target.value)}
-          required
-          style={{ marginBottom: 10, width: '100%', padding: 10 }}
-        />
-        <input
-          type="password"
-          placeholder="Passwort wiederholen"
-          value={confirmPassword}
-          onChange={(e) => setConfirmPassword(e.target.value)}
-          required
-          style={{ marginBottom: 10, width: '100%', padding: 10 }}
-        />
-        <button type="submit" style={{ width: '100%', padding: 10 }}>Registrieren</button>
-        <p style={{ textAlign: 'center', marginTop: 20 }}>
-          Schon ein Konto? <a href="/login" style={{ color: '#0070f3', textDecoration: 'none' }}>Zur Anmeldung</a>
-        </p>
+
+        <div style={{ position: 'relative', marginBottom: 10 }}>
+          <input
+            type={showPassword ? "text" : "password"}
+            placeholder="Passwort"
+            value={password}
+            onChange={(e) => setPassword(e.target.value)}
+            required
+            style={{
+              width: '100%',
+              padding: '10px 40px 10px 10px',
+              borderRadius: 4,
+              border: '1px solid #ccc',
+              boxSizing: 'border-box'
+            }}
+          />
+          <img
+            src={showPassword ? "/eye-open.png" : "/eye-closed.png"}
+            alt="Toggle visibility"
+            onClick={() => setShowPassword(!showPassword)}
+            style={{
+              position: 'absolute',
+              top: '50%',
+              right: 10,
+              width: 24,
+              height: 24,
+              cursor: 'pointer',
+              transform: 'translateY(-50%)'
+            }}
+          />
+        </div>
+
+        <div style={{ position: 'relative', marginBottom: 10 }}>
+          <input
+            type={showConfirmPassword ? "text" : "password"}
+            placeholder="Passwort wiederholen"
+            value={confirmPassword}
+            onChange={(e) => setConfirmPassword(e.target.value)}
+            required
+            style={{
+              width: '100%',
+              padding: '10px 40px 10px 10px',
+              borderRadius: 4,
+              border: '1px solid #ccc',
+              boxSizing: 'border-box'
+            }}
+          />
+          <img
+            src={showConfirmPassword ? "/eye-open.png" : "/eye-closed.png"}
+            alt="Toggle visibility"
+            onClick={() => setShowConfirmPassword(!showConfirmPassword)}
+            style={{
+              position: 'absolute',
+              top: '50%',
+              right: 10,
+              width: 24,
+              height: 24,
+              cursor: 'pointer',
+              transform: 'translateY(-50%)'
+            }}
+          />
+        </div>
+
+        <button type="submit" style={{
+          width: '100%',
+          padding: 10,
+          borderRadius: 4,
+          backgroundColor: '#0070f3',
+          color: 'white',
+          border: 'none',
+          cursor: 'pointer'
+        }}>Registrieren</button>
       </form>
     </div>
   );
