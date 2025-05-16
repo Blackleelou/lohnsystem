@@ -5,12 +5,39 @@ export default function RegisterPage() {
   const [email, setEmail] = useState('');
   const [password, setPassword] = useState('');
   const [confirmPassword, setConfirmPassword] = useState('');
-  const [showPassword, setShowPassword] = useState(false);
-  const [showConfirmPassword, setShowConfirmPassword] = useState(false);
+  const [error, setError] = useState('');
+  const [success, setSuccess] = useState('');
 
   const handleRegister = async (e: React.FormEvent) => {
     e.preventDefault();
-    alert("Registrierung wurde abgesendet!");
+    setError('');
+    setSuccess('');
+
+    if (password !== confirmPassword) {
+      setError('Passwörter stimmen nicht überein.');
+      return;
+    }
+
+    try {
+      const res = await fetch('/api/register', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ email, password }),
+      });
+
+      const data = await res.json();
+
+      if (!res.ok) {
+        setError(data.message || 'Fehler bei der Registrierung.');
+      } else {
+        setSuccess('Erfolgreich registriert. Du kannst dich jetzt anmelden.');
+        setEmail('');
+        setPassword('');
+        setConfirmPassword('');
+      }
+    } catch (err) {
+      setError('Serverfehler. Bitte später erneut versuchen.');
+    }
   };
 
   return (
@@ -54,7 +81,7 @@ export default function RegisterPage() {
 
         <div style={{ position: 'relative', marginBottom: 10 }}>
           <input
-            type={showPassword ? "text" : "password"}
+            type="password"
             placeholder="Passwort"
             value={password}
             onChange={(e) => setPassword(e.target.value)}
@@ -68,25 +95,11 @@ export default function RegisterPage() {
               boxSizing: 'border-box'
             }}
           />
-          <img
-            src={showPassword ? "/eye-open.png" : "/eye-closed.png"}
-            alt="Toggle visibility"
-            onClick={() => setShowPassword(!showPassword)}
-            style={{
-              position: 'absolute',
-              top: '50%',
-              right: 10,
-              width: 24,
-              height: 24,
-              cursor: 'pointer',
-              transform: 'translateY(-50%)'
-            }}
-          />
         </div>
 
         <div style={{ position: 'relative', marginBottom: 10 }}>
           <input
-            type={showConfirmPassword ? "text" : "password"}
+            type="password"
             placeholder="Passwort wiederholen"
             value={confirmPassword}
             onChange={(e) => setConfirmPassword(e.target.value)}
@@ -100,21 +113,10 @@ export default function RegisterPage() {
               boxSizing: 'border-box'
             }}
           />
-          <img
-            src={showConfirmPassword ? "/eye-open.png" : "/eye-closed.png"}
-            alt="Toggle visibility"
-            onClick={() => setShowConfirmPassword(!showConfirmPassword)}
-            style={{
-              position: 'absolute',
-              top: '50%',
-              right: 10,
-              width: 24,
-              height: 24,
-              cursor: 'pointer',
-              transform: 'translateY(-50%)'
-            }}
-          />
         </div>
+
+        {error && <p style={{ color: 'red' }}>{error}</p>}
+        {success && <p style={{ color: 'green' }}>{success}</p>}
 
         <button type="submit" style={{
           width: '100%',
