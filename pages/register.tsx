@@ -5,6 +5,8 @@ export default function RegisterPage() {
   const [email, setEmail] = useState('');
   const [password, setPassword] = useState('');
   const [confirmPassword, setConfirmPassword] = useState('');
+  const [showPassword, setShowPassword] = useState(false);
+  const [showConfirmPassword, setShowConfirmPassword] = useState(false);
   const [error, setError] = useState('');
   const [success, setSuccess] = useState('');
 
@@ -50,12 +52,73 @@ export default function RegisterPage() {
     <div style={{ display: 'flex', justifyContent: 'center', alignItems: 'center', height: '100vh', background: '#f4f4f4' }}>
       <form onSubmit={handleRegister} style={{ background: 'white', padding: 30, borderRadius: 8, boxShadow: '0 2px 8px rgba(0,0,0,0.1)', width: '100%', maxWidth: 400 }}>
         <h2 style={{ textAlign: 'center', marginBottom: 20 }}>Registrieren</h2>
-        <input type="email" placeholder="E-Mail" value={email} onChange={(e) => setEmail(e.target.value)} required style={{ marginBottom: 10, width: '100%', padding: 10 }} />
-        <input type="password" placeholder="Passwort" value={password} onChange={(e) => setPassword(e.target.value)} required style={{ marginBottom: 10, width: '100%', padding: 10 }} />
-        <input type="password" placeholder="Passwort wiederholen" value={confirmPassword} onChange={(e) => setConfirmPassword(e.target.value)} required style={{ marginBottom: 10, width: '100%', padding: 10 }} />
+
+        <div style={{ position: 'relative', marginBottom: 10 }}>
+          <input
+            type="email"
+            placeholder="E-Mail"
+            value={email}
+            onChange={(e) => setEmail(e.target.value)}
+            required
+            style={{ width: '100%', padding: 10, paddingRight: 40, boxSizing: 'border-box' }}
+          />
+        </div>
+
+        <div style={{ position: 'relative', marginBottom: 10 }}>
+          <input
+            type={showPassword ? "text" : "password"}
+            placeholder="Passwort"
+            value={password}
+            onChange={(e) => setPassword(e.target.value)}
+            required
+            style={{ width: '100%', padding: 10, paddingRight: 40, boxSizing: 'border-box' }}
+          />
+          <img
+            src={showPassword ? "/eye-open.png" : "/eye-closed.png"}
+            alt="Toggle visibility"
+            onClick={() => setShowPassword(!showPassword)}
+            style={{
+              position: 'absolute',
+              top: '50%',
+              right: 10,
+              width: 24,
+              height: 24,
+              cursor: 'pointer',
+              transform: 'translateY(-50%)'
+            }}
+          />
+        </div>
+
+        <div style={{ position: 'relative', marginBottom: 10 }}>
+          <input
+            type={showConfirmPassword ? "text" : "password"}
+            placeholder="Passwort wiederholen"
+            value={confirmPassword}
+            onChange={(e) => setConfirmPassword(e.target.value)}
+            required
+            style={{ width: '100%', padding: 10, paddingRight: 40, boxSizing: 'border-box' }}
+          />
+          <img
+            src={showConfirmPassword ? "/eye-open.png" : "/eye-closed.png"}
+            alt="Toggle visibility"
+            onClick={() => setShowConfirmPassword(!showConfirmPassword)}
+            style={{
+              position: 'absolute',
+              top: '50%',
+              right: 10,
+              width: 24,
+              height: 24,
+              cursor: 'pointer',
+              transform: 'translateY(-50%)'
+            }}
+          />
+        </div>
+
         {error && <p style={{ color: 'red' }}>{error}</p>}
         {success && <p style={{ color: 'green' }}>{success}</p>}
+
         <button type="submit" style={{ width: '100%', padding: 10 }}>Registrieren</button>
+
         <p style={{ textAlign: 'center', marginTop: 20 }}>
           Schon ein Konto? <a href="/login" style={{ color: '#0070f3', textDecoration: 'none' }}>Zur Anmeldung</a>
         </p>
