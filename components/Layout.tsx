@@ -8,12 +8,11 @@ export default function Layout({ children }: { children: React.ReactNode }) {
       <div style={{ minHeight: '100vh', backgroundColor: '#fff' }}>
         <header style={{
           display: 'flex',
-          justifyContent: 'space-between',
+          justifyContent: 'flex-end',
           alignItems: 'center',
-          padding: '10px 20px',
-          borderBottom: '1px solid #ccc'
+          padding: '10px 16px',
+          backgroundColor: '#fff'
         }}>
-          <div />
           <MobileMenu />
         </header>
         <main style={{ padding: '20px' }}>

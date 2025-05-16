@@ -17,29 +17,27 @@ const MobileMenu = () => {
       <button
         onClick={toggleMenu}
         style={{
-          backgroundColor: '#f0f0f0',
-          borderRadius: '50%',
+          background: 'none',
           border: 'none',
-          padding: '10px',
+          fontSize: '26px',
           cursor: 'pointer'
         }}
         aria-label="Menü öffnen"
       >
-        <span style={{ fontSize: '24px' }}>≡</span>
+        ≡
       </button>
       {menuOpen && (
         <div style={{
           position: 'absolute',
-          top: '100%',
+          top: '40px',
           right: 0,
           backgroundColor: 'white',
           border: '1px solid #ccc',
-          borderRadius: '4px',
+          borderRadius: '6px',
           padding: '10px',
-          marginTop: '8px',
           zIndex: 1000,
-          minWidth: '150px',
-          boxShadow: '0 2px 6px rgba(0,0,0,0.1)'
+          boxShadow: '0 2px 6px rgba(0,0,0,0.1)',
+          minWidth: '160px'
         }}>
           <div
             onClick={() => signOut()}
