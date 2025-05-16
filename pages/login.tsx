@@ -119,3 +119,13 @@ export default function LoginPage() {
 }
 
 LoginPage.getLayout = (page: React.ReactNode) => page;
+        <p style={{ textAlign: 'center', marginTop: 20 }}>
+          Noch kein Konto?{' '}
+          <a href="/register" style={{ color: '#0070f3', textDecoration: 'none' }}>
+            Jetzt registrieren
+          </a>
+        </p>
+      </form>
+    </div>
+  );
+}

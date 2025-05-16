@@ -70,3 +70,14 @@ export default function RegisterPage() {
     </div>
   );
 }
+
+        <p style={{ textAlign: 'center', marginTop: 20 }}>
+          Schon ein Konto?{' '}
+          <a href="/login" style={{ color: '#0070f3', textDecoration: 'none' }}>
+            Zur Anmeldung
+          </a>
+        </p>
+      </form>
+    </div>
+  );
+}
