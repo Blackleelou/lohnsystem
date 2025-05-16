@@ -20,7 +20,7 @@ function isRateLimited(ip: string) {
   return false;
 }
 
-function isStrongPassword(password) {
+function isStrongPassword(password: string) {
   return (
     password.length >= 8 &&
     /[A-Z]/.test(password) &&
