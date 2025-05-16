@@ -1,4 +1,3 @@
-
 import { useState } from 'react';
 import { signIn } from 'next-auth/react';
 
@@ -6,25 +5,32 @@ export default function LoginPage() {
   const [email, setEmail] = useState('');
   const [password, setPassword] = useState('');
   const [showPassword, setShowPassword] = useState(false);
+  const [error, setError] = useState('');
 
-  const isValidEmail = (email: string) => {
-    return /^[^\s@]+@[^\s@]+\.[^\s@]{2,}$/.test(email);
+  const validateEmail = (email: string) => {
+    const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
+    return emailRegex.test(email);
   };
 
   const handleLogin = async (e: React.FormEvent) => {
     e.preventDefault();
 
-    if (!isValidEmail(email)) {
-      alert("Bitte gib eine gültige E-Mail-Adresse ein.");
+    if (!validateEmail(email)) {
+      setError('Bitte gib eine gültige E-Mail-Adresse ein.');
       return;
     }
 
-    await signIn('credentials', {
+    const res = await signIn('credentials', {
       email,
       password,
-      redirect: true,
-      callbackUrl: '/dashboard'
+      redirect: false,
     });
+
+    if (res?.error) {
+      setError('Benutzername oder Passwort ist ungültig.');
+    } else {
+      window.location.href = '/dashboard';
+    }
   };
 
   return (
@@ -47,6 +53,13 @@ export default function LoginPage() {
         boxSizing: 'border-box'
       }}>
         <h2 style={{ textAlign: 'center', marginBottom: 20 }}>Login</h2>
+
+        {error && (
+          <div style={{ color: 'red', marginBottom: 10, textAlign: 'center' }}>
+            {error}
+          </div>
+        )}
+
         <input
           type="email"
           placeholder="E-Mail"
@@ -55,6 +68,7 @@ export default function LoginPage() {
           required
           style={{ width: '100%', padding: 10, marginBottom: 10, borderRadius: 4, border: '1px solid #ccc', boxSizing: 'border-box' }}
         />
+
         <div style={{ position: 'relative', width: '100%' }}>
           <input
             type={showPassword ? 'text' : 'password'}
@@ -85,6 +99,7 @@ export default function LoginPage() {
             }}
           />
         </div>
+
         <button type="submit" style={{
           width: '100%',
           marginTop: 20,
