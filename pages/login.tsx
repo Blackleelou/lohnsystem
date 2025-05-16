@@ -55,7 +55,7 @@ export default function LoginPage() {
           value={email}
           onChange={(e) => setEmail(e.target.value)}
           required
-          style={{ marginBottom: 10, width: '100%', padding: 10, paddingRight: 40 }}
+          style={{ marginBottom: 10, width: '100%', padding: 10 }}
         />
         <div style={{ position: 'relative', marginBottom: 10 }}>
           <input
@@ -64,7 +64,7 @@ export default function LoginPage() {
             value={password}
             onChange={(e) => setPassword(e.target.value)}
             required
-            style={{ width: '100%', padding: 10, paddingRight: 40 }}
+            style={{ width: '100%', padding: 10 }}
           />
           <img
             src={showPassword ? "/eye-open.png" : "/eye-closed.png"}
@@ -81,7 +81,7 @@ export default function LoginPage() {
             }}
           />
         </div>
-        <button type="submit" style={{ width: '100%', padding: 10, paddingRight: 40 }}>Login</button>
+        <button type="submit" style={{ width: '100%', padding: 10 }}>Login</button>
         {error && <p style={{ color: 'red' }}>{error}</p>}
         <p style={{ textAlign: 'center', marginTop: 20 }}>
           Noch kein Konto? <a href="/register" style={{ color: '#0070f3', textDecoration: 'none' }}>Jetzt registrieren</a>

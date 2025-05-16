@@ -39,7 +39,7 @@ export default function RegisterPage() {
           value={email}
           onChange={(e) => setEmail(e.target.value)}
           required
-          style={{ marginBottom: 10, width: '100%', padding: 10, paddingRight: 40 }}
+          style={{ marginBottom: 10, width: '100%', padding: 10 }}
         />
         <div style={{ position: 'relative', marginBottom: 10 }}>
           <input
@@ -48,7 +48,7 @@ export default function RegisterPage() {
             value={password}
             onChange={(e) => setPassword(e.target.value)}
             required
-            style={{ width: '100%', padding: 10, paddingRight: 40 }}
+            style={{ width: '100%', padding: 10 }}
           />
           <img
             src={showPassword ? "/eye-open.png" : "/eye-closed.png"}
@@ -72,7 +72,7 @@ export default function RegisterPage() {
             value={confirmPassword}
             onChange={(e) => setConfirmPassword(e.target.value)}
             required
-            style={{ width: '100%', padding: 10, paddingRight: 40 }}
+            style={{ width: '100%', padding: 10 }}
           />
           <img
             src={showConfirmPassword ? "/eye-open.png" : "/eye-closed.png"}
@@ -89,7 +89,7 @@ export default function RegisterPage() {
             }}
           />
         </div>
-        <button type="submit" style={{ width: '100%', padding: 10, paddingRight: 40 }}>Registrieren</button>
+        <button type="submit" style={{ width: '100%', padding: 10 }}>Registrieren</button>
         <p style={{ textAlign: 'center', marginTop: 20 }}>
           Schon ein Konto? <a href="/login" style={{ color: '#0070f3', textDecoration: 'none' }}>Zur Anmeldung</a>
         </p>
