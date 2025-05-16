@@ -1,3 +1,4 @@
+
 import { useState } from 'react';
 
 export default function RegisterPage() {
@@ -37,7 +38,7 @@ export default function RegisterPage() {
           value={email}
           onChange={(e) => setEmail(e.target.value)}
           required
-          style={{ width: '100%', padding: 10, marginBottom: 10, borderRadius: 4, border: '1px solid #ccc' }}
+          style={{ marginBottom: 10, width: '100%', padding: 10 }}
         />
         <input
           type="password"
@@ -45,37 +46,19 @@ export default function RegisterPage() {
           value={password}
           onChange={(e) => setPassword(e.target.value)}
           required
-          style={{ width: '100%', padding: 10, marginBottom: 10, borderRadius: 4, border: '1px solid #ccc' }}
+          style={{ marginBottom: 10, width: '100%', padding: 10 }}
         />
         <input
           type="password"
-          placeholder="Passwort bestätigen"
+          placeholder="Passwort wiederholen"
           value={confirmPassword}
           onChange={(e) => setConfirmPassword(e.target.value)}
           required
-          style={{ width: '100%', padding: 10, marginBottom: 20, borderRadius: 4, border: '1px solid #ccc' }}
+          style={{ marginBottom: 10, width: '100%', padding: 10 }}
         />
-        <button type="submit" style={{
-          width: '100%',
-          padding: 10,
-          backgroundColor: '#0070f3',
-          color: 'white',
-          border: 'none',
-          borderRadius: 4,
-          cursor: 'pointer'
-        }}>
-          Registrieren
-        </button>
-      </form>
-    </div>
-  );
-}
-
+        <button type="submit" style={{ width: '100%', padding: 10 }}>Registrieren</button>
         <p style={{ textAlign: 'center', marginTop: 20 }}>
-          Schon ein Konto?{' '}
-          <a href="/login" style={{ color: '#0070f3', textDecoration: 'none' }}>
-            Zur Anmeldung
-          </a>
+          Schon ein Konto? <a href="/login" style={{ color: '#0070f3', textDecoration: 'none' }}>Zur Anmeldung</a>
         </p>
       </form>
     </div>
