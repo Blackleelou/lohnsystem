@@ -22,7 +22,9 @@ export default function LoginPage() {
       justifyContent: 'center',
       alignItems: 'center',
       height: '100vh',
-      background: '#f4f4f4'
+      background: '#f4f4f4',
+      margin: 0,
+      padding: 0,
     }}>
       <form onSubmit={handleLogin} style={{
         background: 'white',
@@ -30,7 +32,8 @@ export default function LoginPage() {
         borderRadius: 8,
         boxShadow: '0 2px 8px rgba(0,0,0,0.1)',
         width: '100%',
-        maxWidth: 400
+        maxWidth: 400,
+        boxSizing: 'border-box'
       }}>
         <h2 style={{ textAlign: 'center', marginBottom: 20 }}>Login</h2>
         <input
@@ -39,16 +42,22 @@ export default function LoginPage() {
           value={email}
           onChange={(e) => setEmail(e.target.value)}
           required
-          style={{ width: '100%', padding: 10, marginBottom: 10, borderRadius: 4, border: '1px solid #ccc' }}
+          style={{ width: '100%', padding: 10, marginBottom: 10, borderRadius: 4, border: '1px solid #ccc', boxSizing: 'border-box' }}
         />
-        <div style={{ position: 'relative' }}>
+        <div style={{ position: 'relative', width: '100%' }}>
           <input
             type={showPassword ? 'text' : 'password'}
             placeholder="Passwort"
             value={password}
             onChange={(e) => setPassword(e.target.value)}
             required
-            style={{ width: '100%', padding: 10, paddingRight: 40, borderRadius: 4, border: '1px solid #ccc' }}
+            style={{
+              width: '100%',
+              padding: '10px 40px 10px 10px',
+              borderRadius: 4,
+              border: '1px solid #ccc',
+              boxSizing: 'border-box'
+            }}
           />
           <img
             src={showPassword ? "/eye-open.png" : "/eye-closed.png"}
@@ -73,7 +82,8 @@ export default function LoginPage() {
           color: 'white',
           border: 'none',
           borderRadius: 4,
-          cursor: 'pointer'
+          cursor: 'pointer',
+          boxSizing: 'border-box'
         }}>
           Anmelden
         </button>
