@@ -1,3 +1,4 @@
+
 import { useState } from 'react';
 import { signIn } from 'next-auth/react';
 
@@ -7,22 +8,21 @@ export default function LoginPage() {
   const [showPassword, setShowPassword] = useState(false);
   const [error, setError] = useState('');
 
-  const isValidEmail = (email: string) =>
-    /^[a-zA-Z0-9._%+-]+@[a-zA-Z0-9.-]+\.[a-zA-Z]{2,}$/.test(email);
-
   const handleLogin = async (e: React.FormEvent) => {
     e.preventDefault();
-    if (!isValidEmail(email)) {
-      setError('Bitte gib eine gültige E-Mail-Adresse ein.');
-      return;
-    }
     setError('');
-    await signIn('credentials', {
+
+    const res = await signIn('credentials', {
       email,
       password,
-      redirect: true,
-      callbackUrl: '/dashboard'
+      redirect: false
     });
+
+    if (res?.error) {
+      setError('Benutzername oder Passwort ist ungültig.');
+    } else if (res?.ok) {
+      window.location.href = '/dashboard';
+    }
   };
 
   return (
@@ -83,9 +83,7 @@ export default function LoginPage() {
             }}
           />
         </div>
-        {error && (
-          <p style={{ color: 'red', marginTop: 10 }}>{error}</p>
-        )}
+        {error && <div style={{ color: 'red', marginTop: 10 }}>{error}</div>}
         <button type="submit" style={{
           width: '100%',
           marginTop: 20,
