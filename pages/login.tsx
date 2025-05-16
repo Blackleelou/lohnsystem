@@ -48,28 +48,82 @@ export default function LoginPage() {
         maxWidth: 400,
         boxSizing: 'border-box'
       }}>
-        <h2 style={{ textAlign: 'center', marginBottom: 20 }}>Anmelden</h2>
+        <h2 style={{ textAlign: 'center', marginBottom: 20 }}>Login</h2>
         <input
           type="email"
           placeholder="E-Mail"
           value={email}
           onChange={(e) => setEmail(e.target.value)}
           required
-          style={{ marginBottom: 10, width: '100%', padding: 10 }}
+          style={{
+            width: '100%',
+            padding: 10,
+            marginBottom: 10,
+            borderRadius: 4,
+            border: '1px solid #ccc',
+            boxSizing: 'border-box'
+          }}
         />
-        <input
-          type={showPassword ? "text" : "password"}
-          placeholder="Passwort"
-          value={password}
-          onChange={(e) => setPassword(e.target.value)}
-          required
-          style={{ marginBottom: 10, width: '100%', padding: 10 }}
-        />
-        <button type="submit" style={{ width: '100%', padding: 10 }}>Login</button>
-        {error && <p style={{ color: 'red' }}>{error}</p>}
-        <p style={{ textAlign: 'center', marginTop: 20 }}>
-          Noch kein Konto? <a href="/register" style={{ color: '#0070f3', textDecoration: 'none' }}>Jetzt registrieren</a>
-        </p>
+
+        <div style={{ position: 'relative', marginBottom: 10 }}>
+          <input
+            type={showPassword ? 'text' : 'password'}
+            placeholder="Passwort"
+            value={password}
+            onChange={(e) => setPassword(e.target.value)}
+            required
+            style={{
+              width: '100%',
+              padding: '10px 40px 10px 10px',
+              borderRadius: 4,
+              border: '1px solid #ccc',
+              boxSizing: 'border-box'
+            }}
+          />
+          <img
+            src={showPassword ? "/eye-open.png" : "/eye-closed.png"}
+            alt="Toggle visibility"
+            onClick={() => setShowPassword(!showPassword)}
+            style={{
+              position: 'absolute',
+              top: '50%',
+              right: 10,
+              width: 24,
+              height: 24,
+              cursor: 'pointer',
+              transform: 'translateY(-50%)'
+            }}
+          />
+        </div>
+
+        {error && <p style={{ color: 'red', marginTop: 10 }}>{error}</p>}
+
+        <div style={{ display: 'flex', gap: 10, marginTop: 20 }}>
+          <button type="submit" style={{
+            flex: 1,
+            padding: 10,
+            backgroundColor: '#0070f3',
+            color: 'white',
+            border: 'none',
+            borderRadius: 4,
+            cursor: 'pointer',
+            boxSizing: 'border-box'
+          }}>
+            Anmelden
+          </button>
+          <button type="button" onClick={() => router.push('/register')} style={{
+            flex: 1,
+            padding: 10,
+            backgroundColor: '#e0e0e0',
+            color: '#000',
+            border: 'none',
+            borderRadius: 4,
+            cursor: 'pointer',
+            boxSizing: 'border-box'
+          }}>
+            Registrieren
+          </button>
+        </div>
       </form>
     </div>
   );
