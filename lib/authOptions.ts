@@ -1,3 +1,4 @@
+
 import { AuthOptions } from "next-auth";
 import CredentialsProvider from "next-auth/providers/credentials";
 import { prisma } from "@/lib/prisma";
@@ -23,7 +24,6 @@ export const authOptions: AuthOptions = {
 
         return {
           id: user.id,
-          name: user.username,
           email: user.email,
         };
       },
