@@ -39,7 +39,7 @@ export default function RegisterPage() {
           value={email}
           onChange={(e) => setEmail(e.target.value)}
           required
-          style={{ width: '100%', padding: 10, marginBottom: 10, borderRadius: 4, border: '1px solid #ccc', boxSizing: 'border-box' }}
+          style={{ width: '100%', padding: 10, borderRadius: 4, marginBottom: 10, borderRadius: 4, border: '1px solid #ccc', boxSizing: 'border-box' }}
         />
         <div style={{ position: 'relative', width: '100%', marginBottom: 10 }}>
           <input
@@ -104,8 +104,8 @@ export default function RegisterPage() {
         <div style={{ display: 'flex', gap: 10, marginTop: 20 }}>
           <button type="submit" style={{
             flex: 1,
-            padding: 10,
-            backgroundColor: '#0070f3',
+            padding: 10, borderRadius: 4,
+            backgroundColor: '#0070f3', borderRadius: 4,
             color: 'white',
             border: 'none',
             borderRadius: 4,
@@ -116,8 +116,8 @@ export default function RegisterPage() {
           </button>
           <button type="button" onClick={() => window.location.href = '/login'} style={{
             flex: 1,
-            padding: 10,
-            backgroundColor: '#e0e0e0',
+            padding: 10, borderRadius: 4,
+            backgroundColor: '#e0e0e0', borderRadius: 4,
             color: '#000',
             border: 'none',
             borderRadius: 4,
