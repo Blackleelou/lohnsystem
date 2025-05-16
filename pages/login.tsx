@@ -64,7 +64,7 @@ export default function LoginPage() {
             value={password}
             onChange={(e) => setPassword(e.target.value)}
             required
-            style={{ width: '100%', padding: '10px 40px 10px 10px' }}
+            style={{ width: '100%', padding: 10 }}
           />
           <img
             src={showPassword ? "/eye-open.png" : "/eye-closed.png"}
