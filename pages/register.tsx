@@ -1,5 +1,6 @@
 
 import { useState } from 'react';
+import { useRouter } from 'next/router';
 
 export default function RegisterPage() {
   const [email, setEmail] = useState('');
@@ -8,12 +9,11 @@ export default function RegisterPage() {
   const [showPassword, setShowPassword] = useState(false);
   const [showConfirmPassword, setShowConfirmPassword] = useState(false);
   const [error, setError] = useState('');
-  const [success, setSuccess] = useState('');
+  const router = useRouter();
 
   const handleRegister = async (e: React.FormEvent) => {
     e.preventDefault();
     setError('');
-    setSuccess('');
 
     const emailValid = /^[a-zA-Z0-9._%+-]+@[a-zA-Z0-9.-]+\.[a-zA-Z]{2,}$/.test(email);
     if (!emailValid) {
@@ -38,10 +38,12 @@ export default function RegisterPage() {
       if (!res.ok) {
         setError(data.message || 'Fehler bei der Registrierung.');
       } else {
-        setSuccess('Erfolgreich registriert. Du kannst dich jetzt anmelden.');
-        setEmail('');
-        setPassword('');
-        setConfirmPassword('');
+        await fetch('/api/user/send-code', {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({ email }),
+        });
+        router.push(`/verify?email=${encodeURIComponent(email)}`);
       }
     } catch (err) {
       setError('Serverfehler. Bitte später erneut versuchen.');
@@ -115,7 +117,6 @@ export default function RegisterPage() {
         </div>
 
         {error && <p style={{ color: 'red' }}>{error}</p>}
-        {success && <p style={{ color: 'green' }}>{success}</p>}
 
         <button type="submit" style={{ width: '100%', padding: 10 }}>Registrieren</button>
 
