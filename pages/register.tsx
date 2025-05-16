@@ -39,7 +39,7 @@ export default function RegisterPage() {
           value={email}
           onChange={(e) => setEmail(e.target.value)}
           required
-          style={{ marginBottom: 10, width: '100%', padding: 10 }}
+          style={{ marginBottom: 10, width: '100%', padding: '10px 40px 10px 10px' }}
         />
         <div style={{ position: 'relative', marginBottom: 10 }}>
           <input
