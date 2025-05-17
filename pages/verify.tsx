@@ -1,4 +1,3 @@
-
 import { useState, useEffect } from "react";
 import { useRouter } from "next/router";
 
@@ -8,6 +7,7 @@ export default function VerifyPage() {
   const [error, setError] = useState("");
   const [info, setInfo] = useState("");
   const [cooldown, setCooldown] = useState(0);
+  const [honeypot, setHoneypot] = useState("");
   const router = useRouter();
 
   useEffect(() => {
@@ -36,7 +36,7 @@ export default function VerifyPage() {
           setError("Netzwerkfehler. Bitte erneut versuchen.");
         });
     }
-  }, [code, email, router]);
+  }, [code, email, honeypot, router]);
 
   useEffect(() => {
     if (cooldown > 0) {
@@ -67,9 +67,7 @@ export default function VerifyPage() {
 
   return (
     <div style={{ display: "flex", justifyContent: "center", alignItems: "center", height: "100vh", background: "#f4f4f4" }}>
-      const [honeypot, setHoneypot] = useState("");
-
-<form style={{ background: "white", padding: 30, borderRadius: 8, boxShadow: "0 2px 8px rgba(0,0,0,0.1)", width: "100%", maxWidth: 400 }}>
+      <form style={{ background: "white", padding: 30, borderRadius: 8, boxShadow: "0 2px 8px rgba(0,0,0,0.1)", width: "100%", maxWidth: 400 }}>
         <h2 style={{ textAlign: "center", marginBottom: 20 }}>E-Mail bestätigen</h2>
         <p style={{ textAlign: "center", marginBottom: 20, fontSize: 14 }}>
           Wir haben dir eine E-Mail mit einem 6-stelligen Code geschickt.<br />
@@ -85,11 +83,23 @@ export default function VerifyPage() {
           autoFocus
           style={{ marginBottom: 10, width: "100%", padding: 10, fontSize: 18, textAlign: "center", letterSpacing: 6 }}
         />
+        <input
+          type="text"
+          value={honeypot}
+          onChange={(e) => setHoneypot(e.target.value)}
+          autoComplete="off"
+          style={{ display: "none" }}
+        />
         {error && <p style={{ color: "red", textAlign: "center" }}>{error}</p>}
         {info && <p style={{ color: "green", textAlign: "center" }}>{info}</p>}
         <p style={{ textAlign: "center", fontSize: 13, marginTop: 20 }}>
           Keine E-Mail erhalten? <br />
-          <button type="button" onClick={resendCode} disabled={cooldown > 0} style={{ background: "none", border: "none", color: "#0070f3", cursor: "pointer" }}>
+          <button
+            type="button"
+            onClick={resendCode}
+            disabled={cooldown > 0}
+            style={{ background: "none", border: "none", color: "#0070f3", cursor: "pointer" }}
+          >
             Code erneut senden {cooldown > 0 ? `(${cooldown}s)` : ""}
           </button>
         </p>
