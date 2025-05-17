@@ -6,6 +6,8 @@ export default function VerifyPage() {
   const [code, setCode] = useState("");
   const [email, setEmail] = useState("");
   const [error, setError] = useState("");
+  const [info, setInfo] = useState("");
+  const [cooldown, setCooldown] = useState(0);
   const router = useRouter();
 
   useEffect(() => {
@@ -36,6 +38,33 @@ export default function VerifyPage() {
     }
   }, [code, email, router]);
 
+  useEffect(() => {
+    if (cooldown > 0) {
+      const timer = setTimeout(() => setCooldown(cooldown - 1), 1000);
+      return () => clearTimeout(timer);
+    }
+  }, [cooldown]);
+
+  const resendCode = async () => {
+    if (!email || cooldown > 0) return;
+    try {
+      const res = await fetch("/api/user/send-code", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ email }),
+      });
+      const data = await res.json();
+      if (res.ok) {
+        setInfo("Code wurde erneut gesendet.");
+        setCooldown(60);
+      } else {
+        setError(data.message || "Fehler beim Senden des Codes.");
+      }
+    } catch {
+      setError("Fehler beim Verbindungsaufbau.");
+    }
+  };
+
   return (
     <div style={{ display: "flex", justifyContent: "center", alignItems: "center", height: "100vh", background: "#f4f4f4" }}>
       <form style={{ background: "white", padding: 30, borderRadius: 8, boxShadow: "0 2px 8px rgba(0,0,0,0.1)", width: "100%", maxWidth: 400 }}>
@@ -55,6 +84,13 @@ export default function VerifyPage() {
           style={{ marginBottom: 10, width: "100%", padding: 10, fontSize: 18, textAlign: "center", letterSpacing: 6 }}
         />
         {error && <p style={{ color: "red", textAlign: "center" }}>{error}</p>}
+        {info && <p style={{ color: "green", textAlign: "center" }}>{info}</p>}
+        <p style={{ textAlign: "center", fontSize: 13, marginTop: 20 }}>
+          Keine E-Mail erhalten? <br />
+          <button type="button" onClick={resendCode} disabled={cooldown > 0} style={{ background: "none", border: "none", color: "#0070f3", cursor: "pointer" }}>
+            Code erneut senden {cooldown > 0 ? `(${cooldown}s)` : ""}
+          </button>
+        </p>
       </form>
     </div>
   );
