@@ -30,7 +30,7 @@ export default async function handler(req: NextApiRequest, res: NextApiResponse)
     });
 
     await client.messages.create(process.env.MAILGUN_DOMAIN || '', {
-      from: 'Lohnsystem <mailgun@sandbox.mailgun.org>',
+      from: 'Lohnsystem <noreply@mg.meinlohn.app>',
       to: [email],
       subject: 'Dein Bestätigungscode',
       text: `Dein Code lautet: ${code} (gültig für 10 Minuten).`,
