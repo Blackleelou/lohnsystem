@@ -1,4 +1,3 @@
-
 import { useState } from 'react';
 import { useRouter } from 'next/router';
 
@@ -9,20 +8,24 @@ export default function RegisterPage() {
   const [showPassword, setShowPassword] = useState(false);
   const [showConfirmPassword, setShowConfirmPassword] = useState(false);
   const [error, setError] = useState('');
+  const [loading, setLoading] = useState(false);
   const router = useRouter();
 
   const handleRegister = async (e: React.FormEvent) => {
     e.preventDefault();
     setError('');
+    setLoading(true);
 
     const emailValid = /^[a-zA-Z0-9._%+-]+@[a-zA-Z0-9.-]+\.[a-zA-Z]{2,}$/.test(email);
     if (!emailValid) {
       setError('Bitte gib eine gültige E-Mail-Adresse ein.');
+      setLoading(false);
       return;
     }
 
     if (password !== confirmPassword) {
       setError('Passwörter stimmen nicht überein.');
+      setLoading(false);
       return;
     }
 
@@ -43,10 +46,15 @@ export default function RegisterPage() {
           headers: { 'Content-Type': 'application/json' },
           body: JSON.stringify({ email }),
         });
+        setEmail('');
+        setPassword('');
+        setConfirmPassword('');
         router.push(`/verify?email=${encodeURIComponent(email)}`);
       }
     } catch (err) {
       setError('Serverfehler. Bitte später erneut versuchen.');
+    } finally {
+      setLoading(false);
     }
   };
 
@@ -118,7 +126,9 @@ export default function RegisterPage() {
 
         {error && <p style={{ color: 'red' }}>{error}</p>}
 
-        <button type="submit" style={{ width: '100%', padding: 10 }}>Registrieren</button>
+        <button type="submit" disabled={loading} style={{ width: '100%', padding: 10 }}>
+          {loading ? 'Wird verarbeitet...' : 'Registrieren'}
+        </button>
 
         <p style={{ textAlign: 'center', marginTop: 20 }}>
           Schon ein Konto? <a href="/login" style={{ color: '#0070f3', textDecoration: 'none' }}>Zur Anmeldung</a>
