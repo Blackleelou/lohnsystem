@@ -1,4 +1,3 @@
-
 import { NextApiRequest, NextApiResponse } from 'next';
 import bcrypt from 'bcryptjs';
 import { prisma } from '@/lib/prisma';
@@ -8,14 +7,11 @@ const rateLimitMap = new Map();
 function isRateLimited(ip: string) {
   const now = Date.now();
   const entry = rateLimitMap.get(ip) || { count: 0, timestamp: now };
-
   if (now - entry.timestamp > 60000) {
     rateLimitMap.set(ip, { count: 1, timestamp: now });
     return false;
   }
-
   if (entry.count >= 5) return true;
-
   rateLimitMap.set(ip, { count: entry.count + 1, timestamp: entry.timestamp });
   return false;
 }
@@ -26,7 +22,7 @@ function isStrongPassword(password: string) {
     /[A-Z]/.test(password) &&
     /[a-z]/.test(password) &&
     /[0-9]/.test(password) &&
-    /[!@#$%^&*()_+\-=\[\]{};':"\\|,.<>\/?]/.test(password)
+    /[!@#$%^&*()_+\-=[\]{};':"\\|,.<>/?]/.test(password)
   );
 }
 
@@ -50,19 +46,12 @@ export default async function handler(req: NextApiRequest, res: NextApiResponse)
 
   try {
     const existingUser = await prisma.user.findUnique({ where: { email } });
-
     if (existingUser) {
       return res.status(409).json({ message: 'Diese E-Mail ist bereits registriert.' });
     }
 
     const hashedPassword = await bcrypt.hash(password, 10);
-
-    const user = await prisma.user.create({
-      data: {
-        email,
-        password: hashedPassword,
-      },
-    });
+    const user = await prisma.user.create({ data: { email, password: hashedPassword } });
 
     return res.status(201).json({ message: 'Benutzer erfolgreich registriert.', user: { id: user.id, email: user.email } });
   } catch (error) {
