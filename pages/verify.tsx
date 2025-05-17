@@ -21,7 +21,7 @@ export default function VerifyPage() {
       fetch("/api/user/verify-code", {
         method: "POST",
         headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ email, code }),
+        body: JSON.stringify({ email, code, honeypot }),
       })
         .then(async (res) => {
           const data = await res.json();
@@ -67,7 +67,9 @@ export default function VerifyPage() {
 
   return (
     <div style={{ display: "flex", justifyContent: "center", alignItems: "center", height: "100vh", background: "#f4f4f4" }}>
-      <form style={{ background: "white", padding: 30, borderRadius: 8, boxShadow: "0 2px 8px rgba(0,0,0,0.1)", width: "100%", maxWidth: 400 }}>
+      const [honeypot, setHoneypot] = useState("");
+
+<form style={{ background: "white", padding: 30, borderRadius: 8, boxShadow: "0 2px 8px rgba(0,0,0,0.1)", width: "100%", maxWidth: 400 }}>
         <h2 style={{ textAlign: "center", marginBottom: 20 }}>E-Mail bestätigen</h2>
         <p style={{ textAlign: "center", marginBottom: 20, fontSize: 14 }}>
           Wir haben dir eine E-Mail mit einem 6-stelligen Code geschickt.<br />
