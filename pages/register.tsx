@@ -9,12 +9,19 @@ export default function RegisterPage() {
   const [showConfirmPassword, setShowConfirmPassword] = useState(false);
   const [error, setError] = useState('');
   const [loading, setLoading] = useState(false);
+  const [honeypot, setHoneypot] = useState('');
   const router = useRouter();
 
   const handleRegister = async (e: React.FormEvent) => {
     e.preventDefault();
     setError('');
     setLoading(true);
+
+    if (honeypot.trim() !== '') {
+      setError('Ungültige Eingabe.');
+      setLoading(false);
+      return;
+    }
 
     const emailValid = /^[a-zA-Z0-9._%+-]+@[a-zA-Z0-9.-]+\.[a-zA-Z]{2,}$/.test(email);
     if (!emailValid) {
@@ -63,65 +70,28 @@ export default function RegisterPage() {
       <form onSubmit={handleRegister} style={{ background: 'white', padding: 30, borderRadius: 8, boxShadow: '0 2px 8px rgba(0,0,0,0.1)', width: '100%', maxWidth: 400 }}>
         <h2 style={{ textAlign: 'center', marginBottom: 20 }}>Registrieren</h2>
 
+        <input
+          type="text"
+          name="honeypot"
+          value={honeypot}
+          onChange={(e) => setHoneypot(e.target.value)}
+          style={{ display: 'none' }}
+          autoComplete="off"
+          tabIndex={-1}
+        />
+
         <div style={{ position: 'relative', marginBottom: 10 }}>
-          <input
-            type="email"
-            placeholder="E-Mail"
-            value={email}
-            onChange={(e) => setEmail(e.target.value)}
-            required
-            style={{ width: '100%', padding: 10, paddingRight: 40, boxSizing: 'border-box' }}
-          />
+          <input type="email" placeholder="E-Mail" value={email} onChange={(e) => setEmail(e.target.value)} required style={{ width: '100%', padding: 10, paddingRight: 40, boxSizing: 'border-box' }} />
         </div>
 
         <div style={{ position: 'relative', marginBottom: 10 }}>
-          <input
-            type={showPassword ? "text" : "password"}
-            placeholder="Passwort"
-            value={password}
-            onChange={(e) => setPassword(e.target.value)}
-            required
-            style={{ width: '100%', padding: 10, paddingRight: 40, boxSizing: 'border-box' }}
-          />
-          <img
-            src={showPassword ? "/eye-open.png" : "/eye-closed.png"}
-            alt="Toggle visibility"
-            onClick={() => setShowPassword(!showPassword)}
-            style={{
-              position: 'absolute',
-              top: '50%',
-              right: 10,
-              width: 24,
-              height: 24,
-              cursor: 'pointer',
-              transform: 'translateY(-50%)'
-            }}
-          />
+          <input type={showPassword ? "text" : "password"} placeholder="Passwort" value={password} onChange={(e) => setPassword(e.target.value)} required style={{ width: '100%', padding: 10, paddingRight: 40, boxSizing: 'border-box' }} />
+          <img src={showPassword ? "/eye-open.png" : "/eye-closed.png"} alt="Toggle visibility" onClick={() => setShowPassword(!showPassword)} style={{ position: 'absolute', top: '50%', right: 10, width: 24, height: 24, cursor: 'pointer', transform: 'translateY(-50%)' }} />
         </div>
 
         <div style={{ position: 'relative', marginBottom: 10 }}>
-          <input
-            type={showConfirmPassword ? "text" : "password"}
-            placeholder="Passwort wiederholen"
-            value={confirmPassword}
-            onChange={(e) => setConfirmPassword(e.target.value)}
-            required
-            style={{ width: '100%', padding: 10, paddingRight: 40, boxSizing: 'border-box' }}
-          />
-          <img
-            src={showConfirmPassword ? "/eye-open.png" : "/eye-closed.png"}
-            alt="Toggle visibility"
-            onClick={() => setShowConfirmPassword(!showConfirmPassword)}
-            style={{
-              position: 'absolute',
-              top: '50%',
-              right: 10,
-              width: 24,
-              height: 24,
-              cursor: 'pointer',
-              transform: 'translateY(-50%)'
-            }}
-          />
+          <input type={showConfirmPassword ? "text" : "password"} placeholder="Passwort wiederholen" value={confirmPassword} onChange={(e) => setConfirmPassword(e.target.value)} required style={{ width: '100%', padding: 10, paddingRight: 40, boxSizing: 'border-box' }} />
+          <img src={showConfirmPassword ? "/eye-open.png" : "/eye-closed.png"} alt="Toggle visibility" onClick={() => setShowConfirmPassword(!showConfirmPassword)} style={{ position: 'absolute', top: '50%', right: 10, width: 24, height: 24, cursor: 'pointer', transform: 'translateY(-50%)' }} />
         </div>
 
         {error && <p style={{ color: 'red' }}>{error}</p>}
