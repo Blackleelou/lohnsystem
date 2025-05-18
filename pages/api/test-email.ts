@@ -7,7 +7,7 @@ export default async function handler(req: NextApiRequest, res: NextApiResponse)
   const mg = new mailgun(formData);
   const client = mg.client({
     username: 'api',
-    key: 'key-xxx_your_real_api_key_here_xxx',
+    key: '9cd0168378bf16be63d5ae53fc0c2fcf-e71583bb-88407e4e,
   });
 
   const domain = 'mg.meinlohn.app';
