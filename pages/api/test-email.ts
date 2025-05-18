@@ -5,7 +5,7 @@ import formData from 'form-data';
 const mg = new mailgun(formData);
 const client = mg.client({
   username: 'api',
-  key: process.env.MAILGUN_API_KEY || '',
+  key: process.env.MAILGUN_API_KEY || '9cd0168378bf16be63d5ae53fc0c2fcf-e71583bb-88407e4e',
 });
 
 const domain = process.env.MAILGUN_DOMAIN || '';
