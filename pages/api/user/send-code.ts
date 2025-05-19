@@ -15,14 +15,12 @@ export default async function handler(req: NextApiRequest, res: NextApiResponse)
   const expires = new Date(Date.now() + 10 * 60 * 1000);
 
   try {
-    // 1. Code speichern
     await prisma.verificationCode.upsert({
       where: { email },
       update: { code, expiresAt: expires },
       create: { email, code, expiresAt: expires },
     });
 
-    // 2. SMTP-Versand über Brevo
     const transporter = nodemailer.createTransport({
       host: 'smtp-relay.brevo.com',
       port: 587,
@@ -33,15 +31,15 @@ export default async function handler(req: NextApiRequest, res: NextApiResponse)
     });
 
     await transporter.sendMail({
-      from: `"Lohnsystem" <noreply@meinlohn.app>`,
+      from: '"Lohnsystem" <noreply@meinlohn.app>',
       to: email,
       subject: 'Dein Bestätigungscode',
-      text: `Hallo!\n\nDein Verifizierungscode lautet: ${code}\nEr ist 10 Minuten lang gültig.\n\nMit freundlichen Grüßen\nDein Lohnsystem-Team`,
+      text: `Hallo!\n\nDein Verifizierungscode lautet: ${code}\nEr ist 10 Minuten gültig.\n\nViele Grüße,\nDein Lohnsystem-Team`,
     });
 
     return res.status(200).json({ message: 'Code gesendet' });
-  } catch (err) {
-    console.error('Fehler beim Versenden:', err);
-    return res.status(500).json({ message: 'Serverfehler beim Versenden des Codes.' });
+  } catch (error) {
+    console.error('Fehler beim Senden:', error);
+    return res.status(500).json({ message: 'Versand fehlgeschlagen.' });
   }
 }
