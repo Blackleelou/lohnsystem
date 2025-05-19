@@ -1,9 +1,6 @@
-
 import { NextApiRequest, NextApiResponse } from 'next';
 import { prisma } from '@/lib/prisma';
 import { customAlphabet } from 'nanoid';
-import mailgun from 'mailgun.js';
-import formData from 'form-data';
 
 const nanoid = customAlphabet('1234567890', 32);
 
@@ -25,25 +22,39 @@ export default async function handler(req: NextApiRequest, res: NextApiResponse)
     create: { userId: user.id, token, expiresAt: expires },
   });
 
-  const mg = new mailgun(formData);
-  const client = mg.client({
-    username: 'api',
-    key: process.env.MAILGUN_API_KEY || '',
-  });
-
-  const domain = process.env.MAILGUN_DOMAIN || '';
   const resetUrl = `https://${process.env.NEXT_PUBLIC_BASE_URL}/reset-password?token=${token}`;
+  const apiKey = process.env.BREVO_API_KEY;
+
+  if (!apiKey) {
+    console.error('BREVO_API_KEY fehlt');
+    return res.status(500).json({ message: 'Mail-Konfiguration fehlt.' });
+  }
 
   try {
-    await client.messages.create(domain, {
-      from: 'Lohnsystem <noreply@mg.meinlohn.app>',
-      to: [email],
-      subject: 'Passwort zurücksetzen',
-      text: `Hier kannst du dein Passwort zurücksetzen: ${resetUrl}`,
+    const response = await fetch('https://api.brevo.com/v3/smtp/email', {
+      method: 'POST',
+      headers: {
+        'Content-Type': 'application/json',
+        'api-key': apiKey,
+      },
+      body: JSON.stringify({
+        sender: { name: 'Lohnsystem', email: 'noreply@meinlohn.app' },
+        to: [{ email }],
+        subject: 'Passwort zurücksetzen',
+        htmlContent: `<p>Klicke auf den folgenden Link, um dein Passwort zurückzusetzen:</p><p><a href="${resetUrl}">${resetUrl}</a></p>`,
+        textContent: `Hier kannst du dein Passwort zurücksetzen: ${resetUrl}`,
+      }),
     });
+
+    if (!response.ok) {
+      const error = await response.text();
+      console.error('Fehler von Brevo:', error);
+      return res.status(500).json({ message: 'Fehler beim E-Mail-Versand.' });
+    }
+
     return res.status(200).json({ message: 'Falls die E-Mail existiert, wurde ein Link gesendet.' });
   } catch (error) {
-    console.error('Fehler beim Senden der Reset-E-Mail:', error);
-    return res.status(500).json({ message: 'Fehler beim Versenden der E-Mail.' });
+    console.error('Fehler beim Versenden:', error);
+    return res.status(500).json({ message: 'Allgemeiner Fehler beim Versand.' });
   }
 }
