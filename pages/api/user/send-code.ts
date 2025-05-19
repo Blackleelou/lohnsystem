@@ -1,9 +1,7 @@
-
 import { NextApiRequest, NextApiResponse } from 'next';
 import { prisma } from '@/lib/prisma';
 import { customAlphabet } from 'nanoid';
-import mailgun from 'mailgun.js';
-import formData from 'form-data';
+import nodemailer from 'nodemailer';
 
 const nanoid = customAlphabet('1234567890', 6);
 
@@ -17,28 +15,33 @@ export default async function handler(req: NextApiRequest, res: NextApiResponse)
   const expires = new Date(Date.now() + 10 * 60 * 1000);
 
   try {
+    // 1. Code speichern
     await prisma.verificationCode.upsert({
       where: { email },
       update: { code, expiresAt: expires },
       create: { email, code, expiresAt: expires },
     });
 
-    const mg = new mailgun(formData);
-    const client = mg.client({
-      username: 'api',
-      key: process.env.MAILGUN_API_KEY || '',
+    // 2. SMTP-Versand über Brevo
+    const transporter = nodemailer.createTransport({
+      host: 'smtp-relay.brevo.com',
+      port: 587,
+      auth: {
+        user: process.env.BREVO_USER,
+        pass: process.env.BREVO_PASS,
+      },
     });
 
-    await client.messages.create(process.env.MAILGUN_DOMAIN || '', {
-      from: 'Lohnsystem <noreply@mg.meinlohn.app>',
-      to: [email],
+    await transporter.sendMail({
+      from: `"Lohnsystem" <noreply@meinlohn.app>`,
+      to: email,
       subject: 'Dein Bestätigungscode',
-      text: `Dein Code lautet: ${code} (gültig für 10 Minuten).`,
+      text: `Hallo!\n\nDein Verifizierungscode lautet: ${code}\nEr ist 10 Minuten lang gültig.\n\nMit freundlichen Grüßen\nDein Lohnsystem-Team`,
     });
 
     return res.status(200).json({ message: 'Code gesendet' });
   } catch (err) {
-    console.error('Fehler beim Senden:', err);
+    console.error('Fehler beim Versenden:', err);
     return res.status(500).json({ message: 'Serverfehler beim Versenden des Codes.' });
   }
 }
