@@ -1,3 +1,4 @@
+
 {
   "name": "lohnsystem",
   "version": "0.6.0",
@@ -21,9 +22,9 @@
     "i18next-browser-languagedetector": "^8.1.0",
     "i18next-http-backend": "^3.0.2",
     "jsonwebtoken": "^9.0.0",
+    "mailgun.js": "^5.2.2",
     "next": "13.5.6",
     "next-auth": "^4.24.2",
-    "nodemailer": "^6.9.0",
     "react": "18.2.0",
     "react-dom": "18.2.0",
     "react-i18next": "^13.2.2"
@@ -32,7 +33,6 @@
     "@types/bcryptjs": "^2.4.2",
     "@types/cookie": "^0.5.1",
     "@types/node": "^18.18.0",
-    "@types/nodemailer": "^6.4.4",
     "@types/react": "^18.2.0",
     "prisma": "^5.22.0",
     "ts-node": "^10.9.1",
