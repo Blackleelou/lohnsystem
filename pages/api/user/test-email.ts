@@ -1,27 +1,39 @@
 import { NextApiRequest, NextApiResponse } from 'next';
-import mailgun from 'mailgun.js';
-import formData from 'form-data';
 
 export default async function handler(req: NextApiRequest, res: NextApiResponse) {
   if (req.method !== 'POST') return res.status(405).json({ message: 'Method Not Allowed' });
 
-  const mg = new mailgun(formData);
-  const client = mg.client({
-    username: 'api',
-    key: process.env.MAILGUN_API_KEY || '',
-  });
+  const apiKey = process.env.BREVO_API_KEY;
+
+  if (!apiKey) {
+    return res.status(500).json({ message: 'BREVO_API_KEY fehlt' });
+  }
 
   try {
-    const result = await client.messages.create(process.env.MAILGUN_DOMAIN || '', {
-      from: 'Lohnsystem <noreply@mg.meinlohn.app>',
-      to: ['test@meinlohn.app'], // kannst du durch deine Testadresse ersetzen
-      subject: 'Test-E-Mail vom Lohnsystem',
-      text: 'Diese E-Mail bestätigt, dass Mailgun korrekt eingerichtet ist.',
+    const response = await fetch('https://api.brevo.com/v3/smtp/email', {
+      method: 'POST',
+      headers: {
+        'Content-Type': 'application/json',
+        'api-key': apiKey,
+      },
+      body: JSON.stringify({
+        sender: { name: 'Lohnsystem', email: 'noreply@meinlohn.app' },
+        to: [{ email: 'test@meinlohn.app' }], // <-- hier deine echte Testadresse eintragen
+        subject: 'Test-E-Mail vom Lohnsystem',
+        htmlContent: `<p>Diese E-Mail bestätigt, dass Brevo korrekt eingerichtet ist.</p>`,
+        textContent: 'Diese E-Mail bestätigt, dass Brevo korrekt eingerichtet ist.',
+      }),
     });
 
-    return res.status(200).json({ message: 'Testmail gesendet', result });
+    if (!response.ok) {
+      const error = await response.text();
+      console.error('Brevo Fehler:', error);
+      return res.status(500).json({ message: 'Fehler beim E-Mail-Versand.', error });
+    }
+
+    return res.status(200).json({ message: 'Testmail gesendet' });
   } catch (error) {
-    console.error('Fehler beim Versenden der Testmail:', error);
-    return res.status(500).json({ message: 'Fehler beim Versenden der Testmail.', error });
+    console.error('Allgemeiner Fehler:', error);
+    return res.status(500).json({ message: 'Allgemeiner Fehler beim Versand.', error });
   }
 }
