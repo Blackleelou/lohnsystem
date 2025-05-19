@@ -1,7 +1,7 @@
 import { NextApiRequest, NextApiResponse } from 'next';
 import { prisma } from '@/lib/prisma';
 import { customAlphabet } from 'nanoid';
-import nodemailer from 'nodemailer';
+import axios from 'axios';
 
 const nanoid = customAlphabet('1234567890', 6);
 
@@ -21,25 +21,25 @@ export default async function handler(req: NextApiRequest, res: NextApiResponse)
       create: { email, code, expiresAt: expires },
     });
 
-    const transporter = nodemailer.createTransport({
-      host: 'smtp-relay.brevo.com',
-      port: 587,
-      auth: {
-        user: process.env.BREVO_USER,
-        pass: process.env.BREVO_PASS,
+    await axios.post(
+      'https://api.brevo.com/v3/smtp/email',
+      {
+        sender: { name: 'Lohnsystem', email: 'noreply@meinlohn.app' },
+        to: [{ email }],
+        subject: 'Dein Verifizierungscode',
+        htmlContent: `<p>Hallo,<br><br>Dein Code lautet: <strong>${code}</strong><br>Er ist 10 Minuten gültig.<br><br>Viele Grüße,<br>Lohnsystem</p>`
       },
-    });
-
-    await transporter.sendMail({
-      from: '"Lohnsystem" <noreply@meinlohn.app>',
-      to: email,
-      subject: 'Dein Bestätigungscode',
-      text: `Hallo!\n\nDein Verifizierungscode lautet: ${code}\nEr ist 10 Minuten gültig.\n\nViele Grüße,\nDein Lohnsystem-Team`,
-    });
+      {
+        headers: {
+          'api-key': process.env.BREVO_API_KEY || '',
+          'Content-Type': 'application/json',
+        },
+      }
+    );
 
     return res.status(200).json({ message: 'Code gesendet' });
-  } catch (error) {
-    console.error('Fehler beim Senden:', error);
-    return res.status(500).json({ message: 'Versand fehlgeschlagen.' });
+  } catch (err) {
+    console.error('Fehler beim Versand:', err);
+    return res.status(500).json({ message: 'Serverfehler beim Versenden des Codes.' });
   }
 }
