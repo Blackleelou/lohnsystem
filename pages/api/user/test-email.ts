@@ -18,7 +18,7 @@ export default async function handler(req: NextApiRequest, res: NextApiResponse)
       },
       body: JSON.stringify({
         sender: { name: 'Lohnsystem', email: 'noreply@meinlohn.app' },
-        to: [{ email: 'test@meinlohn.app' }], // <-- hier deine echte Testadresse eintragen
+        to: [{ email: 'jantzen.chris@gmail.com' }], // <-- hier deine echte Testadresse eintragen
         subject: 'Test-E-Mail vom Lohnsystem',
         htmlContent: `<p>Diese E-Mail bestätigt, dass Brevo korrekt eingerichtet ist.</p>`,
         textContent: 'Diese E-Mail bestätigt, dass Brevo korrekt eingerichtet ist.',
