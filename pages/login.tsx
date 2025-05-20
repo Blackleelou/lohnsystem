@@ -47,19 +47,6 @@ export default function LoginPage() {
               boxSizing: 'border-box'
             }}
           />
-          <img
-            src="/mail.png"
-            alt="E-Mail"
-            style={{
-              position: 'absolute',
-              top: '50%',
-              right: 10,
-              width: 20,
-              height: 20,
-              transform: 'translateY(-50%)',
-              opacity: 0.6
-            }}
-          />
         </div>
 
         <div style={{ position: 'relative', marginBottom: 10 }}>
