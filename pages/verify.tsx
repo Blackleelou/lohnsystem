@@ -1,5 +1,7 @@
 import { useState, useEffect } from "react";
 import { useRouter } from "next/router";
+import { toast, ToastContainer } from "react-toastify";
+import 'react-toastify/dist/ReactToastify.css';
 
 export default function VerifyPage() {
   const [code, setCode] = useState("");
@@ -26,7 +28,10 @@ export default function VerifyPage() {
         .then(async (res) => {
           const data = await res.json();
           if (res.ok) {
-            router.push("/dashboard");
+            toast.success("Registrierung erfolgreich!");
+            setTimeout(() => {
+              router.push("/dashboard");
+            }, 2000);
           } else {
             setError(data.message || "Code ungültig.");
             setCode("");
@@ -104,6 +109,7 @@ export default function VerifyPage() {
           </button>
         </p>
       </form>
+      <ToastContainer position="bottom-right" />
     </div>
   );
 }
