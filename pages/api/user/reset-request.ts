@@ -10,7 +10,7 @@ export default async function handler(req: NextApiRequest, res: NextApiResponse)
   if (!email) return res.status(400).json({ error: 'E-Mail erforderlich' });
 
   const user = await getUserByEmail(email);
-  if (!user) return res.status(404).json({ error: 'Benutzer nicht gefunden' });
+  if (!user) return res.status(200).json({ success: true }); // absichtlich gleich
 
   const token = randomBytes(32).toString('hex');
   const expiresAt = new Date(Date.now() + 1000 * 60 * 60); // 1 Stunde
