@@ -1,10 +1,12 @@
 
-import { useState } from "react";
-import { signOut } from "next-auth/react";
+import { useState, useEffect } from "react";
+import { signOut, useSession } from "next-auth/react";
 import LanguageSwitcher from "./LanguageSwitcher";
+import Link from "next/link";
 
 export default function UserMenu() {
   const [isOpen, setIsOpen] = useState(false);
+  const { data: session } = useSession();
 
   const handleDelete = async () => {
     if (!confirm("Möchtest du dein Konto wirklich löschen?")) return;
@@ -14,7 +16,6 @@ export default function UserMenu() {
     });
 
     if (res.ok) {
-      alert("Dein Konto wurde gelöscht.");
       signOut();
     } else {
       const data = await res.json();
@@ -45,7 +46,13 @@ export default function UserMenu() {
           padding: "1rem",
           zIndex: 1000,
           borderRadius: "8px",
+          minWidth: "160px"
         }}>
+          {session?.user?.email === "jantzen.chris@gmail.com" && (
+            <Link href="/admin/audit" style={{ display: "block", marginBottom: "0.5rem", textDecoration: "none", color: "#0070f3" }}>
+              Audit-Log
+            </Link>
+          )}
           <div style={{ marginBottom: "0.5rem", cursor: "pointer" }} onClick={handleDelete}>
             Account löschen
           </div>
