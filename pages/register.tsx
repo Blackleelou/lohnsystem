@@ -13,14 +13,18 @@ export default function RegisterPage() {
   const router = useRouter();
 
   const getStrength = (pwd: string) => {
-    if (pwd.length < 6) return { value: 20, label: "schwach", color: "red" };
-    if (!/[A-Z]/.test(pwd) || !/\d/.test(pwd)) return { value: 50, label: "mittel", color: "orange" };
-    if (pwd.length >= 10 && /[A-Z]/.test(pwd) && /\d/.test(pwd) && /[^A-Za-z0-9]/.test(pwd))
-      return { value: 100, label: "stark", color: "green" };
-    return { value: 70, label: "gut", color: "#76c7c0" };
+    let score = 0;
+    if (pwd.length >= 8) score++;
+    if (/[A-Z]/.test(pwd)) score++;
+    if (/[a-z]/.test(pwd)) score++;
+    if (/[0-9]/.test(pwd)) score++;
+    if (/[^A-Za-z0-9]/.test(pwd)) score++;
+    return score;
   };
 
   const strength = getStrength(password);
+  const strengthColor = ['#ccc', '#d9534f', '#f0ad4e', '#5bc0de', '#5cb85c'][strength];
+  const strengthLabel = ['Zu kurz', 'Schwach', 'Okay', 'Gut', 'Stark'][strength];
 
   const handleRegister = async (e: React.FormEvent) => {
     e.preventDefault();
@@ -71,24 +75,61 @@ export default function RegisterPage() {
       <form onSubmit={handleRegister} style={{ background: 'white', padding: 30, borderRadius: 6, boxShadow: '0 2px 8px rgba(0,0,0,0.1)', width: '100%', maxWidth: 400 }}>
         <h2 style={{ textAlign: 'center', marginBottom: 20 }}>Registrieren</h2>
         <input type="text" name="honeypot" value={honeypot} onChange={(e) => setHoneypot(e.target.value)} style={{ display: 'none' }} autoComplete="off" tabIndex={-1} />
+
         <div style={{ position: 'relative', marginBottom: 10 }}>
-          <input type="email" placeholder="E-Mail" value={email} onChange={(e) => setEmail(e.target.value)} required style={{ width: '100%', padding: 10, paddingRight: 40, boxSizing: 'border-box' }} />
+          <input
+            type="email"
+            placeholder="E-Mail"
+            value={email}
+            onChange={(e) => setEmail(e.target.value)}
+            required
+            style={{ width: '100%', padding: 10, paddingRight: 40, boxSizing: 'border-box' }}
+          />
         </div>
+
         <div style={{ position: 'relative', marginBottom: 10 }}>
-          <input type={showPassword ? "text" : "password"} placeholder="Passwort" value={password} onChange={(e) => setPassword(e.target.value)} required style={{ width: '100%', padding: 10, paddingRight: 40, boxSizing: 'border-box' }} />
-          <img src={showPassword ? "/eye-open.png" : "/eye-closed.png"} alt="Toggle visibility" onClick={() => setShowPassword(!showPassword)} style={{ position: 'absolute', top: '50%', right: 10, width: 24, height: 24, cursor: 'pointer', transform: 'translateY(-50%)' }} />
-          <div style={{ height: 6, width: '100%', background: '#eee', borderRadius: 3, marginTop: 4 }}>
-            <div style={{ width: `${strength.value}%`, height: '100%', backgroundColor: strength.color, borderRadius: 3 }} />
-          </div>
-          <small style={{ color: strength.color, fontSize: 12 }}>{`Sicherheitsstufe: ${strength.label}`}</small>
+          <input
+            type={showPassword ? "text" : "password"}
+            placeholder="Passwort"
+            value={password}
+            onChange={(e) => setPassword(e.target.value)}
+            required
+            style={{ width: '100%', padding: 10, paddingRight: 40, boxSizing: 'border-box' }}
+          />
+          <img
+            src={showPassword ? "/eye-open.png" : "/eye-closed.png"}
+            alt="Toggle visibility"
+            onClick={() => setShowPassword(!showPassword)}
+            style={{ position: 'absolute', top: 10, right: 10, width: 24, height: 24, cursor: 'pointer' }}
+          />
         </div>
+
+        {/* Passwortstärke-Anzeige */}
+        <div style={{ height: 6, width: '100%', background: '#eee', borderRadius: 4, marginBottom: 5 }}>
+          <div style={{ height: 6, width: `${strength * 25}%`, background: strengthColor, borderRadius: 4, transition: 'width 0.3s ease' }} />
+        </div>
+        <p style={{ fontSize: 12, color: strengthColor, marginBottom: 10 }}>{strengthLabel}</p>
+
         <div style={{ position: 'relative', marginBottom: 10 }}>
-          <input type={showConfirmPassword ? "text" : "password"} placeholder="Passwort wiederholen" value={confirmPassword} onChange={(e) => setConfirmPassword(e.target.value)} required style={{ width: '100%', padding: 10, paddingRight: 40, boxSizing: 'border-box' }} />
-          <img src={showConfirmPassword ? "/eye-open.png" : "/eye-closed.png"} alt="Toggle visibility" onClick={() => setShowConfirmPassword(!showConfirmPassword)} style={{ position: 'absolute', top: '50%', right: 10, width: 24, height: 24, cursor: 'pointer', transform: 'translateY(-50%)' }} />
+          <input
+            type={showConfirmPassword ? "text" : "password"}
+            placeholder="Passwort wiederholen"
+            value={confirmPassword}
+            onChange={(e) => setConfirmPassword(e.target.value)}
+            required
+            style={{ width: '100%', padding: 10, paddingRight: 40, boxSizing: 'border-box' }}
+          />
+          <img
+            src={showConfirmPassword ? "/eye-open.png" : "/eye-closed.png"}
+            alt="Toggle visibility"
+            onClick={() => setShowConfirmPassword(!showConfirmPassword)}
+            style={{ position: 'absolute', top: 10, right: 10, width: 24, height: 24, cursor: 'pointer' }}
+          />
         </div>
+
         {error && <p style={{ color: 'red' }}>{error}</p>}
         <button type="submit" disabled={loading} style={{ width: '100%', padding: 10, borderRadius: 4, backgroundColor: '#0070f3', color: '#fff', border: 'none' }}>
-          {loading ? 'Wird verarbeitet…' : 'Registrieren'}
+          {loading ? 'Wird verarbeitet...' : 'Registrieren'}
         </button>
         <p style={{ textAlign: 'center', marginTop: 12 }}>
           <a href="/reset-request" style={{ fontSize: 13, color: '#0070f3', textDecoration: 'none' }}>Passwort vergessen?</a>
