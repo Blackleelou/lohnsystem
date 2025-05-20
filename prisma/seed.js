@@ -7,17 +7,31 @@ const prisma = new PrismaClient();
 async function main() {
   const password = await bcrypt.hash('Test1234!', 10);
 
+  // Testnutzer
   await prisma.user.upsert({
     where: { email: 'test@user.de' },
     update: {},
     create: {
       email: 'test@user.de',
-      username: 'testuser1',
       password,
+      verified: true,
+      isAdmin: false,
     },
   });
 
-  console.log('✅ Testuser wurde angelegt oder aktualisiert: test@user.de / Test1234!');
+  // Hauptadmin
+  await prisma.user.upsert({
+    where: { email: 'jantzen.chris@gmail.com' },
+    update: {},
+    create: {
+      email: 'jantzen.chris@gmail.com',
+      password,
+      verified: true,
+      isAdmin: true,
+    },
+  });
+
+  console.log('✅ Testnutzer und Hauptadmin wurden angelegt.');
 }
 
 main()
