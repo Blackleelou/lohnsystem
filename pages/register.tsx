@@ -12,20 +12,6 @@ export default function RegisterPage() {
   const [honeypot, setHoneypot] = useState('');
   const router = useRouter();
 
-  const getStrength = (pwd: string) => {
-    let score = 0;
-    if (pwd.length >= 8) score++;
-    if (/[A-Z]/.test(pwd)) score++;
-    if (/[a-z]/.test(pwd)) score++;
-    if (/[0-9]/.test(pwd)) score++;
-    if (/[^A-Za-z0-9]/.test(pwd)) score++;
-    return score;
-  };
-
-  const strength = getStrength(password);
-  const strengthColor = ['#ccc', '#d9534f', '#f0ad4e', '#5bc0de', '#5cb85c'][strength];
-  const strengthLabel = ['Zu kurz', 'Schwach', 'Okay', 'Gut', 'Stark'][strength];
-
   const handleRegister = async (e: React.FormEvent) => {
     e.preventDefault();
     setError('');
@@ -70,10 +56,28 @@ export default function RegisterPage() {
     }
   };
 
+  const getStrength = (pwd: string) => {
+    let score = 0;
+    if (pwd.length >= 8) score += 2;
+    else if (pwd.length >= 5) score += 1;
+    if (/[A-Z]/.test(pwd)) score += 1;
+    if (/[a-z]/.test(pwd)) score += 1;
+    if (/[0-9]/.test(pwd)) score += 1;
+    if (/[^A-Za-z0-9]/.test(pwd)) score += 1;
+    return Math.min(score, 5);
+  };
+
+  const strength = getStrength(password);
+  const strengthColors = ['#ccc', '#d9534f', '#f0ad4e', '#5bc0de', '#5cb85c', '#4CAF50'];
+  const strengthLabels = ['Zu kurz', 'Schwach', 'Okay', 'Normal', 'Gut', 'Stark'];
+  const strengthColor = strengthColors[strength];
+  const strengthLabel = strengthLabels[strength];
+
   return (
     <div style={{ display: 'flex', justifyContent: 'center', alignItems: 'center', height: '100vh', background: '#f4f4f4' }}>
       <form onSubmit={handleRegister} style={{ background: 'white', padding: 30, borderRadius: 6, boxShadow: '0 2px 8px rgba(0,0,0,0.1)', width: '100%', maxWidth: 400 }}>
         <h2 style={{ textAlign: 'center', marginBottom: 20 }}>Registrieren</h2>
+
         <input type="text" name="honeypot" value={honeypot} onChange={(e) => setHoneypot(e.target.value)} style={{ display: 'none' }} autoComplete="off" tabIndex={-1} />
 
         <div style={{ position: 'relative', marginBottom: 10 }}>
@@ -83,7 +87,12 @@ export default function RegisterPage() {
             value={email}
             onChange={(e) => setEmail(e.target.value)}
             required
-            style={{ width: '100%', padding: 10, paddingRight: 40, boxSizing: 'border-box' }}
+            style={{
+              width: '100%',
+              padding: 10,
+              paddingRight: 40,
+              boxSizing: 'border-box',
+            }}
           />
         </div>
 
@@ -94,21 +103,38 @@ export default function RegisterPage() {
             value={password}
             onChange={(e) => setPassword(e.target.value)}
             required
-            style={{ width: '100%', padding: 10, paddingRight: 40, boxSizing: 'border-box' }}
+            style={{
+              width: '100%',
+              padding: 10,
+              paddingRight: 40,
+              boxSizing: 'border-box'
+            }}
           />
           <img
             src={showPassword ? "/eye-open.png" : "/eye-closed.png"}
             alt="Toggle visibility"
             onClick={() => setShowPassword(!showPassword)}
-            style={{ position: 'absolute', top: 10, right: 10, width: 24, height: 24, cursor: 'pointer' }}
+            style={{
+              position: 'absolute',
+              top: '50%',
+              right: 10,
+              width: 24,
+              height: 24,
+              cursor: 'pointer',
+              transform: 'translateY(-50%)'
+            }}
           />
         </div>
 
-        {/* Passwortstärke-Anzeige */}
-        <div style={{ height: 6, width: '100%', background: '#eee', borderRadius: 4, marginBottom: 5 }}>
-          <div style={{ height: 6, width: `${strength * 25}%`, background: strengthColor, borderRadius: 4, transition: 'width 0.3s ease' }} />
+        {/* Passwortstärke */}
+        <div style={{ marginBottom: 10 }}>
+          <div style={{ height: 6, width: '100%', background: '#eee', borderRadius: 3, overflow: 'hidden' }}>
+            <div style={{ width: `${(strength / 5) * 100}%`, height: '100%', backgroundColor: strengthColor, transition: 'width 0.3s ease' }} />
+          </div>
+          <div style={{ fontSize: 12, color: strengthColor, textAlign: 'right', marginTop: 4 }}>
+            {strengthLabel}
+          </div>
         </div>
-        <p style={{ fontSize: 12, color: strengthColor, marginBottom: 10 }}>{strengthLabel}</p>
 
         <div style={{ position: 'relative', marginBottom: 10 }}>
           <input
@@ -117,20 +143,42 @@ export default function RegisterPage() {
             value={confirmPassword}
             onChange={(e) => setConfirmPassword(e.target.value)}
             required
-            style={{ width: '100%', padding: 10, paddingRight: 40, boxSizing: 'border-box' }}
+            style={{
+              width: '100%',
+              padding: 10,
+              paddingRight: 40,
+              boxSizing: 'border-box'
+            }}
           />
           <img
             src={showConfirmPassword ? "/eye-open.png" : "/eye-closed.png"}
             alt="Toggle visibility"
             onClick={() => setShowConfirmPassword(!showConfirmPassword)}
-            style={{ position: 'absolute', top: 10, right: 10, width: 24, height: 24, cursor: 'pointer' }}
+            style={{
+              position: 'absolute',
+              top: '50%',
+              right: 10,
+              width: 24,
+              height: 24,
+              cursor: 'pointer',
+              transform: 'translateY(-50%)'
+            }}
           />
         </div>
 
         {error && <p style={{ color: 'red' }}>{error}</p>}
-        <button type="submit" disabled={loading} style={{ width: '100%', padding: 10, borderRadius: 4, backgroundColor: '#0070f3', color: '#fff', border: 'none' }}>
+
+        <button type="submit" disabled={loading} style={{
+          width: '100%',
+          padding: 10,
+          borderRadius: 4,
+          backgroundColor: '#0070f3',
+          color: '#fff',
+          border: 'none'
+        }}>
           {loading ? 'Wird verarbeitet...' : 'Registrieren'}
         </button>
+
         <p style={{ textAlign: 'center', marginTop: 12 }}>
           <a href="/reset-request" style={{ fontSize: 13, color: '#0070f3', textDecoration: 'none' }}>Passwort vergessen?</a>
         </p>
