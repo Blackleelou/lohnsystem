@@ -15,12 +15,12 @@ export async function sendResetMail(email: string, token: string) {
     body: JSON.stringify({
       sender: {
         name: "Lohnsystem",
-        email: "noreply@meinlohn.app", // kann angepasst werden
+        email: "noreply@meinlohn.app"
       },
       to: [{ email }],
       subject: "Passwort zurücksetzen",
-      htmlContent: `<p>Klicke auf den folgenden Link, um dein Passwort zurückzusetzen:</p><p><a href="${appUrl}/reset?token=${token}">${appUrl}/reset?token=${token}</a></p>`,
-      textContent: `Setze dein Passwort zurück unter: ${appUrl}/reset?token=${token}`,
+      htmlContent: `<p>Klicke auf den folgenden Link, um dein Passwort zurückzusetzen:</p><p><a href="${appUrl}/reset-password?token=${token}">${appUrl}/reset-password?token=${token}</a></p>`,
+      textContent: `Setze dein Passwort zurück unter: ${appUrl}/reset-password?token=${token}`,
     }),
   });
 
