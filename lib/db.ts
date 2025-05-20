@@ -11,3 +11,19 @@ export async function savePasswordResetToken(userId: string, token: string, expi
     create: { userId, token, expiresAt },
   });
 }
+
+export async function updateUserProfile(userId: string, data: {
+  firstname?: string;
+  lastname?: string;
+  username?: string;
+  email?: string;
+  steuerklasse?: string;
+  kinderfreibetrag?: string;
+  kirche?: boolean;
+  iban?: string;
+}) {
+  return await prisma.user.update({
+    where: { id: userId },
+    data,
+  });
+}
