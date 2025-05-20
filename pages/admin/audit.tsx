@@ -16,7 +16,6 @@ export default function AuditPage() {
       return;
     }
 
-    // Optional: Nur bestimmte E-Mail zulassen
     if (session.user.email !== "jantzen.chris@gmail.com") {
       router.push("/dashboard");
       return;
@@ -27,6 +26,21 @@ export default function AuditPage() {
       .then((data) => setLogs(data.logs))
       .catch(() => setLogs([]));
   }, [session, status, router]);
+
+  const handleExport = () => {
+    const header = "Zeit;Aktion;UserID;IP";
+    const rows = logs.map(log =>
+      `${new Date(log.timestamp).toISOString()};${log.action};${log.userId};${log.ip}`
+    );
+    const csvContent = [header, ...rows].join("\n");
+    const blob = new Blob([csvContent], { type: "text/csv" });
+    const url = URL.createObjectURL(blob);
+
+    const a = document.createElement("a");
+    a.href = url;
+    a.download = `audit-log-${new Date().toISOString()}.csv`;
+    a.click();
+  };
 
   return (
     <div className="max-w-5xl mx-auto p-6">
@@ -51,6 +65,12 @@ export default function AuditPage() {
           ))}
         </tbody>
       </table>
+      <button
+        onClick={handleExport}
+        className="mt-4 bg-blue-600 text-white px-4 py-2 rounded"
+      >
+        CSV exportieren
+      </button>
     </div>
   );
 }
