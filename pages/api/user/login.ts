@@ -1,23 +1,32 @@
 import type { NextApiRequest, NextApiResponse } from 'next';
 import { serialize } from 'cookie';
+import { prisma } from '@/lib/prisma';
+import bcrypt from 'bcryptjs';
 
 export default async function handler(req: NextApiRequest, res: NextApiResponse) {
   if (req.method !== 'POST') return res.status(405).end();
 
   const { email, password } = req.body;
 
-  if (email === 'test@user.de' && password === '12345678') {
-    const cookie = serialize("userId", "testuser", {
-      path: "/",
-      httpOnly: false,
-      sameSite: "lax",
-      secure: process.env.NODE_ENV === "production",
-      maxAge: 60 * 60 * 24,
-    });
+  const user = await prisma.user.findUnique({ where: { email } });
 
-    res.setHeader("Set-Cookie", cookie);
-    return res.status(200).end();
+  if (!user || !user.verified) {
+    return res.status(401).json({ message: 'E-Mail wurde noch nicht bestätigt.' });
   }
 
-  return res.status(401).send("Login fehlgeschlagen");
+  const validPassword = await bcrypt.compare(password, user.password);
+  if (!validPassword) {
+    return res.status(401).json({ message: 'Login fehlgeschlagen' });
+  }
+
+  const cookie = serialize("userId", user.id, {
+    path: "/",
+    httpOnly: false,
+    sameSite: "lax",
+    secure: process.env.NODE_ENV === "production",
+    maxAge: 60 * 60 * 24,
+  });
+
+  res.setHeader("Set-Cookie", cookie);
+  return res.status(200).end();
 }
