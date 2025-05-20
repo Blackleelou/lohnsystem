@@ -1,4 +1,3 @@
-
 import { useState } from 'react';
 import { useRouter } from 'next/router';
 
@@ -47,7 +46,6 @@ export default function RegisterPage() {
           headers: { 'Content-Type': 'application/json' },
           body: JSON.stringify({ email }),
         });
-        setEmail(''); setPassword(''); setConfirmPassword('');
         router.push(`/verify?email=${encodeURIComponent(email)}`);
       }
     } catch (err) {
