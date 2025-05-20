@@ -11,6 +11,7 @@ export default function RegisterPage() {
   const [error, setError] = useState('');
   const [loading, setLoading] = useState(false);
   const [honeypot, setHoneypot] = useState('');
+  const [strength, setStrength] = useState(0);
   const router = useRouter();
 
   const handleRegister = async (e: React.FormEvent) => {
@@ -57,15 +58,59 @@ export default function RegisterPage() {
     }
   };
 
+  const checkStrength = (value: string) => {
+    let score = 0;
+    if (value.length >= 8) score++;
+    if (/[A-Z]/.test(value)) score++;
+    if (/[0-9]/.test(value)) score++;
+    if (/[^A-Za-z0-9]/.test(value)) score++;
+    setStrength(score);
+  };
+
+  const getStrengthColor = () => {
+    return ['#ccc', '#f87171', '#facc15', '#4ade80', '#22c55e'][strength];
+  };
+
   return (
     <div style={{ display: 'flex', justifyContent: 'center', alignItems: 'center', height: '100vh', background: '#f4f4f4' }}>
       <form onSubmit={handleRegister} style={{ background: 'white', padding: 30, borderRadius: 6, boxShadow: '0 2px 8px rgba(0,0,0,0.1)', width: '100%', maxWidth: 400 }}>
         <h2 style={{ textAlign: 'center', marginBottom: 20 }}>Registrieren</h2>
         <input type="text" name="honeypot" value={honeypot} onChange={(e) => setHoneypot(e.target.value)} style={{ display: 'none' }} autoComplete="off" tabIndex={-1} />
         <input type="email" placeholder="E-Mail" value={email} onChange={(e) => setEmail(e.target.value)} required style={{ marginBottom: 10, width: '100%', padding: 10 }} />
-        <div style={{ position: 'relative', marginBottom: 10 }}>
-          <input type={showPassword ? "text" : "password"} placeholder="Passwort" value={password} onChange={(e) => setPassword(e.target.value)} required style={{ width: '100%', padding: 10, paddingRight: 40, boxSizing: 'border-box' }} />
-          <img src={showPassword ? "/eye-open.png" : "/eye-closed.png"} alt="Toggle visibility" onClick={() => setShowPassword(!showPassword)} style={{ position: 'absolute', top: '50%', right: 10, width: 24, height: 24, cursor: 'pointer', transform: 'translateY(-50%)' }} />
+        <div style={{ position: 'relative', marginBottom: 4 }}>
+          <input
+            type={showPassword ? "text" : "password"}
+            placeholder="Passwort"
+            value={password}
+            onChange={(e) => {
+              setPassword(e.target.value);
+              checkStrength(e.target.value);
+            }}
+            required
+            style={{ width: '100%', padding: 10, paddingRight: 40, boxSizing: 'border-box' }}
+          />
+          <img
+            src={showPassword ? "/eye-open.png" : "/eye-closed.png"}
+            alt="Toggle visibility"
+            onClick={() => setShowPassword(!showPassword)}
+            style={{
+              position: 'absolute',
+              top: '50%',
+              right: 10,
+              width: 24,
+              height: 24,
+              cursor: 'pointer',
+              transform: 'translateY(-50%)'
+            }}
+          />
+        </div>
+        <div style={{ height: 6, background: '#eee', borderRadius: 4, overflow: 'hidden', marginBottom: 10 }}>
+          <div style={{
+            height: '100%',
+            width: `${(strength / 4) * 100}%`,
+            backgroundColor: getStrengthColor(),
+            transition: 'width 0.3s'
+          }} />
         </div>
         <div style={{ position: 'relative', marginBottom: 10 }}>
           <input type={showConfirmPassword ? "text" : "password"} placeholder="Passwort wiederholen" value={confirmPassword} onChange={(e) => setConfirmPassword(e.target.value)} required style={{ width: '100%', padding: 10, paddingRight: 40, boxSizing: 'border-box' }} />
