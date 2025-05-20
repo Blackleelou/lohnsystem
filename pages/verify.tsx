@@ -1,6 +1,7 @@
+
 import { useState, useEffect } from "react";
 import { useRouter } from "next/router";
-import { toast, ToastContainer } from "react-toastify";
+import { toast, ToastContainer, Slide } from "react-toastify";
 import 'react-toastify/dist/ReactToastify.css';
 
 export default function VerifyPage() {
@@ -28,9 +29,33 @@ export default function VerifyPage() {
         .then(async (res) => {
           const data = await res.json();
           if (res.ok) {
-            toast.success("Registrierung erfolgreich!");
-            setTimeout(() => {
-              router.push("/dashboard");
+            toast.success("Verifiziert – du wirst eingeloggt...", {
+              autoClose: 2000,
+              hideProgressBar: true,
+              closeOnClick: true,
+              pauseOnHover: false,
+              draggable: false,
+              transition: Slide
+            });
+
+            setTimeout(async () => {
+              const storedPass = sessionStorage.getItem("initialPassword");
+              if (!storedPass) {
+                return router.push("/login");
+              }
+
+              const loginRes = await fetch("/api/user/login", {
+                method: "POST",
+                headers: { "Content-Type": "application/json" },
+                body: JSON.stringify({ email, password: storedPass }),
+              });
+
+              if (loginRes.ok) {
+                sessionStorage.removeItem("initialPassword");
+                router.push("/dashboard");
+              } else {
+                router.push("/login");
+              }
             }, 2000);
           } else {
             setError(data.message || "Code ungültig.");
