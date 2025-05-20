@@ -1,7 +1,8 @@
 
 import { useState, useEffect } from "react";
 import { useRouter } from "next/router";
-import { toast, ToastContainer, Slide } from "react-toastify";
+import { signIn } from "next-auth/react";
+import { toast, ToastContainer } from "react-toastify";
 import 'react-toastify/dist/ReactToastify.css';
 
 export default function VerifyPage() {
@@ -30,33 +31,32 @@ export default function VerifyPage() {
           const data = await res.json();
           if (res.ok) {
             toast.success("Verifiziert – du wirst eingeloggt...", {
-              autoClose: 2000,
+              autoClose: 2500,
               hideProgressBar: true,
               closeOnClick: true,
               pauseOnHover: false,
-              draggable: false,
-              transition: Slide
+              draggable: false
             });
 
-            setTimeout(async () => {
-              const storedPass = sessionStorage.getItem("initialPassword");
-              if (!storedPass) {
-                return router.push("/login");
-              }
+            const storedPass = sessionStorage.getItem("initialPassword");
+            if (!storedPass) {
+              return router.push("/login");
+            }
 
-              const loginRes = await fetch("/api/user/login", {
-                method: "POST",
-                headers: { "Content-Type": "application/json" },
-                body: JSON.stringify({ email, password: storedPass }),
+            setTimeout(async () => {
+              const loginRes = await signIn("credentials", {
+                email,
+                password: storedPass,
+                redirect: false,
               });
 
-              if (loginRes.ok) {
+              if (loginRes?.ok) {
                 sessionStorage.removeItem("initialPassword");
                 router.push("/dashboard");
               } else {
                 router.push("/login");
               }
-            }, 2000);
+            }, 2500);
           } else {
             setError(data.message || "Code ungültig.");
             setCode("");
