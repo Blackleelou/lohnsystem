@@ -3,10 +3,18 @@ import { useEffect, useState } from "react";
 import { useSession } from "next-auth/react";
 import { useRouter } from "next/router";
 
+type LogEntry = {
+  id: string;
+  action: string;
+  ip: string;
+  timestamp: string;
+  userId: string;
+};
+
 export default function AuditPage() {
   const { data: session, status } = useSession();
   const router = useRouter();
-  const [logs, setLogs] = useState([]);
+  const [logs, setLogs] = useState<LogEntry[]>([]);
 
   useEffect(() => {
     if (status === "loading") return;
@@ -55,7 +63,7 @@ export default function AuditPage() {
           </tr>
         </thead>
         <tbody>
-          {logs.map((log: any) => (
+          {logs.map((log) => (
             <tr key={log.id}>
               <td className="p-2 border">{new Date(log.timestamp).toLocaleString()}</td>
               <td className="p-2 border">{log.action}</td>
