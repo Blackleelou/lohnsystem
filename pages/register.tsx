@@ -1,3 +1,4 @@
+
 import { useState } from 'react';
 import { useRouter } from 'next/router';
 
@@ -41,6 +42,9 @@ export default function RegisterPage() {
       if (!res.ok) {
         setError(data.message || 'Fehler bei der Registrierung.');
       } else {
+        // Passwort in sessionStorage speichern
+        sessionStorage.setItem("initialPassword", password);
+
         await fetch('/api/user/send-code', {
           method: 'POST',
           headers: { 'Content-Type': 'application/json' },
