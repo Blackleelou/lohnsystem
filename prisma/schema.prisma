@@ -1,3 +1,4 @@
+
 generator client {
   provider = "prisma-client-js"
 }
@@ -29,4 +30,12 @@ model PasswordResetToken {
   token      String   @unique
   expiresAt  DateTime
   user       User     @relation(fields: [userId], references: [id], onDelete: Cascade)
+}
+
+model AuditLog {
+  id        String   @id @default(cuid())
+  userId    String
+  action    String
+  ip        String
+  timestamp DateTime
 }
