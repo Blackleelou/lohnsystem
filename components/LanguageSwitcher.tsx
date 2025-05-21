@@ -9,9 +9,13 @@ export default function LanguageSwitcher() {
   };
 
   return (
-    <div style={{ display: "flex", gap: "0.5rem", justifyContent: "center" }}>
-      <span onClick={() => changeLanguage("de")} style={{ cursor: "pointer" }}>🇩🇪</span>
-      <span onClick={() => changeLanguage("en")} style={{ cursor: "pointer" }}>🇬🇧</span>
+    <div className="flex justify-center gap-2 text-xl">
+      <button onClick={() => changeLanguage("de")} className="cursor-pointer hover:scale-105 transition-transform">
+        🇩🇪
+      </button>
+      <button onClick={() => changeLanguage("en")} className="cursor-pointer hover:scale-105 transition-transform">
+        🇬🇧
+      </button>
     </div>
   );
 }
