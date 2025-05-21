@@ -15,10 +15,20 @@ export default async function handler(req: NextApiRequest, res: NextApiResponse)
     return res.status(400).json({ message: 'Token ist ungültig oder abgelaufen.' });
   }
 
+  const user = await prisma.user.findUnique({ where: { id: entry.userId } });
+  if (!user) {
+    return res.status(404).json({ message: 'Benutzer nicht gefunden.' });
+  }
+
+  const isSamePassword = await bcrypt.compare(password, user.password);
+  if (isSamePassword) {
+    return res.status(400).json({ message: 'Das neue Passwort darf nicht mit dem alten übereinstimmen.' });
+  }
+
   const hashed = await bcrypt.hash(password, 10);
 
   await prisma.user.update({
-    where: { id: entry.userId },
+    where: { id: user.id },
     data: { password: hashed },
   });
 
