@@ -13,11 +13,13 @@ export const authOptions: AuthOptions = {
         password: { label: "Password", type: "password" },
       },
       async authorize(credentials) {
+        if (!credentials?.email || !credentials?.password) return null;
+
         const user = await prisma.user.findUnique({
-          where: { email: credentials?.email || "" },
+          where: { email: credentials.email },
         });
 
-        if (!user || !credentials?.password) return null;
+        if (!user) return null;
 
         const isValid = await compare(credentials.password, user.password);
         if (!isValid) return null;
@@ -39,7 +41,7 @@ export const authOptions: AuthOptions = {
 
   callbacks: {
     async jwt({ token, user, account }) {
-      // === Google Login: automatisch neuen Nutzer anlegen ===
+      // === Google Login: automatisch Nutzer erstellen ===
       if (account?.provider === "google" && user?.email) {
         let dbUser = await prisma.user.findUnique({
           where: { email: user.email },
@@ -49,17 +51,19 @@ export const authOptions: AuthOptions = {
           dbUser = await prisma.user.create({
             data: {
               email: user.email,
-              password: "",       // Kein Passwort nötig bei Google
-              verified: true,     // Google-Nutzer sind verifiziert
+              password: "",
+              verified: true,
             },
           });
-          // Optional: Logging
+
+          // === Audit Log mit timestamp ===
           try {
             await prisma.auditLog.create({
               data: {
                 userId: dbUser.id,
                 action: "auto_register_google",
-                ip: "google-oauth", // keine echte IP bekannt
+                ip: "google-oauth",
+                timestamp: new Date(), // <- Wichtig!
               },
             });
           } catch (err) {
@@ -70,7 +74,6 @@ export const authOptions: AuthOptions = {
         token.id = dbUser.id;
       }
 
-      // === Klassische Anmeldung via Credentials ===
       if (user && !token?.id) {
         token.id = user.id;
       }
@@ -86,6 +89,9 @@ export const authOptions: AuthOptions = {
     },
   },
 
-  pages: { signIn: "/login" },
+  pages: {
+    signIn: "/login",
+  },
+
   secret: process.env.NEXTAUTH_SECRET,
 };
