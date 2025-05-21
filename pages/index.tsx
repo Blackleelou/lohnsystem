@@ -15,6 +15,7 @@ export async function getServerSideProps(context: GetServerSidePropsContext) {
   };
 }
 
+// Kein sichtbarer Inhalt, da nur Weiterleitung erfolgt
 export default function IndexRedirect() {
   return null;
 }
