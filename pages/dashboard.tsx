@@ -2,9 +2,26 @@
 
 import Layout from "@/components/Layout";
 import { useSession } from "next-auth/react";
+import { useEffect, useState } from "react";
+import { useRouter } from "next/router";
 
 export default function Dashboard() {
   const { data: session } = useSession();
+  const router = useRouter();
+  const [showGoogleHint, setShowGoogleHint] = useState(false);
+
+  useEffect(() => {
+    if (router.query.justSignedIn === "google") {
+      setShowGoogleHint(true);
+
+      // Nach 5 Sekunden Hinweis ausblenden und URL bereinigen
+      setTimeout(() => {
+        setShowGoogleHint(false);
+        const { justSignedIn, ...rest } = router.query;
+        router.replace({ pathname: router.pathname, query: rest }, undefined, { shallow: true });
+      }, 5000);
+    }
+  }, [router]);
 
   return (
     <Layout>
@@ -15,8 +32,8 @@ export default function Dashboard() {
           Hier kommt deine Lohnübersicht hin.
         </p>
 
-        {session?.user?.email?.includes("@gmail.com") && (
-          <div className="bg-yellow-100 text-yellow-800 p-4 rounded-md border border-yellow-300 mb-4 text-sm">
+        {showGoogleHint && (
+          <div className="bg-yellow-100 text-yellow-800 p-4 rounded-md border border-yellow-300 mb-4 text-sm shadow">
             Hinweis: Du bist mit deinem <strong>Google-Konto</strong> angemeldet.
             Ein separates Passwort ist nicht erforderlich.
           </div>
