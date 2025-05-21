@@ -29,67 +29,62 @@ export default function LoginPage() {
   };
 
   return (
-    <div style={{ display: 'flex', justifyContent: 'center', alignItems: 'center', height: '100vh', background: '#f4f4f4' }}>
-      <form onSubmit={handleLogin} style={{ background: 'white', padding: 30, borderRadius: 6, boxShadow: '0 2px 8px rgba(0,0,0,0.1)', width: '100%', maxWidth: 400 }}>
-        <h2 style={{ textAlign: 'center', marginBottom: 20 }}>Anmelden</h2>
+    <div className="min-h-screen flex items-center justify-center bg-gray-100">
+      <form
+        onSubmit={handleLogin}
+        className="bg-white shadow-md rounded-lg px-8 py-6 w-full max-w-md"
+      >
+        <h2 className="text-2xl font-semibold text-center mb-6">Anmelden</h2>
 
-        <div style={{ position: 'relative', marginBottom: 10 }}>
+        <div className="mb-4 relative">
           <input
             type="email"
             placeholder="E-Mail"
             value={email}
             onChange={(e) => setEmail(e.target.value)}
             required
-            style={{
-              width: '100%',
-              padding: 10,
-              paddingRight: 40,
-              boxSizing: 'border-box'
-            }}
+            className="w-full p-2 pr-10 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500"
           />
         </div>
 
-        <div style={{ position: 'relative', marginBottom: 10 }}>
+        <div className="mb-4 relative">
           <input
-            type={showPassword ? "text" : "password"}
+            type={showPassword ? 'text' : 'password'}
             placeholder="Passwort"
             value={password}
             onChange={(e) => setPassword(e.target.value)}
             required
-            style={{
-              width: '100%',
-              padding: 10,
-              paddingRight: 40,
-              boxSizing: 'border-box'
-            }}
+            className="w-full p-2 pr-10 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500"
           />
           <img
             src={showPassword ? "/eye-open.png" : "/eye-closed.png"}
             alt="Toggle visibility"
             onClick={() => setShowPassword(!showPassword)}
-            style={{
-              position: 'absolute',
-              top: '50%',
-              right: 10,
-              width: 24,
-              height: 24,
-              cursor: 'pointer',
-              transform: 'translateY(-50%)'
-            }}
+            className="absolute top-1/2 right-3 w-5 h-5 cursor-pointer transform -translate-y-1/2"
           />
         </div>
 
-        {error && <p style={{ color: 'red' }}>{error}</p>}
+        {error && (
+          <p className="text-red-600 text-sm text-center mb-4">{error}</p>
+        )}
 
-        <button type="submit" style={{ width: '100%', padding: 10, borderRadius: 4, backgroundColor: '#0070f3', color: '#fff', border: 'none' }}>
+        <button
+          type="submit"
+          className="w-full py-2 bg-blue-600 text-white rounded-md hover:bg-blue-700 transition"
+        >
           Login
         </button>
 
-        <p style={{ textAlign: 'center', marginTop: 12 }}>
-          <a href="/reset-request" style={{ fontSize: 13, color: '#0070f3', textDecoration: 'none' }}>Passwort vergessen?</a>
+        <p className="text-center text-sm mt-4">
+          <a href="/reset-request" className="text-blue-600 hover:underline">
+            Passwort vergessen?
+          </a>
         </p>
-        <p style={{ textAlign: 'center', marginTop: 10 }}>
-          Noch kein Konto? <a href="/register" style={{ color: '#0070f3', textDecoration: 'none' }}>Jetzt registrieren</a>
+        <p className="text-center text-sm mt-2">
+          Noch kein Konto?{' '}
+          <a href="/register" className="text-blue-600 hover:underline">
+            Jetzt registrieren
+          </a>
         </p>
       </form>
     </div>
