@@ -123,10 +123,11 @@ export default function LoginPage() {
             Passwort vergessen?
           </a>
         </p>
-        <p className="text-center text-sm mt-2">
-          Noch kein Konto?{' '}
+
+        <p className="text-center text-sm mt-6 text-gray-600">
+          Für alle, die lieber selbst klicken:{' '}
           <a href="/register" className="text-blue-600 hover:underline">
-            Jetzt registrieren
+            Registrieren
           </a>
         </p>
       </form>
