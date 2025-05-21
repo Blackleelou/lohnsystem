@@ -1,5 +1,4 @@
-
-import { useState, useEffect } from "react";
+import { useState } from "react";
 import { signOut, useSession } from "next-auth/react";
 import LanguageSwitcher from "./LanguageSwitcher";
 import Link from "next/link";
@@ -24,41 +23,36 @@ export default function UserMenu() {
   };
 
   return (
-    <div style={{ position: "relative" }}>
+    <div className="relative">
       <button
         onClick={() => setIsOpen(!isOpen)}
-        style={{
-          background: "none",
-          border: "none",
-          fontSize: "24px",
-          cursor: "pointer",
-        }}
+        className="bg-transparent border-none text-2xl cursor-pointer"
       >
         &#9776;
       </button>
+
       {isOpen && (
-        <div style={{
-          position: "absolute",
-          right: 0,
-          top: "40px",
-          background: "white",
-          boxShadow: "0 2px 8px rgba(0,0,0,0.15)",
-          padding: "1rem",
-          zIndex: 1000,
-          borderRadius: "8px",
-          minWidth: "160px"
-        }}>
+        <div className="absolute right-0 top-10 bg-white shadow-lg p-4 z-50 rounded-lg min-w-[160px]">
           {session?.user?.email === "jantzen.chris@gmail.com" && (
-            <Link href="/admin/audit" style={{ display: "block", marginBottom: "0.5rem", textDecoration: "none", color: "#0070f3" }}>
+            <Link
+              href="/admin/audit"
+              className="block mb-2 text-blue-600 hover:underline"
+            >
               Audit-Log
             </Link>
           )}
-          <div style={{ marginBottom: "0.5rem", cursor: "pointer" }} onClick={handleDelete}>
+          <button
+            onClick={handleDelete}
+            className="w-full text-left mb-2 hover:text-red-600"
+          >
             Account löschen
-          </div>
-          <div style={{ color: "red", cursor: "pointer", marginBottom: "0.5rem" }} onClick={() => signOut()}>
+          </button>
+          <button
+            onClick={() => signOut()}
+            className="w-full text-left mb-2 text-red-500 hover:text-red-700"
+          >
             Logout
-          </div>
+          </button>
           <LanguageSwitcher />
         </div>
       )}
