@@ -39,25 +39,38 @@ export const authOptions: AuthOptions = {
 
   callbacks: {
     async jwt({ token, user, account }) {
+      // === Google Login: automatisch neuen Nutzer anlegen ===
       if (account?.provider === "google" && user?.email) {
-        const existingUser = await prisma.user.findUnique({
+        let dbUser = await prisma.user.findUnique({
           where: { email: user.email },
         });
 
-        if (!existingUser) {
-          const newUser = await prisma.user.create({
+        if (!dbUser) {
+          dbUser = await prisma.user.create({
             data: {
               email: user.email,
-              password: "",       // Kein Passwort notwendig für Google
-              verified: true,     // Optional, direkt verifiziert
+              password: "",       // Kein Passwort nötig bei Google
+              verified: true,     // Google-Nutzer sind verifiziert
             },
           });
-          token.id = newUser.id;
-        } else {
-          token.id = existingUser.id;
+          // Optional: Logging
+          try {
+            await prisma.auditLog.create({
+              data: {
+                userId: dbUser.id,
+                action: "auto_register_google",
+                ip: "google-oauth", // keine echte IP bekannt
+              },
+            });
+          } catch (err) {
+            console.warn("Audit-Log konnte nicht erstellt werden:", err);
+          }
         }
+
+        token.id = dbUser.id;
       }
 
+      // === Klassische Anmeldung via Credentials ===
       if (user && !token?.id) {
         token.id = user.id;
       }
