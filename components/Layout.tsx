@@ -3,11 +3,11 @@ import UserMenu from "./UserMenu";
 
 export default function Layout({ children }: { children: React.ReactNode }) {
   return (
-    <div>
-      <div style={{ display: "flex", justifyContent: "flex-end", padding: "1rem" }}>
+    <div className="min-h-screen bg-gray-100">
+      <header className="flex justify-end p-4 bg-white shadow-sm">
         <UserMenu />
-      </div>
-      <main>{children}</main>
+      </header>
+      <main className="p-4">{children}</main>
     </div>
   );
 }
