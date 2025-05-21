@@ -1,29 +1,15 @@
-import { useState, useEffect } from 'react';
+import { useState } from 'react';
 import { useRouter } from 'next/router';
 
 export default function ResetPasswordPage() {
   const [password, setPassword] = useState('');
   const [confirm, setConfirm] = useState('');
+  const [showPassword, setShowPassword] = useState(false);
+  const [showConfirm, setShowConfirm] = useState(false);
   const [error, setError] = useState('');
   const [message, setMessage] = useState('');
-  const [strength, setStrength] = useState(0);
-  const [showHint, setShowHint] = useState(false);
   const router = useRouter();
   const { token } = router.query;
-
-  useEffect(() => {
-    evaluateStrength(password);
-  }, [password]);
-
-  const evaluateStrength = (val: string) => {
-    let score = 0;
-    if (val.length >= 8) score++;
-    if (/[A-Z]/.test(val)) score++;
-    if (/[a-z]/.test(val)) score++;
-    if (/[0-9]/.test(val)) score++;
-    if (/[^A-Za-z0-9]/.test(val)) score++;
-    setStrength(score);
-  };
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
@@ -32,12 +18,6 @@ export default function ResetPasswordPage() {
 
     if (password !== confirm) {
       setError('Passwörter stimmen nicht überein.');
-      return;
-    }
-
-    const oldPass = sessionStorage.getItem('initialPassword');
-    if (oldPass && password === oldPass) {
-      setError('Neues Passwort darf nicht dem alten entsprechen.');
       return;
     }
 
@@ -66,53 +46,41 @@ export default function ResetPasswordPage() {
           Neues Passwort festlegen
         </h2>
 
+        {/* Neues Passwort */}
         <div className="relative mb-4">
           <input
-            type="password"
+            type={showPassword ? "text" : "password"}
             placeholder="Neues Passwort"
             value={password}
             onChange={(e) => setPassword(e.target.value)}
             required
             className="w-full p-2 pr-10 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500"
           />
-          <span
-            onClick={() => setShowHint(!showHint)}
-            title="Passwortanforderungen anzeigen"
-            className="absolute right-3 top-2 text-gray-500 font-bold cursor-pointer"
-          >
-            ?
-          </span>
-        </div>
-
-        <div className="h-2 bg-gray-300 rounded mb-2">
-          <div
-            className={`h-full rounded transition-all duration-300 ${
-              strength <= 2
-                ? 'w-2/5 bg-red-500'
-                : strength <= 4
-                ? 'w-3/5 bg-yellow-500'
-                : 'w-full bg-green-500'
-            }`}
+          <img
+            src={showPassword ? "/eye-open.png" : "/eye-closed.png"}
+            alt="Toggle password"
+            className="absolute top-1/2 right-3 transform -translate-y-1/2 w-5 h-5 cursor-pointer"
+            onClick={() => setShowPassword(!showPassword)}
           />
         </div>
 
-        {showHint && (
-          <ul className="text-xs text-gray-600 mb-4 pl-5 list-disc">
-            <li>Mind. 8 Zeichen</li>
-            <li>Groß- und Kleinbuchstaben</li>
-            <li>Ziffern</li>
-            <li>Sonderzeichen</li>
-          </ul>
-        )}
-
-        <input
-          type="password"
-          placeholder="Passwort wiederholen"
-          value={confirm}
-          onChange={(e) => setConfirm(e.target.value)}
-          required
-          className="w-full p-2 mb-4 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500"
-        />
+        {/* Passwort wiederholen */}
+        <div className="relative mb-4">
+          <input
+            type={showConfirm ? "text" : "password"}
+            placeholder="Passwort wiederholen"
+            value={confirm}
+            onChange={(e) => setConfirm(e.target.value)}
+            required
+            className="w-full p-2 pr-10 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500"
+          />
+          <img
+            src={showConfirm ? "/eye-open.png" : "/eye-closed.png"}
+            alt="Toggle confirm password"
+            className="absolute top-1/2 right-3 transform -translate-y-1/2 w-5 h-5 cursor-pointer"
+            onClick={() => setShowConfirm(!showConfirm)}
+          />
+        </div>
 
         <button
           type="submit"
@@ -129,9 +97,7 @@ export default function ResetPasswordPage() {
         )}
 
         <p className="text-center mt-6 text-sm">
-          <a href="/login" className="text-blue-600 hover:underline">
-            Zur Anmeldung
-          </a>
+          <a href="/login" className="text-blue-600 hover:underline">Zur Anmeldung</a>
         </p>
       </form>
     </div>
