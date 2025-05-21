@@ -28,22 +28,9 @@ export default function ResetRequestPage() {
   };
 
   return (
-    <div style={{
-      display: 'flex',
-      justifyContent: 'center',
-      alignItems: 'center',
-      height: '100vh',
-      background: '#f4f4f4'
-    }}>
-      <form onSubmit={handleRequest} style={{
-        background: 'white',
-        padding: 30,
-        borderRadius: 8,
-        boxShadow: '0 2px 8px rgba(0,0,0,0.1)',
-        width: '100%',
-        maxWidth: 400
-      }}>
-        <h2 style={{ textAlign: 'center', marginBottom: 20 }}>Passwort zurücksetzen</h2>
+    <div className="min-h-screen flex items-center justify-center bg-gray-100">
+      <form onSubmit={handleRequest} className="bg-white shadow-md rounded-lg px-8 py-6 w-full max-w-md">
+        <h2 className="text-2xl font-semibold text-center mb-6">Passwort zurücksetzen</h2>
 
         <input
           type="email"
@@ -51,31 +38,22 @@ export default function ResetRequestPage() {
           value={email}
           onChange={(e) => setEmail(e.target.value)}
           required
-          style={{
-            width: '100%',
-            padding: 10,
-            paddingRight: 40,
-            boxSizing: 'border-box',
-            marginBottom: 10
-          }}
+          className="w-full p-2 pr-10 mb-4 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500"
         />
 
-        <button type="submit" disabled={loading} style={{
-          width: '100%',
-          padding: 10,
-          borderRadius: 4,
-          backgroundColor: '#0070f3',
-          color: '#fff',
-          border: 'none'
-        }}>
+        <button
+          type="submit"
+          disabled={loading}
+          className="w-full py-2 bg-blue-600 text-white rounded-md hover:bg-blue-700 transition"
+        >
           {loading ? "Sende..." : "Link anfordern"}
         </button>
 
-        {message && <p style={{ color: 'green', textAlign: 'center', marginTop: 15 }}>{message}</p>}
-        {error && <p style={{ color: 'red', textAlign: 'center', marginTop: 15 }}>{error}</p>}
+        {message && <p className="text-green-600 text-center mt-4 text-sm">{message}</p>}
+        {error && <p className="text-red-600 text-center mt-4 text-sm">{error}</p>}
 
-        <p style={{ textAlign: 'center', marginTop: 20, fontSize: 13 }}>
-          <a href="/login" style={{ color: '#0070f3', textDecoration: 'none' }}>Zur Anmeldung</a>
+        <p className="text-center mt-6 text-sm">
+          <a href="/login" className="text-blue-600 hover:underline">Zur Anmeldung</a>
         </p>
       </form>
     </div>
