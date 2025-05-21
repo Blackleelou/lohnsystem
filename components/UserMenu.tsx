@@ -33,14 +33,22 @@ export default function UserMenu() {
 
       {isOpen && (
         <div className="absolute right-0 top-10 bg-white shadow-lg p-4 z-50 rounded-lg min-w-[160px]">
-          {session?.user?.email === "jantzen.chris@gmail.com" && (
-            <Link
-              href="/admin/audit"
-              className="block mb-2 text-blue-600 hover:underline"
-            >
-              Audit-Log
-            </Link>
-          )}
+        {session?.user?.email === "jantzen.chris@gmail.com" && (
+  <>
+    <Link
+      href="/superadmin"
+      className="block mb-2 text-blue-600 hover:underline"
+    >
+      Superadmin-Menü
+    </Link>
+    <Link
+      href="/admin/audit"
+      className="block mb-2 text-blue-600 hover:underline"
+    >
+      Audit-Log
+    </Link>
+  </>
+)}
           <button
             onClick={handleDelete}
             className="w-full text-left mb-2 hover:text-red-600"
