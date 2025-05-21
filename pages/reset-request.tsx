@@ -28,15 +28,55 @@ export default function ResetRequestPage() {
   };
 
   return (
-    <div style={{ display: 'flex', justifyContent: 'center', alignItems: 'center', height: '100vh', background: '#f4f4f4' }}>
-      <form onSubmit={handleRequest} style={{ background: 'white', padding: 30, borderRadius: 8, boxShadow: '0 2px 8px rgba(0,0,0,0.1)', width: '100%', maxWidth: 400 }}>
+    <div style={{
+      display: 'flex',
+      justifyContent: 'center',
+      alignItems: 'center',
+      height: '100vh',
+      background: '#f4f4f4'
+    }}>
+      <form onSubmit={handleRequest} style={{
+        background: 'white',
+        padding: 30,
+        borderRadius: 8,
+        boxShadow: '0 2px 8px rgba(0,0,0,0.1)',
+        width: '100%',
+        maxWidth: 400
+      }}>
         <h2 style={{ textAlign: 'center', marginBottom: 20 }}>Passwort zurücksetzen</h2>
-        <input type="email" placeholder="E-Mail" value={email} onChange={(e) => setEmail(e.target.value)} required style={{ marginBottom: 10, width: '100%', padding: 10 }} />
-        <button type="submit" disabled={loading} style={{ width: '100%', padding: 10, borderRadius: 4, backgroundColor: '#0070f3', color: '#fff', border: 'none' }}>
+
+        <input
+          type="email"
+          placeholder="E-Mail"
+          value={email}
+          onChange={(e) => setEmail(e.target.value)}
+          required
+          style={{
+            width: '100%',
+            padding: 10,
+            paddingRight: 40,
+            boxSizing: 'border-box',
+            marginBottom: 10
+          }}
+        />
+
+        <button type="submit" disabled={loading} style={{
+          width: '100%',
+          padding: 10,
+          borderRadius: 4,
+          backgroundColor: '#0070f3',
+          color: '#fff',
+          border: 'none'
+        }}>
           {loading ? "Sende..." : "Link anfordern"}
         </button>
+
         {message && <p style={{ color: 'green', textAlign: 'center', marginTop: 15 }}>{message}</p>}
         {error && <p style={{ color: 'red', textAlign: 'center', marginTop: 15 }}>{error}</p>}
+
+        <p style={{ textAlign: 'center', marginTop: 20, fontSize: 13 }}>
+          <a href="/login" style={{ color: '#0070f3', textDecoration: 'none' }}>Zur Anmeldung</a>
+        </p>
       </form>
     </div>
   );
