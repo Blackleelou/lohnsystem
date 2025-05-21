@@ -16,27 +16,14 @@ export default function CookieBanner() {
   if (!visible) return null;
 
   return (
-    <div style={{
-      position: "fixed",
-      bottom: 0,
-      left: 0,
-      width: "100%",
-      backgroundColor: "#333",
-      color: "#fff",
-      padding: "1rem",
-      textAlign: "center",
-      zIndex: 9999
-    }}>
-      <p style={{ margin: "0 0 0.5rem 0" }}>
+    <div className="fixed bottom-0 left-0 w-full bg-gray-800 text-white p-4 text-center z-[9999]">
+      <p className="mb-2">
         Wir verwenden Cookies, um die Nutzererfahrung zu verbessern.
       </p>
-      <button onClick={acceptCookies} style={{
-        backgroundColor: "#fff",
-        color: "#000",
-        border: "none",
-        padding: "0.5rem 1rem",
-        cursor: "pointer"
-      }}>
+      <button
+        onClick={acceptCookies}
+        className="bg-white text-black px-4 py-2 rounded hover:bg-gray-200 transition"
+      >
         Verstanden
       </button>
     </div>
