@@ -75,6 +75,25 @@ export default function LoginPage() {
           Login
         </button>
 
+        {/* Trennlinie mit Text */}
+        <div className="relative my-6">
+          <div className="absolute inset-0 flex items-center">
+            <div className="w-full border-t border-gray-300" />
+          </div>
+          <div className="relative flex justify-center text-sm">
+            <span className="bg-white px-2 text-gray-500">oder</span>
+          </div>
+        </div>
+
+        {/* Google Login Button */}
+        <button
+          type="button"
+          onClick={() => signIn("google")}
+          className="w-full py-2 border border-gray-300 rounded-md hover:bg-gray-100 transition"
+        >
+          Mit Google anmelden
+        </button>
+
         <p className="text-center text-sm mt-4">
           <a href="/reset-request" className="text-blue-600 hover:underline">
             Passwort vergessen?
