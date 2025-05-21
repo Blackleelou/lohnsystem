@@ -1,4 +1,3 @@
-
 import { useState, useEffect } from "react";
 import { useRouter } from "next/router";
 import { signIn } from "next-auth/react";
@@ -96,43 +95,48 @@ export default function VerifyPage() {
   };
 
   return (
-    <div style={{ display: "flex", justifyContent: "center", alignItems: "center", height: "100vh", background: "#f4f4f4" }}>
-      <form style={{ background: "white", padding: 30, borderRadius: 8, boxShadow: "0 2px 8px rgba(0,0,0,0.1)", width: "100%", maxWidth: 400 }}>
-        <h2 style={{ textAlign: "center", marginBottom: 20 }}>E-Mail bestätigen</h2>
-        <p style={{ textAlign: "center", marginBottom: 20, fontSize: 14 }}>
-          Wir haben dir eine E-Mail mit einem 6-stelligen Code geschickt.<br />
-          Gib den Code hier ein, um dein Konto zu aktivieren.
+    <div className="flex items-center justify-center min-h-screen bg-gray-100">
+      <form className="bg-white shadow-md rounded-lg px-8 py-6 w-full max-w-md">
+        <h2 className="text-2xl font-semibold text-center mb-4">E-Mail bestätigen</h2>
+        <p className="text-sm text-center mb-6 text-gray-700">
+          Wir haben dir eine E-Mail mit einem 6-stelligen Code geschickt. Gib den Code hier ein, um dein Konto zu aktivieren.
         </p>
+
         <input
           type="text"
           placeholder="6-stelliger Code"
           value={code}
-          onChange={(e) => setCode(e.target.value.replace(/[^0-9]/g, "").slice(0, 6))}
-          required
+          onChange={(e) =>
+            setCode(e.target.value.replace(/[^0-9]/g, "").slice(0, 6))
+          }
           inputMode="numeric"
+          required
           autoFocus
-          style={{ marginBottom: 10, width: "100%", padding: 10, fontSize: 18, textAlign: "center", letterSpacing: 6 }}
+          className="w-full p-3 text-center text-lg tracking-widest mb-3 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500"
         />
+
         <input
           type="text"
           value={honeypot}
           onChange={(e) => setHoneypot(e.target.value)}
           autoComplete="off"
-          style={{ display: "none" }}
+          className="hidden"
         />
-        {error && <p style={{ color: "red", textAlign: "center" }}>{error}</p>}
-        {info && <p style={{ color: "green", textAlign: "center" }}>{info}</p>}
-        <p style={{ textAlign: "center", fontSize: 13, marginTop: 20 }}>
+
+        {error && <p className="text-red-600 text-center mt-2">{error}</p>}
+        {info && <p className="text-green-600 text-center mt-2">{info}</p>}
+
+        <div className="text-center text-sm mt-5">
           Keine E-Mail erhalten? <br />
           <button
             type="button"
             onClick={resendCode}
             disabled={cooldown > 0}
-            style={{ background: "none", border: "none", color: "#0070f3", cursor: "pointer" }}
+            className="text-blue-600 hover:underline mt-1 disabled:text-gray-400"
           >
             Code erneut senden {cooldown > 0 ? `(${cooldown}s)` : ""}
           </button>
-        </p>
+        </div>
       </form>
       <ToastContainer position="bottom-right" />
     </div>
