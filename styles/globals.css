@@ -1,9 +1,10 @@
-/* Globale Styles für das Lohnsystem */
 @tailwind base;
 @tailwind components;
 @tailwind utilities;
 
-body {
-  margin: 0;
-  font-family: sans-serif;
+/* Globale Styles für das Lohnsystem */
+@layer base {
+  body {
+    @apply m-0 font-sans bg-gray-100 text-gray-900;
+  }
 }
