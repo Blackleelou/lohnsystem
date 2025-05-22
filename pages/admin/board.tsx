@@ -57,6 +57,9 @@ export default function BoardPage() {
     setUploadResult(result.message || "Import abgeschlossen.");
 
     if (res.ok) loadEntries();
+
+    // Auto-hide Toast nach 4 Sekunden
+    setTimeout(() => setUploadResult(null), 4000);
   };
 
   const handleExport = () => {
@@ -71,7 +74,7 @@ export default function BoardPage() {
   };
 
   return (
-    <div className="max-w-6xl mx-auto px-4 py-8">
+    <div className="max-w-6xl mx-auto px-4 py-8 relative">
       <h1 className="text-2xl font-bold text-blue-700 mb-6">Superadmin Board</h1>
 
       <div className="flex flex-col sm:flex-row sm:items-center gap-4 mb-6 bg-white border border-gray-200 p-4 rounded shadow-sm">
@@ -86,7 +89,6 @@ export default function BoardPage() {
             className="block w-full text-sm text-gray-600"
           />
           {uploading && <p className="text-sm text-blue-500 mt-1">Hochladen...</p>}
-          {uploadResult && <p className="text-sm text-green-600 mt-1">{uploadResult}</p>}
         </div>
 
         <div className="sm:ml-auto">
@@ -99,14 +101,21 @@ export default function BoardPage() {
         </div>
       </div>
 
+      {uploadResult && (
+        <div className="fixed top-4 right-4 bg-green-100 border border-green-300 text-green-800 px-4 py-2 rounded shadow z-50">
+          {uploadResult}
+        </div>
+      )}
+
       <div className="grid grid-cols-1 md:grid-cols-2 xl:grid-cols-3 gap-4">
         {entries.map((entry) => {
           const isDone = entry.status.toLowerCase() === "fertig";
           return (
             <div
               key={entry.id}
-              className={`border p-4 rounded-md shadow-sm hover:shadow transition
-                ${isDone ? "bg-green-50 border-green-300" : "bg-white border-gray-200"}`}
+              className={`border p-4 rounded-md shadow-sm hover:shadow transition ${
+                isDone ? "bg-green-50 border-green-300" : "bg-white border-gray-200"
+              }`}
             >
               <h2 className="font-semibold text-lg text-gray-800 mb-2">{entry.title}</h2>
               <p className="text-sm text-gray-500">Kategorie: {entry.category}</p>
