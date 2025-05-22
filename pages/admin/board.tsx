@@ -1,3 +1,4 @@
+
 import { useEffect, useState } from "react";
 import { useSession } from "next-auth/react";
 import { useRouter } from "next/router";
@@ -21,7 +22,6 @@ export default function BoardPage() {
   const [uploadResult, setUploadResult] = useState<string | null>(null);
   const [isRefreshing, setIsRefreshing] = useState(false);
 
-  // Filterzustände
   const [statusFilter, setStatusFilter] = useState<string>("alle");
   const [categoryFilter, setCategoryFilter] = useState<string>("alle");
 
@@ -90,7 +90,6 @@ export default function BoardPage() {
     a.click();
   };
 
-  // Hilfsfunktionen für Dropdown-Werte
   const uniqueCategories = Array.from(new Set(entries.map(e => e.category.toLowerCase())));
   const uniqueStatuses = Array.from(new Set(entries.map(e => e.status.toLowerCase())));
 
@@ -117,7 +116,6 @@ export default function BoardPage() {
           )}
         </div>
 
-        {/* Export-Filter Dropdowns */}
         <div className="flex flex-col sm:flex-row items-start sm:items-center gap-2 sm:ml-auto">
           <select
             className="border text-sm px-2 py-1 rounded text-gray-700"
@@ -143,7 +141,8 @@ export default function BoardPage() {
 
           <button
             onClick={handleExport}
-            className="bg-blue-600 hover:bg-blue-700 text-white px-4 py-2 rounded text-sm"
+            disabled={entries.length === 0}
+            className={\`px-4 py-2 rounded text-sm text-white transition \${entries.length === 0 ? "bg-gray-400 cursor-not-allowed" : "bg-blue-600 hover:bg-blue-700"}\`}
           >
             Als JSON exportieren
           </button>
@@ -168,13 +167,11 @@ export default function BoardPage() {
           return (
             <div
               key={entry.id}
-              className={`border p-4 rounded-md shadow-sm hover:shadow transition ${
-                isDone ? "bg-green-50 border-green-300" : "bg-white border-gray-200"
-              }`}
+              className={\`border p-4 rounded-md shadow-sm hover:shadow transition \${isDone ? "bg-green-50 border-green-300" : "bg-white border-gray-200"}\`}
             >
               <h2 className="font-semibold text-lg text-gray-800 mb-2">{entry.title}</h2>
               <p className="text-sm text-gray-500">Kategorie: {entry.category}</p>
-              <p className={`text-sm mb-2 ${isDone ? "text-green-700 font-medium" : "text-gray-500"}`}>
+              <p className={\`text-sm mb-2 \${isDone ? "text-green-700 font-medium" : "text-gray-500"}\`}>
                 Status: {entry.status}
               </p>
               {entry.notes && (
