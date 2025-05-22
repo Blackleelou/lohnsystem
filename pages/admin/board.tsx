@@ -1,6 +1,7 @@
 import { useEffect, useState } from "react";
 import { useSession } from "next-auth/react";
 import { useRouter } from "next/router";
+import SuperadminLayout from "@/components/SuperadminLayout";
 
 type Entry = {
   id: number;
@@ -31,7 +32,7 @@ export default function BoardPage() {
   }, []);
 
   return (
-    <div className="max-w-6xl mx-auto px-4 py-8">
+    <SuperadminLayout>
       <h1 className="text-2xl font-bold mb-4">Superadmin Board</h1>
 
       <div className="grid grid-cols-1 md:grid-cols-2 xl:grid-cols-3 gap-4">
@@ -58,6 +59,6 @@ export default function BoardPage() {
           </div>
         ))}
       </div>
-    </div>
+    </SuperadminLayout>
   );
 }
