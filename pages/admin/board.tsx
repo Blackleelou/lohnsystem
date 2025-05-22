@@ -1,9 +1,8 @@
-import { useEffect, useState } from "react";
+import { useEffect, useState, useRef } from "react"; // useRef hinzugefügt
 import { useSession } from "next-auth/react";
 import { useRouter } from "next/router";
 import SuperadminLayout from "@/components/SuperadminLayout";
 import UploadButton from "@/components/UploadButton";
-
 
 type Entry = {
   id: number;
@@ -24,6 +23,8 @@ export default function BoardPage() {
   const [isRefreshing, setIsRefreshing] = useState(false);
   const [statusFilter, setStatusFilter] = useState<string>("alle");
   const [categoryFilter, setCategoryFilter] = useState<string>("alle");
+
+  const fileInputRef = useRef<HTMLInputElement | null>(null); // NEU
 
   useEffect(() => {
     if (status === "loading") return;
@@ -68,6 +69,11 @@ export default function BoardPage() {
       }, 500);
     } else {
       setUploadResult(result.message || "Fehler beim Import.");
+    }
+
+    // Dateiname zurücksetzen
+    if (fileInputRef.current) {
+      fileInputRef.current.value = "";
     }
 
     setTimeout(() => setUploadResult(null), 4000);
@@ -119,6 +125,7 @@ export default function BoardPage() {
           <input
             type="file"
             accept=".json"
+            ref={fileInputRef} // NEU
             onChange={handleUpload}
             className="block w-full text-sm text-gray-600 file:mr-0 file:rounded file:border-0 file:bg-blue-50 file:px-3 file:py-1 file:text-sm file:font-semibold file:text-blue-600 file:hover:bg-blue-100"
           />
