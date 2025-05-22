@@ -1,25 +1,21 @@
 import { NextApiRequest, NextApiResponse } from "next";
-import path from "path";
-import fs from "fs/promises";
 import formidable, { File } from "formidable";
+import fs from "fs/promises";
+import { prisma } from "@/lib/prisma";
 
 export const config = {
   api: {
-    bodyParser: false, // wichtig für Datei-Upload
+    bodyParser: false,
   },
 };
 
-const boardPath = path.join(process.cwd(), "data", "superadmin-board.json");
-
 type Entry = {
-  id: number;
   title: string;
   status: string;
   category: string;
   notes?: string;
   createdAt: string;
   completedAt?: string;
-  updatedByImport?: boolean;
 };
 
 export default async function handler(req: NextApiRequest, res: NextApiResponse) {
@@ -43,42 +39,52 @@ export default async function handler(req: NextApiRequest, res: NextApiResponse)
     const fileContent = await fs.readFile(uploadedFile.filepath, "utf-8");
     const incomingEntries: Entry[] = JSON.parse(fileContent);
 
-    const existingRaw = await fs.readFile(boardPath, "utf-8");
-    const currentEntries: Entry[] = JSON.parse(existingRaw);
+    let importCount = 0;
 
-    const merged: Entry[] = [...currentEntries];
+    for (const entry of incomingEntries) {
+      const existing = await prisma.superadminBoardEntry.findFirst({
+        where: {
+          OR: [
+            { title: entry.title },
+            { AND: [{ createdAt: new Date(entry.createdAt) }] }
+          ],
+        },
+      });
 
-    for (const incoming of incomingEntries) {
-      const matchIndex = merged.findIndex(e =>
-        e.id === incoming.id || e.title.toLowerCase() === incoming.title.toLowerCase()
-      );
+      if (existing) {
+        const isIdentical =
+          existing.title === entry.title &&
+          existing.status === entry.status &&
+          existing.category === entry.category &&
+          existing.notes === entry.notes &&
+          (existing.completedAt?.toISOString() ?? null) === (entry.completedAt ?? null);
 
-      if (matchIndex !== -1) {
-        const existing = merged[matchIndex];
+        if (isIdentical) continue;
 
-        const isIdentisch =
-          existing.title === incoming.title &&
-          existing.status === incoming.status &&
-          existing.category === incoming.category &&
-          existing.notes === incoming.notes &&
-          existing.completedAt === incoming.completedAt;
-
-        if (isIdentisch) continue;
-
-        merged[matchIndex] = {
-          ...existing,
-          ...incoming,
-          updatedByImport: true,
-        };
+        await prisma.superadminBoardEntry.update({
+          where: { id: existing.id },
+          data: {
+            ...entry,
+            createdAt: new Date(entry.createdAt),
+            completedAt: entry.completedAt ? new Date(entry.completedAt) : null,
+          },
+        });
+        importCount++;
       } else {
-        merged.push(incoming);
+        await prisma.superadminBoardEntry.create({
+          data: {
+            ...entry,
+            createdAt: new Date(entry.createdAt),
+            completedAt: entry.completedAt ? new Date(entry.completedAt) : null,
+          },
+        });
+        importCount++;
       }
     }
 
-    await fs.writeFile(boardPath, JSON.stringify(merged, null, 2), "utf-8");
-    return res.status(200).json({ message: "Import erfolgreich durchgeführt." });
-  } catch (error) {
-    console.error("Fehler beim Import:", error);
+    return res.status(200).json({ message: `Import abgeschlossen (${importCount} Einträge verarbeitet)` });
+  } catch (err) {
+    console.error("Fehler beim Import:", err);
     return res.status(500).json({ message: "Import fehlgeschlagen." });
   }
 }
