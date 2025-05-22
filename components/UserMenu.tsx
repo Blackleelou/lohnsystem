@@ -16,7 +16,7 @@ export default function UserMenu() {
     });
 
     if (res.ok) {
-      signOut();
+      signOut({ callbackUrl: "/" });
     } else {
       const data = await res.json();
       alert("Fehler: " + data.message);
@@ -26,6 +26,7 @@ export default function UserMenu() {
   return (
     <div className="relative">
       <button
+        type="button"
         onClick={() => setIsOpen(!isOpen)}
         className="bg-transparent border-none text-2xl cursor-pointer"
         aria-label="Benutzermenü öffnen"
@@ -49,6 +50,7 @@ export default function UserMenu() {
           )}
 
           <button
+            type="button"
             onClick={handleDelete}
             className="w-full text-left text-gray-700 hover:text-red-600"
           >
@@ -56,7 +58,8 @@ export default function UserMenu() {
           </button>
 
           <button
-            onClick={() => signOut()}
+            type="button"
+            onClick={() => signOut({ callbackUrl: "/" })}
             className="w-full text-left text-red-500 hover:text-red-700"
           >
             Logout
