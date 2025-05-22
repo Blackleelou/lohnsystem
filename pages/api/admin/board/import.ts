@@ -42,42 +42,54 @@ export default async function handler(req: NextApiRequest, res: NextApiResponse)
     let importCount = 0;
 
     for (const entry of incomingEntries) {
+      const createdAt = new Date(entry.createdAt);
+      const completedAt = entry.completedAt ? new Date(entry.completedAt) : null;
+
       const existing = await prisma.superadminBoardEntry.findFirst({
         where: {
-          OR: [
-            { title: entry.title },
-            { AND: [{ createdAt: new Date(entry.createdAt) }] }
-          ],
+          title: entry.title,
+          createdAt: createdAt,
         },
       });
 
       if (existing) {
+        const incomingCompletedAt = completedAt ? completedAt.getTime() : null;
+        const existingCompletedAt = existing.completedAt ? existing.completedAt.getTime() : null;
+
         const isIdentical =
           existing.title === entry.title &&
           existing.status === entry.status &&
           existing.category === entry.category &&
           existing.notes === entry.notes &&
-          (existing.completedAt?.toISOString() ?? null) === (entry.completedAt ?? null);
+          incomingCompletedAt === existingCompletedAt;
 
         if (isIdentical) continue;
 
         await prisma.superadminBoardEntry.update({
           where: { id: existing.id },
           data: {
-            ...entry,
-            createdAt: new Date(entry.createdAt),
-            completedAt: entry.completedAt ? new Date(entry.completedAt) : null,
+            title: entry.title,
+            status: entry.status,
+            category: entry.category,
+            notes: entry.notes,
+            createdAt,
+            completedAt,
           },
         });
+
         importCount++;
       } else {
         await prisma.superadminBoardEntry.create({
           data: {
-            ...entry,
-            createdAt: new Date(entry.createdAt),
-            completedAt: entry.completedAt ? new Date(entry.completedAt) : null,
+            title: entry.title,
+            status: entry.status,
+            category: entry.category,
+            notes: entry.notes,
+            createdAt,
+            completedAt,
           },
         });
+
         importCount++;
       }
     }
