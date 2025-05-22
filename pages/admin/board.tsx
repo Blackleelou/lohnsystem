@@ -1,5 +1,3 @@
-// Datei: pages/admin/board.tsx
-
 import { useEffect, useState } from "react";
 import { useSession } from "next-auth/react";
 import { useRouter } from "next/router";
@@ -29,10 +27,14 @@ export default function BoardPage() {
     }
   }, [session, status]);
 
+  const loadEntries = async () => {
+    const res = await fetch("/api/admin/board");
+    const data = await res.json();
+    setEntries(data.entries);
+  };
+
   useEffect(() => {
-    fetch("/api/admin/board")
-      .then((res) => res.json())
-      .then((data) => setEntries(data.entries));
+    loadEntries();
   }, []);
 
   const handleUpload = async (e: React.ChangeEvent<HTMLInputElement>) => {
@@ -54,30 +56,47 @@ export default function BoardPage() {
     setUploading(false);
     setUploadResult(result.message || "Import abgeschlossen.");
 
-    if (res.ok) {
-      // Reload entries
-      fetch("/api/admin/board")
-        .then((res) => res.json())
-        .then((data) => setEntries(data.entries));
-    }
+    if (res.ok) loadEntries();
+  };
+
+  const handleExport = () => {
+    const blob = new Blob([JSON.stringify(entries, null, 2)], {
+      type: "application/json",
+    });
+    const url = URL.createObjectURL(blob);
+    const a = document.createElement("a");
+    a.href = url;
+    a.download = `superadmin-board-${new Date().toISOString()}.json`;
+    a.click();
   };
 
   return (
     <div className="max-w-6xl mx-auto px-4 py-8">
       <h1 className="text-2xl font-bold text-blue-700 mb-6">Superadmin Board</h1>
 
-      <div className="mb-6 bg-white border border-gray-200 p-4 rounded shadow-sm">
-        <label className="block mb-2 font-medium text-sm text-gray-700">
-          JSON-Datei importieren:
-        </label>
-        <input
-          type="file"
-          accept=".json"
-          onChange={handleUpload}
-          className="block w-full text-sm text-gray-600"
-        />
-        {uploading && <p className="text-sm text-blue-500 mt-2">Hochladen...</p>}
-        {uploadResult && <p className="text-sm text-green-600 mt-2">{uploadResult}</p>}
+      <div className="flex flex-col sm:flex-row sm:items-center gap-4 mb-6 bg-white border border-gray-200 p-4 rounded shadow-sm">
+        <div>
+          <label className="block font-medium text-sm text-gray-700 mb-1">
+            JSON-Datei importieren:
+          </label>
+          <input
+            type="file"
+            accept=".json"
+            onChange={handleUpload}
+            className="block w-full text-sm text-gray-600"
+          />
+          {uploading && <p className="text-sm text-blue-500 mt-1">Hochladen...</p>}
+          {uploadResult && <p className="text-sm text-green-600 mt-1">{uploadResult}</p>}
+        </div>
+
+        <div className="sm:ml-auto">
+          <button
+            onClick={handleExport}
+            className="bg-blue-600 hover:bg-blue-700 text-white px-4 py-2 rounded text-sm"
+          >
+            Als JSON exportieren
+          </button>
+        </div>
       </div>
 
       <div className="grid grid-cols-1 md:grid-cols-2 xl:grid-cols-3 gap-4">
