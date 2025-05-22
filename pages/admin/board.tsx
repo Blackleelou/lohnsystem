@@ -20,7 +20,6 @@ export default function BoardPage() {
   const [uploading, setUploading] = useState(false);
   const [uploadResult, setUploadResult] = useState<string | null>(null);
   const [isRefreshing, setIsRefreshing] = useState(false);
-
   const [statusFilter, setStatusFilter] = useState<string>("alle");
   const [categoryFilter, setCategoryFilter] = useState<string>("alle");
 
@@ -84,10 +83,22 @@ export default function BoardPage() {
     const blob = new Blob([JSON.stringify(filtered, null, 2)], {
       type: "application/json",
     });
+
+    const timestamp = new Date()
+      .toLocaleString("de-DE", {
+        day: "2-digit",
+        month: "2-digit",
+        year: "numeric",
+        hour: "2-digit",
+        minute: "2-digit",
+      })
+      .replace(/[.:]/g, "_")
+      .replace(", ", "_");
+
     const url = URL.createObjectURL(blob);
     const a = document.createElement("a");
     a.href = url;
-    a.download = `superadmin-board-${new Date().toISOString()}.json`;
+    a.download = `Export_ToDo_${timestamp}.json`;
     a.click();
   };
 
@@ -107,7 +118,7 @@ export default function BoardPage() {
             type="file"
             accept=".json"
             onChange={handleUpload}
-            className="block w-full text-sm text-gray-600"
+            className="block w-full text-sm text-gray-600 file:mr-0 file:rounded file:border-0 file:bg-blue-50 file:px-3 file:py-1 file:text-sm file:font-semibold file:text-blue-600 file:hover:bg-blue-100"
           />
           {uploading && (
             <div className="flex items-center gap-2 text-sm text-blue-600 mt-1">
