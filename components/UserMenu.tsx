@@ -36,6 +36,13 @@ export default function UserMenu() {
 
       {isOpen && (
         <div className="absolute right-0 top-10 bg-white shadow-lg p-4 z-50 rounded-lg min-w-[180px] space-y-2">
+          <Link href="/dashboard" className="block text-gray-700 hover:underline">
+            Dashboard
+          </Link>
+          <Link href="/settings" className="block text-gray-700 hover:underline">
+            Einstellungen
+          </Link>
+
           {isSuperadmin && (
             <>
               <Link href="/superadmin" className="block text-blue-600 hover:underline">
