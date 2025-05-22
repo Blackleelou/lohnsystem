@@ -54,11 +54,14 @@ export default function BoardPage() {
 
     const result = await res.json();
     setUploading(false);
-    setUploadResult(result.message || "Import abgeschlossen.");
 
-    if (res.ok) loadEntries();
+    if (res.ok) {
+      await loadEntries(); // wichtig!
+      setUploadResult(result.message || "Import abgeschlossen.");
+    } else {
+      setUploadResult(result.message || "Fehler beim Import.");
+    }
 
-    // Auto-hide Toast nach 4 Sekunden
     setTimeout(() => setUploadResult(null), 4000);
   };
 
@@ -88,7 +91,12 @@ export default function BoardPage() {
             onChange={handleUpload}
             className="block w-full text-sm text-gray-600"
           />
-          {uploading && <p className="text-sm text-blue-500 mt-1">Hochladen...</p>}
+          {uploading && (
+            <div className="flex items-center gap-2 text-sm text-blue-600 mt-1">
+              <span className="animate-spin h-4 w-4 border-2 border-blue-600 border-t-transparent rounded-full"></span>
+              Hochladen...
+            </div>
+          )}
         </div>
 
         <div className="sm:ml-auto">
