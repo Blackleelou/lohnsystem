@@ -6,7 +6,6 @@ import Link from "next/link";
 export default function UserMenu() {
   const [isOpen, setIsOpen] = useState(false);
   const { data: session } = useSession();
-
   const isSuperadmin = session?.user?.email === "jantzen.chris@gmail.com";
 
   const handleDelete = async () => {
@@ -44,17 +43,9 @@ export default function UserMenu() {
           </Link>
 
           {isSuperadmin && (
-            <>
-              <Link href="/superadmin" className="block text-blue-600 hover:underline">
-                Superadmin-Menü
-              </Link>
-              <Link href="/admin/audit" className="block text-blue-600 hover:underline">
-                Audit-Log
-              </Link>
-              <Link href="/admin/board" className="block text-blue-600 hover:underline">
-                ToDo-Board
-              </Link>
-            </>
+            <Link href="/superadmin" className="block text-blue-600 hover:underline">
+              Superadmin-Menü
+            </Link>
           )}
 
           <button
