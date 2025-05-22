@@ -1,4 +1,3 @@
-
 generator client {
   provider = "prisma-client-js"
 }
@@ -39,4 +38,15 @@ model AuditLog {
   action    String
   ip        String
   timestamp DateTime
+}
+
+model SuperadminBoardEntry {
+  id           String   @id @default(cuid())
+  title        String
+  status       String
+  category     String
+  notes        String?
+  createdAt    DateTime @default(now())
+  completedAt  DateTime?
+  updatedByImport Boolean @default(false)
 }
