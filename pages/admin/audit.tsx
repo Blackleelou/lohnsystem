@@ -1,6 +1,7 @@
 import { useEffect, useState } from "react";
 import { useSession } from "next-auth/react";
 import { useRouter } from "next/router";
+import SuperadminLayout from "@/components/SuperadminLayout";
 
 type LogEntry = {
   id: string;
@@ -50,7 +51,7 @@ export default function AuditPage() {
   };
 
   return (
-    <div className="max-w-6xl mx-auto p-6">
+    <SuperadminLayout>
       <h1 className="text-2xl font-bold mb-6">Audit-Log</h1>
       <div className="overflow-x-auto">
         <table className="w-full text-sm border border-gray-300">
@@ -80,6 +81,6 @@ export default function AuditPage() {
       >
         CSV exportieren
       </button>
-    </div>
+    </SuperadminLayout>
   );
 }
