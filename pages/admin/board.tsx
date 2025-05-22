@@ -1,8 +1,7 @@
-import { useEffect, useState, useRef } from "react"; // useRef hinzugefügt
+import { useEffect, useState, useRef } from "react";
 import { useSession } from "next-auth/react";
 import { useRouter } from "next/router";
 import SuperadminLayout from "@/components/SuperadminLayout";
-import UploadButton from "@/components/UploadButton";
 
 type Entry = {
   id: number;
@@ -24,7 +23,7 @@ export default function BoardPage() {
   const [statusFilter, setStatusFilter] = useState<string>("alle");
   const [categoryFilter, setCategoryFilter] = useState<string>("alle");
 
-  const fileInputRef = useRef<HTMLInputElement | null>(null); // NEU
+  const fileInputRef = useRef<HTMLInputElement | null>(null);
 
   useEffect(() => {
     if (status === "loading") return;
@@ -71,11 +70,7 @@ export default function BoardPage() {
       setUploadResult(result.message || "Fehler beim Import.");
     }
 
-    // Dateiname zurücksetzen
-    if (fileInputRef.current) {
-      fileInputRef.current.value = "";
-    }
-
+    if (fileInputRef.current) fileInputRef.current.value = "";
     setTimeout(() => setUploadResult(null), 4000);
   };
 
@@ -118,19 +113,23 @@ export default function BoardPage() {
       <h1 className="text-2xl font-bold text-blue-700 mb-6">Superadmin Board</h1>
 
       <div className="flex flex-col sm:flex-row sm:items-center gap-4 mb-6 bg-white border border-gray-200 p-4 rounded shadow-sm">
-        <div>
-          <label className="block font-medium text-sm text-gray-700 mb-1">
-            JSON-Datei importieren:
-          </label>
+        <div className="flex flex-col gap-2">
           <input
             type="file"
             accept=".json"
-            ref={fileInputRef} // NEU
+            ref={fileInputRef}
             onChange={handleUpload}
-            className="block w-full text-sm text-gray-600 file:mr-0 file:rounded file:border-0 file:bg-blue-50 file:px-3 file:py-1 file:text-sm file:font-semibold file:text-blue-600 file:hover:bg-blue-100"
+            className="hidden"
+            id="fileUpload"
           />
+          <label
+            htmlFor="fileUpload"
+            className="inline-block cursor-pointer rounded bg-blue-600 px-4 py-2 text-sm font-medium text-white hover:bg-blue-700 transition"
+          >
+            Datei auswählen & importieren
+          </label>
           {uploading && (
-            <div className="flex items-center gap-2 text-sm text-blue-600 mt-1">
+            <div className="flex items-center gap-2 text-sm text-blue-600">
               <span className="animate-spin h-4 w-4 border-2 border-blue-600 border-t-transparent rounded-full"></span>
               Hochladen...
             </div>
