@@ -20,10 +20,11 @@ export default function BoardPage() {
   const [uploading, setUploading] = useState(false);
   const [uploadResult, setUploadResult] = useState<string | null>(null);
   const [isRefreshing, setIsRefreshing] = useState(false);
-  const [statusFilter, setStatusFilter] = useState<string>("alle");
-  const [categoryFilter, setCategoryFilter] = useState<string>("alle");
 
   const fileInputRef = useRef<HTMLInputElement | null>(null);
+
+  const [selectedStatuses, setSelectedStatuses] = useState<string[]>([]);
+  const [selectedCategories, setSelectedCategories] = useState<string[]>([]);
 
   useEffect(() => {
     if (status === "loading") return;
@@ -76,8 +77,8 @@ export default function BoardPage() {
 
   const handleExport = () => {
     const filtered = entries.filter((e) => {
-      const statusOk = statusFilter === "alle" || e.status.toLowerCase() === statusFilter;
-      const categoryOk = categoryFilter === "alle" || e.category.toLowerCase() === categoryFilter;
+      const statusOk = selectedStatuses.length === 0 || selectedStatuses.includes(e.status.toLowerCase());
+      const categoryOk = selectedCategories.length === 0 || selectedCategories.includes(e.category.toLowerCase());
       return statusOk && categoryOk;
     });
 
@@ -108,12 +109,29 @@ export default function BoardPage() {
   const uniqueCategories = Array.from(new Set(entries.map(e => e.category.toLowerCase())));
   const uniqueStatuses = Array.from(new Set(entries.map(e => e.status.toLowerCase())));
 
+  const toggleCheckbox = (value: string, group: string) => {
+    const updater = group === "status" ? setSelectedStatuses : setSelectedCategories;
+    const current = group === "status" ? selectedStatuses : selectedCategories;
+
+    updater(
+      current.includes(value)
+        ? current.filter((v) => v !== value)
+        : [...current, value]
+    );
+  };
+
+  const filteredEntries = entries.filter((e) => {
+    const statusOk = selectedStatuses.length === 0 || selectedStatuses.includes(e.status.toLowerCase());
+    const categoryOk = selectedCategories.length === 0 || selectedCategories.includes(e.category.toLowerCase());
+    return statusOk && categoryOk;
+  });
+
   return (
     <div className="max-w-6xl mx-auto px-4 py-8 relative">
       <h1 className="text-2xl font-bold text-blue-700 mb-6">Superadmin Board</h1>
 
-      <div className="flex flex-col sm:flex-row sm:items-center gap-4 mb-6 bg-white border border-gray-200 p-4 rounded shadow-sm">
-        <div className="flex flex-col gap-2">
+      <div className="flex flex-col gap-4 mb-6 bg-white border border-gray-200 p-4 rounded shadow-sm">
+        <div className="flex flex-col sm:flex-row sm:items-center gap-4">
           <input
             type="file"
             accept=".json"
@@ -128,58 +146,54 @@ export default function BoardPage() {
           >
             Datei auswählen & importieren
           </label>
-          {uploading && (
-            <div className="flex items-center gap-2 text-sm text-blue-600">
-              <span className="animate-spin h-4 w-4 border-2 border-blue-600 border-t-transparent rounded-full"></span>
-              Hochladen...
-            </div>
-          )}
-        </div>
-
-        <div className="flex flex-col sm:flex-row items-start sm:items-center gap-2 sm:ml-auto">
-          <select
-            className="border text-sm px-2 py-1 rounded text-gray-700"
-            value={statusFilter}
-            onChange={(e) => setStatusFilter(e.target.value)}
-          >
-            <option value="alle">Alle Status</option>
-            {uniqueStatuses.map((s) => (
-              <option key={s} value={s}>{s}</option>
-            ))}
-          </select>
-
-          <select
-            className="border text-sm px-2 py-1 rounded text-gray-700"
-            value={categoryFilter}
-            onChange={(e) => setCategoryFilter(e.target.value)}
-          >
-            <option value="alle">Alle Kategorien</option>
-            {uniqueCategories.map((c) => (
-              <option key={c} value={c}>{c}</option>
-            ))}
-          </select>
 
           <button
             onClick={handleExport}
-            disabled={
-              entries.filter(
-                (e) =>
-                  (statusFilter === "alle" || e.status.toLowerCase() === statusFilter) &&
-                  (categoryFilter === "alle" || e.category.toLowerCase() === categoryFilter)
-              ).length === 0
-            }
+            disabled={filteredEntries.length === 0}
             className={`px-4 py-2 rounded text-sm text-white transition ${
-              entries.filter(
-                (e) =>
-                  (statusFilter === "alle" || e.status.toLowerCase() === statusFilter) &&
-                  (categoryFilter === "alle" || e.category.toLowerCase() === categoryFilter)
-              ).length === 0
+              filteredEntries.length === 0
                 ? "bg-gray-400 cursor-not-allowed"
                 : "bg-blue-600 hover:bg-blue-700"
             }`}
           >
             Als JSON exportieren
           </button>
+        </div>
+
+        <div className="flex flex-wrap gap-6">
+          <div>
+            <p className="text-sm font-medium text-gray-700 mb-1">Status-Filter</p>
+            <div className="flex gap-2 flex-wrap">
+              {uniqueStatuses.map((s) => (
+                <label key={s} className="flex items-center gap-1 text-sm cursor-pointer">
+                  <input
+                    type="checkbox"
+                    checked={selectedStatuses.includes(s)}
+                    onChange={() => toggleCheckbox(s, "status")}
+                    className="accent-blue-600"
+                  />
+                  {s}
+                </label>
+              ))}
+            </div>
+          </div>
+
+          <div>
+            <p className="text-sm font-medium text-gray-700 mb-1">Kategorie-Filter</p>
+            <div className="flex gap-2 flex-wrap">
+              {uniqueCategories.map((c) => (
+                <label key={c} className="flex items-center gap-1 text-sm cursor-pointer">
+                  <input
+                    type="checkbox"
+                    checked={selectedCategories.includes(c)}
+                    onChange={() => toggleCheckbox(c, "category")}
+                    className="accent-blue-600"
+                  />
+                  {c}
+                </label>
+              ))}
+            </div>
+          </div>
         </div>
       </div>
 
@@ -196,7 +210,7 @@ export default function BoardPage() {
       )}
 
       <div className="grid grid-cols-1 md:grid-cols-2 xl:grid-cols-3 gap-4">
-        {entries.map((entry) => {
+        {filteredEntries.map((entry) => {
           const isDone = entry.status.toLowerCase() === "fertig";
           return (
             <div
