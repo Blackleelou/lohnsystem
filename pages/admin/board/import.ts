@@ -1,6 +1,6 @@
 import { NextApiRequest, NextApiResponse } from "next";
 import path from "path";
-import fs from "fs/promises";
+import { promises as fs } from "fs";
 
 const boardPath = path.join(process.cwd(), "data", "superadmin-board.json");
 
