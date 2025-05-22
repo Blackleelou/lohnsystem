@@ -7,7 +7,7 @@ export default async function handler(req: NextApiRequest, res: NextApiResponse)
   if (req.method !== "GET") return res.status(405).json({ message: "Method Not Allowed" });
 
   try {
-    const entries = await prisma.superadminBoard.findMany({
+    const entries = await prisma.superadminBoardEntry.findMany({
       orderBy: { createdAt: "desc" },
     });
 
