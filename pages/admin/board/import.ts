@@ -12,11 +12,12 @@ type Entry = {
   notes?: string;
   createdAt: string;
   completedAt?: string;
+  updatedByImport?: boolean; // <- HIER ERLAUBT
 };
 
 export const config = {
   api: {
-    bodyParser: false, // nötig für Datei-Upload (FormData)
+    bodyParser: false,
   },
 };
 
@@ -24,7 +25,6 @@ export default async function handler(req: NextApiRequest, res: NextApiResponse)
   if (req.method !== "POST") return res.status(405).end("Method Not Allowed");
 
   try {
-    // Dateiinhalt aus dem Upload-Stream lesen
     const chunks: Buffer[] = [];
     req.on("data", chunk => chunks.push(chunk));
     req.on("end", async () => {
@@ -56,19 +56,14 @@ export default async function handler(req: NextApiRequest, res: NextApiResponse)
             existing.notes === incoming.notes &&
             existing.completedAt === incoming.completedAt;
 
-          if (isIdentical) {
-            // Identischer Eintrag → überspringen
-            continue;
-          }
+          if (isIdentical) continue;
 
-          // Unterschiedlicher Eintrag mit gleichem Titel/ID → zusammenführen/aktualisieren
           merged[matchIndex] = {
             ...existing,
             ...incoming,
-            updatedByImport: true, // optionales Markierungsfeld
+            updatedByImport: true, // wird akzeptiert durch Typ
           };
         } else {
-          // Neuer Eintrag
           merged.push(incoming);
         }
       }
