@@ -1,4 +1,3 @@
-
 import { useEffect, useState } from "react";
 import { useSession } from "next-auth/react";
 import { useRouter } from "next/router";
@@ -21,6 +20,7 @@ export default function BoardPage() {
   const [uploading, setUploading] = useState(false);
   const [uploadResult, setUploadResult] = useState<string | null>(null);
   const [isRefreshing, setIsRefreshing] = useState(false);
+
   const [statusFilter, setStatusFilter] = useState<string>("alle");
   const [categoryFilter, setCategoryFilter] = useState<string>("alle");
 
@@ -78,6 +78,8 @@ export default function BoardPage() {
       const categoryOk = categoryFilter === "alle" || e.category.toLowerCase() === categoryFilter;
       return statusOk && categoryOk;
     });
+
+    if (filtered.length === 0) return;
 
     const blob = new Blob([JSON.stringify(filtered, null, 2)], {
       type: "application/json",
@@ -140,8 +142,22 @@ export default function BoardPage() {
 
           <button
             onClick={handleExport}
-            disabled={entries.length === 0}
-            className={`px-4 py-2 rounded text-sm text-white transition ${entries.length === 0 ? "bg-gray-400 cursor-not-allowed" : "bg-blue-600 hover:bg-blue-700"}`}
+            disabled={
+              entries.filter(
+                (e) =>
+                  (statusFilter === "alle" || e.status.toLowerCase() === statusFilter) &&
+                  (categoryFilter === "alle" || e.category.toLowerCase() === categoryFilter)
+              ).length === 0
+            }
+            className={`px-4 py-2 rounded text-sm text-white transition ${
+              entries.filter(
+                (e) =>
+                  (statusFilter === "alle" || e.status.toLowerCase() === statusFilter) &&
+                  (categoryFilter === "alle" || e.category.toLowerCase() === categoryFilter)
+              ).length === 0
+                ? "bg-gray-400 cursor-not-allowed"
+                : "bg-blue-600 hover:bg-blue-700"
+            }`}
           >
             Als JSON exportieren
           </button>
@@ -166,11 +182,13 @@ export default function BoardPage() {
           return (
             <div
               key={entry.id}
-              className={\`border p-4 rounded-md shadow-sm hover:shadow transition \${isDone ? "bg-green-50 border-green-300" : "bg-white border-gray-200"}\`}
+              className={`border p-4 rounded-md shadow-sm hover:shadow transition ${
+                isDone ? "bg-green-50 border-green-300" : "bg-white border-gray-200"
+              }`}
             >
               <h2 className="font-semibold text-lg text-gray-800 mb-2">{entry.title}</h2>
               <p className="text-sm text-gray-500">Kategorie: {entry.category}</p>
-              <p className={\`text-sm mb-2 \${isDone ? "text-green-700 font-medium" : "text-gray-500"}\`}>
+              <p className={`text-sm mb-2 ${isDone ? "text-green-700 font-medium" : "text-gray-500"}`}>
                 Status: {entry.status}
               </p>
               {entry.notes && (
