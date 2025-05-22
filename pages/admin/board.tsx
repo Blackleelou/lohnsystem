@@ -2,6 +2,7 @@ import { useEffect, useState } from "react";
 import { useSession } from "next-auth/react";
 import { useRouter } from "next/router";
 import SuperadminLayout from "@/components/SuperadminLayout";
+import { ArrowDownTrayIcon, ArrowUpTrayIcon } from "@heroicons/react/24/solid";
 
 type Entry = {
   id: number;
@@ -56,7 +57,7 @@ export default function BoardPage() {
     setUploading(false);
 
     if (res.ok) {
-      await loadEntries(); // wichtig!
+      await loadEntries();
       setUploadResult(result.message || "Import abgeschlossen.");
     } else {
       setUploadResult(result.message || "Fehler beim Import.");
@@ -85,12 +86,15 @@ export default function BoardPage() {
           <label className="block font-medium text-sm text-gray-700 mb-1">
             JSON-Datei importieren:
           </label>
-          <input
-            type="file"
-            accept=".json"
-            onChange={handleUpload}
-            className="block w-full text-sm text-gray-600"
-          />
+          <div className="flex items-center gap-2">
+            <ArrowUpTrayIcon className="w-5 h-5 text-gray-500" />
+            <input
+              type="file"
+              accept=".json"
+              onChange={handleUpload}
+              className="text-sm text-gray-600"
+            />
+          </div>
           {uploading && (
             <div className="flex items-center gap-2 text-sm text-blue-600 mt-1">
               <span className="animate-spin h-4 w-4 border-2 border-blue-600 border-t-transparent rounded-full"></span>
@@ -102,8 +106,9 @@ export default function BoardPage() {
         <div className="sm:ml-auto">
           <button
             onClick={handleExport}
-            className="bg-blue-600 hover:bg-blue-700 text-white px-4 py-2 rounded text-sm"
+            className="bg-blue-600 hover:bg-blue-700 text-white px-4 py-2 rounded text-sm inline-flex items-center gap-2"
           >
+            <ArrowDownTrayIcon className="w-5 h-5" />
             Als JSON exportieren
           </button>
         </div>
