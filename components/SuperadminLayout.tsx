@@ -1,38 +1,31 @@
 import Link from "next/link";
 import { useRouter } from "next/router";
-import UserMenu from "./UserMenu"; // Wichtig
+
+const links = [
+  { href: "/admin/board", label: "Tagebuch & ToDo" },
+  { href: "/admin/audit", label: "Audit-Log" },
+  // Weitere Superadmin-Links kannst du hier ergänzen
+];
 
 export default function SuperadminLayout({ children }: { children: React.ReactNode }) {
   const router = useRouter();
 
-  const navItems = [
-    { href: "/superadmin", label: "Übersicht" },
-    { href: "/admin/board", label: "ToDo-Board" },
-    { href: "/admin/audit", label: "Audit-Log" },
-    // weitere...
-  ];
-
   return (
-    <div className="min-h-screen flex flex-col bg-gray-50">
-      <div className="bg-blue-800 text-white shadow px-6 py-3 flex items-center justify-between">
-        <nav className="flex gap-6">
-          {navItems.map((item) => (
-            <Link
-              key={item.href}
-              href={item.href}
-              className={`hover:underline ${
-                router.pathname === item.href ? "font-semibold underline" : ""
-              }`}
-            >
-              {item.label}
-            </Link>
-          ))}
-        </nav>
-
-        <UserMenu />
-      </div>
-
-      <main className="flex-1 px-4 py-6">{children}</main>
+    <div className="min-h-screen bg-gray-50">
+      <nav className="bg-white shadow px-6 py-3 flex gap-6 sticky top-0 z-40">
+        {links.map(link => (
+          <Link
+            key={link.href}
+            href={link.href}
+            className={`${router.pathname === link.href
+              ? "text-blue-600 font-semibold"
+              : "text-gray-700 hover:text-blue-500"}`}
+          >
+            {link.label}
+          </Link>
+        ))}
+      </nav>
+      <main className="p-6">{children}</main>
     </div>
   );
 }
