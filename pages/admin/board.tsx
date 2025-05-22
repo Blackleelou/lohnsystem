@@ -19,7 +19,8 @@ export default function BoardPage() {
   const [entries, setEntries] = useState<Entry[]>([]);
   const [uploading, setUploading] = useState(false);
   const [uploadResult, setUploadResult] = useState<string | null>(null);
-  const [isRefreshing, setIsRefreshing] = useState(false); // NEU
+  const [isRefreshing, setIsRefreshing] = useState(false);
+  const [exportFilter, setExportFilter] = useState<string>("alle");
 
   useEffect(() => {
     if (status === "loading") return;
@@ -66,17 +67,23 @@ export default function BoardPage() {
       setUploadResult(result.message || "Fehler beim Import.");
     }
 
+    // Dateinamen im Inputfeld ausblenden
+    e.target.value = "";
     setTimeout(() => setUploadResult(null), 4000);
   };
 
   const handleExport = () => {
-    const blob = new Blob([JSON.stringify(entries, null, 2)], {
+    const filtered = exportFilter === "alle"
+      ? entries
+      : entries.filter(e => e.status.toLowerCase() === exportFilter);
+
+    const blob = new Blob([JSON.stringify(filtered, null, 2)], {
       type: "application/json",
     });
     const url = URL.createObjectURL(blob);
     const a = document.createElement("a");
     a.href = url;
-    a.download = `superadmin-board-${new Date().toISOString()}.json`;
+    a.download = `superadmin-board-${exportFilter}-${new Date().toISOString()}.json`;
     a.click();
   };
 
@@ -103,7 +110,18 @@ export default function BoardPage() {
           )}
         </div>
 
-        <div className="sm:ml-auto">
+        <div className="sm:ml-auto flex flex-col gap-2 sm:flex-row sm:items-center">
+          <select
+            value={exportFilter}
+            onChange={(e) => setExportFilter(e.target.value)}
+            className="text-sm border border-gray-300 rounded px-2 py-1"
+          >
+            <option value="alle">Alle</option>
+            <option value="geplant">Geplant</option>
+            <option value="in arbeit">In Arbeit</option>
+            <option value="fertig">Fertig</option>
+          </select>
+
           <button
             onClick={handleExport}
             className="bg-blue-600 hover:bg-blue-700 text-white px-4 py-2 rounded text-sm"
