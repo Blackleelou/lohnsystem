@@ -2,6 +2,8 @@ import { useEffect, useState } from "react";
 import { useSession } from "next-auth/react";
 import { useRouter } from "next/router";
 import SuperadminLayout from "@/components/SuperadminLayout";
+import UploadButton from "@/components/UploadButton";
+
 
 type Entry = {
   id: number;
