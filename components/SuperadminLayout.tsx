@@ -13,22 +13,22 @@ export default function SuperadminLayout({ children }: { children: React.ReactNo
 
   return (
     <div className="min-h-screen flex flex-col bg-gray-50">
-      {/* Feste Top-Leiste */}
-      <header className="bg-blue-800 text-white shadow flex items-center justify-between px-4 py-3 sticky top-0 z-50">
-        <div className="text-lg font-bold">Superadmin</div>
+      {/* Top-Leiste mit UserMenu */}
+      <header className="bg-white shadow px-6 py-3 flex justify-between items-center sticky top-0 z-50">
+        <span className="text-lg font-semibold text-blue-700">Superadmin-Bereich</span>
         <UserMenu />
       </header>
 
-      {/* Navigation als Tabs */}
-      <nav className="bg-white shadow-sm px-4 py-2 border-b flex gap-6 justify-start sticky top-[52px] z-40">
-        {links.map(link => (
+      {/* Superadmin-Menüleiste */}
+      <nav className="bg-gray-100 px-6 py-2 border-b flex gap-6 sticky top-[60px] z-40">
+        {links.map((link) => (
           <Link
             key={link.href}
             href={link.href}
             className={`text-sm md:text-base ${
               router.pathname === link.href
                 ? "text-blue-600 font-semibold underline"
-                : "text-gray-600 hover:text-blue-500"
+                : "text-gray-700 hover:text-blue-500"
             }`}
           >
             {link.label}
@@ -36,8 +36,8 @@ export default function SuperadminLayout({ children }: { children: React.ReactNo
         ))}
       </nav>
 
-      {/* Hauptinhalt */}
-      <main className="flex-1 px-4 py-6">{children}</main>
+      {/* Inhaltsbereich */}
+      <main className="flex-1 p-6">{children}</main>
     </div>
   );
 }
