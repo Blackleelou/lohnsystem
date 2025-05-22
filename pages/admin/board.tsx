@@ -2,7 +2,6 @@ import { useEffect, useState } from "react";
 import { useSession } from "next-auth/react";
 import { useRouter } from "next/router";
 import SuperadminLayout from "@/components/SuperadminLayout";
-import { ArrowDownTrayIcon, ArrowUpTrayIcon } from "@heroicons/react/24/solid";
 
 type Entry = {
   id: number;
@@ -20,6 +19,7 @@ export default function BoardPage() {
   const [entries, setEntries] = useState<Entry[]>([]);
   const [uploading, setUploading] = useState(false);
   const [uploadResult, setUploadResult] = useState<string | null>(null);
+  const [isRefreshing, setIsRefreshing] = useState(false); // NEU
 
   useEffect(() => {
     if (status === "loading") return;
@@ -57,8 +57,11 @@ export default function BoardPage() {
     setUploading(false);
 
     if (res.ok) {
-      await loadEntries();
       setUploadResult(result.message || "Import abgeschlossen.");
+      setIsRefreshing(true);
+      setTimeout(() => {
+        loadEntries().then(() => setIsRefreshing(false));
+      }, 500);
     } else {
       setUploadResult(result.message || "Fehler beim Import.");
     }
@@ -86,15 +89,12 @@ export default function BoardPage() {
           <label className="block font-medium text-sm text-gray-700 mb-1">
             JSON-Datei importieren:
           </label>
-          <div className="flex items-center gap-2">
-            <ArrowUpTrayIcon className="w-5 h-5 text-gray-500" />
-            <input
-              type="file"
-              accept=".json"
-              onChange={handleUpload}
-              className="text-sm text-gray-600"
-            />
-          </div>
+          <input
+            type="file"
+            accept=".json"
+            onChange={handleUpload}
+            className="block w-full text-sm text-gray-600"
+          />
           {uploading && (
             <div className="flex items-center gap-2 text-sm text-blue-600 mt-1">
               <span className="animate-spin h-4 w-4 border-2 border-blue-600 border-t-transparent rounded-full"></span>
@@ -106,9 +106,8 @@ export default function BoardPage() {
         <div className="sm:ml-auto">
           <button
             onClick={handleExport}
-            className="bg-blue-600 hover:bg-blue-700 text-white px-4 py-2 rounded text-sm inline-flex items-center gap-2"
+            className="bg-blue-600 hover:bg-blue-700 text-white px-4 py-2 rounded text-sm"
           >
-            <ArrowDownTrayIcon className="w-5 h-5" />
             Als JSON exportieren
           </button>
         </div>
@@ -117,6 +116,12 @@ export default function BoardPage() {
       {uploadResult && (
         <div className="fixed top-4 right-4 bg-green-100 border border-green-300 text-green-800 px-4 py-2 rounded shadow z-50">
           {uploadResult}
+        </div>
+      )}
+
+      {isRefreshing && (
+        <div className="fixed top-20 right-4 bg-blue-100 border border-blue-300 text-blue-800 px-4 py-2 rounded shadow z-50">
+          Aktualisiere Daten...
         </div>
       )}
 
