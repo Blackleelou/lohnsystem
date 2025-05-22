@@ -21,7 +21,6 @@ export default function BoardPage() {
   const [uploading, setUploading] = useState(false);
   const [uploadResult, setUploadResult] = useState<string | null>(null);
   const [isRefreshing, setIsRefreshing] = useState(false);
-
   const [statusFilter, setStatusFilter] = useState<string>("alle");
   const [categoryFilter, setCategoryFilter] = useState<string>("alle");
 
@@ -142,7 +141,7 @@ export default function BoardPage() {
           <button
             onClick={handleExport}
             disabled={entries.length === 0}
-            className={\`px-4 py-2 rounded text-sm text-white transition \${entries.length === 0 ? "bg-gray-400 cursor-not-allowed" : "bg-blue-600 hover:bg-blue-700"}\`}
+            className={`px-4 py-2 rounded text-sm text-white transition ${entries.length === 0 ? "bg-gray-400 cursor-not-allowed" : "bg-blue-600 hover:bg-blue-700"}`}
           >
             Als JSON exportieren
           </button>
