@@ -20,7 +20,10 @@ export default function BoardPage() {
   const [uploading, setUploading] = useState(false);
   const [uploadResult, setUploadResult] = useState<string | null>(null);
   const [isRefreshing, setIsRefreshing] = useState(false);
-  const [exportFilter, setExportFilter] = useState<string>("alle");
+
+  // Filterzustände
+  const [statusFilter, setStatusFilter] = useState<string>("alle");
+  const [categoryFilter, setCategoryFilter] = useState<string>("alle");
 
   useEffect(() => {
     if (status === "loading") return;
@@ -67,15 +70,15 @@ export default function BoardPage() {
       setUploadResult(result.message || "Fehler beim Import.");
     }
 
-    // Dateinamen im Inputfeld ausblenden
-    e.target.value = "";
     setTimeout(() => setUploadResult(null), 4000);
   };
 
   const handleExport = () => {
-    const filtered = exportFilter === "alle"
-      ? entries
-      : entries.filter(e => e.status.toLowerCase() === exportFilter);
+    const filtered = entries.filter((e) => {
+      const statusOk = statusFilter === "alle" || e.status.toLowerCase() === statusFilter;
+      const categoryOk = categoryFilter === "alle" || e.category.toLowerCase() === categoryFilter;
+      return statusOk && categoryOk;
+    });
 
     const blob = new Blob([JSON.stringify(filtered, null, 2)], {
       type: "application/json",
@@ -83,9 +86,13 @@ export default function BoardPage() {
     const url = URL.createObjectURL(blob);
     const a = document.createElement("a");
     a.href = url;
-    a.download = `superadmin-board-${exportFilter}-${new Date().toISOString()}.json`;
+    a.download = `superadmin-board-${new Date().toISOString()}.json`;
     a.click();
   };
+
+  // Hilfsfunktionen für Dropdown-Werte
+  const uniqueCategories = Array.from(new Set(entries.map(e => e.category.toLowerCase())));
+  const uniqueStatuses = Array.from(new Set(entries.map(e => e.status.toLowerCase())));
 
   return (
     <div className="max-w-6xl mx-auto px-4 py-8 relative">
@@ -110,16 +117,28 @@ export default function BoardPage() {
           )}
         </div>
 
-        <div className="sm:ml-auto flex flex-col gap-2 sm:flex-row sm:items-center">
+        {/* Export-Filter Dropdowns */}
+        <div className="flex flex-col sm:flex-row items-start sm:items-center gap-2 sm:ml-auto">
           <select
-            value={exportFilter}
-            onChange={(e) => setExportFilter(e.target.value)}
-            className="text-sm border border-gray-300 rounded px-2 py-1"
+            className="border text-sm px-2 py-1 rounded text-gray-700"
+            value={statusFilter}
+            onChange={(e) => setStatusFilter(e.target.value)}
           >
-            <option value="alle">Alle</option>
-            <option value="geplant">Geplant</option>
-            <option value="in arbeit">In Arbeit</option>
-            <option value="fertig">Fertig</option>
+            <option value="alle">Alle Status</option>
+            {uniqueStatuses.map((s) => (
+              <option key={s} value={s}>{s}</option>
+            ))}
+          </select>
+
+          <select
+            className="border text-sm px-2 py-1 rounded text-gray-700"
+            value={categoryFilter}
+            onChange={(e) => setCategoryFilter(e.target.value)}
+          >
+            <option value="alle">Alle Kategorien</option>
+            {uniqueCategories.map((c) => (
+              <option key={c} value={c}>{c}</option>
+            ))}
           </select>
 
           <button
