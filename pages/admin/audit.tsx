@@ -3,6 +3,7 @@
 import { useEffect, useState } from "react";
 import { useSession } from "next-auth/react";
 import { useRouter } from "next/router";
+import SuperadminLayout from "@/components/SuperadminLayout";
 
 type LogEntry = {
   id: string;
@@ -19,22 +20,17 @@ export default function AuditPage() {
 
   useEffect(() => {
     if (status === "loading") return;
-
-    if (!session || !session.user?.email) {
-      router.push("/login");
-      return;
+    if (!session || session.user?.email !== "jantzen.chris@gmail.com") {
+      router.replace("/dashboard");
     }
+  }, [session, status]);
 
-    if (session.user.email !== "jantzen.chris@gmail.com") {
-      router.push("/dashboard");
-      return;
-    }
-
+  useEffect(() => {
     fetch("/api/admin/audit")
       .then((res) => res.json())
       .then((data) => setLogs(data.logs))
       .catch(() => setLogs([]));
-  }, [session, status, router]);
+  }, []);
 
   const handleExport = () => {
     const header = "Zeit;Aktion;UserID;IP";
@@ -52,10 +48,11 @@ export default function AuditPage() {
   };
 
   return (
-    <div className="max-w-6xl mx-auto p-6">
-      <h1 className="text-2xl font-bold mb-6">Audit-Log</h1>
-      <div className="overflow-x-auto">
-        <table className="w-full text-sm border border-gray-300">
+    <div className="max-w-6xl mx-auto px-4 py-8">
+      <h1 className="text-2xl font-bold text-blue-700 mb-6">Audit-Log</h1>
+
+      <div className="overflow-x-auto border border-gray-200 rounded-lg shadow-sm">
+        <table className="w-full text-sm">
           <thead className="bg-gray-100 text-left">
             <tr>
               <th className="p-3 border">Zeitpunkt</th>
@@ -76,6 +73,7 @@ export default function AuditPage() {
           </tbody>
         </table>
       </div>
+
       <button
         onClick={handleExport}
         className="mt-6 bg-blue-600 hover:bg-blue-700 text-white px-4 py-2 rounded transition"
@@ -87,8 +85,6 @@ export default function AuditPage() {
 }
 
 // SuperadminLayout zuweisen
-import SuperadminLayout from "@/components/SuperadminLayout";
-
 AuditPage.getLayout = (page: React.ReactNode) => (
   <SuperadminLayout>{page}</SuperadminLayout>
 );
