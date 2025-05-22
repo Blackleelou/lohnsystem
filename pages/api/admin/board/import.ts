@@ -25,10 +25,15 @@ type Entry = {
 export default async function handler(req: NextApiRequest, res: NextApiResponse) {
   if (req.method !== "POST") return res.status(405).end("Method Not Allowed");
 
-  const form = formidable({ maxFileSize: 2 * 1024 * 1024 }); // max. 2 MB
+  const form = formidable({ maxFileSize: 2 * 1024 * 1024 });
 
   try {
-    const [fields, files] = await form.parse(req);
+    const { fields, files } = await new Promise<{ fields: any; files: any }>((resolve, reject) => {
+      form.parse(req, (err, fields, files) => {
+        if (err) reject(err);
+        else resolve({ fields, files });
+      });
+    });
 
     const uploadedFile = files.file as File;
     if (!uploadedFile || !uploadedFile.filepath) {
@@ -51,14 +56,14 @@ export default async function handler(req: NextApiRequest, res: NextApiResponse)
       if (matchIndex !== -1) {
         const existing = merged[matchIndex];
 
-        const isIdentical =
+        const isIdentisch =
           existing.title === incoming.title &&
           existing.status === incoming.status &&
           existing.category === incoming.category &&
           existing.notes === incoming.notes &&
           existing.completedAt === incoming.completedAt;
 
-        if (isIdentical) continue;
+        if (isIdentisch) continue;
 
         merged[matchIndex] = {
           ...existing,
