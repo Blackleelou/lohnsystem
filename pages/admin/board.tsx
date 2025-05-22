@@ -19,6 +19,8 @@ export default function BoardPage() {
   const { data: session, status } = useSession();
   const router = useRouter();
   const [entries, setEntries] = useState<Entry[]>([]);
+  const [uploading, setUploading] = useState(false);
+  const [uploadResult, setUploadResult] = useState<string | null>(null);
 
   useEffect(() => {
     if (status === "loading") return;
@@ -33,9 +35,50 @@ export default function BoardPage() {
       .then((data) => setEntries(data.entries));
   }, []);
 
+  const handleUpload = async (e: React.ChangeEvent<HTMLInputElement>) => {
+    const file = e.target.files?.[0];
+    if (!file) return;
+
+    const formData = new FormData();
+    formData.append("file", file);
+
+    setUploading(true);
+    setUploadResult(null);
+
+    const res = await fetch("/api/admin/board/import", {
+      method: "POST",
+      body: formData,
+    });
+
+    const result = await res.json();
+    setUploading(false);
+    setUploadResult(result.message || "Import abgeschlossen.");
+
+    if (res.ok) {
+      // Reload entries
+      fetch("/api/admin/board")
+        .then((res) => res.json())
+        .then((data) => setEntries(data.entries));
+    }
+  };
+
   return (
     <div className="max-w-6xl mx-auto px-4 py-8">
       <h1 className="text-2xl font-bold text-blue-700 mb-6">Superadmin Board</h1>
+
+      <div className="mb-6 bg-white border border-gray-200 p-4 rounded shadow-sm">
+        <label className="block mb-2 font-medium text-sm text-gray-700">
+          JSON-Datei importieren:
+        </label>
+        <input
+          type="file"
+          accept=".json"
+          onChange={handleUpload}
+          className="block w-full text-sm text-gray-600"
+        />
+        {uploading && <p className="text-sm text-blue-500 mt-2">Hochladen...</p>}
+        {uploadResult && <p className="text-sm text-green-600 mt-2">{uploadResult}</p>}
+      </div>
 
       <div className="grid grid-cols-1 md:grid-cols-2 xl:grid-cols-3 gap-4">
         {entries.map((entry) => {
