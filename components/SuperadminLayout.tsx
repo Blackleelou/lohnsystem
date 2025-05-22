@@ -1,29 +1,33 @@
-import Layout from "@/components/Layout";
 import Link from "next/link";
+import { useRouter } from "next/router";
 
 export default function SuperadminLayout({ children }: { children: React.ReactNode }) {
-  return (
-    <Layout>
-      <header className="bg-white shadow-md sticky top-0 z-40">
-        <div className="max-w-7xl mx-auto px-4 py-3 flex items-center justify-between">
-          <h1 className="text-lg font-semibold text-gray-800">Superadmin Navigation</h1>
-          <nav className="space-x-4 text-sm">
-            <Link href="/superadmin" className="text-blue-600 hover:underline">
-              Übersicht
-            </Link>
-            <Link href="/superadmin/board" className="text-blue-600 hover:underline">
-              ToDo-Board
-            </Link>
-            <Link href="/admin/audit" className="text-blue-600 hover:underline">
-              Audit-Log
-            </Link>
-          </nav>
-        </div>
-      </header>
+  const router = useRouter();
 
-      <main className="max-w-7xl mx-auto px-4 py-6">
-        {children}
-      </main>
-    </Layout>
+  const navItems = [
+    { href: "/superadmin", label: "Übersicht" },
+    { href: "/admin/board", label: "ToDo-Board" },
+    { href: "/admin/audit", label: "Audit-Log" },
+    // Erweiterbar...
+  ];
+
+  return (
+    <div className="min-h-screen flex flex-col bg-gray-50">
+      <nav className="bg-blue-800 text-white px-6 py-3 shadow flex gap-6">
+        {navItems.map((item) => (
+          <Link
+            key={item.href}
+            href={item.href}
+            className={`hover:underline ${
+              router.pathname === item.href ? "font-semibold underline" : ""
+            }`}
+          >
+            {item.label}
+          </Link>
+        ))}
+      </nav>
+
+      <main className="flex-1 px-4 py-6">{children}</main>
+    </div>
   );
 }
