@@ -137,19 +137,24 @@ export default function BoardPage() {
       <h1 className="text-2xl font-bold text-blue-700 mb-6">Superadmin Board</h1>
 
       <FormPanel
-        editId={editId}
-        newTitle={newTitle}
-        newStatus={newStatus}
-        newCategory={newCategory}
-        newNotes={newNotes}
-        setNewTitle={setNewTitle}
-        setNewStatus={setNewStatus}
-        setNewCategory={setNewCategory}
-        setNewNotes={setNewNotes}
-        handleManualAdd={handleManualAdd}
-        handleUpdate={handleUpdate}
-        setEditId={setEditId}
-      />
+  isEditing={editId !== null}
+  title={newTitle}
+  status={newStatus}
+  category={newCategory}
+  notes={newNotes}
+  onChangeTitle={setNewTitle}
+  onChangeStatus={setNewStatus}
+  onChangeCategory={setNewCategory}
+  onChangeNotes={setNewNotes}
+  onSave={editId !== null ? handleUpdate : handleManualAdd}
+  onCancel={() => {
+    setEditId(null);
+    setNewTitle("");
+    setNewStatus("");
+    setNewCategory("");
+    setNewNotes("");
+  }}
+/>
 
       <FilterPanel
         filteredEntries={filteredEntries}
