@@ -13,6 +13,8 @@ type FilterPanelProps = {
   setSelectedCategories: React.Dispatch<React.SetStateAction<string[]>>;
   fileInputRef: MutableRefObject<HTMLInputElement | null>;
   handleUpload: (e: ChangeEvent<HTMLInputElement>) => Promise<void>;
+  hideImport?: boolean;
+  hideExport?: boolean;
 };
 
 export default function FilterPanel({
@@ -25,6 +27,8 @@ export default function FilterPanel({
   setSelectedCategories,
   fileInputRef,
   handleUpload,
+  hideImport = false,
+  hideExport = false,
 }: FilterPanelProps) {
   const toggleCheckbox = (value: string, group: "status" | "category") => {
     const current = group === "status" ? selectedStatuses : selectedCategories;
@@ -38,7 +42,7 @@ export default function FilterPanel({
       return;
     }
 
-    updater(current.includes(value) ? current.filter(v => v !== value) : [...current, value]);
+    updater(current.includes(value) ? current.filter((v) => v !== value) : [...current, value]);
   };
 
   const categoryOptions = [
@@ -50,34 +54,41 @@ export default function FilterPanel({
   return (
     <div className="mb-6 bg-white border border-gray-200 p-4 rounded shadow-sm">
       <div className="flex flex-wrap gap-4 items-center mb-4">
-        <input
-          type="file"
-          accept=".json"
-          ref={fileInputRef}
-          onChange={handleUpload}
-          className="hidden"
-          id="fileUpload"
-        />
-        <label
-          htmlFor="fileUpload"
-          className="cursor-pointer bg-blue-600 hover:bg-blue-700 text-white px-4 py-2 rounded text-sm"
-        >
-          Datei auswählen & importieren
-        </label>
-        <button
-          onClick={() => {
-            const data = JSON.stringify(filteredEntries, null, 2);
-            const blob = new Blob([data], { type: "application/json" });
-            const url = URL.createObjectURL(blob);
-            const a = document.createElement("a");
-            a.href = url;
-            a.download = `Export_ToDo_${new Date().toISOString().replace(/[:.]/g, "_")}.json`;
-            a.click();
-          }}
-          className="bg-blue-600 hover:bg-blue-700 text-white px-4 py-2 rounded text-sm"
-        >
-          Als JSON exportieren
-        </button>
+        {!hideImport && (
+          <>
+            <input
+              type="file"
+              accept=".json"
+              ref={fileInputRef}
+              onChange={handleUpload}
+              className="hidden"
+              id="fileUpload"
+            />
+            <label
+              htmlFor="fileUpload"
+              className="cursor-pointer bg-blue-600 hover:bg-blue-700 text-white px-4 py-2 rounded-md text-sm"
+            >
+              Datei auswählen & importieren
+            </label>
+          </>
+        )}
+
+        {!hideExport && (
+          <button
+            onClick={() => {
+              const data = JSON.stringify(filteredEntries, null, 2);
+              const blob = new Blob([data], { type: "application/json" });
+              const url = URL.createObjectURL(blob);
+              const a = document.createElement("a");
+              a.href = url;
+              a.download = `Export_ToDo_${new Date().toISOString().replace(/[:.]/g, "_")}.json`;
+              a.click();
+            }}
+            className="bg-blue-600 hover:bg-blue-700 text-white px-4 py-2 rounded-md text-sm"
+          >
+            Als JSON exportieren
+          </button>
+        )}
       </div>
 
       <div className="flex gap-6 flex-wrap">
