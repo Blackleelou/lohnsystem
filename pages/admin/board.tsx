@@ -1,3 +1,5 @@
+// board.tsx (geprüfte finale Version mit Bearbeiten & Löschen)
+
 import { useEffect, useState, useRef } from "react";
 import { useSession } from "next-auth/react";
 import { useRouter } from "next/router";
@@ -22,12 +24,12 @@ export default function BoardPage() {
   const [isRefreshing, setIsRefreshing] = useState(false);
   const [selectedStatuses, setSelectedStatuses] = useState<string[]>([]);
   const [selectedCategories, setSelectedCategories] = useState<string[]>([]);
+  const [editId, setEditId] = useState<number | null>(null);
 
   const [newTitle, setNewTitle] = useState("");
   const [newStatus, setNewStatus] = useState("");
   const [newCategory, setNewCategory] = useState("");
   const [newNotes, setNewNotes] = useState("");
-  const [editId, setEditId] = useState<number | null>(null);
 
   const fileInputRef = useRef<HTMLInputElement | null>(null);
 
@@ -80,82 +82,8 @@ export default function BoardPage() {
     setTimeout(() => setUploadResult(null), 4000);
   };
 
-  const handleExport = () => {
-    const filtered = entries.filter((e) => {
-      const statusOk = selectedStatuses.length === 0 || selectedStatuses.includes(e.status.toLowerCase());
-      const categoryOk = selectedCategories.length === 0 || selectedCategories.includes(e.category.toLowerCase());
-      return statusOk && categoryOk;
-    });
-
-    if (filtered.length === 0) return;
-
-    const blob = new Blob([JSON.stringify(filtered, null, 2)], {
-      type: "application/json",
-    });
-
-    const timestamp = new Date()
-      .toLocaleString("de-DE", {
-        day: "2-digit",
-        month: "2-digit",
-        year: "numeric",
-        hour: "2-digit",
-        minute: "2-digit",
-      })
-      .replace(/[.:]/g, "_")
-      .replace(", ", "_");
-
-    const url = URL.createObjectURL(blob);
-    const a = document.createElement("a");
-    a.href = url;
-    a.download = `Export_ToDo_${timestamp}.json`;
-    a.click();
-  };
-
-  
-  const handleUpdate = async () => {
-    if (!editId) return;
-    const payload = {
-      id: editId,
-      title: newTitle,
-      status: newStatus,
-      category: newCategory,
-      notes: newNotes,
-    };
-    const res = await fetch("/api/admin/board/update", {
-      method: "PATCH",
-      headers: { "Content-Type": "application/json" },
-      body: JSON.stringify(payload),
-    });
-    if (res.ok) {
-      setEditId(null);
-      setNewTitle("");
-      setNewStatus("");
-      setNewCategory("");
-      setNewNotes("");
-      await loadEntries();
-    }
-  };
-
-  const handleDelete = async (id: number) => {
-    if (!confirm("Eintrag wirklich löschen?")) return;
-    const res = await fetch("/api/admin/board/delete", {
-      method: "DELETE",
-      headers: { "Content-Type": "application/json" },
-      body: JSON.stringify({ id }),
-    });
-    if (res.ok) {
-      await loadEntries();
-    }
-  };
-    
   const handleManualAdd = async () => {
-    const payload = {
-      title: newTitle,
-      status: newStatus,
-      category: newCategory,
-      notes: newNotes,
-    };
-
+    const payload = { title: newTitle, status: newStatus, category: newCategory, notes: newNotes };
     const res = await fetch("/api/admin/board/create", {
       method: "POST",
       headers: { "Content-Type": "application/json" },
@@ -171,124 +99,116 @@ export default function BoardPage() {
     }
   };
 
-  const uniqueCategories = Array.from(new Set(entries.map(e => e.category.toLowerCase())));
-  const uniqueStatuses = Array.from(new Set(entries.map(e => e.status.toLowerCase())));
+  const handleUpdate = async () => {
+    if (!editId) return;
+    const payload = { id: editId, title: newTitle, status: newStatus, category: newCategory, notes: newNotes };
+    const res = await fetch("/api/admin/board/update", {
+      method: "PATCH",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify(payload),
+    });
 
-  const toggleCheckbox = (value: string, group: string) => {
-    const updater = group === "status" ? setSelectedStatuses : setSelectedCategories;
-    const current = group === "status" ? selectedStatuses : selectedCategories;
-
-    updater(current.includes(value)
-      ? current.filter((v) => v !== value)
-      : [...current, value]);
+    if (res.ok) {
+      setEditId(null);
+      setNewTitle("");
+      setNewStatus("");
+      setNewCategory("");
+      setNewNotes("");
+      await loadEntries();
+    }
   };
 
-  const filteredEntries = entries.filter((e) => {
-    const statusOk = selectedStatuses.length === 0 || selectedStatuses.includes(e.status.toLowerCase());
-    const categoryOk = selectedCategories.length === 0 || selectedCategories.includes(e.category.toLowerCase());
-    return statusOk && categoryOk;
-  });
+  const handleDelete = async (id: number) => {
+    if (!confirm("Eintrag wirklich löschen?")) return;
+    await fetch("/api/admin/board/delete", {
+      method: "DELETE",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify({ id }),
+    });
+    await loadEntries();
+  };
+
+  const filteredEntries = entries.filter(e =>
+    (selectedStatuses.length === 0 || selectedStatuses.includes(e.status.toLowerCase())) &&
+    (selectedCategories.length === 0 || selectedCategories.includes(e.category.toLowerCase()))
+  );
+
+  const uniqueStatuses = [...new Set(entries.map(e => e.status.toLowerCase()))];
+  const uniqueCategories = [...new Set(entries.map(e => e.category.toLowerCase()))];
+
+  const toggleCheckbox = (value: string, group: string) => {
+    const current = group === "status" ? selectedStatuses : selectedCategories;
+    const updater = group === "status" ? setSelectedStatuses : setSelectedCategories;
+    updater(current.includes(value) ? current.filter(v => v !== value) : [...current, value]);
+  };
 
   return (
     <div className="max-w-6xl mx-auto px-4 py-8 relative">
       <h1 className="text-2xl font-bold text-blue-700 mb-6">Superadmin Board</h1>
 
-      {/* Manuell hinzufügen */}
       <div className="bg-white border border-gray-200 p-4 rounded shadow-sm mb-6">
-        <h2 className="text-md font-semibold text-gray-800 mb-2">Manuellen Eintrag hinzufügen</h2>
+        <h2 className="text-md font-semibold text-gray-800 mb-2">{editId ? "Eintrag bearbeiten" : "Manuellen Eintrag hinzufügen"}</h2>
         <div className="grid grid-cols-1 md:grid-cols-4 gap-4 mb-3">
           <input placeholder="Titel" value={newTitle} onChange={e => setNewTitle(e.target.value)} className="border px-2 py-1 text-sm rounded w-full" />
           <input placeholder="Status" value={newStatus} onChange={e => setNewStatus(e.target.value)} className="border px-2 py-1 text-sm rounded w-full" />
           <input placeholder="Kategorie" value={newCategory} onChange={e => setNewCategory(e.target.value)} className="border px-2 py-1 text-sm rounded w-full" />
           <input placeholder="Notizen" value={newNotes} onChange={e => setNewNotes(e.target.value)} className="border px-2 py-1 text-sm rounded w-full" />
         </div>
-        <div className="flex gap-2 mt-2">
-          {editId ? (
-            <>
-              <button
-                onClick={handleUpdate}
-                className="bg-blue-600 hover:bg-blue-700 text-white text-sm px-4 py-2 rounded"
-              >
-                Speichern
-              </button>
-              <button
-                onClick={() => {
-                  setEditId(null);
-                  setNewTitle("");
-                  setNewStatus("");
-                  setNewCategory("");
-                  setNewNotes("");
-                }}
-                className="bg-gray-400 hover:bg-gray-500 text-white text-sm px-4 py-2 rounded"
-              >
-                Abbrechen
-              </button>
-            </>
-          ) : (
-            <button
-              onClick={handleManualAdd}
-              className="bg-green-600 hover:bg-green-700 text-white text-sm px-4 py-2 rounded"
-            >
-              Hinzufügen
-            </button>
-          )}
-        </div>
-
         {editId ? (
-          <>
-            <button onClick={handleUpdate} className="bg-blue-600 hover:bg-blue-700 text-white text-sm px-4 py-2 rounded">Speichern</button>
+          <div className="flex gap-2">
+            <button onClick={handleUpdate} className="bg-blue-600 hover:bg-blue-700 text-white px-4 py-2 text-sm rounded">Speichern</button>
             <button onClick={() => {
               setEditId(null);
               setNewTitle("");
               setNewStatus("");
               setNewCategory("");
               setNewNotes("");
-            }} className="bg-gray-400 hover:bg-gray-500 text-white text-sm px-4 py-2 rounded">Abbrechen</button>
-          </>
+            }} className="bg-gray-500 hover:bg-gray-600 text-white px-4 py-2 text-sm rounded">Abbrechen</button>
+          </div>
         ) : (
-          <button onClick={handleManualAdd} className="bg-green-600 hover:bg-green-700 text-white text-sm px-4 py-2 rounded">
+          <button onClick={handleManualAdd} className="bg-green-600 hover:bg-green-700 text-white px-4 py-2 text-sm rounded">Hinzufügen</button>
+        )}
+      </div>
 
-
-      {/* Upload & Filter */}
-      <div className="flex flex-col gap-4 mb-6 bg-white border border-gray-200 p-4 rounded shadow-sm">
-        <div className="flex flex-col sm:flex-row sm:items-center gap-4">
-          <input
-            type="file"
-            accept=".json"
-            ref={fileInputRef}
-            onChange={handleUpload}
-            className="hidden"
-            id="fileUpload"
-          />
-          <label
-            htmlFor="fileUpload"
-            className="inline-block cursor-pointer rounded bg-blue-600 px-4 py-2 text-sm font-medium text-white hover:bg-blue-700 transition"
-          >
-            Datei auswählen & importieren
-          </label>
-
-          <button
-            onClick={handleExport}
-            disabled={filteredEntries.length === 0}
-            className={`px-4 py-2 rounded text-sm text-white transition ${
-              filteredEntries.length === 0
-                ? "bg-gray-400 cursor-not-allowed"
-                : "bg-blue-600 hover:bg-blue-700"
-            }`}
-          >
+      <div className="mb-6 bg-white border border-gray-200 p-4 rounded shadow-sm">
+        <div className="flex flex-wrap gap-4 items-center mb-4">
+          <input type="file" accept=".json" ref={fileInputRef} onChange={handleUpload} className="hidden" id="fileUpload" />
+          <label htmlFor="fileUpload" className="cursor-pointer bg-blue-600 hover:bg-blue-700 text-white px-4 py-2 rounded text-sm">Datei auswählen & importieren</label>
+          <button onClick={() => {
+            const data = JSON.stringify(filteredEntries, null, 2);
+            const blob = new Blob([data], { type: "application/json" });
+            const url = URL.createObjectURL(blob);
+            const a = document.createElement("a");
+            a.href = url;
+            a.download = `Export_ToDo_${new Date().toISOString().replace(/[:.]/g, "_")}.json`;
+            a.click();
+          }} className="bg-blue-600 hover:bg-blue-700 text-white px-4 py-2 rounded text-sm">
             Als JSON exportieren
           </button>
         </div>
 
-        <div className="flex flex-wrap gap-6">
+        <div className="flex gap-6 flex-wrap">
           <div>
-            <p className="text-sm font-medium text-gray-700 mb-1">Status-Filter</p>
-            
+            <p className="font-medium text-sm mb-1 text-gray-700">Status-Filter</p>
+            <div className="flex gap-2 flex-wrap">
+              {uniqueStatuses.map(s => (
+                <label key={s} className="text-sm flex items-center gap-1">
+                  <input type="checkbox" checked={selectedStatuses.includes(s)} onChange={() => toggleCheckbox(s, "status")} />
+                  {s}
+                </label>
+              ))}
+            </div>
           </div>
-
           <div>
-            <p className="text-sm font-medium text-gray-700 mb-1">Kategorie-Filter</p>
-            
+            <p className="font-medium text-sm mb-1 text-gray-700">Kategorie-Filter</p>
+            <div className="flex gap-2 flex-wrap">
+              {uniqueCategories.map(c => (
+                <label key={c} className="text-sm flex items-center gap-1">
+                  <input type="checkbox" checked={selectedCategories.includes(c)} onChange={() => toggleCheckbox(c, "category")} />
+                  {c}
+                </label>
+              ))}
+            </div>
           </div>
         </div>
       </div>
@@ -299,52 +219,29 @@ export default function BoardPage() {
         </div>
       )}
 
-      {isRefreshing && (
-        <div className="fixed top-20 right-4 bg-blue-100 border border-blue-300 text-blue-800 px-4 py-2 rounded shadow z-50">
-          Aktualisiere Daten...
-        </div>
-      )}
-
       <div className="grid grid-cols-1 md:grid-cols-2 xl:grid-cols-3 gap-4">
-        {filteredEntries.map((entry) => {
-          const isDone = entry.status.toLowerCase() === "fertig";
-          return (
-            <div
-              key={entry.id}
-              className={`border p-4 rounded-md shadow-sm hover:shadow transition ${
-                isDone ? "bg-green-50 border-green-300" : "bg-white border-gray-200"
-              }`}
-            >
-              <h2 className="font-semibold text-lg text-gray-800 mb-2">{entry.title}</h2>
-              <p className="text-sm text-gray-500">Kategorie: {entry.category}</p>
-              <p className={`text-sm mb-2 ${isDone ? "text-green-700 font-medium" : "text-gray-500"}`}>
-                Status: {entry.status}
-              </p>
-              {entry.notes && (
-                <p className="text-sm text-gray-700 mt-2 whitespace-pre-line">{entry.notes}</p>
-              )}
-              <p className="text-xs text-gray-400 mt-4">
-                Erstellt: {new Date(entry.createdAt).toLocaleString()}
-                {entry.completedAt && (
-                  <>
-                    <br />
-                    Fertig: {new Date(entry.completedAt).toLocaleString()}
-                  </>
-                )}
-              </p>
-              <div className="flex justify-end gap-2 mt-3">
-                <button onClick={() => {
-                  setEditId(entry.id);
-                  setNewTitle(entry.title);
-                  setNewStatus(entry.status);
-                  setNewCategory(entry.category);
-                  setNewNotes(entry.notes || "");
-                }} className="text-blue-600 hover:underline text-sm">Bearbeiten</button>
-                <button onClick={() => handleDelete(entry.id)} className="text-red-600 hover:underline text-sm">Löschen</button>
-              </div>
+        {filteredEntries.map(entry => (
+          <div key={entry.id} className="border p-4 rounded-md shadow-sm bg-white">
+            <h2 className="font-semibold text-lg text-gray-800 mb-2">{entry.title}</h2>
+            <p className="text-sm text-gray-500">Kategorie: {entry.category}</p>
+            <p className="text-sm text-gray-500">Status: {entry.status}</p>
+            {entry.notes && <p className="text-sm text-gray-700 mt-2">{entry.notes}</p>}
+            <p className="text-xs text-gray-400 mt-4">
+              Erstellt: {new Date(entry.createdAt).toLocaleString()}
+              {entry.completedAt && <><br />Fertig: {new Date(entry.completedAt).toLocaleString()}</>}
+            </p>
+            <div className="flex justify-end gap-2 mt-3">
+              <button onClick={() => {
+                setEditId(entry.id);
+                setNewTitle(entry.title);
+                setNewStatus(entry.status);
+                setNewCategory(entry.category);
+                setNewNotes(entry.notes || "");
+              }} className="text-blue-600 hover:underline text-sm">Bearbeiten</button>
+              <button onClick={() => handleDelete(entry.id)} className="text-red-600 hover:underline text-sm">Löschen</button>
             </div>
-          );
-        })}
+          </div>
+        ))}
       </div>
     </div>
   );
@@ -353,8 +250,3 @@ export default function BoardPage() {
 BoardPage.getLayout = (page: React.ReactNode) => (
   <SuperadminLayout>{page}</SuperadminLayout>
 );
-
-</div>
-
-    </div>
-  );
