@@ -2,7 +2,6 @@
 
 import React, { MutableRefObject, ChangeEvent } from "react";
 import { Entry } from "./types";
-import { STATUS_OPTIONS, CATEGORY_OPTIONS } from "./constants";
 
 type FilterPanelProps = {
   filteredEntries: Entry[];
@@ -42,6 +41,10 @@ export default function FilterPanel({
     updater(current.includes(value) ? current.filter(v => v !== value) : [...current, value]);
   };
 
+  const categoryOptions = [
+    "IT", "Personal", "Finanzen", "Organisation", "Kommunikation", "Projekte", "Sonstiges",
+  ];
+
   return (
     <div className="mb-6 bg-white border border-gray-200 p-4 rounded shadow-sm">
       <div className="flex flex-wrap gap-4 items-center mb-4">
@@ -69,11 +72,13 @@ export default function FilterPanel({
         <div>
           <p className="font-medium text-sm mb-2 text-gray-700">Status-Filter</p>
           <div className="flex gap-2 flex-wrap">
-            {STATUS_OPTIONS.filter(s => s !== "fertig" && s !== "getestet" && s !== "fertig/getestet").map((s) => (
+            {[...new Set(uniqueStatuses.filter(s =>
+              s !== "fertig" && s !== "getestet" && s !== "fertig/getestet"
+            ))].map((s) => (
               <button
                 key={s}
                 onClick={() => toggleCheckbox(s, "status")}
-                className={`px-3 py-1 rounded-full text-sm border ${
+                className={`px-3 py-1 rounded-md text-sm border ${
                   selectedStatuses.includes(s)
                     ? "bg-blue-600 text-white"
                     : "bg-gray-100 text-gray-700"
@@ -84,7 +89,7 @@ export default function FilterPanel({
             ))}
             <button
               onClick={() => toggleCheckbox("fertig/getestet", "status")}
-              className={`px-3 py-1 rounded-full text-sm border ${
+              className={`px-3 py-1 rounded-md text-sm border ${
                 selectedStatuses.includes("fertig") || selectedStatuses.includes("getestet")
                   ? "bg-blue-600 text-white"
                   : "bg-gray-100 text-gray-700"
@@ -98,11 +103,11 @@ export default function FilterPanel({
         <div>
           <p className="font-medium text-sm mb-2 text-gray-700">Kategorie-Filter</p>
           <div className="flex gap-2 flex-wrap">
-            {CATEGORY_OPTIONS.map((c) => (
+            {categoryOptions.map((c) => (
               <button
                 key={c}
                 onClick={() => toggleCheckbox(c.toLowerCase(), "category")}
-                className={`px-3 py-1 rounded-full text-sm border ${
+                className={`px-3 py-1 rounded-md text-sm border ${
                   selectedCategories.includes(c.toLowerCase())
                     ? "bg-blue-600 text-white"
                     : "bg-gray-100 text-gray-700"
