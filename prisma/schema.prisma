@@ -41,12 +41,12 @@ model AuditLog {
 }
 
 model SuperadminBoardEntry {
-  id           String   @id @default(cuid())
-  title        String
-  status       String
-  category     String
-  notes        String?
-  createdAt    DateTime @default(now())
-  completedAt  DateTime?
-  updatedByImport Boolean @default(false)
+  id               String    @id @default(cuid())
+  title            String
+  status           String
+  category         String[]  // ← hier wurde das Feld in ein Array geändert
+  notes            String?
+  createdAt        DateTime  @default(now())
+  completedAt      DateTime?
+  updatedByImport  Boolean   @default(false)
 }
