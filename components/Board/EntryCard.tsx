@@ -6,8 +6,8 @@ import { STATUS_OPTIONS, CATEGORY_OPTIONS } from "./constants";
 
 type EntryCardProps = {
   entry: Entry;
-  handleUpdate: (updated: Partial<Entry> & { id: number }) => void;
-  handleDelete: (id: number) => void;
+  handleUpdate: (updated: Partial<Entry> & { id: string }) => void;
+  handleDelete: (id: string) => void;
   onClick: () => void;
 };
 
@@ -25,9 +25,7 @@ export default function EntryCard({
       ["getestet", "fertig"].includes(entry.status.toLowerCase())
         ? "fertig"
         : entry.status,
-    category: Array.isArray(entry.category)
-      ? entry.category
-      : entry.category.split(",").map((c) => c.trim()),
+    category: entry.category,
     notes: entry.notes || "",
   });
 
@@ -45,7 +43,7 @@ export default function EntryCard({
       id: entry.id,
       title: editData.title,
       status: editData.status,
-      category: editData.category.join(", "),
+      category: editData.category,
       notes: editData.notes,
     });
     setIsEditing(false);
@@ -132,7 +130,9 @@ export default function EntryCard({
             {entry.title}
             {isFertig && <span className="text-green-600 font-bold text-sm">✔</span>}
           </h2>
-          <p className="text-sm text-gray-500">Kategorie: {entry.category}</p>
+          <p className="text-sm text-gray-500">
+            Kategorie: {Array.isArray(entry.category) ? entry.category.join(", ") : ""}
+          </p>
           <p className="text-sm text-gray-500">Status: {entry.status}</p>
           {entry.notes && <p className="text-sm text-gray-700 mt-2">{entry.notes}</p>}
           <p className="text-xs text-gray-400 mt-4">
