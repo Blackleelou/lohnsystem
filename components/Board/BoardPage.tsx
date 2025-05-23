@@ -1,5 +1,3 @@
-// components/Board/BoardPage.tsx
-
 import { useEffect, useState, useRef } from "react";
 import { useSession } from "next-auth/react";
 import { useRouter } from "next/router";
@@ -14,18 +12,20 @@ import { STATUS_OPTIONS, CATEGORY_OPTIONS } from "./constants";
 export default function BoardPage() {
   const { data: session, status } = useSession();
   const router = useRouter();
+
   const [entries, setEntries] = useState<Entry[]>([]);
   const [toast, setToast] = useState<string | null>(null);
   const [selectedStatuses, setSelectedStatuses] = useState<string[]>([]);
   const [selectedCategories, setSelectedCategories] = useState<string[]>([]);
   const [editId, setEditId] = useState<number | null>(null);
   const [selectedEntry, setSelectedEntry] = useState<Entry | null>(null);
-  const [activeTab, setActiveTab] = useState<"import" | "export" | "manual">("manual");
 
   const [newTitle, setNewTitle] = useState("");
   const [newStatus, setNewStatus] = useState("");
   const [newCategory, setNewCategory] = useState<string[]>([]);
   const [newNotes, setNewNotes] = useState("");
+
+  const [section, setSection] = useState<"manuell" | "import" | "export" | null>("manuell");
 
   const fileInputRef = useRef<HTMLInputElement | null>(null);
 
@@ -35,8 +35,7 @@ export default function BoardPage() {
       router.replace("/dashboard");
     }
   }, [session, status]);
-
-  const showToast = (msg: string) => {
+    const showToast = (msg: string) => {
     setToast(msg);
     setTimeout(() => setToast(null), 4000);
   };
@@ -130,15 +129,15 @@ export default function BoardPage() {
       showToast("Fehler beim Löschen.");
     }
   };
-
-  const normalizeStatus = (status: string) =>
+    const normalizeStatus = (status: string) =>
     ["fertig", "getestet"].includes(status.toLowerCase()) ? "fertig/getestet" : status.toLowerCase();
 
   const filteredEntries = entries.filter((e) => {
     const normalized = normalizeStatus(e.status);
     const matchesStatus = selectedStatuses.length === 0 || selectedStatuses.includes(normalized);
     const categories = e.category.split(",").map((c) => c.trim().toLowerCase());
-    const matchesCategory = selectedCategories.length === 0 || categories.some((c) => selectedCategories.includes(c));
+    const matchesCategory =
+      selectedCategories.length === 0 || categories.some((c) => selectedCategories.includes(c));
     return matchesStatus && matchesCategory;
   });
 
@@ -147,38 +146,54 @@ export default function BoardPage() {
     new Set(entries.flatMap((e) => e.category.split(",").map((c) => c.trim().toLowerCase())))
   );
 
+  const [activeSection, setActiveSection] = useState<"manual" | "import" | "export" | null>(null);
+
   return (
     <div className="max-w-6xl mx-auto px-4 py-8 relative">
-      <h1 className="text-2xl font-bold text-blue-700 mb-6">Superadmin Board</h1>
+      <h1 className="text-2xl font-bold text-blue-700 mb-4">Superadmin Board</h1>
 
-      <div className="flex gap-4 mb-4">
+      <div className="flex gap-4 mb-6">
         <button
-          className={`px-4 py-2 text-sm rounded-md border ${
-            activeTab === "manual" ? "bg-blue-600 text-white" : "bg-gray-100 text-gray-800"
+          className={`px-4 py-1 text-sm rounded border ${
+            activeSection === "manual" ? "bg-blue-600 text-white" : "bg-white text-gray-700"
           }`}
-          onClick={() => setActiveTab("manual")}
+          onClick={() => setActiveSection(activeSection === "manual" ? null : "manual")}
         >
           Manuell
         </button>
         <button
-          className={`px-4 py-2 text-sm rounded-md border ${
-            activeTab === "import" ? "bg-blue-600 text-white" : "bg-gray-100 text-gray-800"
+          className={`px-4 py-1 text-sm rounded border ${
+            activeSection === "import" ? "bg-blue-600 text-white" : "bg-white text-gray-700"
           }`}
-          onClick={() => setActiveTab("import")}
+          onClick={() => setActiveSection(activeSection === "import" ? null : "import")}
         >
           Import
         </button>
         <button
-          className={`px-4 py-2 text-sm rounded-md border ${
-            activeTab === "export" ? "bg-blue-600 text-white" : "bg-gray-100 text-gray-800"
+          className={`px-4 py-1 text-sm rounded border ${
+            activeSection === "export" ? "bg-blue-600 text-white" : "bg-white text-gray-700"
           }`}
-          onClick={() => setActiveTab("export")}
+          onClick={() => setActiveSection(activeSection === "export" ? null : "export")}
         >
           Export
         </button>
       </div>
 
-      {activeTab === "manual" && (
+      <FilterPanel
+        uniqueStatuses={uniqueStatuses}
+        uniqueCategories={uniqueCategories}
+        selectedStatuses={selectedStatuses}
+        selectedCategories={selectedCategories}
+        setSelectedStatuses={setSelectedStatuses}
+        setSelectedCategories={setSelectedCategories}
+        fileInputRef={fileInputRef}
+        handleUpload={handleUpload}
+        filteredEntries={filteredEntries}
+        hideImport={activeSection !== "import"}
+        hideExport={activeSection !== "export"}
+      />
+
+      {activeSection === "manual" && (
         <FormPanel
           isEditing={editId !== null}
           title={newTitle}
@@ -210,41 +225,7 @@ export default function BoardPage() {
           }}
         />
       )}
-
-      {(activeTab === "import" || activeTab === "export") && (
-        <FilterPanel
-          uniqueStatuses={uniqueStatuses}
-          uniqueCategories={uniqueCategories}
-          selectedStatuses={selectedStatuses}
-          selectedCategories={selectedCategories}
-          setSelectedStatuses={setSelectedStatuses}
-          setSelectedCategories={setSelectedCategories}
-          fileInputRef={fileInputRef}
-          handleUpload={handleUpload}
-          filteredEntries={filteredEntries}
-        />
-      )}
-
-      {activeTab === "export" && (
-        <div className="mb-6">
-          <button
-            onClick={() => {
-              const data = JSON.stringify(filteredEntries, null, 2);
-              const blob = new Blob([data], { type: "application/json" });
-              const url = URL.createObjectURL(blob);
-              const a = document.createElement("a");
-              a.href = url;
-              a.download = `Export_ToDo_${new Date().toISOString().replace(/[:.]/g, "_")}.json`;
-              a.click();
-            }}
-            className="bg-blue-600 hover:bg-blue-700 text-white px-4 py-2 rounded text-sm"
-          >
-            Als JSON exportieren
-          </button>
-        </div>
-      )}
-
-      <div className="grid grid-cols-1 md:grid-cols-2 xl:grid-cols-3 gap-4">
+            <div className="grid grid-cols-1 md:grid-cols-2 xl:grid-cols-3 gap-4">
         {filteredEntries.map((entry) => (
           <EntryCard
             key={entry.id}
@@ -256,7 +237,12 @@ export default function BoardPage() {
         ))}
       </div>
 
-      {selectedEntry && <EntryModal entry={selectedEntry} onClose={() => setSelectedEntry(null)} />}
+      {selectedEntry && (
+        <EntryModal
+          entry={selectedEntry}
+          onClose={() => setSelectedEntry(null)}
+        />
+      )}
 
       {toast && (
         <div className="fixed top-4 right-4 z-50 bg-blue-600 text-white px-4 py-2 rounded shadow">
@@ -267,4 +253,6 @@ export default function BoardPage() {
   );
 }
 
-BoardPage.getLayout = (page: React.ReactNode) => <SuperadminLayout>{page}</SuperadminLayout>;
+BoardPage.getLayout = (page: React.ReactNode) => (
+  <SuperadminLayout>{page}</SuperadminLayout>
+);
