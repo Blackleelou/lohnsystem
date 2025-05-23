@@ -1,5 +1,10 @@
+// components/Board/EntryCard.tsx
+
 import React, { useState } from "react";
 import { Entry } from "./types";
+
+const statusOptions = ["geplant", "offen", "in Bearbeitung", "fertig"];
+const categoryOptions = ["IT", "Personal", "Finanzen", "Organisation", "Kommunikation", "Projekte", "Sonstiges"];
 
 type EntryCardProps = {
   entry: Entry;
@@ -18,28 +23,35 @@ export default function EntryCard({
   const [isEditing, setIsEditing] = useState(false);
   const [editData, setEditData] = useState({
     title: entry.title,
-    status:
-      ["getestet", "fertig"].includes(entry.status.toLowerCase())
-        ? "getestet/fertig"
-        : entry.status,
-    category: entry.category,
+    status: ["getestet", "fertig"].includes(entry.status.toLowerCase()) ? "fertig" : entry.status,
+    category: Array.isArray(entry.category) ? entry.category : entry.category.split(",").map(s => s.trim()),
     notes: entry.notes || "",
   });
 
-  const saveChanges = () => {
-    const normalizedStatus =
-      editData.status === "getestet/fertig" ? "fertig" : editData.status;
+  const toggleCategory = (value: string) => {
+    if (editData.category.includes(value)) {
+      setEditData({ ...editData, category: editData.category.filter(c => c !== value) });
+    } else {
+      setEditData({ ...editData, category: [...editData.category, value] });
+    }
+  };
 
-    handleUpdate({ id: entry.id, ...editData, status: normalizedStatus });
+  const saveChanges = () => {
+    const normalizedStatus = editData.status === "getestet/fertig" ? "fertig" : editData.status;
+    handleUpdate({
+      id: entry.id,
+      title: editData.title,
+      status: normalizedStatus,
+      category: editData.category.join(", "),
+      notes: editData.notes,
+    });
     setIsEditing(false);
   };
 
   return (
     <div
       onClick={!isEditing ? onClick : undefined}
-      className={`border p-4 rounded-md shadow-sm ${
-        isFertig ? "bg-green-50 border-green-200" : "bg-white"
-      }`}
+      className={`border p-4 rounded-md shadow-sm ${isFertig ? "bg-green-50 border-green-200" : "bg-white"}`}
     >
       {isEditing ? (
         <>
@@ -48,40 +60,47 @@ export default function EntryCard({
             value={editData.title}
             onChange={(e) => setEditData({ ...editData, title: e.target.value })}
           />
-          <select
-            className="w-full border px-2 py-1 text-sm rounded mb-2"
-            value={editData.status}
-            onChange={(e) => setEditData({ ...editData, status: e.target.value })}
-          >
-            {["geplant", "offen", "in Bearbeitung", "getestet/fertig"].map((s) => (
-              <option key={s} value={s}>
-                {s}
-              </option>
+
+          <div className="flex flex-wrap gap-2 mb-2">
+            {statusOptions.map((opt) => (
+              <button
+                key={opt}
+                onClick={() => setEditData({ ...editData, status: opt })}
+                className={`px-3 py-1 rounded border text-sm ${
+                  editData.status === opt ? "bg-blue-600 text-white" : "bg-white text-gray-700"
+                }`}
+              >
+                {opt}
+              </button>
             ))}
-          </select>
-          <input
-            className="w-full border px-2 py-1 text-sm rounded mb-2"
-            placeholder="Kategorie"
-            value={editData.category}
-            onChange={(e) => setEditData({ ...editData, category: e.target.value })}
-          />
+          </div>
+
+          <div className="flex flex-wrap gap-2 mb-2">
+            {categoryOptions.map((opt) => (
+              <button
+                key={opt}
+                onClick={() => toggleCategory(opt)}
+                className={`px-3 py-1 rounded border text-sm ${
+                  editData.category.includes(opt) ? "bg-blue-600 text-white" : "bg-white text-gray-700"
+                }`}
+              >
+                {opt}
+              </button>
+            ))}
+          </div>
+
           <input
             className="w-full border px-2 py-1 text-sm rounded mb-2"
             placeholder="Notizen"
             value={editData.notes}
             onChange={(e) => setEditData({ ...editData, notes: e.target.value })}
           />
+
           <div className="flex justify-end gap-2 mt-2">
-            <button
-              onClick={saveChanges}
-              className="bg-blue-600 hover:bg-blue-700 text-white px-3 py-1 text-sm rounded"
-            >
+            <button onClick={saveChanges} className="bg-blue-600 hover:bg-blue-700 text-white px-3 py-1 text-sm rounded">
               Speichern
             </button>
-            <button
-              onClick={() => setIsEditing(false)}
-              className="bg-gray-400 hover:bg-gray-500 text-white px-3 py-1 text-sm rounded"
-            >
+            <button onClick={() => setIsEditing(false)} className="bg-gray-400 hover:bg-gray-500 text-white px-3 py-1 text-sm rounded">
               Abbrechen
             </button>
           </div>
