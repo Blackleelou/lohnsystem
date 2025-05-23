@@ -285,36 +285,12 @@ export default function BoardPage() {
         <div className="flex flex-wrap gap-6">
           <div>
             <p className="text-sm font-medium text-gray-700 mb-1">Status-Filter</p>
-            <div className="flex gap-2 flex-wrap">
-              {uniqueStatuses.map((s) => (
-                <label key={s} className="flex items-center gap-1 text-sm cursor-pointer">
-                  <input
-                    type="checkbox"
-                    checked={selectedStatuses.includes(s)}
-                    onChange={() => toggleCheckbox(s, "status")}
-                    className="accent-blue-600"
-                  />
-                  {s}
-                </label>
-              ))}
-            </div>
+            
           </div>
 
           <div>
             <p className="text-sm font-medium text-gray-700 mb-1">Kategorie-Filter</p>
-            <div className="flex gap-2 flex-wrap">
-              {uniqueCategories.map((c) => (
-                <label key={c} className="flex items-center gap-1 text-sm cursor-pointer">
-                  <input
-                    type="checkbox"
-                    checked={selectedCategories.includes(c)}
-                    onChange={() => toggleCheckbox(c, "category")}
-                    className="accent-blue-600"
-                  />
-                  {c}
-                </label>
-              ))}
-            </div>
+            
           </div>
         </div>
       </div>
