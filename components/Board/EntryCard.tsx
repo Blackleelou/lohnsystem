@@ -54,14 +54,14 @@ export default function EntryCard({
   return (
     <div
       onClick={!isEditing ? onClick : undefined}
-      className={`border p-4 rounded shadow-sm ${
+      className={`border p-4 rounded-md shadow-sm ${
         isFertig ? "bg-green-50 border-green-200" : "bg-white"
       }`}
     >
       {isEditing ? (
         <>
           <input
-            className="w-full text-lg font-semibold text-gray-800 mb-3 border rounded px-2 py-1"
+            className="w-full text-lg font-semibold text-gray-800 mb-3 border rounded-md px-2 py-1"
             value={editData.title}
             onChange={(e) => setEditData({ ...editData, title: e.target.value })}
           />
@@ -73,7 +73,7 @@ export default function EntryCard({
                 <button
                   key={opt}
                   onClick={() => setEditData({ ...editData, status: opt })}
-                  className={`px-3 py-1 rounded border text-sm transition ${
+                  className={`px-3 py-1 rounded-md border text-sm transition ${
                     editData.status === opt
                       ? "bg-blue-600 text-white border-blue-600"
                       : "bg-gray-100 text-gray-700 hover:bg-gray-200"
@@ -92,7 +92,7 @@ export default function EntryCard({
                 <button
                   key={opt}
                   onClick={() => toggleCategory(opt)}
-                  className={`px-3 py-1 rounded border text-sm transition ${
+                  className={`px-3 py-1 rounded-md border text-sm transition ${
                     editData.category.includes(opt)
                       ? "bg-blue-600 text-white border-blue-600"
                       : "bg-gray-100 text-gray-700 hover:bg-gray-200"
@@ -105,7 +105,7 @@ export default function EntryCard({
           </div>
 
           <input
-            className="w-full border px-2 py-1 text-sm rounded mb-2"
+            className="w-full border px-2 py-1 text-sm rounded-md mb-2"
             placeholder="Notizen"
             value={editData.notes}
             onChange={(e) => setEditData({ ...editData, notes: e.target.value })}
@@ -114,13 +114,13 @@ export default function EntryCard({
           <div className="flex justify-end gap-2 mt-3">
             <button
               onClick={saveChanges}
-              className="bg-blue-600 hover:bg-blue-700 text-white px-3 py-1 text-sm rounded"
+              className="bg-blue-600 hover:bg-blue-700 text-white px-3 py-1 text-sm rounded-md"
             >
               Speichern
             </button>
             <button
               onClick={() => setIsEditing(false)}
-              className="bg-gray-400 hover:bg-gray-500 text-white px-3 py-1 text-sm rounded"
+              className="bg-gray-400 hover:bg-gray-500 text-white px-3 py-1 text-sm rounded-md"
             >
               Abbrechen
             </button>
