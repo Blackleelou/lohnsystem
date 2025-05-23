@@ -27,6 +27,7 @@ export default function BoardPage() {
   const [newStatus, setNewStatus] = useState("");
   const [newCategory, setNewCategory] = useState("");
   const [newNotes, setNewNotes] = useState("");
+  const [editId, setEditId] = useState<number | null>(null);
 
   const fileInputRef = useRef<HTMLInputElement | null>(null);
 
@@ -110,6 +111,43 @@ export default function BoardPage() {
     a.click();
   };
 
+  
+  const handleUpdate = async () => {
+    if (!editId) return;
+    const payload = {
+      id: editId,
+      title: newTitle,
+      status: newStatus,
+      category: newCategory,
+      notes: newNotes,
+    };
+    const res = await fetch("/api/admin/board/update", {
+      method: "PATCH",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify(payload),
+    });
+    if (res.ok) {
+      setEditId(null);
+      setNewTitle("");
+      setNewStatus("");
+      setNewCategory("");
+      setNewNotes("");
+      await loadEntries();
+    }
+  };
+
+  const handleDelete = async (id: number) => {
+    if (!confirm("Eintrag wirklich löschen?")) return;
+    const res = await fetch("/api/admin/board/delete", {
+      method: "DELETE",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify({ id }),
+    });
+    if (res.ok) {
+      await loadEntries();
+    }
+  };
+    
   const handleManualAdd = async () => {
     const payload = {
       title: newTitle,
@@ -164,7 +202,19 @@ export default function BoardPage() {
           <input placeholder="Kategorie" value={newCategory} onChange={e => setNewCategory(e.target.value)} className="border px-2 py-1 text-sm rounded w-full" />
           <input placeholder="Notizen" value={newNotes} onChange={e => setNewNotes(e.target.value)} className="border px-2 py-1 text-sm rounded w-full" />
         </div>
-        <button onClick={handleManualAdd} className="bg-green-600 hover:bg-green-700 text-white text-sm px-4 py-2 rounded">
+        {editId ? (
+          <>
+            <button onClick={handleUpdate} className="bg-blue-600 hover:bg-blue-700 text-white text-sm px-4 py-2 rounded">Speichern</button>
+            <button onClick={() => {
+              setEditId(null);
+              setNewTitle("");
+              setNewStatus("");
+              setNewCategory("");
+              setNewNotes("");
+            }} className="bg-gray-400 hover:bg-gray-500 text-white text-sm px-4 py-2 rounded">Abbrechen</button>
+          </>
+        ) : (
+          <button onClick={handleManualAdd} className="bg-green-600 hover:bg-green-700 text-white text-sm px-4 py-2 rounded">
           Hinzufügen
         </button>
       </div>
@@ -276,6 +326,16 @@ export default function BoardPage() {
                   </>
                 )}
               </p>
+              <div className="flex justify-end gap-2 mt-3">
+                <button onClick={() => {
+                  setEditId(entry.id);
+                  setNewTitle(entry.title);
+                  setNewStatus(entry.status);
+                  setNewCategory(entry.category);
+                  setNewNotes(entry.notes || "");
+                }} className="text-blue-600 hover:underline text-sm">Bearbeiten</button>
+                <button onClick={() => handleDelete(entry.id)} className="text-red-600 hover:underline text-sm">Löschen</button>
+              </div>
             </div>
           );
         })}
