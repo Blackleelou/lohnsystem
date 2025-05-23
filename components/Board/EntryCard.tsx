@@ -23,25 +23,29 @@ export default function EntryCard({
   const [isEditing, setIsEditing] = useState(false);
   const [editData, setEditData] = useState({
     title: entry.title,
-    status: ["getestet", "fertig"].includes(entry.status.toLowerCase()) ? "fertig" : entry.status,
-    category: Array.isArray(entry.category) ? entry.category : entry.category.split(",").map(s => s.trim()),
+    status:
+      ["getestet", "fertig"].includes(entry.status.toLowerCase())
+        ? "fertig"
+        : entry.status,
+    category: Array.isArray(entry.category)
+      ? entry.category
+      : entry.category.split(",").map((c) => c.trim()),
     notes: entry.notes || "",
   });
 
   const toggleCategory = (value: string) => {
     if (editData.category.includes(value)) {
-      setEditData({ ...editData, category: editData.category.filter(c => c !== value) });
+      setEditData({ ...editData, category: editData.category.filter((c) => c !== value) });
     } else {
       setEditData({ ...editData, category: [...editData.category, value] });
     }
   };
 
   const saveChanges = () => {
-    const normalizedStatus = editData.status === "getestet/fertig" ? "fertig" : editData.status;
     handleUpdate({
       id: entry.id,
       title: editData.title,
-      status: normalizedStatus,
+      status: editData.status,
       category: editData.category.join(", "),
       notes: editData.notes,
     });
@@ -51,7 +55,9 @@ export default function EntryCard({
   return (
     <div
       onClick={!isEditing ? onClick : undefined}
-      className={`border p-4 rounded-md shadow-sm ${isFertig ? "bg-green-50 border-green-200" : "bg-white"}`}
+      className={`border p-4 rounded-md shadow-sm ${
+        isFertig ? "bg-green-50 border-green-200" : "bg-white"
+      }`}
     >
       {isEditing ? (
         <>
@@ -61,32 +67,38 @@ export default function EntryCard({
             onChange={(e) => setEditData({ ...editData, title: e.target.value })}
           />
 
-          <div className="flex flex-wrap gap-2 mb-2">
-            {statusOptions.map((opt) => (
-              <button
-                key={opt}
-                onClick={() => setEditData({ ...editData, status: opt })}
-                className={`px-3 py-1 rounded border text-sm ${
-                  editData.status === opt ? "bg-blue-600 text-white" : "bg-white text-gray-700"
-                }`}
-              >
-                {opt}
-              </button>
-            ))}
+          <div className="mb-2">
+            <p className="font-medium text-sm mb-1 text-gray-700">Status</p>
+            <div className="flex flex-wrap gap-2">
+              {statusOptions.map((opt) => (
+                <button
+                  key={opt}
+                  onClick={() => setEditData({ ...editData, status: opt })}
+                  className={`px-3 py-1 rounded border text-sm ${
+                    editData.status === opt ? "bg-blue-600 text-white" : "bg-white text-gray-700"
+                  }`}
+                >
+                  {opt}
+                </button>
+              ))}
+            </div>
           </div>
 
-          <div className="flex flex-wrap gap-2 mb-2">
-            {categoryOptions.map((opt) => (
-              <button
-                key={opt}
-                onClick={() => toggleCategory(opt)}
-                className={`px-3 py-1 rounded border text-sm ${
-                  editData.category.includes(opt) ? "bg-blue-600 text-white" : "bg-white text-gray-700"
-                }`}
-              >
-                {opt}
-              </button>
-            ))}
+          <div className="mb-2">
+            <p className="font-medium text-sm mb-1 text-gray-700">Kategorie</p>
+            <div className="flex flex-wrap gap-2">
+              {categoryOptions.map((opt) => (
+                <button
+                  key={opt}
+                  onClick={() => toggleCategory(opt)}
+                  className={`px-3 py-1 rounded border text-sm ${
+                    editData.category.includes(opt) ? "bg-blue-600 text-white" : "bg-white text-gray-700"
+                  }`}
+                >
+                  {opt}
+                </button>
+              ))}
+            </div>
           </div>
 
           <input
@@ -97,10 +109,16 @@ export default function EntryCard({
           />
 
           <div className="flex justify-end gap-2 mt-2">
-            <button onClick={saveChanges} className="bg-blue-600 hover:bg-blue-700 text-white px-3 py-1 text-sm rounded">
+            <button
+              onClick={saveChanges}
+              className="bg-blue-600 hover:bg-blue-700 text-white px-3 py-1 text-sm rounded"
+            >
               Speichern
             </button>
-            <button onClick={() => setIsEditing(false)} className="bg-gray-400 hover:bg-gray-500 text-white px-3 py-1 text-sm rounded">
+            <button
+              onClick={() => setIsEditing(false)}
+              className="bg-gray-400 hover:bg-gray-500 text-white px-3 py-1 text-sm rounded"
+            >
               Abbrechen
             </button>
           </div>
