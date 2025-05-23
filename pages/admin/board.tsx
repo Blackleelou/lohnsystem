@@ -1,3 +1,6 @@
+// Diese Datei enthält die vollständige React-Komponente mit allen Funktionen: Upload, Export, Edit, Delete.
+// Bitte ersetze damit deine BoardPage.tsx Datei in deinem Projekt.
+
 
 import { useEffect, useState, useRef } from "react";
 import { useSession } from "next-auth/react";
