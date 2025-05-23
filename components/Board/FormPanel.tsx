@@ -6,11 +6,11 @@ type FormPanelProps = {
   isEditing: boolean;
   title: string;
   status: string;
-  category: string;
+  category: string[];
   notes: string;
   onChangeTitle: (val: string) => void;
   onChangeStatus: (val: string) => void;
-  onChangeCategory: (val: string) => void;
+  onChangeCategory: (val: string[]) => void;
   onChangeNotes: (val: string) => void;
   onSave: () => void;
   onCancel: () => void;
@@ -32,12 +32,20 @@ export default function FormPanel({
   onSave,
   onCancel,
 }: FormPanelProps) {
+  const toggleCategory = (value: string) => {
+    if (category.includes(value)) {
+      onChangeCategory(category.filter(c => c !== value));
+    } else {
+      onChangeCategory([...category, value]);
+    }
+  };
+
   return (
     <div className="bg-white border border-gray-200 p-4 rounded shadow-sm mb-6">
       <h2 className="text-md font-semibold text-gray-800 mb-2">
         {isEditing ? "Eintrag bearbeiten" : "Manuellen Eintrag hinzufügen"}
       </h2>
-      <div className="grid grid-cols-1 md:grid-cols-4 gap-4 mb-3">
+      <div className="grid grid-cols-1 gap-4 mb-3">
         <input
           placeholder="Titel"
           value={title}
@@ -45,40 +53,34 @@ export default function FormPanel({
           className="border px-2 py-1 text-sm rounded w-full"
         />
 
-        {/* Status Auswahl */}
-        <div className="flex flex-wrap gap-2">
-          {statusOptions.map((opt) => (
-            <button
-              key={opt}
-              type="button"
-              className={`px-3 py-1 text-sm rounded border ${
-                status === opt
-                  ? "bg-blue-600 text-white border-blue-600"
-                  : "bg-white text-gray-700 border-gray-300"
-              }`}
-              onClick={() => onChangeStatus(opt)}
-            >
-              {opt}
-            </button>
-          ))}
+        <div>
+          <p className="font-medium text-sm mb-1 text-gray-700">Status</p>
+          <div className="flex flex-wrap gap-2">
+            {statusOptions.map((opt) => (
+              <button
+                key={opt}
+                onClick={() => onChangeStatus(opt)}
+                className={`px-3 py-1 rounded border text-sm ${status === opt ? "bg-blue-600 text-white" : "bg-white text-gray-700"}`}
+              >
+                {opt}
+              </button>
+            ))}
+          </div>
         </div>
 
-        {/* Kategorie Auswahl */}
-        <div className="flex flex-wrap gap-2">
-          {categoryOptions.map((cat) => (
-            <button
-              key={cat}
-              type="button"
-              className={`px-3 py-1 text-sm rounded border ${
-                category === cat
-                  ? "bg-blue-600 text-white border-blue-600"
-                  : "bg-white text-gray-700 border-gray-300"
-              }`}
-              onClick={() => onChangeCategory(cat)}
-            >
-              {cat}
-            </button>
-          ))}
+        <div>
+          <p className="font-medium text-sm mb-1 text-gray-700">Kategorie</p>
+          <div className="flex flex-wrap gap-2">
+            {categoryOptions.map((opt) => (
+              <button
+                key={opt}
+                onClick={() => toggleCategory(opt)}
+                className={`px-3 py-1 rounded border text-sm ${category.includes(opt) ? "bg-blue-600 text-white" : "bg-white text-gray-700"}`}
+              >
+                {opt}
+              </button>
+            ))}
+          </div>
         </div>
 
         <input
@@ -88,7 +90,6 @@ export default function FormPanel({
           className="border px-2 py-1 text-sm rounded w-full"
         />
       </div>
-
       {isEditing ? (
         <div className="flex gap-2">
           <button onClick={onSave} className="bg-blue-600 hover:bg-blue-700 text-white px-4 py-2 text-sm rounded">
