@@ -19,7 +19,7 @@ export default function BoardPage() {
   const [toast, setToast] = useState<string | null>(null);
   const [selectedStatuses, setSelectedStatuses] = useState<string[]>([]);
   const [selectedCategories, setSelectedCategories] = useState<string[]>([]);
-  const [editId, setEditId] = useState<string | null>(null);
+  const [editId, setEditId] = useState<number | null>(null);
   const [selectedEntry, setSelectedEntry] = useState<Entry | null>(null);
 
   const [newTitle, setNewTitle] = useState("");
@@ -101,7 +101,7 @@ export default function BoardPage() {
     }
   };
 
-  const handleUpdate = async (data: Partial<Entry> & { id: string }) => {
+  const handleUpdate = async (data: Partial<Entry> & { id: number }) => {
     const res = await fetch("/api/admin/board/update", {
       method: "PATCH",
       headers: { "Content-Type": "application/json" },
@@ -116,7 +116,7 @@ export default function BoardPage() {
     }
   };
 
-  const handleDelete = async (id: string) => {
+  const handleDelete = async (id: number) => {
     if (!confirm("Eintrag wirklich löschen?")) return;
     const res = await fetch("/api/admin/board/delete", {
       method: "DELETE",
