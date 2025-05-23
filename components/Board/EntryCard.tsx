@@ -18,13 +18,19 @@ export default function EntryCard({
   const [isEditing, setIsEditing] = useState(false);
   const [editData, setEditData] = useState({
     title: entry.title,
-    status: entry.status,
+    status:
+      ["getestet", "fertig"].includes(entry.status.toLowerCase())
+        ? "getestet/fertig"
+        : entry.status,
     category: entry.category,
     notes: entry.notes || "",
   });
 
   const saveChanges = () => {
-    handleUpdate({ id: entry.id, ...editData });
+    const normalizedStatus =
+      editData.status === "getestet/fertig" ? "fertig" : editData.status;
+
+    handleUpdate({ id: entry.id, ...editData, status: normalizedStatus });
     setIsEditing(false);
   };
 
@@ -47,7 +53,7 @@ export default function EntryCard({
             value={editData.status}
             onChange={(e) => setEditData({ ...editData, status: e.target.value })}
           >
-            {["geplant", "offen", "in Bearbeitung", "getestet", "fertig"].map((s) => (
+            {["geplant", "offen", "in Bearbeitung", "getestet/fertig"].map((s) => (
               <option key={s} value={s}>
                 {s}
               </option>
