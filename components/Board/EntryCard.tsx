@@ -25,7 +25,7 @@ export default function EntryCard({
       ["getestet", "fertig"].includes(entry.status.toLowerCase())
         ? "fertig"
         : entry.status,
-    category: entry.category,
+    category: entry.category, // <-- Direktes Verwenden des string[]
     notes: entry.notes || "",
   });
 
@@ -130,9 +130,7 @@ export default function EntryCard({
             {entry.title}
             {isFertig && <span className="text-green-600 font-bold text-sm">✔</span>}
           </h2>
-          <p className="text-sm text-gray-500">
-            Kategorie: {Array.isArray(entry.category) ? entry.category.join(", ") : ""}
-          </p>
+          <p className="text-sm text-gray-500">Kategorie: {entry.category.join(", ")}</p>
           <p className="text-sm text-gray-500">Status: {entry.status}</p>
           {entry.notes && <p className="text-sm text-gray-700 mt-2">{entry.notes}</p>}
           <p className="text-xs text-gray-400 mt-4">
