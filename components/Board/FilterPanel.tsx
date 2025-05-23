@@ -2,6 +2,7 @@
 
 import React, { MutableRefObject, ChangeEvent } from "react";
 import { Entry } from "./types";
+import { STATUS_OPTIONS, CATEGORY_OPTIONS } from "./constants";
 
 type FilterPanelProps = {
   filteredEntries: Entry[];
@@ -41,10 +42,6 @@ export default function FilterPanel({
     updater(current.includes(value) ? current.filter(v => v !== value) : [...current, value]);
   };
 
-  const categoryOptions = [
-    "IT", "Personal", "Finanzen", "Organisation", "Kommunikation", "Projekte", "Sonstiges",
-  ];
-
   return (
     <div className="mb-6 bg-white border border-gray-200 p-4 rounded shadow-sm">
       <div className="flex flex-wrap gap-4 items-center mb-4">
@@ -72,9 +69,7 @@ export default function FilterPanel({
         <div>
           <p className="font-medium text-sm mb-2 text-gray-700">Status-Filter</p>
           <div className="flex gap-2 flex-wrap">
-            {[...new Set(uniqueStatuses.filter(s =>
-              s !== "fertig" && s !== "getestet" && s !== "fertig/getestet"
-            ))].map((s) => (
+            {STATUS_OPTIONS.filter(s => s !== "fertig" && s !== "getestet" && s !== "fertig/getestet").map((s) => (
               <button
                 key={s}
                 onClick={() => toggleCheckbox(s, "status")}
@@ -103,7 +98,7 @@ export default function FilterPanel({
         <div>
           <p className="font-medium text-sm mb-2 text-gray-700">Kategorie-Filter</p>
           <div className="flex gap-2 flex-wrap">
-            {categoryOptions.map((c) => (
+            {CATEGORY_OPTIONS.map((c) => (
               <button
                 key={c}
                 onClick={() => toggleCheckbox(c.toLowerCase(), "category")}
