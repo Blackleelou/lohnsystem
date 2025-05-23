@@ -124,12 +124,19 @@ export default function BoardPage() {
     }
   };
 
+  const normalizeStatus = (status: string) =>
+    ["fertig", "getestet"].includes(status.toLowerCase()) ? "fertig/getestet" : status.toLowerCase();
+
   const filteredEntries = entries.filter(e =>
-    (selectedStatuses.length === 0 || selectedStatuses.includes(e.status.toLowerCase())) &&
+    (selectedStatuses.length === 0 || selectedStatuses.includes(normalizeStatus(e.status))) &&
     (selectedCategories.length === 0 || selectedCategories.includes(e.category.toLowerCase()))
   );
 
-  const uniqueStatuses = [...new Set(entries.map(e => e.status.toLowerCase()))];
+  const uniqueStatusesRaw = Array.from(new Set(entries.map(e => e.status.toLowerCase())));
+  const uniqueStatuses = uniqueStatusesRaw.includes("fertig") || uniqueStatusesRaw.includes("getestet")
+    ? [...uniqueStatusesRaw.filter(s => s !== "fertig" && s !== "getestet"), "fertig/getestet"]
+    : uniqueStatusesRaw;
+
   const uniqueCategories = [...new Set(entries.map(e => e.category.toLowerCase()))];
 
   return (
@@ -146,7 +153,18 @@ export default function BoardPage() {
         onChangeStatus={setNewStatus}
         onChangeCategory={setNewCategory}
         onChangeNotes={setNewNotes}
-        onSave={editId !== null ? () => handleUpdate({ id: editId, title: newTitle, status: newStatus, category: newCategory, notes: newNotes }) : handleManualAdd}
+        onSave={
+          editId !== null
+            ? () =>
+                handleUpdate({
+                  id: editId,
+                  title: newTitle,
+                  status: newStatus,
+                  category: newCategory,
+                  notes: newNotes,
+                })
+            : handleManualAdd
+        }
         onCancel={() => {
           setEditId(null);
           setNewTitle("");
