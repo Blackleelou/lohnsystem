@@ -202,6 +202,38 @@ export default function BoardPage() {
           <input placeholder="Kategorie" value={newCategory} onChange={e => setNewCategory(e.target.value)} className="border px-2 py-1 text-sm rounded w-full" />
           <input placeholder="Notizen" value={newNotes} onChange={e => setNewNotes(e.target.value)} className="border px-2 py-1 text-sm rounded w-full" />
         </div>
+        <div className="flex gap-2 mt-2">
+          {editId ? (
+            <>
+              <button
+                onClick={handleUpdate}
+                className="bg-blue-600 hover:bg-blue-700 text-white text-sm px-4 py-2 rounded"
+              >
+                Speichern
+              </button>
+              <button
+                onClick={() => {
+                  setEditId(null);
+                  setNewTitle("");
+                  setNewStatus("");
+                  setNewCategory("");
+                  setNewNotes("");
+                }}
+                className="bg-gray-400 hover:bg-gray-500 text-white text-sm px-4 py-2 rounded"
+              >
+                Abbrechen
+              </button>
+            </>
+          ) : (
+            <button
+              onClick={handleManualAdd}
+              className="bg-green-600 hover:bg-green-700 text-white text-sm px-4 py-2 rounded"
+            >
+              Hinzufügen
+            </button>
+          )}
+        </div>
+
         {editId ? (
           <>
             <button onClick={handleUpdate} className="bg-blue-600 hover:bg-blue-700 text-white text-sm px-4 py-2 rounded">Speichern</button>
