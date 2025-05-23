@@ -3,7 +3,7 @@ import { Entry } from "./types";
 
 type EntryCardProps = {
   entry: Entry;
-  handleUpdate: (entry: Partial<Entry> & { id: number }) => void;
+  handleUpdate: (updated: Partial<Entry> & { id: number }) => void;
   handleDelete: (id: number) => void;
   onClick: () => void;
 };
@@ -14,40 +14,70 @@ export default function EntryCard({
   handleDelete,
   onClick,
 }: EntryCardProps) {
-  const isFertig = entry.status.toLowerCase() === "fertig" || entry.status.toLowerCase() === "getestet";
+  const isFertig = ["fertig", "getestet"].includes(entry.status.toLowerCase());
   const [isEditing, setIsEditing] = useState(false);
-  const [title, setTitle] = useState(entry.title);
-  const [status, setStatus] = useState(entry.status);
-  const [category, setCategory] = useState(entry.category);
-  const [notes, setNotes] = useState(entry.notes || "");
+  const [editData, setEditData] = useState({
+    title: entry.title,
+    status: entry.status,
+    category: entry.category,
+    notes: entry.notes || "",
+  });
 
-  const handleSave = () => {
-    handleUpdate({ id: entry.id, title, status, category, notes });
+  const saveChanges = () => {
+    handleUpdate({ id: entry.id, ...editData });
     setIsEditing(false);
   };
 
   return (
     <div
       onClick={!isEditing ? onClick : undefined}
-      className={`border p-4 rounded-md shadow-sm ${isFertig ? "bg-green-50 border-green-200" : "bg-white"}`}
+      className={`border p-4 rounded-md shadow-sm ${
+        isFertig ? "bg-green-50 border-green-200" : "bg-white"
+      }`}
     >
       {isEditing ? (
         <>
-          <input value={title} onChange={(e) => setTitle(e.target.value)} className="w-full mb-2 border px-2 py-1 rounded text-sm" />
-          <select value={status} onChange={(e) => setStatus(e.target.value)} className="w-full mb-2 border px-2 py-1 rounded text-sm">
-            <option value="">Status wählen</option>
-            <option value="geplant">Geplant</option>
-            <option value="offen">Offen</option>
-            <option value="in Bearbeitung">In Bearbeitung</option>
-            <option value="getestet">Getestet</option>
-            <option value="fertig">Fertig</option>
+          <input
+            className="w-full text-lg font-semibold text-gray-800 mb-2 border rounded px-2 py-1"
+            value={editData.title}
+            onChange={(e) => setEditData({ ...editData, title: e.target.value })}
+          />
+          <select
+            className="w-full border px-2 py-1 text-sm rounded mb-2"
+            value={editData.status}
+            onChange={(e) => setEditData({ ...editData, status: e.target.value })}
+          >
+            {["geplant", "offen", "in Bearbeitung", "getestet", "fertig"].map((s) => (
+              <option key={s} value={s}>
+                {s}
+              </option>
+            ))}
           </select>
-          <input value={category} onChange={(e) => setCategory(e.target.value)} className="w-full mb-2 border px-2 py-1 rounded text-sm" />
-          <textarea value={notes} onChange={(e) => setNotes(e.target.value)} className="w-full mb-2 border px-2 py-1 rounded text-sm" rows={2} />
-
+          <input
+            className="w-full border px-2 py-1 text-sm rounded mb-2"
+            placeholder="Kategorie"
+            value={editData.category}
+            onChange={(e) => setEditData({ ...editData, category: e.target.value })}
+          />
+          <input
+            className="w-full border px-2 py-1 text-sm rounded mb-2"
+            placeholder="Notizen"
+            value={editData.notes}
+            onChange={(e) => setEditData({ ...editData, notes: e.target.value })}
+          />
           <div className="flex justify-end gap-2 mt-2">
-            <button onClick={handleSave} className="bg-blue-600 hover:bg-blue-700 text-white px-3 py-1 text-sm rounded">Speichern</button>
-            <button onClick={() => setIsEditing(false)} className="bg-gray-500 hover:bg-gray-600 text-white px-3 py-1 text-sm rounded">Abbrechen</button>
+            <button
+              onClick={saveChanges}
+              className="bg-blue-600 hover:bg-blue-700 text-white px-3 py-1 text-sm rounded"
+            >
+              Speichern
+            </button>
+            <button
+              onClick={() => setIsEditing(false)}
+              className="bg-gray-400 hover:bg-gray-500 text-white px-3 py-1 text-sm rounded"
+            >
+              Abbrechen
+            </button>
           </div>
         </>
       ) : (
@@ -61,7 +91,12 @@ export default function EntryCard({
           {entry.notes && <p className="text-sm text-gray-700 mt-2">{entry.notes}</p>}
           <p className="text-xs text-gray-400 mt-4">
             Erstellt: {new Date(entry.createdAt).toLocaleString()}
-            {entry.completedAt && <><br />Fertig: {new Date(entry.completedAt).toLocaleString()}</>}
+            {entry.completedAt && (
+              <>
+                <br />
+                Fertig: {new Date(entry.completedAt).toLocaleString()}
+              </>
+            )}
           </p>
           <div className="flex justify-end gap-2 mt-3">
             <button
