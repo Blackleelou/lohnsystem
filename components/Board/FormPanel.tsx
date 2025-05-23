@@ -1,6 +1,7 @@
 // components/Board/FormPanel.tsx
 
 import React from "react";
+import { STATUS_OPTIONS, CATEGORY_OPTIONS } from "./constants";
 
 type FormPanelProps = {
   isEditing: boolean;
@@ -15,9 +16,6 @@ type FormPanelProps = {
   onSave: () => void;
   onCancel: () => void;
 };
-
-const statusOptions = ["geplant", "offen", "in Bearbeitung", "fertig"];
-const categoryOptions = ["IT", "Personal", "Finanzen", "Organisation", "Kommunikation", "Projekte", "Sonstiges"];
 
 export default function FormPanel({
   isEditing,
@@ -57,7 +55,7 @@ export default function FormPanel({
         <div>
           <p className="font-medium text-sm text-gray-700 mb-1">Status</p>
           <div className="flex flex-wrap gap-2">
-            {statusOptions.map((opt) => (
+            {STATUS_OPTIONS.map((opt) => (
               <button
                 key={opt}
                 type="button"
@@ -77,7 +75,7 @@ export default function FormPanel({
         <div>
           <p className="font-medium text-sm text-gray-700 mb-1">Kategorie</p>
           <div className="flex flex-wrap gap-2">
-            {categoryOptions.map((opt) => (
+            {CATEGORY_OPTIONS.map((opt) => (
               <button
                 key={opt}
                 type="button"
