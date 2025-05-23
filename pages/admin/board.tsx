@@ -1,5 +1,3 @@
-// board.tsx (geprüfte finale Version mit Bearbeiten & Löschen)
-
 import { useEffect, useState, useRef } from "react";
 import { useSession } from "next-auth/react";
 import { useRouter } from "next/router";
@@ -220,28 +218,33 @@ export default function BoardPage() {
       )}
 
       <div className="grid grid-cols-1 md:grid-cols-2 xl:grid-cols-3 gap-4">
-        {filteredEntries.map(entry => (
-          <div key={entry.id} className="border p-4 rounded-md shadow-sm bg-white">
-            <h2 className="font-semibold text-lg text-gray-800 mb-2">{entry.title}</h2>
-            <p className="text-sm text-gray-500">Kategorie: {entry.category}</p>
-            <p className="text-sm text-gray-500">Status: {entry.status}</p>
-            {entry.notes && <p className="text-sm text-gray-700 mt-2">{entry.notes}</p>}
-            <p className="text-xs text-gray-400 mt-4">
-              Erstellt: {new Date(entry.createdAt).toLocaleString()}
-              {entry.completedAt && <><br />Fertig: {new Date(entry.completedAt).toLocaleString()}</>}
-            </p>
-            <div className="flex justify-end gap-2 mt-3">
-              <button onClick={() => {
-                setEditId(entry.id);
-                setNewTitle(entry.title);
-                setNewStatus(entry.status);
-                setNewCategory(entry.category);
-                setNewNotes(entry.notes || "");
-              }} className="text-blue-600 hover:underline text-sm">Bearbeiten</button>
-              <button onClick={() => handleDelete(entry.id)} className="text-red-600 hover:underline text-sm">Löschen</button>
+        {filteredEntries.map(entry => {
+          const isDone = entry.status.toLowerCase() === "fertig";
+          return (
+            <div key={entry.id} className={`border p-4 rounded-md shadow-sm transition ${isDone ? "bg-green-50 border-green-300" : "bg-white border-gray-200"}`}>
+              <h2 className="font-semibold text-lg text-gray-800 mb-2">
+                {entry.title} {isDone && <span className="ml-2 text-green-600 font-bold">✔</span>}
+              </h2>
+              <p className="text-sm text-gray-500">Kategorie: {entry.category}</p>
+              <p className="text-sm text-gray-500">Status: {entry.status}</p>
+              {entry.notes && <p className="text-sm text-gray-700 mt-2">{entry.notes}</p>}
+              <p className="text-xs text-gray-400 mt-4">
+                Erstellt: {new Date(entry.createdAt).toLocaleString()}
+                {entry.completedAt && <><br />Fertig: {new Date(entry.completedAt).toLocaleString()}</>}
+              </p>
+              <div className="flex justify-end gap-2 mt-3">
+                <button onClick={() => {
+                  setEditId(entry.id);
+                  setNewTitle(entry.title);
+                  setNewStatus(entry.status);
+                  setNewCategory(entry.category);
+                  setNewNotes(entry.notes || "");
+                }} className="text-blue-600 hover:underline text-sm">Bearbeiten</button>
+                <button onClick={() => handleDelete(entry.id)} className="text-red-600 hover:underline text-sm">Löschen</button>
+              </div>
             </div>
-          </div>
-        ))}
+          );
+        })}
       </div>
     </div>
   );
