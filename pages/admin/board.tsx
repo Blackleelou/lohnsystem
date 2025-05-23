@@ -353,3 +353,5 @@ export default function BoardPage() {
 BoardPage.getLayout = (page: React.ReactNode) => (
   <SuperadminLayout>{page}</SuperadminLayout>
 );
+
+</div>
