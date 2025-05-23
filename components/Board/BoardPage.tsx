@@ -14,7 +14,6 @@ export default function BoardPage() {
   const { data: session, status } = useSession();
   const router = useRouter();
   const [entries, setEntries] = useState<Entry[]>([]);
-  const [uploading, setUploading] = useState(false);
   const [toast, setToast] = useState<string | null>(null);
   const [selectedStatuses, setSelectedStatuses] = useState<string[]>([]);
   const [selectedCategories, setSelectedCategories] = useState<string[]>([]);
@@ -56,7 +55,6 @@ export default function BoardPage() {
 
     const formData = new FormData();
     formData.append("file", file);
-    setUploading(true);
 
     const res = await fetch("/api/admin/board/import", {
       method: "POST",
@@ -64,7 +62,7 @@ export default function BoardPage() {
     });
 
     const result = await res.json();
-    setUploading(false);
+
     if (res.ok) {
       showToast(result.message || "Import abgeschlossen.");
       await loadEntries();
@@ -95,22 +93,15 @@ export default function BoardPage() {
     }
   };
 
-  const handleUpdate = async () => {
-    if (!editId) return;
-    const payload = { id: editId, title: newTitle, status: newStatus, category: newCategory, notes: newNotes };
+  const handleUpdate = async (data: Partial<Entry> & { id: number }) => {
     const res = await fetch("/api/admin/board/update", {
       method: "PATCH",
       headers: { "Content-Type": "application/json" },
-      body: JSON.stringify(payload),
+      body: JSON.stringify(data),
     });
 
     if (res.ok) {
       showToast("Eintrag aktualisiert.");
-      setEditId(null);
-      setNewTitle("");
-      setNewStatus("");
-      setNewCategory("");
-      setNewNotes("");
       await loadEntries();
     } else {
       showToast("Fehler beim Aktualisieren.");
@@ -155,7 +146,7 @@ export default function BoardPage() {
         onChangeStatus={setNewStatus}
         onChangeCategory={setNewCategory}
         onChangeNotes={setNewNotes}
-        onSave={editId !== null ? handleUpdate : handleManualAdd}
+        onSave={editId !== null ? () => handleUpdate({ id: editId, title: newTitle, status: newStatus, category: newCategory, notes: newNotes }) : handleManualAdd}
         onCancel={() => {
           setEditId(null);
           setNewTitle("");
@@ -174,7 +165,6 @@ export default function BoardPage() {
         setSelectedCategories={setSelectedCategories}
         fileInputRef={fileInputRef}
         handleUpload={handleUpload}
-        uploadResult={uploadResult}
         filteredEntries={filteredEntries}
       />
 
@@ -183,11 +173,7 @@ export default function BoardPage() {
           <EntryCard
             key={entry.id}
             entry={entry}
-            setEditId={setEditId}
-            setNewTitle={setNewTitle}
-            setNewStatus={setNewStatus}
-            setNewCategory={setNewCategory}
-            setNewNotes={setNewNotes}
+            handleUpdate={handleUpdate}
             handleDelete={handleDelete}
             onClick={() => setSelectedEntry(entry)}
           />
