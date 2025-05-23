@@ -1,3 +1,5 @@
+// components/Board/BoardPage.tsx
+
 import { useEffect, useState, useRef } from "react";
 import { useSession } from "next-auth/react";
 import { useRouter } from "next/router";
@@ -17,7 +19,7 @@ export default function BoardPage() {
   const [toast, setToast] = useState<string | null>(null);
   const [selectedStatuses, setSelectedStatuses] = useState<string[]>([]);
   const [selectedCategories, setSelectedCategories] = useState<string[]>([]);
-  const [editId, setEditId] = useState<number | null>(null);
+  const [editId, setEditId] = useState<string | null>(null);
   const [selectedEntry, setSelectedEntry] = useState<Entry | null>(null);
 
   const [newTitle, setNewTitle] = useState("");
@@ -25,8 +27,7 @@ export default function BoardPage() {
   const [newCategory, setNewCategory] = useState<string[]>([]);
   const [newNotes, setNewNotes] = useState("");
 
-  const [section, setSection] = useState<"manuell" | "import" | "export" | null>("manuell");
-
+  const [activeSection, setActiveSection] = useState<"manual" | "import" | "export" | null>(null);
   const fileInputRef = useRef<HTMLInputElement | null>(null);
 
   useEffect(() => {
@@ -35,7 +36,8 @@ export default function BoardPage() {
       router.replace("/dashboard");
     }
   }, [session, status]);
-    const showToast = (msg: string) => {
+
+  const showToast = (msg: string) => {
     setToast(msg);
     setTimeout(() => setToast(null), 4000);
   };
@@ -78,7 +80,7 @@ export default function BoardPage() {
     const payload = {
       title: newTitle,
       status: newStatus,
-      category: newCategory.join(", "),
+      category: newCategory,
       notes: newNotes,
     };
     const res = await fetch("/api/admin/board/create", {
@@ -99,7 +101,7 @@ export default function BoardPage() {
     }
   };
 
-  const handleUpdate = async (data: Partial<Entry> & { id: number }) => {
+  const handleUpdate = async (data: Partial<Entry> & { id: string }) => {
     const res = await fetch("/api/admin/board/update", {
       method: "PATCH",
       headers: { "Content-Type": "application/json" },
@@ -114,7 +116,7 @@ export default function BoardPage() {
     }
   };
 
-  const handleDelete = async (id: number) => {
+  const handleDelete = async (id: string) => {
     if (!confirm("Eintrag wirklich löschen?")) return;
     const res = await fetch("/api/admin/board/delete", {
       method: "DELETE",
@@ -129,54 +131,39 @@ export default function BoardPage() {
       showToast("Fehler beim Löschen.");
     }
   };
-    const normalizeStatus = (status: string) =>
+
+  const normalizeStatus = (status: string) =>
     ["fertig", "getestet"].includes(status.toLowerCase()) ? "fertig/getestet" : status.toLowerCase();
 
   const filteredEntries = entries.filter((e) => {
-    const normalized = normalizeStatus(e.status);
-    const matchesStatus = selectedStatuses.length === 0 || selectedStatuses.includes(normalized);
-    const categories = e.category.split(",").map((c) => c.trim().toLowerCase());
+    const matchesStatus =
+      selectedStatuses.length === 0 || selectedStatuses.includes(normalizeStatus(e.status));
     const matchesCategory =
-      selectedCategories.length === 0 || categories.some((c) => selectedCategories.includes(c));
+      selectedCategories.length === 0 || e.category.some((c) => selectedCategories.includes(c.toLowerCase()));
     return matchesStatus && matchesCategory;
   });
 
   const uniqueStatuses = Array.from(new Set(entries.map((e) => normalizeStatus(e.status))));
   const uniqueCategories = Array.from(
-    new Set(entries.flatMap((e) => e.category.split(",").map((c) => c.trim().toLowerCase())))
+    new Set(entries.flatMap((e) => e.category.map((c) => c.trim().toLowerCase())))
   );
-
-  const [activeSection, setActiveSection] = useState<"manual" | "import" | "export" | null>(null);
 
   return (
     <div className="max-w-6xl mx-auto px-4 py-8 relative">
       <h1 className="text-2xl font-bold text-blue-700 mb-4">Superadmin Board</h1>
 
       <div className="flex gap-4 mb-6">
-        <button
-          className={`px-4 py-1 text-sm rounded border ${
-            activeSection === "manual" ? "bg-blue-600 text-white" : "bg-white text-gray-700"
-          }`}
-          onClick={() => setActiveSection(activeSection === "manual" ? null : "manual")}
-        >
-          Manuell
-        </button>
-        <button
-          className={`px-4 py-1 text-sm rounded border ${
-            activeSection === "import" ? "bg-blue-600 text-white" : "bg-white text-gray-700"
-          }`}
-          onClick={() => setActiveSection(activeSection === "import" ? null : "import")}
-        >
-          Import
-        </button>
-        <button
-          className={`px-4 py-1 text-sm rounded border ${
-            activeSection === "export" ? "bg-blue-600 text-white" : "bg-white text-gray-700"
-          }`}
-          onClick={() => setActiveSection(activeSection === "export" ? null : "export")}
-        >
-          Export
-        </button>
+        {["manual", "import", "export"].map((s) => (
+          <button
+            key={s}
+            onClick={() => setActiveSection((prev) => (prev === s ? null : s as typeof activeSection))}
+            className={`px-4 py-1 text-sm rounded border ${
+              activeSection === s ? "bg-blue-600 text-white" : "bg-white text-gray-700"
+            }`}
+          >
+            {s === "manual" ? "Manuell" : s.charAt(0).toUpperCase() + s.slice(1)}
+          </button>
+        ))}
       </div>
 
       <FilterPanel
@@ -211,7 +198,7 @@ export default function BoardPage() {
                     id: editId,
                     title: newTitle,
                     status: newStatus,
-                    category: newCategory.join(", "),
+                    category: newCategory,
                     notes: newNotes,
                   })
               : handleManualAdd
@@ -225,7 +212,8 @@ export default function BoardPage() {
           }}
         />
       )}
-            <div className="grid grid-cols-1 md:grid-cols-2 xl:grid-cols-3 gap-4">
+
+      <div className="grid grid-cols-1 md:grid-cols-2 xl:grid-cols-3 gap-4">
         {filteredEntries.map((entry) => (
           <EntryCard
             key={entry.id}
@@ -238,10 +226,7 @@ export default function BoardPage() {
       </div>
 
       {selectedEntry && (
-        <EntryModal
-          entry={selectedEntry}
-          onClose={() => setSelectedEntry(null)}
-        />
+        <EntryModal entry={selectedEntry} onClose={() => setSelectedEntry(null)} />
       )}
 
       {toast && (
