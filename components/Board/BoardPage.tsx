@@ -19,7 +19,7 @@ export default function BoardPage() {
   const [toast, setToast] = useState<string | null>(null);
   const [selectedStatuses, setSelectedStatuses] = useState<string[]>([]);
   const [selectedCategories, setSelectedCategories] = useState<string[]>([]);
-  const [editId, setEditId] = useState<string | null>(null); // geändert zu string
+  const [editId, setEditId] = useState<string | null>(null); // geändert
   const [selectedEntry, setSelectedEntry] = useState<Entry | null>(null);
 
   const [newTitle, setNewTitle] = useState("");
@@ -195,7 +195,7 @@ export default function BoardPage() {
             editId !== null
               ? () =>
                   handleUpdate({
-                    id: editId!,
+                    id: editId,
                     title: newTitle,
                     status: newStatus,
                     category: newCategory,
