@@ -16,12 +16,8 @@ type FormPanelProps = {
   onCancel: () => void;
 };
 
-const statusOptions = [
-  { label: "Geplant", value: "geplant" },
-  { label: "Offen", value: "offen" },
-  { label: "In Bearbeitung", value: "in Bearbeitung" },
-  { label: "Getestet / Fertig", value: "fertig" }, // zusammengeführt
-];
+const statusOptions = ["geplant", "offen", "in Bearbeitung", "fertig"];
+const categoryOptions = ["IT", "Personal", "Finanzen", "Organisation", "Kommunikation", "Projekte", "Sonstiges"];
 
 export default function FormPanel({
   isEditing,
@@ -48,24 +44,43 @@ export default function FormPanel({
           onChange={(e) => onChangeTitle(e.target.value)}
           className="border px-2 py-1 text-sm rounded w-full"
         />
-        <select
-          value={status}
-          onChange={(e) => onChangeStatus(e.target.value)}
-          className="border px-2 py-1 text-sm rounded w-full"
-        >
-          <option value="">Status wählen</option>
+
+        {/* Status Auswahl */}
+        <div className="flex flex-wrap gap-2">
           {statusOptions.map((opt) => (
-            <option key={opt.value} value={opt.value}>
-              {opt.label}
-            </option>
+            <button
+              key={opt}
+              type="button"
+              className={`px-3 py-1 text-sm rounded border ${
+                status === opt
+                  ? "bg-blue-600 text-white border-blue-600"
+                  : "bg-white text-gray-700 border-gray-300"
+              }`}
+              onClick={() => onChangeStatus(opt)}
+            >
+              {opt}
+            </button>
           ))}
-        </select>
-        <input
-          placeholder="Kategorie"
-          value={category}
-          onChange={(e) => onChangeCategory(e.target.value)}
-          className="border px-2 py-1 text-sm rounded w-full"
-        />
+        </div>
+
+        {/* Kategorie Auswahl */}
+        <div className="flex flex-wrap gap-2">
+          {categoryOptions.map((cat) => (
+            <button
+              key={cat}
+              type="button"
+              className={`px-3 py-1 text-sm rounded border ${
+                category === cat
+                  ? "bg-blue-600 text-white border-blue-600"
+                  : "bg-white text-gray-700 border-gray-300"
+              }`}
+              onClick={() => onChangeCategory(cat)}
+            >
+              {cat}
+            </button>
+          ))}
+        </div>
+
         <input
           placeholder="Notizen"
           value={notes}
@@ -73,6 +88,7 @@ export default function FormPanel({
           className="border px-2 py-1 text-sm rounded w-full"
         />
       </div>
+
       {isEditing ? (
         <div className="flex gap-2">
           <button onClick={onSave} className="bg-blue-600 hover:bg-blue-700 text-white px-4 py-2 text-sm rounded">
