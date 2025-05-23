@@ -15,21 +15,12 @@ type FilterPanelProps = {
   handleUpload: (e: ChangeEvent<HTMLInputElement>) => Promise<void>;
 };
 
-const fixedCategories = [
-  "IT",
-  "Personal",
-  "Finanzen",
-  "Organisation",
-  "Kommunikation",
-  "Projekte",
-  "Sonstiges",
-];
-
 export default function FilterPanel({
   filteredEntries,
   selectedStatuses,
   selectedCategories,
   uniqueStatuses,
+  uniqueCategories,
   setSelectedStatuses,
   setSelectedCategories,
   fileInputRef,
@@ -49,6 +40,10 @@ export default function FilterPanel({
 
     updater(current.includes(value) ? current.filter(v => v !== value) : [...current, value]);
   };
+
+  const categoryOptions = [
+    "IT", "Personal", "Finanzen", "Organisation", "Kommunikation", "Projekte", "Sonstiges",
+  ];
 
   return (
     <div className="mb-6 bg-white border border-gray-200 p-4 rounded shadow-sm">
@@ -75,51 +70,50 @@ export default function FilterPanel({
 
       <div className="flex gap-6 flex-wrap">
         <div>
-          <p className="font-medium text-sm mb-1 text-gray-700">Status-Filter</p>
+          <p className="font-medium text-sm mb-2 text-gray-700">Status-Filter</p>
           <div className="flex gap-2 flex-wrap">
             {[...new Set(uniqueStatuses.filter(s =>
-              s !== "fertig" &&
-              s !== "getestet" &&
-              s !== "fertig/getestet"
+              s !== "fertig" && s !== "getestet" && s !== "fertig/getestet"
             ))].map((s) => (
-              <label key={s} className="text-sm flex items-center gap-1">
-                <input
-                  type="checkbox"
-                  checked={selectedStatuses.includes(s)}
-                  onChange={() => toggleCheckbox(s, "status")}
-                />
+              <button
+                key={s}
+                onClick={() => toggleCheckbox(s, "status")}
+                className={`px-3 py-1 rounded-full text-sm border ${
+                  selectedStatuses.includes(s)
+                    ? "bg-blue-600 text-white"
+                    : "bg-gray-100 text-gray-700"
+                }`}
+              >
                 {s}
-              </label>
+              </button>
             ))}
-
-            <label className="text-sm flex items-center gap-1">
-              <input
-                type="checkbox"
-                checked={
-                  selectedStatuses.includes("fertig") || selectedStatuses.includes("getestet")
-                }
-                onChange={() => toggleCheckbox("fertig/getestet", "status")}
-              />
+            <button
+              onClick={() => toggleCheckbox("fertig/getestet", "status")}
+              className={`px-3 py-1 rounded-full text-sm border ${
+                selectedStatuses.includes("fertig") || selectedStatuses.includes("getestet")
+                  ? "bg-blue-600 text-white"
+                  : "bg-gray-100 text-gray-700"
+              }`}
+            >
               fertig/getestet
-            </label>
+            </button>
           </div>
         </div>
 
         <div>
-          <p className="font-medium text-sm mb-1 text-gray-700">Kategorie-Filter</p>
+          <p className="font-medium text-sm mb-2 text-gray-700">Kategorie-Filter</p>
           <div className="flex gap-2 flex-wrap">
-            {fixedCategories.map((cat) => (
+            {categoryOptions.map((c) => (
               <button
-                key={cat}
-                type="button"
-                onClick={() => toggleCheckbox(cat.toLowerCase(), "category")}
-                className={`px-3 py-1 text-sm rounded-full border ${
-                  selectedCategories.includes(cat.toLowerCase())
-                    ? "bg-blue-600 text-white border-blue-600"
-                    : "bg-white text-gray-700 border-gray-300 hover:bg-gray-100"
+                key={c}
+                onClick={() => toggleCheckbox(c.toLowerCase(), "category")}
+                className={`px-3 py-1 rounded-full text-sm border ${
+                  selectedCategories.includes(c.toLowerCase())
+                    ? "bg-blue-600 text-white"
+                    : "bg-gray-100 text-gray-700"
                 }`}
               >
-                {cat}
+                {c}
               </button>
             ))}
           </div>
