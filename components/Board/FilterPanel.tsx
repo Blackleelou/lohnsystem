@@ -15,12 +15,21 @@ type FilterPanelProps = {
   handleUpload: (e: ChangeEvent<HTMLInputElement>) => Promise<void>;
 };
 
+const fixedCategories = [
+  "IT",
+  "Personal",
+  "Finanzen",
+  "Organisation",
+  "Kommunikation",
+  "Projekte",
+  "Sonstiges",
+];
+
 export default function FilterPanel({
   filteredEntries,
   selectedStatuses,
   selectedCategories,
   uniqueStatuses,
-  uniqueCategories,
   setSelectedStatuses,
   setSelectedCategories,
   fileInputRef,
@@ -44,18 +53,8 @@ export default function FilterPanel({
   return (
     <div className="mb-6 bg-white border border-gray-200 p-4 rounded shadow-sm">
       <div className="flex flex-wrap gap-4 items-center mb-4">
-        <input
-          type="file"
-          accept=".json"
-          ref={fileInputRef}
-          onChange={handleUpload}
-          className="hidden"
-          id="fileUpload"
-        />
-        <label
-          htmlFor="fileUpload"
-          className="cursor-pointer bg-blue-600 hover:bg-blue-700 text-white px-4 py-2 rounded text-sm"
-        >
+        <input type="file" accept=".json" ref={fileInputRef} onChange={handleUpload} className="hidden" id="fileUpload" />
+        <label htmlFor="fileUpload" className="cursor-pointer bg-blue-600 hover:bg-blue-700 text-white px-4 py-2 rounded text-sm">
           Datei auswählen & importieren
         </label>
         <button
@@ -108,21 +107,22 @@ export default function FilterPanel({
 
         <div>
           <p className="font-medium text-sm mb-1 text-gray-700">Kategorie-Filter</p>
-          <select
-            multiple
-            className="border px-2 py-1 text-sm rounded w-48 h-28"
-            value={selectedCategories}
-            onChange={(e) => {
-              const selected = Array.from(e.target.selectedOptions, option => option.value);
-              setSelectedCategories(selected);
-            }}
-          >
-            {["IT", "Personal", "Finanzen", "Organisation", "Kommunikation", "Projekte", "Sonstiges"].map((cat) => (
-              <option key={cat} value={cat}>
+          <div className="flex gap-2 flex-wrap">
+            {fixedCategories.map((cat) => (
+              <button
+                key={cat}
+                type="button"
+                onClick={() => toggleCheckbox(cat.toLowerCase(), "category")}
+                className={`px-3 py-1 text-sm rounded-full border ${
+                  selectedCategories.includes(cat.toLowerCase())
+                    ? "bg-blue-600 text-white border-blue-600"
+                    : "bg-white text-gray-700 border-gray-300 hover:bg-gray-100"
+                }`}
+              >
                 {cat}
-              </option>
+              </button>
             ))}
-          </select>
+          </div>
         </div>
       </div>
     </div>
