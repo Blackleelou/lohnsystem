@@ -20,11 +20,15 @@ export default function BoardPage() {
   const [uploading, setUploading] = useState(false);
   const [uploadResult, setUploadResult] = useState<string | null>(null);
   const [isRefreshing, setIsRefreshing] = useState(false);
-
-  const fileInputRef = useRef<HTMLInputElement | null>(null);
-
   const [selectedStatuses, setSelectedStatuses] = useState<string[]>([]);
   const [selectedCategories, setSelectedCategories] = useState<string[]>([]);
+
+  const [newTitle, setNewTitle] = useState("");
+  const [newStatus, setNewStatus] = useState("");
+  const [newCategory, setNewCategory] = useState("");
+  const [newNotes, setNewNotes] = useState("");
+
+  const fileInputRef = useRef<HTMLInputElement | null>(null);
 
   useEffect(() => {
     if (status === "loading") return;
@@ -106,6 +110,29 @@ export default function BoardPage() {
     a.click();
   };
 
+  const handleManualAdd = async () => {
+    const payload = {
+      title: newTitle,
+      status: newStatus,
+      category: newCategory,
+      notes: newNotes,
+    };
+
+    const res = await fetch("/api/admin/board/create", {
+      method: "POST",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify(payload),
+    });
+
+    if (res.ok) {
+      setNewTitle("");
+      setNewStatus("");
+      setNewCategory("");
+      setNewNotes("");
+      await loadEntries();
+    }
+  };
+
   const uniqueCategories = Array.from(new Set(entries.map(e => e.category.toLowerCase())));
   const uniqueStatuses = Array.from(new Set(entries.map(e => e.status.toLowerCase())));
 
@@ -113,11 +140,9 @@ export default function BoardPage() {
     const updater = group === "status" ? setSelectedStatuses : setSelectedCategories;
     const current = group === "status" ? selectedStatuses : selectedCategories;
 
-    updater(
-      current.includes(value)
-        ? current.filter((v) => v !== value)
-        : [...current, value]
-    );
+    updater(current.includes(value)
+      ? current.filter((v) => v !== value)
+      : [...current, value]);
   };
 
   const filteredEntries = entries.filter((e) => {
@@ -130,6 +155,21 @@ export default function BoardPage() {
     <div className="max-w-6xl mx-auto px-4 py-8 relative">
       <h1 className="text-2xl font-bold text-blue-700 mb-6">Superadmin Board</h1>
 
+      {/* Manuell hinzufügen */}
+      <div className="bg-white border border-gray-200 p-4 rounded shadow-sm mb-6">
+        <h2 className="text-md font-semibold text-gray-800 mb-2">Manuellen Eintrag hinzufügen</h2>
+        <div className="grid grid-cols-1 md:grid-cols-4 gap-4 mb-3">
+          <input placeholder="Titel" value={newTitle} onChange={e => setNewTitle(e.target.value)} className="border px-2 py-1 text-sm rounded w-full" />
+          <input placeholder="Status" value={newStatus} onChange={e => setNewStatus(e.target.value)} className="border px-2 py-1 text-sm rounded w-full" />
+          <input placeholder="Kategorie" value={newCategory} onChange={e => setNewCategory(e.target.value)} className="border px-2 py-1 text-sm rounded w-full" />
+          <input placeholder="Notizen" value={newNotes} onChange={e => setNewNotes(e.target.value)} className="border px-2 py-1 text-sm rounded w-full" />
+        </div>
+        <button onClick={handleManualAdd} className="bg-green-600 hover:bg-green-700 text-white text-sm px-4 py-2 rounded">
+          Hinzufügen
+        </button>
+      </div>
+
+      {/* Upload & Filter */}
       <div className="flex flex-col gap-4 mb-6 bg-white border border-gray-200 p-4 rounded shadow-sm">
         <div className="flex flex-col sm:flex-row sm:items-center gap-4">
           <input
