@@ -355,3 +355,6 @@ BoardPage.getLayout = (page: React.ReactNode) => (
 );
 
 </div>
+
+    </div>
+  );
