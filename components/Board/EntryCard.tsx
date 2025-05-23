@@ -2,9 +2,7 @@
 
 import React, { useState } from "react";
 import { Entry } from "./types";
-
-const statusOptions = ["geplant", "offen", "in Bearbeitung", "fertig"];
-const categoryOptions = ["IT", "Personal", "Finanzen", "Organisation", "Kommunikation", "Projekte", "Sonstiges"];
+import { STATUS_OPTIONS, CATEGORY_OPTIONS } from "./constants";
 
 type EntryCardProps = {
   entry: Entry;
@@ -34,11 +32,12 @@ export default function EntryCard({
   });
 
   const toggleCategory = (value: string) => {
-    if (editData.category.includes(value)) {
-      setEditData({ ...editData, category: editData.category.filter((c) => c !== value) });
-    } else {
-      setEditData({ ...editData, category: [...editData.category, value] });
-    }
+    setEditData((prev) => ({
+      ...prev,
+      category: prev.category.includes(value)
+        ? prev.category.filter((c) => c !== value)
+        : [...prev.category, value],
+    }));
   };
 
   const saveChanges = () => {
@@ -62,20 +61,22 @@ export default function EntryCard({
       {isEditing ? (
         <>
           <input
-            className="w-full text-lg font-semibold text-gray-800 mb-2 border rounded px-2 py-1"
+            className="w-full text-lg font-semibold text-gray-800 mb-3 border rounded px-2 py-1"
             value={editData.title}
             onChange={(e) => setEditData({ ...editData, title: e.target.value })}
           />
 
-          <div className="mb-2">
+          <div className="mb-3">
             <p className="font-medium text-sm mb-1 text-gray-700">Status</p>
             <div className="flex flex-wrap gap-2">
-              {statusOptions.map((opt) => (
+              {STATUS_OPTIONS.map((opt) => (
                 <button
                   key={opt}
                   onClick={() => setEditData({ ...editData, status: opt })}
-                  className={`px-3 py-1 rounded border text-sm ${
-                    editData.status === opt ? "bg-blue-600 text-white" : "bg-white text-gray-700"
+                  className={`px-3 py-1 rounded border text-sm transition ${
+                    editData.status === opt
+                      ? "bg-blue-600 text-white border-blue-600"
+                      : "bg-gray-100 text-gray-700 hover:bg-gray-200"
                   }`}
                 >
                   {opt}
@@ -84,15 +85,17 @@ export default function EntryCard({
             </div>
           </div>
 
-          <div className="mb-2">
+          <div className="mb-3">
             <p className="font-medium text-sm mb-1 text-gray-700">Kategorie</p>
             <div className="flex flex-wrap gap-2">
-              {categoryOptions.map((opt) => (
+              {CATEGORY_OPTIONS.map((opt) => (
                 <button
                   key={opt}
                   onClick={() => toggleCategory(opt)}
-                  className={`px-3 py-1 rounded border text-sm ${
-                    editData.category.includes(opt) ? "bg-blue-600 text-white" : "bg-white text-gray-700"
+                  className={`px-3 py-1 rounded border text-sm transition ${
+                    editData.category.includes(opt)
+                      ? "bg-blue-600 text-white border-blue-600"
+                      : "bg-gray-100 text-gray-700 hover:bg-gray-200"
                   }`}
                 >
                   {opt}
@@ -108,7 +111,7 @@ export default function EntryCard({
             onChange={(e) => setEditData({ ...editData, notes: e.target.value })}
           />
 
-          <div className="flex justify-end gap-2 mt-2">
+          <div className="flex justify-end gap-2 mt-3">
             <button
               onClick={saveChanges}
               className="bg-blue-600 hover:bg-blue-700 text-white px-3 py-1 text-sm rounded"
