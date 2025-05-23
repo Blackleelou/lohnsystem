@@ -29,6 +29,16 @@ export default function FilterPanel({
   const toggleCheckbox = (value: string, group: "status" | "category") => {
     const current = group === "status" ? selectedStatuses : selectedCategories;
     const updater = group === "status" ? setSelectedStatuses : setSelectedCategories;
+
+    // Spezialbehandlung für kombiniert "fertig/getestet"
+    if (group === "status" && value === "fertig/getestet") {
+      const updated = current.includes("fertig") || current.includes("getestet")
+        ? current.filter((s) => s !== "fertig" && s !== "getestet")
+        : [...current, "fertig", "getestet"];
+      updater(updated);
+      return;
+    }
+
     updater(current.includes(value) ? current.filter(v => v !== value) : [...current, value]);
   };
 
@@ -59,7 +69,7 @@ export default function FilterPanel({
         <div>
           <p className="font-medium text-sm mb-1 text-gray-700">Status-Filter</p>
           <div className="flex gap-2 flex-wrap">
-            {uniqueStatuses.map((s) => (
+            {[...new Set(uniqueStatuses.filter(s => s !== "fertig" && s !== "getestet"))].map((s) => (
               <label key={s} className="text-sm flex items-center gap-1">
                 <input
                   type="checkbox"
@@ -69,8 +79,20 @@ export default function FilterPanel({
                 {s}
               </label>
             ))}
+
+            <label className="text-sm flex items-center gap-1">
+              <input
+                type="checkbox"
+                checked={
+                  selectedStatuses.includes("fertig") || selectedStatuses.includes("getestet")
+                }
+                onChange={() => toggleCheckbox("fertig/getestet", "status")}
+              />
+              fertig/getestet
+            </label>
           </div>
         </div>
+
         <div>
           <p className="font-medium text-sm mb-1 text-gray-700">Kategorie-Filter</p>
           <div className="flex gap-2 flex-wrap">
