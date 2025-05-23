@@ -11,7 +11,6 @@ type FilterPanelProps = {
   setSelectedCategories: React.Dispatch<React.SetStateAction<string[]>>;
   fileInputRef: MutableRefObject<HTMLInputElement | null>;
   handleUpload: (e: ChangeEvent<HTMLInputElement>) => Promise<void>;
-  uploadResult: string | null;
 };
 
 export default function FilterPanel({
@@ -24,7 +23,6 @@ export default function FilterPanel({
   setSelectedCategories,
   fileInputRef,
   handleUpload,
-  uploadResult,
 }: FilterPanelProps) {
   const toggleCheckbox = (value: string, group: "status" | "category") => {
     const current = group === "status" ? selectedStatuses : selectedCategories;
@@ -35,8 +33,18 @@ export default function FilterPanel({
   return (
     <div className="mb-6 bg-white border border-gray-200 p-4 rounded shadow-sm">
       <div className="flex flex-wrap gap-4 items-center mb-4">
-        <input type="file" accept=".json" ref={fileInputRef} onChange={handleUpload} className="hidden" id="fileUpload" />
-        <label htmlFor="fileUpload" className="cursor-pointer bg-blue-600 hover:bg-blue-700 text-white px-4 py-2 rounded text-sm">
+        <input
+          type="file"
+          accept=".json"
+          ref={fileInputRef}
+          onChange={handleUpload}
+          className="hidden"
+          id="fileUpload"
+        />
+        <label
+          htmlFor="fileUpload"
+          className="cursor-pointer bg-blue-600 hover:bg-blue-700 text-white px-4 py-2 rounded text-sm"
+        >
           Datei auswählen & importieren
         </label>
         <button
@@ -87,12 +95,6 @@ export default function FilterPanel({
           </div>
         </div>
       </div>
-
-      {uploadResult && (
-        <div className="mt-4 bg-green-100 border border-green-300 text-green-800 px-4 py-2 rounded shadow">
-          {uploadResult}
-        </div>
-      )}
     </div>
   );
 }
