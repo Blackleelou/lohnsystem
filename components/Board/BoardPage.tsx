@@ -9,6 +9,7 @@ import FormPanel from "./FormPanel";
 import FilterPanel from "./FilterPanel";
 import EntryCard from "./EntryCard";
 import EntryModal from "./EntryModal";
+import { STATUS_OPTIONS, CATEGORY_OPTIONS } from "./constants";
 
 export default function BoardPage() {
   const { data: session, status } = useSession();
@@ -132,16 +133,17 @@ export default function BoardPage() {
   const normalizeStatus = (status: string) =>
     ["fertig", "getestet"].includes(status.toLowerCase()) ? "fertig/getestet" : status.toLowerCase();
 
-  const filteredEntries = entries.filter(e =>
-    (selectedStatuses.length === 0 || selectedStatuses.includes(normalizeStatus(e.status))) &&
-    (selectedCategories.length === 0 || selectedCategories.includes(e.category.toLowerCase()))
-  );
+  const filteredEntries = entries.filter((e) => {
+    const normalized = normalizeStatus(e.status);
+    const matchesStatus = selectedStatuses.length === 0 || selectedStatuses.includes(normalized);
+    const categories = e.category.split(",").map((c) => c.trim().toLowerCase());
+    const matchesCategory = selectedCategories.length === 0 || categories.some((c) => selectedCategories.includes(c));
+    return matchesStatus && matchesCategory;
+  });
 
-  const uniqueStatuses = Array.from(
-    new Set(entries.map(e => normalizeStatus(e.status)))
-  );
+  const uniqueStatuses = Array.from(new Set(entries.map((e) => normalizeStatus(e.status))));
   const uniqueCategories = Array.from(
-    new Set(entries.flatMap(e => e.category.split(",").map(c => c.trim().toLowerCase())))
+    new Set(entries.flatMap((e) => e.category.split(",").map((c) => c.trim().toLowerCase())))
   );
 
   return (
@@ -192,7 +194,7 @@ export default function BoardPage() {
       />
 
       <div className="grid grid-cols-1 md:grid-cols-2 xl:grid-cols-3 gap-4">
-        {filteredEntries.map(entry => (
+        {filteredEntries.map((entry) => (
           <EntryCard
             key={entry.id}
             entry={entry}
@@ -203,9 +205,7 @@ export default function BoardPage() {
         ))}
       </div>
 
-      {selectedEntry && (
-        <EntryModal entry={selectedEntry} onClose={() => setSelectedEntry(null)} />
-      )}
+      {selectedEntry && <EntryModal entry={selectedEntry} onClose={() => setSelectedEntry(null)} />}
 
       {toast && (
         <div className="fixed top-4 right-4 z-50 bg-blue-600 text-white px-4 py-2 rounded shadow">
