@@ -20,6 +20,7 @@ export default function BoardPage() {
   const [selectedCategories, setSelectedCategories] = useState<string[]>([]);
   const [editId, setEditId] = useState<number | null>(null);
   const [selectedEntry, setSelectedEntry] = useState<Entry | null>(null);
+  const [activeTab, setActiveTab] = useState<"import" | "export" | "manual">("manual");
 
   const [newTitle, setNewTitle] = useState("");
   const [newStatus, setNewStatus] = useState("");
@@ -150,48 +151,98 @@ export default function BoardPage() {
     <div className="max-w-6xl mx-auto px-4 py-8 relative">
       <h1 className="text-2xl font-bold text-blue-700 mb-6">Superadmin Board</h1>
 
-      <FormPanel
-        isEditing={editId !== null}
-        title={newTitle}
-        status={newStatus}
-        category={newCategory}
-        notes={newNotes}
-        onChangeTitle={setNewTitle}
-        onChangeStatus={setNewStatus}
-        onChangeCategory={setNewCategory}
-        onChangeNotes={setNewNotes}
-        onSave={
-          editId !== null
-            ? () =>
-                handleUpdate({
-                  id: editId,
-                  title: newTitle,
-                  status: newStatus,
-                  category: newCategory.join(", "),
-                  notes: newNotes,
-                })
-            : handleManualAdd
-        }
-        onCancel={() => {
-          setEditId(null);
-          setNewTitle("");
-          setNewStatus("");
-          setNewCategory([]);
-          setNewNotes("");
-        }}
-      />
+      <div className="flex gap-4 mb-4">
+        <button
+          className={`px-4 py-2 text-sm rounded-md border ${
+            activeTab === "manual" ? "bg-blue-600 text-white" : "bg-gray-100 text-gray-800"
+          }`}
+          onClick={() => setActiveTab("manual")}
+        >
+          Manuell
+        </button>
+        <button
+          className={`px-4 py-2 text-sm rounded-md border ${
+            activeTab === "import" ? "bg-blue-600 text-white" : "bg-gray-100 text-gray-800"
+          }`}
+          onClick={() => setActiveTab("import")}
+        >
+          Import
+        </button>
+        <button
+          className={`px-4 py-2 text-sm rounded-md border ${
+            activeTab === "export" ? "bg-blue-600 text-white" : "bg-gray-100 text-gray-800"
+          }`}
+          onClick={() => setActiveTab("export")}
+        >
+          Export
+        </button>
+      </div>
 
-      <FilterPanel
-        uniqueStatuses={uniqueStatuses}
-        uniqueCategories={uniqueCategories}
-        selectedStatuses={selectedStatuses}
-        selectedCategories={selectedCategories}
-        setSelectedStatuses={setSelectedStatuses}
-        setSelectedCategories={setSelectedCategories}
-        fileInputRef={fileInputRef}
-        handleUpload={handleUpload}
-        filteredEntries={filteredEntries}
-      />
+      {activeTab === "manual" && (
+        <FormPanel
+          isEditing={editId !== null}
+          title={newTitle}
+          status={newStatus}
+          category={newCategory}
+          notes={newNotes}
+          onChangeTitle={setNewTitle}
+          onChangeStatus={setNewStatus}
+          onChangeCategory={setNewCategory}
+          onChangeNotes={setNewNotes}
+          onSave={
+            editId !== null
+              ? () =>
+                  handleUpdate({
+                    id: editId,
+                    title: newTitle,
+                    status: newStatus,
+                    category: newCategory.join(", "),
+                    notes: newNotes,
+                  })
+              : handleManualAdd
+          }
+          onCancel={() => {
+            setEditId(null);
+            setNewTitle("");
+            setNewStatus("");
+            setNewCategory([]);
+            setNewNotes("");
+          }}
+        />
+      )}
+
+      {(activeTab === "import" || activeTab === "export") && (
+        <FilterPanel
+          uniqueStatuses={uniqueStatuses}
+          uniqueCategories={uniqueCategories}
+          selectedStatuses={selectedStatuses}
+          selectedCategories={selectedCategories}
+          setSelectedStatuses={setSelectedStatuses}
+          setSelectedCategories={setSelectedCategories}
+          fileInputRef={fileInputRef}
+          handleUpload={handleUpload}
+          filteredEntries={filteredEntries}
+        />
+      )}
+
+      {activeTab === "export" && (
+        <div className="mb-6">
+          <button
+            onClick={() => {
+              const data = JSON.stringify(filteredEntries, null, 2);
+              const blob = new Blob([data], { type: "application/json" });
+              const url = URL.createObjectURL(blob);
+              const a = document.createElement("a");
+              a.href = url;
+              a.download = `Export_ToDo_${new Date().toISOString().replace(/[:.]/g, "_")}.json`;
+              a.click();
+            }}
+            className="bg-blue-600 hover:bg-blue-700 text-white px-4 py-2 rounded text-sm"
+          >
+            Als JSON exportieren
+          </button>
+        </div>
+      )}
 
       <div className="grid grid-cols-1 md:grid-cols-2 xl:grid-cols-3 gap-4">
         {filteredEntries.map((entry) => (
@@ -216,6 +267,4 @@ export default function BoardPage() {
   );
 }
 
-BoardPage.getLayout = (page: React.ReactNode) => (
-  <SuperadminLayout>{page}</SuperadminLayout>
-);
+BoardPage.getLayout = (page: React.ReactNode) => <SuperadminLayout>{page}</SuperadminLayout>;
