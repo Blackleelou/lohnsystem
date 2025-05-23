@@ -22,7 +22,7 @@ export default function BoardPage() {
 
   const [newTitle, setNewTitle] = useState("");
   const [newStatus, setNewStatus] = useState("");
-  const [newCategory, setNewCategory] = useState("");
+  const [newCategory, setNewCategory] = useState<string[]>([]);
   const [newNotes, setNewNotes] = useState("");
 
   const fileInputRef = useRef<HTMLInputElement | null>(null);
@@ -74,7 +74,12 @@ export default function BoardPage() {
   };
 
   const handleManualAdd = async () => {
-    const payload = { title: newTitle, status: newStatus, category: newCategory, notes: newNotes };
+    const payload = {
+      title: newTitle,
+      status: newStatus,
+      category: newCategory.join(", "),
+      notes: newNotes,
+    };
     const res = await fetch("/api/admin/board/create", {
       method: "POST",
       headers: { "Content-Type": "application/json" },
@@ -85,7 +90,7 @@ export default function BoardPage() {
       showToast("Eintrag hinzugefügt.");
       setNewTitle("");
       setNewStatus("");
-      setNewCategory("");
+      setNewCategory([]);
       setNewNotes("");
       await loadEntries();
     } else {
@@ -133,16 +138,11 @@ export default function BoardPage() {
   );
 
   const uniqueStatuses = Array.from(
-  new Set(
-    entries
-      .map(e => {
-        const s = e.status.toLowerCase();
-        return s === "fertig" || s === "getestet" ? "fertig/getestet" : s;
-      })
-  )
-);
-
-  const uniqueCategories = [...new Set(entries.map(e => e.category.toLowerCase()))];
+    new Set(entries.map(e => normalizeStatus(e.status)))
+  );
+  const uniqueCategories = Array.from(
+    new Set(entries.flatMap(e => e.category.split(",").map(c => c.trim().toLowerCase())))
+  );
 
   return (
     <div className="max-w-6xl mx-auto px-4 py-8 relative">
@@ -165,7 +165,7 @@ export default function BoardPage() {
                   id: editId,
                   title: newTitle,
                   status: newStatus,
-                  category: newCategory,
+                  category: newCategory.join(", "),
                   notes: newNotes,
                 })
             : handleManualAdd
@@ -174,7 +174,7 @@ export default function BoardPage() {
           setEditId(null);
           setNewTitle("");
           setNewStatus("");
-          setNewCategory("");
+          setNewCategory([]);
           setNewNotes("");
         }}
       />
