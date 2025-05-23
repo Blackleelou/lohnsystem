@@ -1,5 +1,3 @@
-// Datei: pages/api/admin/create.ts
-
 import { NextApiRequest, NextApiResponse } from "next";
 import { prisma } from "@/lib/prisma";
 
@@ -9,18 +7,18 @@ export default async function handler(req: NextApiRequest, res: NextApiResponse)
   try {
     const { title, status, category, notes } = req.body;
 
-    if (!title || !status || !category) {
-      return res.status(400).json({ message: "Titel, Status und Kategorie sind erforderlich." });
+    if (!title || !status || !Array.isArray(category) || category.length === 0) {
+      return res.status(400).json({ message: "Titel, Status und mindestens eine Kategorie sind erforderlich." });
     }
 
     const newEntry = await prisma.superadminBoardEntry.create({
       data: {
         title,
         status,
-        category,
+        category: { set: category }, // ← Array korrekt setzen
         notes,
         createdAt: new Date(),
-        completedAt: status.toLowerCase() === "fertig" ? new Date() : null,
+        completedAt: ["fertig", "getestet"].includes(status.toLowerCase()) ? new Date() : null,
       },
     });
 
