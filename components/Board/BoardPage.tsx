@@ -193,20 +193,17 @@ export default function BoardPage() {
       />
 
       <FilterPanel
-        statuses={uniqueStatuses}
-        categories={uniqueCategories}
-        selectedStatuses={selectedStatuses}
-        selectedCategories={selectedCategories}
-        onToggle={(value, group) => {
-          const current = group === "status" ? selectedStatuses : selectedCategories;
-          const setter = group === "status" ? setSelectedStatuses : setSelectedCategories;
-          setter(
-            current.includes(value)
-              ? current.filter((v) => v !== value)
-              : [...current, value]
-          );
-        }}
-      />
+  uniqueStatuses={uniqueStatuses}
+  uniqueCategories={uniqueCategories}
+  selectedStatuses={selectedStatuses}
+  selectedCategories={selectedCategories}
+  setSelectedStatuses={setSelectedStatuses}
+  setSelectedCategories={setSelectedCategories}
+  fileInputRef={fileInputRef}
+  handleUpload={handleUpload}
+  uploadResult={uploadResult}
+  filteredEntries={filteredEntries}
+/>
 
       <div className="flex flex-wrap gap-4 items-center mb-4">
         <input
