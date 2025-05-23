@@ -54,7 +54,7 @@ export default function EntryCard({
   return (
     <div
       onClick={!isEditing ? onClick : undefined}
-      className={`border p-4 rounded-md shadow-sm ${
+      className={`border p-4 rounded shadow-sm ${
         isFertig ? "bg-green-50 border-green-200" : "bg-white"
       }`}
     >
