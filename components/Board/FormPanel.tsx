@@ -1,3 +1,5 @@
+// components/Board/FormPanel.tsx
+
 import React from "react";
 
 type FormPanelProps = {
@@ -14,7 +16,12 @@ type FormPanelProps = {
   onCancel: () => void;
 };
 
-const statusOptions = ["geplant", "offen", "in Bearbeitung", "getestet", "fertig"];
+const statusOptions = [
+  { label: "Geplant", value: "geplant" },
+  { label: "Offen", value: "offen" },
+  { label: "In Bearbeitung", value: "in Bearbeitung" },
+  { label: "Getestet / Fertig", value: "fertig" }, // zusammengeführt
+];
 
 export default function FormPanel({
   isEditing,
@@ -48,8 +55,8 @@ export default function FormPanel({
         >
           <option value="">Status wählen</option>
           {statusOptions.map((opt) => (
-            <option key={opt} value={opt}>
-              {opt}
+            <option key={opt.value} value={opt.value}>
+              {opt.label}
             </option>
           ))}
         </select>
