@@ -1,3 +1,5 @@
+// pages/api/admin/board/import.ts
+
 import { NextApiRequest, NextApiResponse } from "next";
 import formidable, { File } from "formidable";
 import fs from "fs/promises";
@@ -12,7 +14,7 @@ export const config = {
 type Entry = {
   title: string;
   status: string;
-  category: string;
+  category: string[]; // <-- jetzt ein Array!
   notes?: string;
   createdAt: string;
   completedAt?: string;
@@ -24,7 +26,7 @@ export default async function handler(req: NextApiRequest, res: NextApiResponse)
   const form = formidable({ maxFileSize: 2 * 1024 * 1024 });
 
   try {
-    const { fields, files } = await new Promise<{ fields: any; files: any }>((resolve, reject) => {
+    const { files } = await new Promise<{ fields: any; files: any }>((resolve, reject) => {
       form.parse(req, (err, fields, files) => {
         if (err) reject(err);
         else resolve({ fields, files });
@@ -52,14 +54,16 @@ export default async function handler(req: NextApiRequest, res: NextApiResponse)
         },
       });
 
+      const entryCategory = entry.category.map((c) => c.trim());
+
       if (existing) {
-        const incomingCompletedAt = completedAt ? completedAt.getTime() : null;
-        const existingCompletedAt = existing.completedAt ? existing.completedAt.getTime() : null;
+        const existingCompletedAt = existing.completedAt?.getTime() ?? null;
+        const incomingCompletedAt = completedAt?.getTime() ?? null;
 
         const isIdentical =
           existing.title === entry.title &&
           existing.status === entry.status &&
-          existing.category === entry.category &&
+          JSON.stringify(existing.category) === JSON.stringify(entryCategory) &&
           existing.notes === entry.notes &&
           incomingCompletedAt === existingCompletedAt;
 
@@ -70,10 +74,11 @@ export default async function handler(req: NextApiRequest, res: NextApiResponse)
           data: {
             title: entry.title,
             status: entry.status,
-            category: entry.category,
+            category: { set: entryCategory },
             notes: entry.notes,
             createdAt,
             completedAt,
+            updatedByImport: true,
           },
         });
 
@@ -83,10 +88,11 @@ export default async function handler(req: NextApiRequest, res: NextApiResponse)
           data: {
             title: entry.title,
             status: entry.status,
-            category: entry.category,
+            category: { set: entryCategory },
             notes: entry.notes,
             createdAt,
             completedAt,
+            updatedByImport: true,
           },
         });
 
