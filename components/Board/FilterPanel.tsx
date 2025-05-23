@@ -30,7 +30,6 @@ export default function FilterPanel({
     const current = group === "status" ? selectedStatuses : selectedCategories;
     const updater = group === "status" ? setSelectedStatuses : setSelectedCategories;
 
-    // Spezialbehandlung für kombiniert "fertig/getestet"
     if (group === "status" && value === "fertig/getestet") {
       const updated = current.includes("fertig") || current.includes("getestet")
         ? current.filter((s) => s !== "fertig" && s !== "getestet")
@@ -69,7 +68,11 @@ export default function FilterPanel({
         <div>
           <p className="font-medium text-sm mb-1 text-gray-700">Status-Filter</p>
           <div className="flex gap-2 flex-wrap">
-            {[...new Set(uniqueStatuses.filter(s => s !== "fertig" && s !== "getestet"))].map((s) => (
+            {[...new Set(uniqueStatuses.filter(s =>
+              s !== "fertig" &&
+              s !== "getestet" &&
+              s !== "fertig/getestet"
+            ))].map((s) => (
               <label key={s} className="text-sm flex items-center gap-1">
                 <input
                   type="checkbox"
