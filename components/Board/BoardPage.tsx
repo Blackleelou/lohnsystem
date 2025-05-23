@@ -15,9 +15,7 @@ export default function BoardPage() {
   const router = useRouter();
   const [entries, setEntries] = useState<Entry[]>([]);
   const [uploading, setUploading] = useState(false);
-  const [uploadResult, setUploadResult] = useState<string | null>(null);
   const [toast, setToast] = useState<string | null>(null);
-  const [isRefreshing, setIsRefreshing] = useState(false);
   const [selectedStatuses, setSelectedStatuses] = useState<string[]>([]);
   const [selectedCategories, setSelectedCategories] = useState<string[]>([]);
   const [editId, setEditId] = useState<number | null>(null);
@@ -29,12 +27,18 @@ export default function BoardPage() {
   const [newNotes, setNewNotes] = useState("");
 
   const fileInputRef = useRef<HTMLInputElement | null>(null);
-    useEffect(() => {
+
+  useEffect(() => {
     if (status === "loading") return;
     if (!session || session.user?.email !== "jantzen.chris@gmail.com") {
       router.replace("/dashboard");
     }
   }, [session, status]);
+
+  const showToast = (msg: string) => {
+    setToast(msg);
+    setTimeout(() => setToast(null), 4000);
+  };
 
   const loadEntries = async () => {
     const res = await fetch("/api/admin/board");
@@ -52,9 +56,7 @@ export default function BoardPage() {
 
     const formData = new FormData();
     formData.append("file", file);
-
     setUploading(true);
-    setUploadResult(null);
 
     const res = await fetch("/api/admin/board/import", {
       method: "POST",
@@ -63,29 +65,18 @@ export default function BoardPage() {
 
     const result = await res.json();
     setUploading(false);
-
     if (res.ok) {
-      setToast(result.message || "Import abgeschlossen.");
-      setIsRefreshing(true);
-      setTimeout(() => {
-        loadEntries().then(() => setIsRefreshing(false));
-      }, 500);
+      showToast(result.message || "Import abgeschlossen.");
+      await loadEntries();
     } else {
-      setToast(result.message || "Fehler beim Import.");
+      showToast(result.message || "Fehler beim Import.");
     }
 
     if (fileInputRef.current) fileInputRef.current.value = "";
-    setTimeout(() => setToast(null), 4000);
   };
 
   const handleManualAdd = async () => {
-    const payload = {
-      title: newTitle,
-      status: newStatus,
-      category: newCategory,
-      notes: newNotes,
-    };
-
+    const payload = { title: newTitle, status: newStatus, category: newCategory, notes: newNotes };
     const res = await fetch("/api/admin/board/create", {
       method: "POST",
       headers: { "Content-Type": "application/json" },
@@ -93,29 +84,20 @@ export default function BoardPage() {
     });
 
     if (res.ok) {
-      setToast("Eintrag hinzugefügt.");
+      showToast("Eintrag hinzugefügt.");
       setNewTitle("");
       setNewStatus("");
       setNewCategory("");
       setNewNotes("");
       await loadEntries();
     } else {
-      setToast("Fehler beim Speichern.");
+      showToast("Fehler beim Speichern.");
     }
-
-    setTimeout(() => setToast(null), 4000);
   };
 
   const handleUpdate = async () => {
     if (!editId) return;
-    const payload = {
-      id: editId,
-      title: newTitle,
-      status: newStatus,
-      category: newCategory,
-      notes: newNotes,
-    };
-
+    const payload = { id: editId, title: newTitle, status: newStatus, category: newCategory, notes: newNotes };
     const res = await fetch("/api/admin/board/update", {
       method: "PATCH",
       headers: { "Content-Type": "application/json" },
@@ -123,7 +105,7 @@ export default function BoardPage() {
     });
 
     if (res.ok) {
-      setToast("Eintrag aktualisiert.");
+      showToast("Eintrag aktualisiert.");
       setEditId(null);
       setNewTitle("");
       setNewStatus("");
@@ -131,15 +113,12 @@ export default function BoardPage() {
       setNewNotes("");
       await loadEntries();
     } else {
-      setToast("Fehler beim Aktualisieren.");
+      showToast("Fehler beim Aktualisieren.");
     }
-
-    setTimeout(() => setToast(null), 4000);
   };
 
   const handleDelete = async (id: number) => {
     if (!confirm("Eintrag wirklich löschen?")) return;
-
     const res = await fetch("/api/admin/board/delete", {
       method: "DELETE",
       headers: { "Content-Type": "application/json" },
@@ -147,28 +126,22 @@ export default function BoardPage() {
     });
 
     if (res.ok) {
-      setToast("Eintrag gelöscht.");
+      showToast("Eintrag gelöscht.");
       await loadEntries();
     } else {
-      setToast("Fehler beim Löschen.");
+      showToast("Fehler beim Löschen.");
     }
-
-    setTimeout(() => setToast(null), 4000);
   };
 
-  const filteredEntries = entries.filter((e) => {
-    const status = e.status.toLowerCase();
-    const category = e.category.toLowerCase();
-    const statusMatch =
-      selectedStatuses.length === 0 || selectedStatuses.includes(status);
-    const categoryMatch =
-      selectedCategories.length === 0 || selectedCategories.includes(category);
-    return statusMatch && categoryMatch;
-  });
+  const filteredEntries = entries.filter(e =>
+    (selectedStatuses.length === 0 || selectedStatuses.includes(e.status.toLowerCase())) &&
+    (selectedCategories.length === 0 || selectedCategories.includes(e.category.toLowerCase()))
+  );
 
-  const uniqueStatuses = [...new Set(entries.map((e) => e.status.toLowerCase()))];
-  const uniqueCategories = [...new Set(entries.map((e) => e.category.toLowerCase()))];
-    return (
+  const uniqueStatuses = [...new Set(entries.map(e => e.status.toLowerCase()))];
+  const uniqueCategories = [...new Set(entries.map(e => e.category.toLowerCase()))];
+
+  return (
     <div className="max-w-6xl mx-auto px-4 py-8 relative">
       <h1 className="text-2xl font-bold text-blue-700 mb-6">Superadmin Board</h1>
 
@@ -193,53 +166,20 @@ export default function BoardPage() {
       />
 
       <FilterPanel
-  uniqueStatuses={uniqueStatuses}
-  uniqueCategories={uniqueCategories}
-  selectedStatuses={selectedStatuses}
-  selectedCategories={selectedCategories}
-  setSelectedStatuses={setSelectedStatuses}
-  setSelectedCategories={setSelectedCategories}
-  fileInputRef={fileInputRef}
-  handleUpload={handleUpload}
-  uploadResult={uploadResult}
-  filteredEntries={filteredEntries}
-/>
-
-      <div className="flex flex-wrap gap-4 items-center mb-4">
-        <input
-          type="file"
-          accept=".json"
-          ref={fileInputRef}
-          onChange={handleUpload}
-          className="hidden"
-          id="fileUpload"
-        />
-        <label
-          htmlFor="fileUpload"
-          className="cursor-pointer bg-blue-600 hover:bg-blue-700 text-white px-4 py-2 rounded text-sm"
-        >
-          Datei auswählen & importieren
-        </label>
-        <button
-          onClick={() => {
-            const data = JSON.stringify(filteredEntries, null, 2);
-            const blob = new Blob([data], { type: "application/json" });
-            const url = URL.createObjectURL(blob);
-            const a = document.createElement("a");
-            a.href = url;
-            a.download = `Export_ToDo_${new Date()
-              .toISOString()
-              .replace(/[:.]/g, "_")}.json`;
-            a.click();
-          }}
-          className="bg-blue-600 hover:bg-blue-700 text-white px-4 py-2 rounded text-sm"
-        >
-          Als JSON exportieren
-        </button>
-      </div>
+        uniqueStatuses={uniqueStatuses}
+        uniqueCategories={uniqueCategories}
+        selectedStatuses={selectedStatuses}
+        selectedCategories={selectedCategories}
+        setSelectedStatuses={setSelectedStatuses}
+        setSelectedCategories={setSelectedCategories}
+        fileInputRef={fileInputRef}
+        handleUpload={handleUpload}
+        uploadResult={uploadResult}
+        filteredEntries={filteredEntries}
+      />
 
       <div className="grid grid-cols-1 md:grid-cols-2 xl:grid-cols-3 gap-4">
-        {filteredEntries.map((entry) => (
+        {filteredEntries.map(entry => (
           <EntryCard
             key={entry.id}
             entry={entry}
