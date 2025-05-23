@@ -247,9 +247,7 @@ export default function BoardPage() {
           </>
         ) : (
           <button onClick={handleManualAdd} className="bg-green-600 hover:bg-green-700 text-white text-sm px-4 py-2 rounded">
-          Hinzufügen
-        </button>
-      </div>
+
 
       {/* Upload & Filter */}
       <div className="flex flex-col gap-4 mb-6 bg-white border border-gray-200 p-4 rounded shadow-sm">
