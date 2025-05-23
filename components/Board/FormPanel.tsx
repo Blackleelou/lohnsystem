@@ -49,7 +49,7 @@ export default function FormPanel({
           placeholder="Titel"
           value={title}
           onChange={(e) => onChangeTitle(e.target.value)}
-          className="border px-3 py-2 text-sm rounded w-full"
+          className="border px-3 py-2 text-sm rounded-md w-full"
         />
 
         <div>
@@ -60,7 +60,7 @@ export default function FormPanel({
                 key={opt}
                 type="button"
                 onClick={() => onChangeStatus(opt)}
-                className={`px-3 py-1 rounded border text-sm transition ${
+                className={`px-3 py-1 rounded-md border text-sm transition ${
                   status === opt
                     ? "bg-blue-600 text-white border-blue-600"
                     : "bg-gray-100 text-gray-700 hover:bg-gray-200"
@@ -80,7 +80,7 @@ export default function FormPanel({
                 key={opt}
                 type="button"
                 onClick={() => toggleCategory(opt)}
-                className={`px-3 py-1 rounded border text-sm transition ${
+                className={`px-3 py-1 rounded-md border text-sm transition ${
                   category.includes(opt)
                     ? "bg-blue-600 text-white border-blue-600"
                     : "bg-gray-100 text-gray-700 hover:bg-gray-200"
@@ -96,7 +96,7 @@ export default function FormPanel({
           placeholder="Notizen"
           value={notes}
           onChange={(e) => onChangeNotes(e.target.value)}
-          className="border px-3 py-2 text-sm rounded w-full"
+          className="border px-3 py-2 text-sm rounded-md w-full"
         />
       </div>
 
@@ -105,13 +105,13 @@ export default function FormPanel({
           <>
             <button
               onClick={onSave}
-              className="bg-blue-600 hover:bg-blue-700 text-white px-4 py-2 text-sm rounded"
+              className="bg-blue-600 hover:bg-blue-700 text-white px-4 py-2 text-sm rounded-md"
             >
               Speichern
             </button>
             <button
               onClick={onCancel}
-              className="bg-gray-500 hover:bg-gray-600 text-white px-4 py-2 text-sm rounded"
+              className="bg-gray-500 hover:bg-gray-600 text-white px-4 py-2 text-sm rounded-md"
             >
               Abbrechen
             </button>
@@ -119,7 +119,7 @@ export default function FormPanel({
         ) : (
           <button
             onClick={onSave}
-            className="bg-green-600 hover:bg-green-700 text-white px-4 py-2 text-sm rounded"
+            className="bg-green-600 hover:bg-green-700 text-white px-4 py-2 text-sm rounded-md"
           >
             Hinzufügen
           </button>
