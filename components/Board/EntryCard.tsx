@@ -1,3 +1,5 @@
+// components/Board/EntryCard.tsx
+
 import React from "react";
 import { Entry } from "./types";
 
@@ -22,18 +24,19 @@ export default function EntryCard({
   handleDelete,
   onClick,
 }: EntryCardProps) {
-  const isFertig = entry.status.toLowerCase() === "fertig";
+  const statusNormalized = entry.status.toLowerCase();
+  const isGrünStatus = statusNormalized === "fertig" || statusNormalized === "getestet";
 
   return (
     <div
       onClick={onClick}
       className={`border p-4 rounded-md shadow-sm cursor-pointer ${
-        isFertig ? "bg-green-50 border-green-200" : "bg-white"
+        isGrünStatus ? "bg-green-50 border-green-200" : "bg-white"
       }`}
     >
       <h2 className="font-semibold text-lg text-gray-800 mb-2 flex items-center gap-2">
         {entry.title}
-        {isFertig && (
+        {isGrünStatus && (
           <span className="text-green-600 font-bold text-sm">✔</span>
         )}
       </h2>
