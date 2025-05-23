@@ -1,11 +1,14 @@
+// components/Board/BoardPage.tsx
+
 import { useEffect, useState, useRef } from "react";
 import { useSession } from "next-auth/react";
 import { useRouter } from "next/router";
 import SuperadminLayout from "@/components/SuperadminLayout";
+import { Entry } from "./types";
 import FormPanel from "./FormPanel";
 import FilterPanel from "./FilterPanel";
 import EntryCard from "./EntryCard";
-import { Entry } from "./types";
+import EntryModal from "./EntryModal";
 
 export default function BoardPage() {
   const { data: session, status } = useSession();
@@ -13,16 +16,16 @@ export default function BoardPage() {
   const [entries, setEntries] = useState<Entry[]>([]);
   const [uploading, setUploading] = useState(false);
   const [uploadResult, setUploadResult] = useState<string | null>(null);
+  const [isRefreshing, setIsRefreshing] = useState(false);
   const [selectedStatuses, setSelectedStatuses] = useState<string[]>([]);
   const [selectedCategories, setSelectedCategories] = useState<string[]>([]);
   const [editId, setEditId] = useState<number | null>(null);
+  const [selectedEntry, setSelectedEntry] = useState<Entry | null>(null);
 
-  const [form, setForm] = useState({
-    title: "",
-    status: "",
-    category: "",
-    notes: "",
-  });
+  const [newTitle, setNewTitle] = useState("");
+  const [newStatus, setNewStatus] = useState("");
+  const [newCategory, setNewCategory] = useState("");
+  const [newNotes, setNewNotes] = useState("");
 
   const fileInputRef = useRef<HTMLInputElement | null>(null);
 
@@ -63,7 +66,10 @@ export default function BoardPage() {
 
     if (res.ok) {
       setUploadResult(result.message || "Import abgeschlossen.");
-      await loadEntries();
+      setIsRefreshing(true);
+      setTimeout(() => {
+        loadEntries().then(() => setIsRefreshing(false));
+      }, 500);
     } else {
       setUploadResult(result.message || "Fehler beim Import.");
     }
@@ -73,7 +79,7 @@ export default function BoardPage() {
   };
 
   const handleManualAdd = async () => {
-    const payload = { ...form };
+    const payload = { title: newTitle, status: newStatus, category: newCategory, notes: newNotes };
     const res = await fetch("/api/admin/board/create", {
       method: "POST",
       headers: { "Content-Type": "application/json" },
@@ -81,17 +87,17 @@ export default function BoardPage() {
     });
 
     if (res.ok) {
-      setForm({ title: "", status: "", category: "", notes: "" });
+      setNewTitle("");
+      setNewStatus("");
+      setNewCategory("");
+      setNewNotes("");
       await loadEntries();
-    } else {
-      setUploadResult("Fehler beim Hinzufügen.");
-      setTimeout(() => setUploadResult(null), 4000);
     }
   };
 
   const handleUpdate = async () => {
     if (!editId) return;
-    const payload = { id: editId, ...form };
+    const payload = { id: editId, title: newTitle, status: newStatus, category: newCategory, notes: newNotes };
     const res = await fetch("/api/admin/board/update", {
       method: "PATCH",
       headers: { "Content-Type": "application/json" },
@@ -100,7 +106,10 @@ export default function BoardPage() {
 
     if (res.ok) {
       setEditId(null);
-      setForm({ title: "", status: "", category: "", notes: "" });
+      setNewTitle("");
+      setNewStatus("");
+      setNewCategory("");
+      setNewNotes("");
       await loadEntries();
     }
   };
@@ -120,56 +129,60 @@ export default function BoardPage() {
     (selectedCategories.length === 0 || selectedCategories.includes(e.category.toLowerCase()))
   );
 
+  const uniqueStatuses = [...new Set(entries.map(e => e.status.toLowerCase()))];
+  const uniqueCategories = [...new Set(entries.map(e => e.category.toLowerCase()))];
+
   return (
     <div className="max-w-6xl mx-auto px-4 py-8 relative">
       <h1 className="text-2xl font-bold text-blue-700 mb-6">Superadmin Board</h1>
 
       <FormPanel
-        form={form}
-        setForm={setForm}
-        onSave={editId ? handleUpdate : handleManualAdd}
-        isEditing={!!editId}
-        onCancel={() => {
-          setEditId(null);
-          setForm({ title: "", status: "", category: "", notes: "" });
-        }}
+        editId={editId}
+        newTitle={newTitle}
+        newStatus={newStatus}
+        newCategory={newCategory}
+        newNotes={newNotes}
+        setNewTitle={setNewTitle}
+        setNewStatus={setNewStatus}
+        setNewCategory={setNewCategory}
+        setNewNotes={setNewNotes}
+        handleManualAdd={handleManualAdd}
+        handleUpdate={handleUpdate}
+        setEditId={setEditId}
       />
 
       <FilterPanel
-        entries={entries}
+        filteredEntries={filteredEntries}
         selectedStatuses={selectedStatuses}
         selectedCategories={selectedCategories}
+        uniqueStatuses={uniqueStatuses}
+        uniqueCategories={uniqueCategories}
         setSelectedStatuses={setSelectedStatuses}
         setSelectedCategories={setSelectedCategories}
         fileInputRef={fileInputRef}
-        onUpload={handleUpload}
-        filteredEntries={filteredEntries}
+        handleUpload={handleUpload}
+        uploadResult={uploadResult}
       />
-
-      {uploadResult && (
-        <div className="fixed top-4 right-4 bg-green-100 border border-green-300 text-green-800 px-4 py-2 rounded shadow z-50">
-          {uploadResult}
-        </div>
-      )}
 
       <div className="grid grid-cols-1 md:grid-cols-2 xl:grid-cols-3 gap-4">
         {filteredEntries.map(entry => (
           <EntryCard
             key={entry.id}
             entry={entry}
-            onEdit={(e) => {
-              setEditId(e.id);
-              setForm({
-                title: e.title,
-                status: e.status,
-                category: e.category,
-                notes: e.notes || "",
-              });
-            }}
-            onDelete={handleDelete}
+            setEditId={setEditId}
+            setNewTitle={setNewTitle}
+            setNewStatus={setNewStatus}
+            setNewCategory={setNewCategory}
+            setNewNotes={setNewNotes}
+            handleDelete={handleDelete}
+            onClick={() => setSelectedEntry(entry)}
           />
         ))}
       </div>
+
+      {selectedEntry && (
+        <EntryModal entry={selectedEntry} onClose={() => setSelectedEntry(null)} />
+      )}
     </div>
   );
 }
