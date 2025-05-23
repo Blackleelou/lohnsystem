@@ -132,10 +132,15 @@ export default function BoardPage() {
     (selectedCategories.length === 0 || selectedCategories.includes(e.category.toLowerCase()))
   );
 
-  const uniqueStatusesRaw = Array.from(new Set(entries.map(e => e.status.toLowerCase())));
-  const uniqueStatuses = uniqueStatusesRaw.includes("fertig") || uniqueStatusesRaw.includes("getestet")
-    ? [...uniqueStatusesRaw.filter(s => s !== "fertig" && s !== "getestet"), "fertig/getestet"]
-    : uniqueStatusesRaw;
+  const uniqueStatuses = Array.from(
+  new Set(
+    entries
+      .map(e => {
+        const s = e.status.toLowerCase();
+        return s === "fertig" || s === "getestet" ? "fertig/getestet" : s;
+      })
+  )
+);
 
   const uniqueCategories = [...new Set(entries.map(e => e.category.toLowerCase()))];
 
