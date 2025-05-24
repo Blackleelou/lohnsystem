@@ -1,10 +1,9 @@
-// components/Board/constants.ts
-
 export const STATUS_OPTIONS = [
-  "geplant",
   "offen",
+  "geplant",
   "in Bearbeitung",
-  "fertig/getestet", // zusammengeführt
+  "getestet",
+  "fertig",
 ];
 
 export const CATEGORY_OPTIONS = [
