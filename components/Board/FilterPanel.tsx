@@ -85,17 +85,17 @@ export default function FilterPanel({
         <div>
           <p className="font-medium text-sm mb-2 text-gray-700">Status-Filter</p>
           <div className="flex gap-2 flex-wrap">
-            {statusOrder.map((status) => (
+            {statusOrder.map((s) => (
               <button
-                key={status}
-                onClick={() => toggleCheckbox(status, "status")}
+                key={s}
+                onClick={() => toggleCheckbox(s, "status")}
                 className={`px-3 py-1 rounded-md text-sm border ${
-                  selectedStatuses.includes(status)
+                  selectedStatuses.includes(s)
                     ? "bg-blue-600 text-white"
                     : "bg-gray-100 text-gray-700"
                 }`}
               >
-                {status}
+                {s}
               </button>
             ))}
           </div>
@@ -104,22 +104,19 @@ export default function FilterPanel({
         <div>
           <p className="font-medium text-sm mb-2 text-gray-700">Kategorie-Filter</p>
           <div className="flex gap-2 flex-wrap">
-            {categoryOptions.map((category) => {
-              const categoryKey = category.toLowerCase();
-              return (
-                <button
-                  key={category}
-                  onClick={() => toggleCheckbox(categoryKey, "category")}
-                  className={`px-3 py-1 rounded-md text-sm border ${
-                    selectedCategories.includes(categoryKey)
-                      ? "bg-blue-600 text-white"
-                      : "bg-gray-100 text-gray-700"
-                  }`}
-                >
-                  {category}
-                </button>
-              );
-            })}
+            {categoryOptions.map((c) => (
+              <button
+                key={c}
+                onClick={() => toggleCheckbox(c.toLowerCase(), "category")}
+                className={`px-3 py-1 rounded-md text-sm border ${
+                  selectedCategories.includes(c.toLowerCase())
+                    ? "bg-blue-600 text-white"
+                    : "bg-gray-100 text-gray-700"
+                }`}
+              >
+                {c}
+              </button>
+            ))}
           </div>
         </div>
       </div>
