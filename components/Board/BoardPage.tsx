@@ -1,3 +1,5 @@
+// components/Board/BoardPage.tsx
+
 import { useEffect, useState, useRef } from "react";
 import { useSession } from "next-auth/react";
 import { useRouter } from "next/router";
@@ -23,7 +25,6 @@ export default function BoardPage() {
   const [newStatus, setNewStatus] = useState("");
   const [newCategory, setNewCategory] = useState<string[]>([]);
   const [newNotes, setNewNotes] = useState("");
-
   const [activeSection, setActiveSection] = useState<"manual" | "import" | "export" | null>(null);
   const fileInputRef = useRef<HTMLInputElement | null>(null);
 
@@ -129,23 +130,15 @@ export default function BoardPage() {
     }
   };
 
-  const normalizeStatus = (status: string) => {
-    const s = status.toLowerCase();
-    if (s === "getestet") return "getestet";
-    if (s === "fertig") return "fertig";
-    return s;
-  };
-
   const filteredEntries = entries.filter((e) => {
-    const statusMatch =
-      selectedStatuses.length === 0 || selectedStatuses.includes(normalizeStatus(e.status));
-    const categoryMatch =
-      selectedCategories.length === 0 ||
-      e.category.some((c) => selectedCategories.includes(c.toLowerCase()));
-    return statusMatch && categoryMatch;
+    const matchesStatus =
+      selectedStatuses.length === 0 || selectedStatuses.includes(e.status.toLowerCase());
+    const matchesCategory =
+      selectedCategories.length === 0 || e.category.some((c) => selectedCategories.includes(c.toLowerCase()));
+    return matchesStatus && matchesCategory;
   });
 
-  const uniqueStatuses = Array.from(new Set(entries.map((e) => normalizeStatus(e.status))));
+  const uniqueStatuses = Array.from(new Set(entries.map((e) => e.status.toLowerCase())));
   const uniqueCategories = Array.from(
     new Set(entries.flatMap((e) => e.category.map((c) => c.trim().toLowerCase())))
   );
@@ -184,7 +177,6 @@ export default function BoardPage() {
 
       {activeSection === "manual" && (
         <FormPanel
-          isEditing={false}
           title={newTitle}
           status={newStatus}
           category={newCategory}
