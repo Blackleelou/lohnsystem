@@ -129,19 +129,15 @@ export default function BoardPage() {
     }
   };
 
-  // KEINE Umwandlung mehr auf lowercase → sorgt dafür, dass "in Bearbeitung" auch korrekt erkannt wird
-  const normalizeStatus = (status: string) =>
-    ["fertig", "getestet"].includes(status.toLowerCase()) ? "fertig/getestet" : status;
-
   const filteredEntries = entries.filter((e) => {
     const matchesStatus =
-      selectedStatuses.length === 0 || selectedStatuses.includes(normalizeStatus(e.status));
+      selectedStatuses.length === 0 || selectedStatuses.includes(e.status.toLowerCase());
     const matchesCategory =
       selectedCategories.length === 0 || e.category.some((c) => selectedCategories.includes(c.toLowerCase()));
     return matchesStatus && matchesCategory;
   });
 
-  const uniqueStatuses = Array.from(new Set(entries.map((e) => normalizeStatus(e.status))));
+  const uniqueStatuses = Array.from(new Set(entries.map((e) => e.status.toLowerCase())));
   const uniqueCategories = Array.from(
     new Set(entries.flatMap((e) => e.category.map((c) => c.trim().toLowerCase())))
   );
@@ -180,7 +176,6 @@ export default function BoardPage() {
 
       {activeSection === "manual" && (
         <FormPanel
-          isEditing={!!selectedEntry}
           title={newTitle}
           status={newStatus}
           category={newCategory}
@@ -189,20 +184,8 @@ export default function BoardPage() {
           onChangeStatus={setNewStatus}
           onChangeCategory={setNewCategory}
           onChangeNotes={setNewNotes}
-          onSave={
-            selectedEntry
-              ? () =>
-                  handleUpdate({
-                    id: selectedEntry.id,
-                    title: newTitle,
-                    status: newStatus,
-                    category: newCategory,
-                    notes: newNotes,
-                  })
-              : handleManualAdd
-          }
+          onSave={handleManualAdd}
           onCancel={() => {
-            setSelectedEntry(null);
             setNewTitle("");
             setNewStatus("");
             setNewCategory([]);
@@ -218,14 +201,7 @@ export default function BoardPage() {
             entry={entry}
             handleUpdate={handleUpdate}
             handleDelete={handleDelete}
-            onClick={() => {
-              setSelectedEntry(entry);
-              setNewTitle(entry.title);
-              setNewStatus(entry.status);
-              setNewCategory(entry.category);
-              setNewNotes(entry.notes || "");
-              setActiveSection("manual");
-            }}
+            onClick={() => setSelectedEntry(entry)}
           />
         ))}
       </div>
