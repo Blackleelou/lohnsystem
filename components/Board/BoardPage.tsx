@@ -1,3 +1,5 @@
+// components/Board/BoardPage.tsx
+
 import { useEffect, useState, useRef } from "react";
 import { useSession } from "next-auth/react";
 import { useRouter } from "next/router";
@@ -17,7 +19,6 @@ export default function BoardPage() {
   const [toast, setToast] = useState<string | null>(null);
   const [selectedStatuses, setSelectedStatuses] = useState<string[]>([]);
   const [selectedCategories, setSelectedCategories] = useState<string[]>([]);
-  const [editId, setEditId] = useState<number | null>(null);
   const [selectedEntry, setSelectedEntry] = useState<Entry | null>(null);
 
   const [newTitle, setNewTitle] = useState("");
@@ -99,7 +100,7 @@ export default function BoardPage() {
     }
   };
 
-  const handleUpdate = async (data: Partial<Entry> & { id: number }) => {
+  const handleUpdate = async (data: Partial<Entry> & { id: string }) => {
     const res = await fetch("/api/admin/board/update", {
       method: "PATCH",
       headers: { "Content-Type": "application/json" },
@@ -114,7 +115,7 @@ export default function BoardPage() {
     }
   };
 
-  const handleDelete = async (id: number) => {
+  const handleDelete = async (id: string) => {
     if (!confirm("Eintrag wirklich löschen?")) return;
     const res = await fetch("/api/admin/board/delete", {
       method: "DELETE",
@@ -180,7 +181,7 @@ export default function BoardPage() {
 
       {activeSection === "manual" && (
         <FormPanel
-          isEditing={editId !== null}
+          isEditing={false}
           title={newTitle}
           status={newStatus}
           category={newCategory}
@@ -189,20 +190,8 @@ export default function BoardPage() {
           onChangeStatus={setNewStatus}
           onChangeCategory={setNewCategory}
           onChangeNotes={setNewNotes}
-          onSave={
-            editId !== null
-              ? () =>
-                  handleUpdate({
-                    id: editId,
-                    title: newTitle,
-                    status: newStatus,
-                    category: newCategory,
-                    notes: newNotes,
-                  })
-              : handleManualAdd
-          }
+          onSave={handleManualAdd}
           onCancel={() => {
-            setEditId(null);
             setNewTitle("");
             setNewStatus("");
             setNewCategory([]);
