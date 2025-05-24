@@ -1,5 +1,3 @@
-// components/Board/BoardPage.tsx
-
 import { useEffect, useState, useRef } from "react";
 import { useSession } from "next-auth/react";
 import { useRouter } from "next/router";
@@ -131,8 +129,9 @@ export default function BoardPage() {
     }
   };
 
+  // KEINE Umwandlung mehr auf lowercase → sorgt dafür, dass "in Bearbeitung" auch korrekt erkannt wird
   const normalizeStatus = (status: string) =>
-    ["fertig", "getestet"].includes(status.toLowerCase()) ? "fertig/getestet" : status.toLowerCase();
+    ["fertig", "getestet"].includes(status.toLowerCase()) ? "fertig/getestet" : status;
 
   const filteredEntries = entries.filter((e) => {
     const matchesStatus =
@@ -181,7 +180,7 @@ export default function BoardPage() {
 
       {activeSection === "manual" && (
         <FormPanel
-          isEditing={false}
+          isEditing={!!selectedEntry}
           title={newTitle}
           status={newStatus}
           category={newCategory}
@@ -190,8 +189,20 @@ export default function BoardPage() {
           onChangeStatus={setNewStatus}
           onChangeCategory={setNewCategory}
           onChangeNotes={setNewNotes}
-          onSave={handleManualAdd}
+          onSave={
+            selectedEntry
+              ? () =>
+                  handleUpdate({
+                    id: selectedEntry.id,
+                    title: newTitle,
+                    status: newStatus,
+                    category: newCategory,
+                    notes: newNotes,
+                  })
+              : handleManualAdd
+          }
           onCancel={() => {
+            setSelectedEntry(null);
             setNewTitle("");
             setNewStatus("");
             setNewCategory([]);
@@ -207,7 +218,14 @@ export default function BoardPage() {
             entry={entry}
             handleUpdate={handleUpdate}
             handleDelete={handleDelete}
-            onClick={() => setSelectedEntry(entry)}
+            onClick={() => {
+              setSelectedEntry(entry);
+              setNewTitle(entry.title);
+              setNewStatus(entry.status);
+              setNewCategory(entry.category);
+              setNewNotes(entry.notes || "");
+              setActiveSection("manual");
+            }}
           />
         ))}
       </div>
