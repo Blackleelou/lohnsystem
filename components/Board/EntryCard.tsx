@@ -6,8 +6,8 @@ import { STATUS_OPTIONS, CATEGORY_OPTIONS } from "./constants";
 
 type EntryCardProps = {
   entry: Entry;
-  handleUpdate: (updated: Partial<Entry> & { id: number }) => void;
-  handleDelete: (id: number) => void;
+  handleUpdate: (updated: Partial<Entry> & { id: string }) => void;
+  handleDelete: (id: string) => void;
   onClick: () => void;
 };
 
@@ -19,13 +19,14 @@ export default function EntryCard({
 }: EntryCardProps) {
   const isFertig = ["fertig", "getestet"].includes(entry.status.toLowerCase());
   const [isEditing, setIsEditing] = useState(false);
+
   const [editData, setEditData] = useState({
     title: entry.title,
     status:
       ["getestet", "fertig"].includes(entry.status.toLowerCase())
         ? "fertig"
         : entry.status,
-    category: entry.category,
+    category: [...entry.category],
     notes: entry.notes || "",
   });
 
@@ -130,7 +131,9 @@ export default function EntryCard({
             {entry.title}
             {isFertig && <span className="text-green-600 font-bold text-sm">✔</span>}
           </h2>
-          <p className="text-sm text-gray-500">Kategorie: {entry.category.join(", ")}</p>
+          <p className="text-sm text-gray-500">
+            Kategorie: {entry.category.join(", ")}
+          </p>
           <p className="text-sm text-gray-500">Status: {entry.status}</p>
           {entry.notes && <p className="text-sm text-gray-700 mt-2">{entry.notes}</p>}
           <p className="text-xs text-gray-400 mt-4">
