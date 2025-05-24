@@ -132,13 +132,17 @@ export default function BoardPage() {
   };
 
   const filteredEntries = entries.filter((e) => {
-    const matchesStatus =
-      selectedStatuses.length === 0 || selectedStatuses.includes(e.status.toLowerCase());
-    const matchesCategory =
-      selectedCategories.length === 0 ||
-      e.category.some((c) => selectedCategories.includes(c.toLowerCase()));
-    return matchesStatus && matchesCategory;
-  });
+  const entryStatus = e.status.toLowerCase();
+  const matchesStatus =
+    selectedStatuses.length === 0 ||
+    selectedStatuses.map((s) => s.toLowerCase()).includes(entryStatus);
+
+  const matchesCategory =
+    selectedCategories.length === 0 ||
+    e.category.map((c) => c.toLowerCase()).some((cat) => selectedCategories.includes(cat));
+
+  return matchesStatus && matchesCategory;
+});
 
   const uniqueStatuses = Array.from(new Set(entries.map((e) => e.status.toLowerCase())));
   const uniqueCategories = Array.from(
