@@ -9,7 +9,7 @@ import FormPanel from "./FormPanel";
 import FilterPanel from "./FilterPanel";
 import EntryCard from "./EntryCard";
 import EntryModal from "./EntryModal";
-import { STATUS_OPTIONS, CATEGORY_OPTIONS } from "./constants";
+import { STATUS_OPTIONS } from "./constants";
 
 export default function BoardPage() {
   const { data: session, status } = useSession();
@@ -26,7 +26,7 @@ export default function BoardPage() {
   const [newCategory, setNewCategory] = useState<string[]>([]);
   const [newNotes, setNewNotes] = useState("");
 
-  const [activeSection, setActiveSection] = useState<"manual" | "import" | "export" | null>("manual");
+  const [activeSection, setActiveSection] = useState<"manual" | "import" | "export" | null>(null);
   const fileInputRef = useRef<HTMLInputElement | null>(null);
 
   useEffect(() => {
@@ -64,6 +64,7 @@ export default function BoardPage() {
     });
 
     const result = await res.json();
+
     if (res.ok) {
       showToast(result.message || "Import abgeschlossen.");
       await loadEntries();
@@ -134,7 +135,8 @@ export default function BoardPage() {
     const matchesStatus =
       selectedStatuses.length === 0 || selectedStatuses.includes(e.status.toLowerCase());
     const matchesCategory =
-      selectedCategories.length === 0 || e.category.some((c) => selectedCategories.includes(c.toLowerCase()));
+      selectedCategories.length === 0 ||
+      e.category.some((c) => selectedCategories.includes(c.toLowerCase()));
     return matchesStatus && matchesCategory;
   });
 
