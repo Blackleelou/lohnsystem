@@ -25,7 +25,8 @@ export default function BoardPage() {
   const [newStatus, setNewStatus] = useState("");
   const [newCategory, setNewCategory] = useState<string[]>([]);
   const [newNotes, setNewNotes] = useState("");
-  const [activeSection, setActiveSection] = useState<"manual" | "import" | "export" | null>(null);
+
+  const [activeSection, setActiveSection] = useState<"manual" | "import" | "export" | null>("manual");
   const fileInputRef = useRef<HTMLInputElement | null>(null);
 
   useEffect(() => {
@@ -63,7 +64,6 @@ export default function BoardPage() {
     });
 
     const result = await res.json();
-
     if (res.ok) {
       showToast(result.message || "Import abgeschlossen.");
       await loadEntries();
@@ -177,6 +177,7 @@ export default function BoardPage() {
 
       {activeSection === "manual" && (
         <FormPanel
+          isEditing={false}
           title={newTitle}
           status={newStatus}
           category={newCategory}
