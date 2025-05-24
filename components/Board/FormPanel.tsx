@@ -1,5 +1,3 @@
-// components/Board/FormPanel.tsx
-
 import React from "react";
 import { STATUS_OPTIONS, CATEGORY_OPTIONS } from "./constants";
 
@@ -38,6 +36,8 @@ export default function FormPanel({
     );
   };
 
+  const statusOrder = ["offen", "geplant", "in Bearbeitung", "getestet", "fertig"];
+
   return (
     <div className="bg-white border border-gray-200 p-4 rounded shadow-sm mb-6">
       <h2 className="text-md font-semibold text-gray-800 mb-4">
@@ -55,7 +55,7 @@ export default function FormPanel({
         <div>
           <p className="font-medium text-sm text-gray-700 mb-1">Status</p>
           <div className="flex flex-wrap gap-2">
-            {STATUS_OPTIONS.map((opt) => (
+            {statusOrder.map((opt) => (
               <button
                 key={opt}
                 type="button"
@@ -101,20 +101,29 @@ export default function FormPanel({
       </div>
 
       <div className="flex gap-2 mt-4">
-        <button
-          onClick={onSave}
-          className={`${
-            isEditing ? "bg-blue-600 hover:bg-blue-700" : "bg-green-600 hover:bg-green-700"
-          } text-white px-4 py-2 text-sm rounded`}
-        >
-          {isEditing ? "Speichern" : "Hinzufügen"}
-        </button>
-        <button
-          onClick={onCancel}
-          className="bg-gray-500 hover:bg-gray-600 text-white px-4 py-2 text-sm rounded"
-        >
-          Abbrechen
-        </button>
+        {isEditing ? (
+          <>
+            <button
+              onClick={onSave}
+              className="bg-blue-600 hover:bg-blue-700 text-white px-4 py-2 text-sm rounded"
+            >
+              Speichern
+            </button>
+            <button
+              onClick={onCancel}
+              className="bg-gray-500 hover:bg-gray-600 text-white px-4 py-2 text-sm rounded"
+            >
+              Abbrechen
+            </button>
+          </>
+        ) : (
+          <button
+            onClick={onSave}
+            className="bg-green-600 hover:bg-green-700 text-white px-4 py-2 text-sm rounded"
+          >
+            Hinzufügen
+          </button>
+        )}
       </div>
     </div>
   );
