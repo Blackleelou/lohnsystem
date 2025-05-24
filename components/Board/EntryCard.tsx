@@ -1,5 +1,3 @@
-// components/Board/EntryCard.tsx
-
 import React, { useState } from "react";
 import { Entry } from "./types";
 import { STATUS_OPTIONS, CATEGORY_OPTIONS } from "./constants";
@@ -17,16 +15,13 @@ export default function EntryCard({
   handleDelete,
   onClick,
 }: EntryCardProps) {
-  const isFertig = ["fertig", "getestet"].includes(entry.status.toLowerCase());
-  const [isEditing, setIsEditing] = useState(false);
+  const isFertig = entry.status.toLowerCase() === "fertig";
 
+  const [isEditing, setIsEditing] = useState(false);
   const [editData, setEditData] = useState({
     title: entry.title,
-    status:
-      ["getestet", "fertig"].includes(entry.status.toLowerCase())
-        ? "fertig"
-        : entry.status,
-    category: [...entry.category],
+    status: entry.status,
+    category: entry.category,
     notes: entry.notes || "",
   });
 
@@ -38,6 +33,8 @@ export default function EntryCard({
         : [...prev.category, value],
     }));
   };
+
+  const statusOrder = ["offen", "geplant", "in Bearbeitung", "getestet", "fertig"];
 
   const saveChanges = () => {
     handleUpdate({
@@ -53,7 +50,7 @@ export default function EntryCard({
   return (
     <div
       onClick={!isEditing ? onClick : undefined}
-      className={`border p-4 rounded-md shadow-sm ${
+      className={`border p-4 rounded-md shadow-sm transition ${
         isFertig ? "bg-green-50 border-green-200" : "bg-white"
       }`}
     >
@@ -68,7 +65,7 @@ export default function EntryCard({
           <div className="mb-3">
             <p className="font-medium text-sm mb-1 text-gray-700">Status</p>
             <div className="flex flex-wrap gap-2">
-              {STATUS_OPTIONS.map((opt) => (
+              {statusOrder.map((opt) => (
                 <button
                   key={opt}
                   onClick={() => setEditData({ ...editData, status: opt })}
@@ -131,9 +128,7 @@ export default function EntryCard({
             {entry.title}
             {isFertig && <span className="text-green-600 font-bold text-sm">✔</span>}
           </h2>
-          <p className="text-sm text-gray-500">
-            Kategorie: {entry.category.join(", ")}
-          </p>
+          <p className="text-sm text-gray-500">Kategorie: {entry.category.join(", ")}</p>
           <p className="text-sm text-gray-500">Status: {entry.status}</p>
           {entry.notes && <p className="text-sm text-gray-700 mt-2">{entry.notes}</p>}
           <p className="text-xs text-gray-400 mt-4">
