@@ -1,6 +1,5 @@
-// Datei: pages/dashboard.tsx
-
 import Layout from "@/components/Layout";
+import ModeSelection from "@/components/onboarding/ModeSelection";
 import { useSession } from "next-auth/react";
 import { useEffect, useState } from "react";
 import { useRouter } from "next/router";
@@ -10,11 +9,15 @@ export default function Dashboard() {
   const router = useRouter();
   const [showGoogleHint, setShowGoogleHint] = useState(false);
 
+  const userMode = session?.user?.mode;
+  const handleModeSelect = (mode: "solo" | "company") => {
+    console.log("Ausgewählt:", mode);
+    // später: API-Aufruf oder Session-Update
+  };
+
   useEffect(() => {
     if (router.query.justSignedIn === "google") {
       setShowGoogleHint(true);
-
-      // Nach 5 Sekunden Hinweis ausblenden und URL bereinigen
       setTimeout(() => {
         setShowGoogleHint(false);
         const { justSignedIn, ...rest } = router.query;
@@ -26,17 +29,20 @@ export default function Dashboard() {
   return (
     <Layout>
       <div className="max-w-4xl mx-auto px-4 py-8">
-        <h1 className="text-2xl font-bold mb-4">Dashboard</h1>
+        {!userMode ? (
+          <ModeSelection onSelect={handleModeSelect} />
+        ) : (
+          <>
+            <h1 className="text-2xl font-bold mb-4">Dashboard</h1>
+            <p className="text-gray-700 mb-4">Hier kommt deine Lohnübersicht hin.</p>
 
-        <p className="text-gray-700 mb-4">
-          Hier kommt deine Lohnübersicht hin.
-        </p>
-
-        {showGoogleHint && (
-          <div className="bg-yellow-100 text-yellow-800 p-4 rounded-md border border-yellow-300 mb-4 text-sm shadow">
-            Hinweis: Du bist mit deinem <strong>Google-Konto</strong> angemeldet.
-            Ein separates Passwort ist nicht erforderlich.
-          </div>
+            {showGoogleHint && (
+              <div className="bg-yellow-100 text-yellow-800 p-4 rounded-md border border-yellow-300 mb-4 text-sm shadow">
+                Hinweis: Du bist mit deinem <strong>Google-Konto</strong> angemeldet.
+                Ein separates Passwort ist nicht erforderlich.
+              </div>
+            )}
+          </>
         )}
       </div>
     </Layout>
