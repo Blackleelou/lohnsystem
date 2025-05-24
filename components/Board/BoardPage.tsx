@@ -1,5 +1,3 @@
-// components/Board/BoardPage.tsx
-
 import { useEffect, useState, useRef } from "react";
 import { useSession } from "next-auth/react";
 import { useRouter } from "next/router";
@@ -19,7 +17,7 @@ export default function BoardPage() {
   const [toast, setToast] = useState<string | null>(null);
   const [selectedStatuses, setSelectedStatuses] = useState<string[]>([]);
   const [selectedCategories, setSelectedCategories] = useState<string[]>([]);
-  const [editId, setEditId] = useState<string | null>(null);
+  const [editId, setEditId] = useState<number | null>(null);
   const [selectedEntry, setSelectedEntry] = useState<Entry | null>(null);
 
   const [newTitle, setNewTitle] = useState("");
@@ -101,7 +99,7 @@ export default function BoardPage() {
     }
   };
 
-  const handleUpdate = async (data: Partial<Entry> & { id: string }) => {
+  const handleUpdate = async (data: Partial<Entry> & { id: number }) => {
     const res = await fetch("/api/admin/board/update", {
       method: "PATCH",
       headers: { "Content-Type": "application/json" },
@@ -116,7 +114,7 @@ export default function BoardPage() {
     }
   };
 
-  const handleDelete = async (id: string) => {
+  const handleDelete = async (id: number) => {
     if (!confirm("Eintrag wirklich löschen?")) return;
     const res = await fetch("/api/admin/board/delete", {
       method: "DELETE",
@@ -225,7 +223,9 @@ export default function BoardPage() {
         ))}
       </div>
 
-      {selectedEntry && <EntryModal entry={selectedEntry} onClose={() => setSelectedEntry(null)} />}
+      {selectedEntry && (
+        <EntryModal entry={selectedEntry} onClose={() => setSelectedEntry(null)} />
+      )}
 
       {toast && (
         <div className="fixed top-4 right-4 z-50 bg-blue-600 text-white px-4 py-2 rounded shadow">
