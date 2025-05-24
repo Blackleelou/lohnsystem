@@ -6,8 +6,8 @@ import { STATUS_OPTIONS, CATEGORY_OPTIONS } from "./constants";
 
 type EntryCardProps = {
   entry: Entry;
-  handleUpdate: (updated: Partial<Entry> & { id: string }) => void;
-  handleDelete: (id: string) => void;
+  handleUpdate: (updated: Partial<Entry> & { id: number }) => void;
+  handleDelete: (id: number) => void;
   onClick: () => void;
 };
 
@@ -25,7 +25,7 @@ export default function EntryCard({
       ["getestet", "fertig"].includes(entry.status.toLowerCase())
         ? "fertig"
         : entry.status,
-    category: entry.category, // <-- Direktes Verwenden des string[]
+    category: entry.category,
     notes: entry.notes || "",
   });
 
