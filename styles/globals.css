@@ -1,0 +1,10 @@
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+/* Globale Styles für das Lohnsystem */
+@layer base {
+  body {
+    @apply m-0 font-sans bg-gray-100 text-gray-900;
+  }
+}

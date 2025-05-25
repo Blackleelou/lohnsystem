@@ -1,0 +1,57 @@
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "postgresql"
+  url      = env("DATABASE_URL")
+}
+
+model User {
+  id          String                 @id @default(cuid())
+  email       String                 @unique
+  password    String
+  verified    Boolean                @default(false)
+  isAdmin     Boolean                @default(false)
+  createdAt   DateTime               @default(now())
+  resetTokens PasswordResetToken[]
+
+  // Neu für Modus- und Firmenlogik
+  mode        String?                // "solo" oder "company"
+  companyId   String?                // spätere Verbindung zu Company
+  role        String?                // "admin", "editor", "viewer"
+}
+
+model VerificationCode {
+  id        String   @id @default(cuid())
+  email     String   @unique
+  code      String
+  expiresAt DateTime
+}
+
+model PasswordResetToken {
+  id         String   @id @default(cuid())
+  userId     String   @unique
+  token      String   @unique
+  expiresAt  DateTime
+  user       User     @relation(fields: [userId], references: [id], onDelete: Cascade)
+}
+
+model AuditLog {
+  id        String   @id @default(cuid())
+  userId    String
+  action    String
+  ip        String
+  timestamp DateTime
+}
+
+model SuperadminBoardEntry {
+  id               String    @id @default(cuid())
+  title            String
+  status           String
+  category         String[]  // ← hier wurde das Feld in ein Array geändert
+  notes            String?
+  createdAt        DateTime  @default(now())
+  completedAt      DateTime?
+  updatedByImport  Boolean   @default(false)
+}
