@@ -14,6 +14,11 @@ export default async function handler(req: NextApiRequest, res: NextApiResponse)
     return res.status(401).json({ message: 'E-Mail wurde noch nicht bestätigt.' });
   }
 
+  // Fix: Prüfen, ob ein Passwort gespeichert ist (z. B. Google-Login-Nutzer haben keins)
+  if (!user.password) {
+    return res.status(401).json({ message: 'Dieser Account hat kein Passwort (Google-Login?)' });
+  }
+
   const validPassword = await bcrypt.compare(password, user.password);
   if (!validPassword) {
     return res.status(401).json({ message: 'Login fehlgeschlagen' });

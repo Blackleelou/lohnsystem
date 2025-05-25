@@ -8,18 +8,24 @@ datasource db {
 }
 
 model User {
-  id          String                 @id @default(cuid())
-  email       String                 @unique
-  password    String
-  verified    Boolean                @default(false)
-  isAdmin     Boolean                @default(false)
-  createdAt   DateTime               @default(now())
-  resetTokens PasswordResetToken[]
+  id            String   @id @default(cuid())
+  email         String   @unique
+  emailVerified DateTime?
+  password      String?
+  name          String?
+  image         String?
+  verified      Boolean  @default(false)
+  isAdmin       Boolean  @default(false)
+  createdAt     DateTime @default(now())
+  resetTokens   PasswordResetToken[]
 
-  // Neu für Modus- und Firmenlogik
-  mode        String?                // "solo" oder "company"
-  companyId   String?                // spätere Verbindung zu Company
-  role        String?                // "admin", "editor", "viewer"
+  // Modus- und Firmenlogik
+  mode        String?    // "solo" oder "company"
+  companyId   String?    // spätere Verbindung zu Company
+  role        String?    // "admin", "editor", "viewer"
+
+  accounts    Account[]
+  sessions    Session[]
 }
 
 model VerificationCode {
@@ -49,9 +55,46 @@ model SuperadminBoardEntry {
   id               String    @id @default(cuid())
   title            String
   status           String
-  category         String[]  // ← hier wurde das Feld in ein Array geändert
+  category         String[]
   notes            String?
   createdAt        DateTime  @default(now())
   completedAt      DateTime?
   updatedByImport  Boolean   @default(false)
+}
+
+// NextAuth-kompatible Modelle:
+
+model Account {
+  id                 String   @id @default(cuid())
+  userId             String
+  type               String
+  provider           String
+  providerAccountId  String
+  refresh_token      String?
+  access_token       String?
+  expires_at         Int?
+  token_type         String?
+  scope              String?
+  id_token           String?
+  session_state      String?
+
+  user User @relation(fields: [userId], references: [id], onDelete: Cascade)
+
+  @@unique([provider, providerAccountId])
+}
+
+model Session {
+  id           String   @id @default(cuid())
+  sessionToken String   @unique
+  userId       String
+  expires      DateTime
+  user         User     @relation(fields: [userId], references: [id], onDelete: Cascade)
+}
+
+model VerificationToken {
+  identifier String
+  token      String   @unique
+  expires    DateTime
+
+  @@unique([identifier, token])
 }

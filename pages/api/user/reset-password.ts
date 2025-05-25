@@ -20,6 +20,20 @@ export default async function handler(req: NextApiRequest, res: NextApiResponse)
     return res.status(404).json({ message: 'Benutzer nicht gefunden.' });
   }
 
+  // NEU: Falls der Nutzer kein Passwort hat (z. B. Google-Nutzer), direkt erlauben
+  if (!user.password) {
+    const hashed = await bcrypt.hash(password, 10);
+
+    await prisma.user.update({
+      where: { id: user.id },
+      data: { password: hashed },
+    });
+
+    await prisma.passwordResetToken.delete({ where: { token } });
+
+    return res.status(200).json({ message: 'Passwort gesetzt.' });
+  }
+
   const isSamePassword = await bcrypt.compare(password, user.password);
   if (isSamePassword) {
     return res.status(400).json({ message: 'Das neue Passwort darf nicht mit dem alten übereinstimmen.' });
