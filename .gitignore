@@ -1,0 +1,13 @@
+# Node & Umgebung
+node_modules/
+.env
+*.log
+
+# Prisma & Build
+.prisma/
+dev.db
+.next/
+out/
+.vercel/
+
+.vercel
