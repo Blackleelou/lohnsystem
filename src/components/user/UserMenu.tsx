@@ -1,7 +1,7 @@
 import { useState } from "react";
 import { signOut, useSession } from "next-auth/react";
-import LanguageSwitcher from "./LanguageSwitcher";
-import ThemeSwitch from "@/components/ThemeSwitch";
+import LanguageSwitcher from "@/components/common/LanguageSwitcher";
+import ThemeSwitch from "@/components/common/ThemeSwitch";
 import Link from "next/link";
 import { LogOut, Settings, User, Shield, Palette } from "lucide-react"; // Palette hinzugefügt!
 

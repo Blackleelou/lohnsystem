@@ -1,4 +1,4 @@
-// Datei: pages/_app.tsx
+/* @/pages/_app.ts */
 
 import type { AppProps } from "next/app";
 import { SessionProvider } from "next-auth/react";

@@ -1,6 +1,6 @@
 import { GetServerSideProps } from "next";
 import { requireAuth } from "@/lib/authRequired";
-import Layout from "@/components/Layout";
+import Layout from "@/components/common/Layout";
 
 export const getServerSideProps: GetServerSideProps = requireAuth;
 

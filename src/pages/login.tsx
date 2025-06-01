@@ -1,4 +1,4 @@
-/* pages/login.tsx */
+/* src/pages/login.tsx */
 
 import { useState } from 'react';
 import { signIn } from 'next-auth/react';

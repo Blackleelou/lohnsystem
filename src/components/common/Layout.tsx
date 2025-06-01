@@ -1,4 +1,4 @@
-import UserMenu from "./UserMenu";
+import UserMenu from "@/components/user/UserMenu";
 
 export default function Layout({ children }: { children: React.ReactNode }) {
   return (
