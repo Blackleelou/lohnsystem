@@ -3,7 +3,7 @@
 import { useEffect, useState, useRef } from "react";
 import { useSession } from "next-auth/react";
 import { useRouter } from "next/router";
-import SuperadminLayout from "@/components/SuperadminLayout";
+import SuperadminLayout from "@/components/superadmin/SuperadminLayout";
 import { Entry } from "./types";
 import FormPanel from "./FormPanel";
 import FilterPanel from "./FilterPanel";
