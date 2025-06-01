@@ -1,6 +1,6 @@
 // pages/admin/board.tsx
-import BoardPage from "@/components/Board/BoardPage";
-import SuperadminLayout from "@/components/SuperadminLayout";
+import BoardPage from "@/components/board/BoardPage";
+import SuperadminLayout from "@/components/superadmin/SuperadminLayout";
 
 export default function AdminBoardPage() {
   return <BoardPage />;
