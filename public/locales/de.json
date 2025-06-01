@@ -1,0 +1,42 @@
+{
+  "login": {
+    "title": "Anmeldung",
+    "email": "E-Mail",
+    "password": "Passwort",
+    "loginButton": "Einloggen",
+    "forgotPassword": "Passwort vergessen?"
+  },
+  "profile": {
+    "title": "Benutzerprofil",
+    "firstname": "Vorname",
+    "lastname": "Nachname",
+    "taxClass": "Steuerklasse",
+    "children": "Kinderfreibetrag",
+    "churchTax": "Kirchensteuerpflicht",
+    "overtimeStart": "Start-Überstunden",
+    "save": "Speichern"
+  },
+  "reset": {
+    "title": "Passwort zurücksetzen",
+    "newPassword": "Neues Passwort",
+    "confirmPassword": "Passwort bestätigen",
+    "resetButton": "Zurücksetzen"
+  },
+  "notifications": {
+    "success": "Änderungen gespeichert.",
+    "error": "Fehler beim Speichern."
+  },
+  "app.title": "Brutto-Netto Lohn im Blick",
+  "login.title": "Einloggen",
+  "login.username": "Benutzername oder E-Mail",
+  "login.password": "Passwort",
+  "login.submit": "Einloggen",
+  "login.link": "Schon registriert? Jetzt einloggen",
+  "register.title": "Registrieren",
+  "register.username": "Benutzername",
+  "register.email": "E-Mail",
+  "register.password": "Passwort",
+  "register.submit": "Registrieren",
+  "register.link": "Noch kein Konto? Jetzt registrieren",
+  "footer.version": "Lohnsystem Version v0.5.05"
+}

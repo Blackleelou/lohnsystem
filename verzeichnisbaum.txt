@@ -1,0 +1,202 @@
+Auflistung der Ordnerpfade
+Volumeseriennummer : FE49-0D94
+C:.
+|   .env
+|   .gitignore
+|   i18n.ts
+|   middleware.ts
+|   next-env.d.ts
+|   next-i18next.config.js
+|   package-lock.json
+|   package.json
+|   postcss.config.js
+|   README.md
+|   tailwind.config.js
+|   tsconfig.json
+|   verzeichnisbaum.txt
+|   
++---prisma
+|   |   schema.prisma
+|   |   seed.js
+|   |   
+|   \---migrations
+|       |   migration_lock.toml
+|       |   
+|       +---20250515075441_init
+|       |       migration.sql
+|       |       
+|       +---20250528012733_add_company_settings
+|       |       migration.sql
+|       |       
+|       \---20250531112439_remove_mode_field
+|               migration.sql
+|               
++---public
+|   |   eye-closed.png
+|   |   eye-open.png
+|   |   
+|   +---flags
+|   |       de.png
+|   |       gb.png
+|   |       
+|   +---locales
+|   |   |   de.json
+|   |   |   en.json
+|   |   |   
+|   |   +---de
+|   |   |       translation.json
+|   |   |       
+|   |   \---en
+|   |           translation.json
+|   |           
+|   \---templates
+|           resetPasswordMail.html
+|           
+\---src
+    +---components
+    |   +---admin
+    |   |       AdminPanel.tsx
+    |   |       SuperPanel.tsx
+    |   |       SuperpanelLayout.tsx
+    |   |       ThemeSelector.tsx
+    |   |       
+    |   +---common
+    |   |       CookieBanner.tsx
+    |   |       ErrorBoundary.tsx
+    |   |       LanguageSwitcher.tsx
+    |   |       Layout.tsx
+    |   |       ThemeSwitch.tsx
+    |   |       
+    |   +---superadmin
+    |   |       CompanyAdmin.tsx
+    |   |       SuperadminLayout.tsx
+    |   |       
+    |   +---ui
+    |   |       UploadButton.tsx
+    |   |       
+    |   \---user
+    |           PasswordReset.tsx
+    |           UserMenu.tsx
+    |           UserProfile.tsx
+    |           
+    +---lib
+    |       authOptions.ts
+    |       authRequired.ts
+    |       db.ts
+    |       i18n.ts
+    |       mail.ts
+    |       prisma.ts
+    |       themes.ts
+    |       
+    +---locales
+    |       de.json
+    |       en.json
+    |       
+    +---modules
+    |   \---board
+    |           BoardPage.tsx
+    |           constants.ts
+    |           EntryCard.tsx
+    |           EntryModal.tsx
+    |           FilterPanel.tsx
+    |           FormPanel.tsx
+    |           Toast.tsx
+    |           types.ts
+    |           
+    +---pages
+    |   |   auswertung.tsx
+    |   |   dashboard.tsx
+    |   |   debug-mode.tsx
+    |   |   index.tsx
+    |   |   login.tsx
+    |   |   profile.tsx
+    |   |   README.txt
+    |   |   register.tsx
+    |   |   reset-password.tsx
+    |   |   reset-request.tsx
+    |   |   settings.tsx
+    |   |   superadmin.tsx
+    |   |   verify.tsx
+    |   |   _app.tsx
+    |   |   _error.tsx
+    |   |   
+    |   +---admin
+    |   |       audit.tsx
+    |   |       board.tsx
+    |   |       index.tsx
+    |   |       theme.tsx
+    |   |       
+    |   +---api
+    |   |   |   company.ts
+    |   |   |   register.ts
+    |   |   |   
+    |   |   +---admin
+    |   |   |   |   audit.ts
+    |   |   |   |   board.ts
+    |   |   |   |   companies.ts
+    |   |   |   |   payrules.ts
+    |   |   |   |   shifts.ts
+    |   |   |   |   superadminboardentrys.ts
+    |   |   |   |   users.ts
+    |   |   |   |   
+    |   |   |   +---board
+    |   |   |   |       create.ts
+    |   |   |   |       delete.ts
+    |   |   |   |       import.ts
+    |   |   |   |       update.ts
+    |   |   |   |       
+    |   |   |   +---companies
+    |   |   |   |       [id].ts
+    |   |   |   |       
+    |   |   |   +---payrules
+    |   |   |   |       [id].ts
+    |   |   |   |       
+    |   |   |   +---shifts
+    |   |   |   |       [id].ts
+    |   |   |   |       
+    |   |   |   +---superadminboardentrys
+    |   |   |   |       [id].ts
+    |   |   |   |       
+    |   |   |   \---user
+    |   |   |           [id].ts
+    |   |   |           
+    |   |   +---auth
+    |   |   |       status.ts
+    |   |   |       [...nextauth].ts
+    |   |   |       
+    |   |   +---company
+    |   |   |       settings.ts
+    |   |   |       
+    |   |   +---debug
+    |   |   |       user.ts
+    |   |   |       
+    |   |   +---superadmin
+    |   |   |   |   companies.ts
+    |   |   |   |   
+    |   |   |   \---company
+    |   |   |           update.ts
+    |   |   |           
+    |   |   \---user
+    |   |           delete.ts
+    |   |           login.ts
+    |   |           reset-password.ts
+    |   |           reset-request.ts
+    |   |           send-code.ts
+    |   |           test-email.ts
+    |   |           update.ts
+    |   |           verify-code.ts
+    |   |           
+    |   +---superadmin
+    |   |       companies.tsx
+    |   |       index.tsx
+    |   |       
+    |   \---superpanel
+    |           index.tsx
+    |           
+    +---styles
+    |       globals.css
+    |       password.css
+    |       
+    \---types
+            next-auth.d.ts
+            

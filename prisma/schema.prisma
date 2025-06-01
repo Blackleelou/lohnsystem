@@ -1,0 +1,125 @@
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "postgresql"
+  url      = env("DATABASE_URL")
+}
+
+model User {
+  id            String   @id @default(cuid())
+  email         String   @unique
+  emailVerified DateTime?
+  password      String?
+  name          String?
+  image         String?
+  verified      Boolean  @default(false)
+  isAdmin       Boolean  @default(false)
+  createdAt     DateTime @default(now())
+  resetTokens   PasswordResetToken[]
+
+  // Modus- und Firmenlogik
+  companyId   String?   
+  company     Company?   @relation(fields: [companyId], references: [id])
+  role        String?    // "admin", "editor", "viewer"
+
+  accounts    Account[]
+  sessions    Session[]
+}
+
+model Company {
+  id        String   @id @default(cuid())
+  name      String
+  createdAt DateTime @default(now())
+
+  users     User[]   // alle User dieser Company
+  settings  CompanySettings?   // <--- Richtig hier!
+}
+
+model VerificationCode {
+  id        String   @id @default(cuid())
+  email     String   @unique
+  code      String
+  expiresAt DateTime
+}
+
+model PasswordResetToken {
+  id         String   @id @default(cuid())
+  userId     String   @unique
+  token      String   @unique
+  expiresAt  DateTime
+  user       User     @relation(fields: [userId], references: [id], onDelete: Cascade)
+
+  
+}
+
+model AuditLog {
+  id        String   @id @default(cuid())
+  userId    String
+  action    String
+  ip        String
+  timestamp DateTime
+}
+
+model SuperadminBoardEntry {
+  id               String    @id @default(cuid())
+  title            String
+  status           String
+  category         String[]
+  notes            String?
+  createdAt        DateTime  @default(now())
+  completedAt      DateTime?
+  updatedByImport  Boolean   @default(false)
+}
+
+// NextAuth-kompatible Modelle:
+
+model Account {
+  id                 String   @id @default(cuid())
+  userId             String
+  type               String
+  provider           String
+  providerAccountId  String
+  refresh_token      String?
+  access_token       String?
+  expires_at         Int?
+  token_type         String?
+  scope              String?
+  id_token           String?
+  session_state      String?
+
+  user User @relation(fields: [userId], references: [id], onDelete: Cascade)
+
+  @@unique([provider, providerAccountId])
+}
+
+model Session {
+  id           String   @id @default(cuid())
+  sessionToken String   @unique
+  userId       String
+  expires      DateTime
+  user         User     @relation(fields: [userId], references: [id], onDelete: Cascade)
+}
+
+model VerificationToken {
+  identifier String
+  token      String   @unique
+  expires    DateTime
+
+  @@unique([identifier, token])
+}
+model CompanySettings {
+  id             String   @id @default(cuid())
+  companyId      String   @unique
+  themeName      String   @default("Classic Duo") // Aurora, Oceanic etc.
+  useCustomColors Boolean @default(false)
+  primaryColor   String?  // Hex-Wert, z. B. "#4F46E5"
+  accentColor    String?
+  bgLight        String?
+  bgDark         String?
+  textColor      String?
+
+  company        Company  @relation(fields: [companyId], references: [id], onDelete: Cascade)
+}
+
