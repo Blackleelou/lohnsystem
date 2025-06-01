@@ -1,8 +1,22 @@
-import { useState, useEffect } from "react";
+import { useState } from "react";
 import { THEMES, Theme } from "@/lib/themes";
 
-export default function ThemeSelector({ settings, onSave }) {
-  // settings = aktuelle Theme-Settings vom Server (Prop)
+type ThemeSettings = {
+  themeName?: string;
+  useCustomColors?: boolean;
+  primaryColor?: string;
+  accentColor?: string;
+  bgLight?: string;
+  bgDark?: string;
+  textColor?: string;
+};
+
+interface ThemeSelectorProps {
+  settings?: ThemeSettings;
+  onSave: (data: ThemeSettings) => void;
+}
+
+export default function ThemeSelector({ settings, onSave }: ThemeSelectorProps) {
   const [selected, setSelected] = useState<string>(settings?.themeName || "classic-duo");
   const [useCustom, setUseCustom] = useState<boolean>(settings?.useCustomColors || false);
   const [custom, setCustom] = useState({
@@ -20,12 +34,12 @@ export default function ThemeSelector({ settings, onSave }) {
   }
 
   // Input-Felder ändern
-  function handleCustomChange(e) {
+  function handleCustomChange(e: React.ChangeEvent<HTMLInputElement>) {
     setCustom({ ...custom, [e.target.name]: e.target.value });
     setUseCustom(true);
   }
 
-  function handleSubmit(e) {
+  function handleSubmit(e: React.FormEvent) {
     e.preventDefault();
     if (useCustom) {
       onSave({ themeName: "custom", useCustomColors: true, ...custom });
@@ -79,7 +93,7 @@ export default function ThemeSelector({ settings, onSave }) {
               <input
                 name={field}
                 type="color"
-                value={custom[field] || "#ffffff"}
+                value={custom[field as keyof typeof custom] || "#ffffff"}
                 onChange={handleCustomChange}
                 className="w-16 h-8 p-0 border-none"
               />
