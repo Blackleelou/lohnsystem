@@ -1,1 +1,7 @@
-
+{
+  "welcome": "Welcome",
+  "logout": "Logout",
+  "settings": "Settings",
+  "dashboard": "Dashboard",
+  "language": "Language"
+}
