@@ -1,7 +1,7 @@
 import { useState } from "react";
 import { THEMES } from "@/lib/themes";
 
-type ThemeSettings = {
+export type ThemeSettings = {
   themeName?: string;
   useCustomColors?: boolean;
   primaryColor?: string;
