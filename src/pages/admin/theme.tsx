@@ -1,5 +1,5 @@
 import { useEffect, useState } from "react";
-import ThemeSelector from "@/components/Admin/ThemeSelector";
+import ThemeSelector from "@/components/admin/ThemeSelector";
 
 // Hilfsfunktion, um Theme-Settings vom Server zu holen
 async function fetchSettings() {
