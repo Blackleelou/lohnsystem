@@ -2,7 +2,7 @@ import { useEffect, useState } from "react";
 import ThemeSelector from "@/components/admin/ThemeSelector";
 
 // Hilfsfunktion, um Theme-Settings vom Server zu holen
-async function fetchSettings() {
+async function saveSettings(settings: ThemeSettings) {
   const res = await fetch("/api/company/settings");
   const data = await res.json();
   return data.settings;
