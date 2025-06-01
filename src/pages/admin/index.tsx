@@ -1,7 +1,7 @@
 // pages/admin/index.tsx
 import dynamic from "next/dynamic";
 
-const AdminPanel = dynamic(() => import("../../components/AdminPanel"), {
+const AdminPanel = dynamic(() => import("@/components/admin/AdminPanel"), {
   ssr: false,
 });
 
