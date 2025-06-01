@@ -25,7 +25,6 @@ export default async function handler(req: NextApiRequest, res: NextApiResponse)
         where: { companyId: id as string },
         data: {
           companyId: null,
-          mode: null,
         },
       });
 
