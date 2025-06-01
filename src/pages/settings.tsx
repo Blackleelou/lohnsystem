@@ -1,7 +1,7 @@
 import { signOut } from "next-auth/react";
 import { useRouter } from "next/router";
 import { useState } from "react";
-import Layout from "@/components/Layout";
+import Layout from "@/components/common/Layout";
 import { GetServerSideProps } from "next";
 import { requireAuth } from "@/lib/authRequired";
 import { LogOut, Trash2, KeyRound, Bell, Moon, Sun } from "lucide-react";

@@ -1,6 +1,6 @@
 import Link from "next/link";
 import { useRouter } from "next/router";
-import UserMenu from "./UserMenu";
+import UserMenu from "@/components/user/UserMenu";
 
 const links = [
   { href: "/superadmin", label: "Übersicht" },
