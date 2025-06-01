@@ -33,7 +33,10 @@ export default async function handler(req: NextApiRequest, res: NextApiResponse)
 
     res.status(405).json({ message: "Method not allowed" });
   } catch (err) {
-    console.error("API Fehler:", err);
-    res.status(500).json({ error: err.message || err.toString() });
+  console.error("API Fehler:", err);
+  if (err instanceof Error) {
+    res.status(500).json({ error: err.message });
+  } else {
+    res.status(500).json({ error: String(err) });
   }
 }
