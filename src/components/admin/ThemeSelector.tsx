@@ -1,5 +1,5 @@
 import { useState } from "react";
-import { THEMES, Theme } from "@/lib/themes";
+import { THEMES } from "@/lib/themes";
 
 type ThemeSettings = {
   themeName?: string;
@@ -16,15 +16,31 @@ interface ThemeSelectorProps {
   onSave: (data: ThemeSettings) => void;
 }
 
+const colorLabels: Record<string, string> = {
+  primaryColor: "Hauptfarbe",
+  accentColor: "Akzentfarbe",
+  bgLight: "Hintergrund hell",
+  bgDark: "Hintergrund dunkel",
+  textColor: "Textfarbe",
+};
+
+const colorHelps: Record<string, string> = {
+  primaryColor: "Farbe für Buttons und wichtige Elemente.",
+  accentColor: "Zweite Akzentfarbe für Hervorhebungen.",
+  bgLight: "Hintergrundfarbe im hellen Modus.",
+  bgDark: "Hintergrundfarbe im dunklen Modus.",
+  textColor: "Farbe für Texte.",
+};
+
 export default function ThemeSelector({ settings, onSave }: ThemeSelectorProps) {
   const [selected, setSelected] = useState<string>(settings?.themeName || "classic-duo");
   const [useCustom, setUseCustom] = useState<boolean>(settings?.useCustomColors || false);
   const [custom, setCustom] = useState({
-    primaryColor: settings?.primaryColor || "",
-    accentColor: settings?.accentColor || "",
-    bgLight: settings?.bgLight || "",
-    bgDark: settings?.bgDark || "",
-    textColor: settings?.textColor || "",
+    primaryColor: settings?.primaryColor || "#2563eb",
+    accentColor: settings?.accentColor || "#1e40af",
+    bgLight: settings?.bgLight || "#f9fafb",
+    bgDark: settings?.bgDark || "#2e3440",
+    textColor: settings?.textColor || "#111827",
   });
 
   // Theme wechseln
@@ -37,6 +53,7 @@ export default function ThemeSelector({ settings, onSave }: ThemeSelectorProps) 
   function handleCustomChange(e: React.ChangeEvent<HTMLInputElement>) {
     setCustom({ ...custom, [e.target.name]: e.target.value });
     setUseCustom(true);
+    setSelected("custom");
   }
 
   function handleSubmit(e: React.FormEvent) {
@@ -87,22 +104,66 @@ export default function ThemeSelector({ settings, onSave }: ThemeSelectorProps) 
 
       {useCustom && (
         <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-          {["primaryColor", "accentColor", "bgLight", "bgDark", "textColor"].map(field => (
-            <label key={field} className="flex flex-col">
-              {field}
-              <input
-                name={field}
-                type="color"
-                value={custom[field as keyof typeof custom] || "#ffffff"}
-                onChange={handleCustomChange}
-                className="w-16 h-8 p-0 border-none"
-              />
+          {Object.keys(colorLabels).map(field => (
+            <label key={field} className="flex flex-col gap-1">
+              <span className="font-semibold">{colorLabels[field]}</span>
+              <span className="text-xs text-gray-500">{colorHelps[field]}</span>
+              <div className="flex items-center gap-2 mt-1">
+                <input
+                  name={field}
+                  type="color"
+                  value={custom[field as keyof typeof custom] || "#ffffff"}
+                  onChange={handleCustomChange}
+                  className="w-10 h-7 p-0 border rounded shadow"
+                />
+                {/* Live-Vorschau für diese Farbe */}
+                {field === "primaryColor" && (
+                  <span
+                    className="px-2 py-1 rounded text-white text-xs"
+                    style={{ background: custom.primaryColor }}
+                  >
+                    Button
+                  </span>
+                )}
+                {field === "accentColor" && (
+                  <span
+                    className="px-2 py-1 rounded text-white text-xs"
+                    style={{ background: custom.accentColor }}
+                  >
+                    Akzent
+                  </span>
+                )}
+                {field === "bgLight" && (
+                  <span
+                    className="px-2 py-1 rounded text-gray-700 text-xs border"
+                    style={{ background: custom.bgLight }}
+                  >
+                    Hintergrund hell
+                  </span>
+                )}
+                {field === "bgDark" && (
+                  <span
+                    className="px-2 py-1 rounded text-gray-100 text-xs border"
+                    style={{ background: custom.bgDark }}
+                  >
+                    Hintergrund dunkel
+                  </span>
+                )}
+                {field === "textColor" && (
+                  <span
+                    className="px-2 py-1 rounded text-xs border"
+                    style={{ color: custom.textColor, borderColor: "#ccc" }}
+                  >
+                    Text
+                  </span>
+                )}
+              </div>
             </label>
           ))}
         </div>
       )}
 
-      <button type="submit" className="btn-primary w-full">
+      <button type="submit" className="btn-primary w-full mt-4">
         Speichern
       </button>
     </form>
