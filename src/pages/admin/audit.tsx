@@ -3,7 +3,7 @@
 import { useEffect, useState } from "react";
 import { useSession } from "next-auth/react";
 import { useRouter } from "next/router";
-import SuperadminLayout from "@/components/SuperadminLayout";
+import SuperadminLayout from "@/components/superadmin/SuperadminLayout";
 
 type LogEntry = {
   id: string;
