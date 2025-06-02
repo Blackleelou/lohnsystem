@@ -75,6 +75,18 @@ export default function UserMenu() {
             </Link>
           )}
 
+          {/* Admin-Panel (RA) nur für Superadmin */}
+          {isSuperadmin && (
+            <Link
+              href="/admin"
+              className="flex items-center gap-2 px-3 py-2 rounded-lg text-blue-700 dark:text-blue-400 font-semibold hover:bg-blue-50 dark:hover:bg-gray-800 transition"
+              onClick={() => setIsOpen(false)}
+            >
+              <Shield className="w-5 h-5" />
+              Admin-Panel (RA)
+            </Link>
+          )}
+
           <button
             type="button"
             onClick={() => signOut({ callbackUrl: "/" })}
