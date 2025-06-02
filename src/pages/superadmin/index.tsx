@@ -1,7 +1,13 @@
 import dynamic from "next/dynamic";
 
-const Superpanel = dynamic(() => import("@/components/superadmin/SuperadminLayout"), { ssr: false });
+const SuperadminLayout = dynamic(() => import("@/components/superadmin/SuperadminLayout"), { ssr: false });
 
-export default function SuperpanelPage() {
-  return <Superpanel />;
+export default function SuperadminHomePage() {
+  return (
+    <SuperadminLayout>
+      <div>
+        Willkommen im Superadmin-Bereich!
+      </div>
+    </SuperadminLayout>
+  );
 }
