@@ -1,6 +1,3 @@
-import dynamic from "next/dynamic";
-
-// Korrigierter Importpfad!
 const SuperadminLayout = dynamic(
   () => import("@/components/superadmin/SuperadminLayout"),
   { ssr: false }
