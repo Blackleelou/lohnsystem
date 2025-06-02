@@ -1,5 +1,6 @@
 import { useEffect, useState } from "react";
 import ThemeSelector, { ThemeSettings } from "@/components/admin/ThemeSelector";
+import Layout from "@/components/common/Layout"; // <- Das zentrale Layout mit Bürger-Menü
 
 // Hilfsfunktion, um Theme-Settings vom Server zu holen
 async function fetchSettings(): Promise<ThemeSettings> {
@@ -29,7 +30,7 @@ export default function AdminThemePage() {
 
   useEffect(() => {
     fetchSettings()
-      .then(s => {
+      .then((s) => {
         setSettings(s);
         setLoading(false);
       })
@@ -45,14 +46,18 @@ export default function AdminThemePage() {
     setTimeout(() => setSuccess(false), 2000);
   }
 
-  if (loading) return <div className="p-8 text-center">Lade Theme-Einstellungen…</div>;
-
   return (
-    <div className="max-w-2xl mx-auto py-8">
-      <h1 className="text-2xl font-bold mb-6 text-center">Design & Theme verwalten</h1>
-      <ThemeSelector settings={settings!} onSave={handleSave} />
-      {saving && <div className="text-blue-600 text-center mt-4">Wird gespeichert…</div>}
-      {success && <div className="text-green-600 text-center mt-4">Theme gespeichert!</div>}
-    </div>
+    <Layout>
+      {loading ? (
+        <div className="p-8 text-center">Lade Theme-Einstellungen…</div>
+      ) : (
+        <div className="max-w-2xl mx-auto py-8">
+          <h1 className="text-2xl font-bold mb-6 text-center">Design & Theme verwalten</h1>
+          <ThemeSelector settings={settings!} onSave={handleSave} />
+          {saving && <div className="text-blue-600 text-center mt-4">Wird gespeichert…</div>}
+          {success && <div className="text-green-600 text-center mt-4">Theme gespeichert!</div>}
+        </div>
+      )}
+    </Layout>
   );
 }
