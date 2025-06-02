@@ -132,3 +132,14 @@ model PayRule {
 
   company   Company  @relation(fields: [companyId], references: [id])
 }
+model Shift {
+  id          String   @id @default(cuid())
+  userId      String
+  companyId   String
+  startTime   DateTime
+  endTime     DateTime
+  breakMinutes Int     @default(0)
+  createdAt   DateTime @default(now())
+  user        User     @relation(fields: [userId], references: [id], onDelete: Cascade)
+  company     Company  @relation(fields: [companyId], references: [id], onDelete: Cascade)
+}
