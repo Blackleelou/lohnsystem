@@ -1,6 +1,6 @@
 // pages/debug.tsx
 import { useSession } from "next-auth/react";
-import SuperadminLayout from "@/components/SuperadminLayout";
+import SuperadminLayout from "@/components/superadmin/SuperadminLayout";
 import { useState } from "react";
 
 export default function DebugPage() {
