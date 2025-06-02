@@ -7,7 +7,7 @@ const links = [
   { href: "/superadmin/companies", label: "Firmen" },
   { href: "/admin/board", label: "ToDo-Board" },
   { href: "/admin/audit", label: "Audit-Log" },
-  { href: "/admin/debug-mode", label: "Debug-Modus" },
+  { href: "/superadmin/debug-mode", label: "Debug-Modus" },
 ];
 
 export default function SuperadminLayout({ children }: { children: React.ReactNode }) {
