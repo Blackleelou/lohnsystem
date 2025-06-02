@@ -1,7 +1,11 @@
-const SuperadminLayout = dynamic(() => import("@/components/superadmin/SuperadminLayout"), { ssr: false });
+import dynamic from "next/dynamic"; // DAS FEHLT!
+
+const SuperadminLayout = dynamic(
+  () => import("@/components/superadmin/SuperadminLayout"),
+  { ssr: false }
+);
 
 export default function SuperpanelPage() {
-  // Damit auch Kinder (children) gerendert werden, z.B. ein Willkommenstext:
   return (
     <SuperadminLayout>
       <div className="text-center p-6">
