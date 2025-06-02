@@ -1,4 +1,4 @@
-// Datei: pages/admin/audit.tsx
+// src/pages/superadmin/audit.tsx
 
 import { useEffect, useState } from "react";
 import { useSession } from "next-auth/react";
@@ -48,43 +48,40 @@ export default function AuditPage() {
   };
 
   return (
-    <div className="max-w-6xl mx-auto px-4 py-8">
-      <h1 className="text-2xl font-bold text-blue-700 mb-6">Audit-Log</h1>
+    <SuperadminLayout>
+      <div className="max-w-6xl mx-auto px-4 py-8">
+        <h1 className="text-2xl font-bold text-blue-700 mb-6">Audit-Log</h1>
 
-      <div className="overflow-x-auto border border-gray-200 rounded-lg shadow-sm">
-        <table className="w-full text-sm">
-          <thead className="bg-gray-100 text-left">
-            <tr>
-              <th className="p-3 border">Zeitpunkt</th>
-              <th className="p-3 border">Aktion</th>
-              <th className="p-3 border">User-ID</th>
-              <th className="p-3 border">IP</th>
-            </tr>
-          </thead>
-          <tbody>
-            {logs.map((log) => (
-              <tr key={log.id} className="hover:bg-gray-50">
-                <td className="p-3 border">{new Date(log.timestamp).toLocaleString()}</td>
-                <td className="p-3 border">{log.action}</td>
-                <td className="p-3 border">{log.userId}</td>
-                <td className="p-3 border">{log.ip}</td>
+        <div className="overflow-x-auto border border-gray-200 rounded-lg shadow-sm">
+          <table className="w-full text-sm">
+            <thead className="bg-gray-100 text-left">
+              <tr>
+                <th className="p-3 border">Zeitpunkt</th>
+                <th className="p-3 border">Aktion</th>
+                <th className="p-3 border">User-ID</th>
+                <th className="p-3 border">IP</th>
               </tr>
-            ))}
-          </tbody>
-        </table>
-      </div>
+            </thead>
+            <tbody>
+              {logs.map((log) => (
+                <tr key={log.id} className="hover:bg-gray-50">
+                  <td className="p-3 border">{new Date(log.timestamp).toLocaleString()}</td>
+                  <td className="p-3 border">{log.action}</td>
+                  <td className="p-3 border">{log.userId}</td>
+                  <td className="p-3 border">{log.ip}</td>
+                </tr>
+              ))}
+            </tbody>
+          </table>
+        </div>
 
-      <button
-        onClick={handleExport}
-        className="mt-6 bg-blue-600 hover:bg-blue-700 text-white px-4 py-2 rounded transition"
-      >
-        CSV exportieren
-      </button>
-    </div>
+        <button
+          onClick={handleExport}
+          className="mt-6 bg-blue-600 hover:bg-blue-700 text-white px-4 py-2 rounded transition"
+        >
+          CSV exportieren
+        </button>
+      </div>
+    </SuperadminLayout>
   );
 }
-
-// SuperadminLayout zuweisen
-AuditPage.getLayout = (page: React.ReactNode) => (
-  <SuperadminLayout>{page}</SuperadminLayout>
-);
