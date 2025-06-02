@@ -1,32 +1,26 @@
 import Link from "next/link";
 import { useRouter } from "next/router";
 import UserMenu from "@/components/user/UserMenu";
-// Optional: Importiere passende Icons, falls du möchtest
 import {
-  Home,
-  Building,
-  ClipboardList,
-  FileSearch,
-  Bug,
-  Users,
-  Server,
-  Wrench,
-  UploadCloud,
-  ShieldCheck,
+  Home, Building, ClipboardList, FileSearch, Bug,
+  Users, Server, Wrench, UploadCloud, ShieldCheck,
 } from "lucide-react";
 
 const links = [
+  // DEINE ALTEN SEITEN zuerst
   { href: "/superadmin", label: "Übersicht", icon: <Home className="w-4 h-4 mr-1" /> },
+  { href: "/superadmin/companies", label: "Firmen", icon: <Building className="w-4 h-4 mr-1" /> },
+  { href: "/superadmin/board", label: "ToDo-Board", icon: <ClipboardList className="w-4 h-4 mr-1" /> },
+  { href: "/superadmin/audit", label: "Audit-Log", icon: <FileSearch className="w-4 h-4 mr-1" /> },
+  { href: "/superadmin/debug-mode", label: "Debug-Modus", icon: <Bug className="w-4 h-4 mr-1" /> },
+
+  // NEUE BEREICHE aus deinem Konzept (nach ALTEN Seiten)
   { href: "/superadmin/health", label: "Health-Checks", icon: <ShieldCheck className="w-4 h-4 mr-1" /> },
   { href: "/superadmin/errors", label: "Fehler-Log", icon: <Bug className="w-4 h-4 mr-1" /> },
   { href: "/superadmin/users", label: "User-Monitoring", icon: <Users className="w-4 h-4 mr-1" /> },
   { href: "/superadmin/housekeeping", label: "Housekeeping", icon: <Server className="w-4 h-4 mr-1" /> },
   { href: "/superadmin/maintenance", label: "Maintenance", icon: <Wrench className="w-4 h-4 mr-1" /> },
   { href: "/superadmin/deploy", label: "Deployments", icon: <UploadCloud className="w-4 h-4 mr-1" /> },
-  { href: "/superadmin/companies", label: "Firmen", icon: <Building className="w-4 h-4 mr-1" /> },
-  { href: "/superadmin/board", label: "ToDo-Board", icon: <ClipboardList className="w-4 h-4 mr-1" /> },
-  { href: "/superadmin/audit", label: "Audit-Log", icon: <FileSearch className="w-4 h-4 mr-1" /> },
-  { href: "/superadmin/debug-mode", label: "Debug-Modus", icon: <Bug className="w-4 h-4 mr-1" /> },
 ];
 
 export default function SuperadminLayout({ children }: { children: React.ReactNode }) {
