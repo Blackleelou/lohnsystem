@@ -52,19 +52,24 @@ export default function SystemStatusPage() {
           <div>Lade Status…</div>
         ) : status ? (
           <div className="space-y-4">
-            {Object.entries(LABELS).map(([key, label]) => (
-              <div key={key} className="flex items-center bg-white rounded shadow p-4">
-                <StatusAmpel status={status[key as keyof HealthStatus]} />
-                <span className="font-semibold mr-2">{label}:</span>
-                <span>
-                  {status[key as keyof HealthStatus] === "ok"
-                    ? "OK"
-                    : status[key as keyof HealthStatus] === "warn"
-                    ? "Warnung"
-                    : "Fehler"}
-                </span>
-              </div>
-            ))}
+            {Object.entries(LABELS).map(([key, label]) => {
+  // Value ist "ok" | "warn" | "error" | undefined
+  const value = status?.[key as keyof HealthStatus] as "ok" | "warn" | "error" | undefined;
+  const safeValue = value ?? "error"; // Fallback auf error, falls fehlt
+  return (
+    <div key={key} className="flex items-center bg-white rounded shadow p-4">
+      <StatusAmpel status={safeValue} />
+      <span className="font-semibold mr-2">{label}:</span>
+      <span>
+        {safeValue === "ok"
+          ? "OK"
+          : safeValue === "warn"
+          ? "Warnung"
+          : "Fehler"}
+      </span>
+    </div>
+  );
+})}
             {status.serverTime && (
               <div className="text-xs text-gray-400 mt-4">
                 Serverzeit: {new Date(status.serverTime).toLocaleString()}
