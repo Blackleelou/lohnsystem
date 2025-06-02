@@ -122,4 +122,12 @@ model CompanySettings {
 
   company        Company  @relation(fields: [companyId], references: [id], onDelete: Cascade)
 }
+model PayRule {
+  id        String   @id @default(cuid())
+  companyId String
+  title     String      // z. B. „Nachtzuschlag“, „Überstunde“
+  rate      Float       // z. B. 0.25 für 25% Zuschlag
+  createdAt DateTime @default(now())
 
+  company   Company  @relation(fields: [companyId], references: [id])
+}
