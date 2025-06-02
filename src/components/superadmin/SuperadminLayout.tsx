@@ -5,7 +5,7 @@ import UserMenu from "@/components/user/UserMenu";
 const links = [
   { href: "/superadmin", label: "Übersicht" },
   { href: "/superadmin/companies", label: "Firmen" },
-  { href: "/admin/board", label: "ToDo-Board" },
+  { href: "/superadmin/board", label: "ToDo-Board" },
   { href: "/admin/audit", label: "Audit-Log" },
   { href: "/superadmin/debug-mode", label: "Debug-Modus" },
 ];
