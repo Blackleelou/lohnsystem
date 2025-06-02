@@ -1,3 +1,5 @@
+import dynamic from "next/dynamic";
+
 const SuperadminLayout = dynamic(
   () => import("@/components/superadmin/SuperadminLayout"),
   { ssr: false }
