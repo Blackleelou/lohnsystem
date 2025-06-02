@@ -1,11 +1,12 @@
-import dynamic from "next/dynamic"; // DAS FEHLT!
+import dynamic from "next/dynamic";
 
+// Korrigierter Importpfad!
 const SuperadminLayout = dynamic(
   () => import("@/components/superadmin/SuperadminLayout"),
   { ssr: false }
 );
 
-export default function SuperpanelPage() {
+export default function SuperadminPage() {
   return (
     <SuperadminLayout>
       <div className="text-center p-6">
