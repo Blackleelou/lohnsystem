@@ -20,12 +20,13 @@ model User {
   resetTokens   PasswordResetToken[]
 
   // Modus- und Firmenlogik
-  companyId   String?   
+  companyId   String?
   company     Company?   @relation(fields: [companyId], references: [id])
   role        String?    // "admin", "editor", "viewer"
 
   accounts    Account[]
   sessions    Session[]
+  shifts      Shift[]    // <--- Rückbeziehung auf Shift
 }
 
 model Company {
@@ -33,9 +34,10 @@ model Company {
   name      String
   createdAt DateTime @default(now())
 
-  users     User[]   
+  users     User[]
   settings  CompanySettings?
   payRules  PayRule[]   // <--- Rückbeziehung auf PayRule
+  shifts    Shift[]     // <--- Rückbeziehung auf Shift
 }
 
 model VerificationCode {
@@ -51,8 +53,6 @@ model PasswordResetToken {
   token      String   @unique
   expiresAt  DateTime
   user       User     @relation(fields: [userId], references: [id], onDelete: Cascade)
-
-  
 }
 
 model AuditLog {
@@ -110,12 +110,13 @@ model VerificationToken {
 
   @@unique([identifier, token])
 }
+
 model CompanySettings {
   id             String   @id @default(cuid())
   companyId      String   @unique
-  themeName      String   @default("Classic Duo") // Aurora, Oceanic etc.
+  themeName      String   @default("Classic Duo")
   useCustomColors Boolean @default(false)
-  primaryColor   String?  // Hex-Wert, z. B. "#4F46E5"
+  primaryColor   String?
   accentColor    String?
   bgLight        String?
   bgDark         String?
@@ -123,15 +124,17 @@ model CompanySettings {
 
   company        Company  @relation(fields: [companyId], references: [id], onDelete: Cascade)
 }
+
 model PayRule {
   id        String   @id @default(cuid())
   companyId String
-  title     String      // z. B. „Nachtzuschlag“, „Überstunde“
-  rate      Float       // z. B. 0.25 für 25% Zuschlag
+  title     String
+  rate      Float
   createdAt DateTime @default(now())
 
   company   Company  @relation(fields: [companyId], references: [id])
 }
+
 model Shift {
   id          String   @id @default(cuid())
   userId      String
