@@ -1,5 +1,6 @@
 import type { NextApiRequest, NextApiResponse } from "next";
-import { prisma } from "@/lib/prisma"; // oder: import prisma from "@/lib/prisma";
+import { prisma } from "@/lib/prisma";
+import { extractErrorMessage } from "@/lib/apiError"; // Import GANZ OBEN!
 
 export default async function handler(req: NextApiRequest, res: NextApiResponse) {
   try {
@@ -35,10 +36,8 @@ export default async function handler(req: NextApiRequest, res: NextApiResponse)
     }
 
     res.status(405).json({ message: "Method not allowed" });
-  } import { extractErrorMessage } from "@/lib/apiError";
-
-catch (err) {
-  const errorMsg = extractErrorMessage(err);
-  res.status(500).json({ error: errorMsg });
-}
+  } catch (err) {
+    const errorMsg = extractErrorMessage(err);
+    res.status(500).json({ error: errorMsg });
+  }
 }
