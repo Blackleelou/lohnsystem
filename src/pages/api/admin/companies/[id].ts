@@ -1,5 +1,6 @@
 import { prisma } from "@/lib/prisma";
 import type { NextApiRequest, NextApiResponse } from "next";
+import { extractErrorMessage } from "@/lib/apiError";
 
 export default async function handler(req: NextApiRequest, res: NextApiResponse) {
   const { id } = req.query;
@@ -36,11 +37,8 @@ export default async function handler(req: NextApiRequest, res: NextApiResponse)
     }
     res.status(405).json({ message: "Method not allowed" });
   } catch (err) {
-  console.error("API Fehler:", err);
-  if (err instanceof Error) {
-    res.status(500).json({ error: err.message });
-  } else {
-    res.status(500).json({ error: String(err) });
-  }
+  const errorMsg = extractErrorMessage(err);
+  res.status(500).json({ error: errorMsg });
+}
 }
 }
