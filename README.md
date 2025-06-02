@@ -8,7 +8,7 @@ Mit moderner Oberfläche, mehrsprachig (DE/EN), Admin-Panel, Benutzerprofil, und
 ## ✨ Funktionen
 
 - 🔐 Login & Registrierung mit Passwort-Reset
-- 👤 Benutzerprofil (Steuerklasse, Freibeträge, Kirchensteuer)
+- 👤 Benutzerprofil (Steuerklasse, Freibeträge, Kirchensteuer, etc)
 - 🕒 Manuelle Überstundenverwaltung
 - 💼 Admin-Bereich für Lohngruppen, Zuschläge, Feiertagskonfiguration
 - 📅 Schichteinträge (Früh/Spät/Nacht), Abwesenheiten, Feiertagsberechnung
