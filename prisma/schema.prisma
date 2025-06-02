@@ -33,8 +33,9 @@ model Company {
   name      String
   createdAt DateTime @default(now())
 
-  users     User[]   // alle User dieser Company
-  settings  CompanySettings?   // <--- Richtig hier!
+  users     User[]   
+  settings  CompanySettings?
+  payRules  PayRule[]   // <--- Rückbeziehung auf PayRule
 }
 
 model VerificationCode {
