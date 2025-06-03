@@ -10,11 +10,13 @@ export default function TeamCreatePage() {
   const [showNickname, setShowNickname] = useState(false);
   const [showEmail, setShowEmail] = useState(false);
   const [saving, setSaving] = useState(false);
+  const [error, setError] = useState<string | null>(null);
   const router = useRouter();
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
     setSaving(true);
+    setError(null);
 
     const res = await fetch("/api/team", {
       method: "POST",
@@ -24,7 +26,7 @@ export default function TeamCreatePage() {
         description,
         nickname,
         showName,
-        showNickname,
+        showNickname: !!nickname && showNickname, // Falls Nickname leer, immer false!
         showEmail,
       }),
     });
@@ -33,8 +35,18 @@ export default function TeamCreatePage() {
       const data = await res.json();
       router.push("/team");
     } else {
-      alert("Fehler beim Anlegen: " + (await res.text()));
+      setError(await res.text());
       setSaving(false);
+    }
+  };
+
+  // Nickname-Häkchen auto aktivieren/deaktivieren
+  const handleNicknameChange = (val: string) => {
+    setNickname(val);
+    if (val) {
+      setShowNickname(true);
+    } else {
+      setShowNickname(false);
     }
   };
 
@@ -83,7 +95,7 @@ export default function TeamCreatePage() {
               className="w-full px-3 py-2 border rounded"
               placeholder="z.B. ChrisJ, NightshiftPro, etc."
               value={nickname}
-              onChange={e => setNickname(e.target.value)}
+              onChange={e => handleNicknameChange(e.target.value)}
               maxLength={32}
             />
             <span className="block mt-1 text-xs text-gray-500">
@@ -100,7 +112,12 @@ export default function TeamCreatePage() {
                 <span>Name</span>
               </label>
               <label className="flex items-center gap-2">
-                <input type="checkbox" checked={showNickname} onChange={e => setShowNickname(e.target.checked)} />
+                <input
+                  type="checkbox"
+                  checked={showNickname}
+                  onChange={e => setShowNickname(e.target.checked)}
+                  disabled={!nickname}
+                />
                 <span>Nickname (falls hinterlegt)</span>
               </label>
               <label className="flex items-center gap-2">
@@ -112,6 +129,9 @@ export default function TeamCreatePage() {
               </span>
             </div>
           </div>
+          {error && (
+            <div className="text-red-600 text-sm">{error}</div>
+          )}
           <button
             type="submit"
             disabled={saving || !teamName}
