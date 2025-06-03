@@ -9,16 +9,23 @@ export default function TeamCreatePage() {
   const router = useRouter();
 
   const handleSubmit = async (e: React.FormEvent) => {
-    e.preventDefault();
-    setSaving(true);
+  e.preventDefault();
+  setSaving(true);
 
-    // Hier später echten API-Call zum Erstellen!
-    setTimeout(() => {
-      setSaving(false);
-      // Nach erfolgreicher Erstellung weiterleiten (Demo)
-      router.push("/dashboard?created=1");
-    }, 1200);
-  };
+  const res = await fetch("/api/team", {
+    method: "POST",
+    headers: { "Content-Type": "application/json" },
+    body: JSON.stringify({ name: teamName, description }),
+  });
+
+  if (res.ok) {
+    // Erfolgreich: Weiter auf Dashboard/Einstellungen etc.
+    router.push("/dashboard?created=1");
+  } else {
+    alert("Fehler beim Anlegen: " + (await res.text()));
+    setSaving(false);
+  }
+};
 
   return (
     <Layout>
