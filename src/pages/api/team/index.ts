@@ -13,11 +13,19 @@ export default async function handler(req: NextApiRequest, res: NextApiResponse)
     return res.status(401).json({ error: "Nicht eingeloggt" });
   }
 
-  // Nur EINE Destructuring-Zeile:
+  // Aus dem Request Body die benötigten Werte holen:
   const { name, description, nickname, showName, showNickname, showEmail } = req.body;
   if (!name) return res.status(400).json({ error: "Kein Name angegeben" });
 
-  // Neues Team anlegen (company, settings optional)
+  // *** NEU: Doppelte Team-Namen abfangen ***
+  const existing = await prisma.company.findFirst({ where: { name } });
+  if (existing) {
+    return res.status(400).json({
+      error: "Es gibt bereits ein Team/Firma mit diesem Namen. Bitte wähle einen anderen Namen oder frage im Team nach."
+    });
+  }
+
+  // Team (Company) anlegen
   const company = await prisma.company.create({
     data: {
       name,
@@ -26,7 +34,7 @@ export default async function handler(req: NextApiRequest, res: NextApiResponse)
       users: {
         connect: { email: session.user.email }
       },
-      // settings: { create: { ... } } // Sichtbarkeit NICHT mehr hier!
+      // settings: { create: { ... } } // <- Sichtbarkeitsoptionen ggf. später!
     }
   });
 
@@ -35,7 +43,7 @@ export default async function handler(req: NextApiRequest, res: NextApiResponse)
     where: { email: session.user.email },
     data: {
       companyId: company.id,
-      nickname, // NEU!
+      nickname, // Nickname wird übernommen!
       showName: !!showName,
       showNickname: !!showNickname,
       showEmail: !!showEmail,
