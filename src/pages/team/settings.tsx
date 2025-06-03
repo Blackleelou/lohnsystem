@@ -15,21 +15,21 @@ export default function TeamSettings() {
 
   // Teamdaten laden
   useEffect(() => {
-    if (status !== "authenticated") return;
-    if (!session?.user?.companyId) {
-      router.replace("/dashboard");
-      return;
-    }
-    setLoading(true);
-    fetch("/api/team/me")
-      .then((res) => res.json())
-      .then((data) => {
-        if (!data?.name) router.replace("/dashboard");
-        else setTeam(data);
-      })
-      .catch(() => setTeam(null))
-      .finally(() => setLoading(false));
-  }, [session, status, router]);
+  if (status !== "authenticated") return;
+  if (!session?.user?.companyId) {
+    router.replace("/dashboard");
+    return;
+  }
+  setLoading(true);
+  fetch("/api/team/me")
+    .then((res) => res.json())
+    .then((data) => {
+      if (!data?.team?.name) router.replace("/dashboard");
+      else setTeam(data.team);
+    })
+    .catch(() => setTeam(null))
+    .finally(() => setLoading(false));
+}, [session, status, router]);
 
   // Team löschen Handler
   const handleDelete = async () => {
