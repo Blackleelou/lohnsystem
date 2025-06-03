@@ -37,6 +37,7 @@ export default function UserMenu() {
           </div>
           <hr className="my-2 border-gray-200 dark:border-gray-700" />
 
+          {/* Dashboard */}
           <Link
             href="/dashboard"
             className="flex items-center gap-2 px-3 py-2 rounded-lg text-gray-700 dark:text-gray-100 hover:bg-blue-50 dark:hover:bg-gray-800 transition"
@@ -46,13 +47,14 @@ export default function UserMenu() {
             Dashboard
           </Link>
 
+          {/* Persönliche Einstellungen: immer sichtbar */}
           <Link
             href="/settings"
             className="flex items-center gap-2 px-3 py-2 rounded-lg text-gray-700 dark:text-gray-100 hover:bg-blue-50 dark:hover:bg-gray-800 transition"
             onClick={() => setIsOpen(false)}
           >
             <Settings className="w-5 h-5" />
-            Einstellungen
+            Mein Konto
           </Link>
 
           {/* Team-Funktionen für Solo-User */}
@@ -124,6 +126,7 @@ export default function UserMenu() {
             </Link>
           )}
 
+          {/* Logout */}
           <button
             type="button"
             onClick={() => signOut({ callbackUrl: "/" })}
@@ -133,6 +136,7 @@ export default function UserMenu() {
             Logout
           </button>
 
+          {/* Language Switcher */}
           <div className="flex justify-center pt-2">
             <LanguageSwitcher />
           </div>
