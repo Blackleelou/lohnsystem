@@ -13,7 +13,8 @@ export default async function handler(req: NextApiRequest, res: NextApiResponse)
     return res.status(401).json({ error: "Nicht eingeloggt" });
   }
 
-  const { name, description, showName, showNickname, showEmail } = req.body;
+  // Nur EINE Destructuring-Zeile:
+  const { name, description, nickname, showName, showNickname, showEmail } = req.body;
   if (!name) return res.status(400).json({ error: "Kein Name angegeben" });
 
   // Neues Team anlegen (company, settings optional)
@@ -25,22 +26,21 @@ export default async function handler(req: NextApiRequest, res: NextApiResponse)
       users: {
         connect: { email: session.user.email }
       },
-      // settings: { create: { ... } } // <--- Sichtbarkeit NICHT mehr hier!
+      // settings: { create: { ... } } // Sichtbarkeit NICHT mehr hier!
     }
   });
 
-  // User auf das Team setzen & Sichtbarkeitsoptionen setzen
   // User auf das Team setzen & persönliche Einstellungen/Nickname speichern
-await prisma.user.update({
-  where: { email: session.user.email },
-  data: {
-    companyId: company.id,
-    nickname, // NEU!
-    showName: !!showName,
-    showNickname: !!showNickname,
-    showEmail: !!showEmail,
-  },
-});
+  await prisma.user.update({
+    where: { email: session.user.email },
+    data: {
+      companyId: company.id,
+      nickname, // NEU!
+      showName: !!showName,
+      showNickname: !!showNickname,
+      showEmail: !!showEmail,
+    },
+  });
 
   return res.status(200).json({ teamId: company.id });
 }
