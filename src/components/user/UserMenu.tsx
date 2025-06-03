@@ -28,6 +28,7 @@ export default function UserMenu() {
         </span>
       </button>
 
+      {/* ALLES INS DROPDOWN */}
       {isOpen && (
         <div className="absolute right-0 top-12 bg-white dark:bg-gray-900 shadow-2xl border border-gray-200 dark:border-gray-800 rounded-2xl min-w-[220px] z-50 p-4 flex flex-col gap-2 animate-fade-in">
           {/* ThemeSwitch oben */}
@@ -54,7 +55,30 @@ export default function UserMenu() {
             Einstellungen
           </Link>
 
-          {/* Firmeneinstellungen, wenn User in Team/Firma */}
+          {/* Team-Funktionen für Solo-User */}
+          {!companyId && (
+            <>
+              <Link
+                href="/team/create"
+                className="flex items-center gap-2 px-3 py-2 rounded-lg text-violet-700 dark:text-violet-400 font-semibold hover:bg-violet-50 dark:hover:bg-gray-800 transition"
+                onClick={() => setIsOpen(false)}
+              >
+                <Building2 className="w-5 h-5" />
+                Team erstellen
+              </Link>
+              <Link
+                href="/invite/join"
+                className="flex items-center gap-2 px-3 py-2 rounded-lg text-green-700 dark:text-green-400 font-semibold hover:bg-green-50 dark:hover:bg-gray-800 transition"
+                onClick={() => setIsOpen(false)}
+              >
+                <User className="w-5 h-5" />
+                Mit Einladung beitreten
+              </Link>
+              <hr className="my-2 border-gray-200 dark:border-gray-700" />
+            </>
+          )}
+
+          {/* Firmeneinstellungen für Team-User */}
           {companyId && (
             <Link
               href="/team/settings"
