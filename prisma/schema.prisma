@@ -113,17 +113,20 @@ model VerificationToken {
 }
 
 model CompanySettings {
-  id             String   @id @default(cuid())
-  companyId      String   @unique
-  themeName      String   @default("Classic Duo")
-  useCustomColors Boolean @default(false)
-  primaryColor   String?
-  accentColor    String?
-  bgLight        String?
-  bgDark         String?
-  textColor      String?
-
-  company        Company  @relation(fields: [companyId], references: [id], onDelete: Cascade)
+  id                String   @id @default(cuid())
+  companyId         String   @unique
+  themeName         String   @default("Classic Duo")
+  useCustomColors   Boolean  @default(false)
+  primaryColor      String?
+  accentColor       String?
+  bgLight           String?
+  bgDark            String?
+  textColor         String?
+  // HIER ERGÄNZEN:
+  showName          Boolean  @default(true)
+  showNickname      Boolean  @default(false)
+  showEmail         Boolean  @default(false)
+  company           Company  @relation(fields: [companyId], references: [id], onDelete: Cascade)
 }
 
 model PayRule {
