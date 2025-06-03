@@ -1,7 +1,23 @@
 import Layout from "@/components/common/Layout";
+import { getServerSession } from "next-auth/next";
+import { authOptions } from "@/lib/authOptions";
+
+export async function getServerSideProps(context) {
+  const session = await getServerSession(context.req, context.res, authOptions);
+
+  if (!session?.user?.companyId) {
+    return {
+      redirect: {
+        destination: "/dashboard",
+        permanent: false,
+      },
+    };
+  }
+
+  return { props: {} };
+}
 
 export default function LohnUebersicht() {
-  // Hier später die echten Lohn-Widgets & Statistiken
   return (
     <Layout>
       <div className="max-w-2xl mx-auto py-12 text-center">
