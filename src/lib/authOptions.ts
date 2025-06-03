@@ -29,42 +29,67 @@ export const authOptions: AuthOptions = {
     }),
   ],
   session: { strategy: "jwt" },
-callbacks: {
-  async jwt({ token, user, trigger }) {
-    if (user && user.email) {
-      const dbUser = await prisma.user.findUnique({ where: { email: user.email } });
-      if (dbUser) {
-        token.id = dbUser.id;
-        token.email = dbUser.email;
-        // token.mode = dbUser.mode;  // <-- ENTFERNT
-        token.companyId = dbUser.companyId;
-        token.role = dbUser.role;
-        token.isAdmin = dbUser.isAdmin;
+  callbacks: {
+    async jwt({ token, user, trigger, session }) {
+      // Siehe Block oben!
+      if (user && user.email) {
+        const dbUser = await prisma.user.findUnique({ where: { email: user.email } });
+        if (dbUser) {
+          token.id = dbUser.id;
+          token.email = dbUser.email;
+          token.companyId = dbUser.companyId;
+          token.role = dbUser.role;
+          token.isAdmin = dbUser.isAdmin;
+          token.name = dbUser.name;
+          token.nickname = dbUser.nickname;
+          token.showName = dbUser.showName;
+          token.showNickname = dbUser.showNickname;
+          token.showEmail = dbUser.showEmail;
+        }
       }
-    }
-    if (trigger === "update" && token.email) {
-      const dbUser = await prisma.user.findUnique({ where: { email: token.email } });
-      if (dbUser) {
-        // token.mode = dbUser.mode; // <-- ENTFERNT
-        token.companyId = dbUser.companyId;
-        token.role = dbUser.role;
-        token.isAdmin = dbUser.isAdmin;
+      if (trigger === "update" && token.email) {
+        const dbUser = await prisma.user.findUnique({ where: { email: token.email } });
+        if (dbUser) {
+          token.companyId = dbUser.companyId;
+          token.role = dbUser.role;
+          token.isAdmin = dbUser.isAdmin;
+          token.name = dbUser.name;
+          token.nickname = dbUser.nickname;
+          token.showName = dbUser.showName;
+          token.showNickname = dbUser.showNickname;
+          token.showEmail = dbUser.showEmail;
+        }
       }
-    }
-    return token;
+      if (trigger === "session" && session?.user?.email) {
+        const dbUser = await prisma.user.findUnique({ where: { email: session.user.email } });
+        if (dbUser) {
+          token.companyId = dbUser.companyId;
+          token.role = dbUser.role;
+          token.isAdmin = dbUser.isAdmin;
+          token.name = dbUser.name;
+          token.nickname = dbUser.nickname;
+          token.showName = dbUser.showName;
+          token.showNickname = dbUser.showNickname;
+          token.showEmail = dbUser.showEmail;
+        }
+      }
+      return token;
+    },
+    async session({ session, token }) {
+      if (session.user) {
+        session.user.id = token.id as string;
+        session.user.companyId = token.companyId as string | null;
+        session.user.role = token.role as "admin" | "editor" | "viewer";
+        session.user.isAdmin = typeof token.isAdmin === "boolean" ? token.isAdmin : undefined;
+        session.user.name = token.name as string;
+        session.user.nickname = token.nickname as string;
+        session.user.showName = token.showName as boolean;
+        session.user.showNickname = token.showNickname as boolean;
+        session.user.showEmail = token.showEmail as boolean;
+      }
+      return session;
+    },
   },
-  async session({ session, token }) {
-    if (session.user) {
-      session.user.id = token.id as string;
-      // session.user.mode = token.mode as "solo" | "company"; // <-- ENTFERNT
-      session.user.companyId = token.companyId as string | null;
-      session.user.role = token.role as "admin" | "editor" | "viewer";
-      session.user.isAdmin = typeof token.isAdmin === "boolean" ? token.isAdmin : undefined;
-    }
-    return session;
-  },
-},
-
   pages: {
     signIn: "/login",
   },
