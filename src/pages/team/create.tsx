@@ -23,7 +23,7 @@ export default function TeamCreatePage() {
     if (res.ok) {
       const data = await res.json();
       // Sofort auf die Team-Seite weiterleiten!
-      router.push("/team");
+     router.push(`/team/${data.teamId}`);
     } else {
       alert("Fehler beim Anlegen: " + (await res.text()));
       setSaving(false);
