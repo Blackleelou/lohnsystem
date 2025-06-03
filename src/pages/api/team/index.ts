@@ -1,39 +1,43 @@
 // src/pages/api/team/index.ts
 
 import type { NextApiRequest, NextApiResponse } from "next";
-import { getServerSession } from "next-auth";
-import { authOptions } from "@/lib/authOptions";
 import { prisma } from "@/lib/prisma";
+import { getServerSession } from "next-auth/next";
+import { authOptions } from "@/lib/authOptions";
 
-export default async function handler(
-  req: NextApiRequest,
-  res: NextApiResponse
-) {
+export default async function handler(req: NextApiRequest, res: NextApiResponse) {
+  if (req.method !== "POST") {
+    return res.status(405).json({ error: "Nur POST erlaubt" });
+  }
+
   const session = await getServerSession(req, res, authOptions);
-  if (!session || !session.user) {
+  if (!session?.user?.email) {
     return res.status(401).json({ error: "Nicht eingeloggt" });
   }
 
-  if (req.method === "POST") {
-    const { name, description } = req.body;
-    if (!name) {
-      return res.status(400).json({ error: "Teamname fehlt" });
-    }
-    // Team (Company) anlegen
-    const company = await prisma.company.create({
-      data: {
-        name,
-        // Du kannst description speichern, falls im Modell vorhanden
-      },
-    });
-    // User zuordnen (hier: als Admin)
-    await prisma.user.update({
-      where: { id: session.user.id },
-      data: { companyId: company.id, role: "admin" },
-    });
-    return res.status(201).json({ success: true, company });
-  }
+  const { name, description } = req.body;
+  if (!name) return res.status(400).json({ error: "Kein Name angegeben" });
 
-  res.setHeader("Allow", ["POST"]);
-  res.status(405).end(`Method ${req.method} Not Allowed`);
+  // Neues Team anlegen
+  const company = await prisma.company.create({
+    data: {
+      name,
+      createdAt: new Date(),
+      users: {
+        connect: { email: session.user.email }
+      },
+    },
+  });
+
+  // User auf das Team setzen
+  await prisma.user.update({
+    where: { email: session.user.email },
+    data: { companyId: company.id }
+  });
+
+  // Optional: description speichern (wenn im Modell vorhanden)
+  // await prisma.company.update({ where: { id: company.id }, data: { description } });
+
+  // Team-ID zurückgeben
+  return res.status(200).json({ teamId: company.id });
 }
