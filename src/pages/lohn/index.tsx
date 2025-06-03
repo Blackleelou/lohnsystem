@@ -1,79 +1,52 @@
-// src/pages/api/team/index.ts
-
-import type { NextApiRequest, NextApiResponse } from "next";
-import { prisma } from "@/lib/prisma";
+import type { GetServerSideProps, GetServerSidePropsContext } from "next";
 import { getServerSession } from "next-auth/next";
 import { authOptions } from "@/lib/authOptions";
+import Layout from "@/components/common/Layout";
+import { useSession } from "next-auth/react";
 
-export default async function handler(req: NextApiRequest, res: NextApiResponse) {
-  // === TEAM ERSTELLEN ===
-  if (req.method === "POST") {
-    const session = await getServerSession(req, res, authOptions);
-    if (!session?.user?.email) {
-      return res.status(401).json({ error: "Nicht eingeloggt" });
-    }
+export const getServerSideProps: GetServerSideProps = async (context: GetServerSidePropsContext) => {
+  const session = await getServerSession(context.req, context.res, authOptions);
 
-    const { name, description, nickname, showName, showNickname, showEmail } = req.body;
-    if (!name) return res.status(400).json({ error: "Kein Name angegeben" });
-
-    // Team-Name auf Einzigartigkeit prüfen
-    const existing = await prisma.company.findFirst({ where: { name } });
-    if (existing) {
-      return res.status(400).json({
-        error: "Es gibt bereits ein Team/Firma mit diesem Namen. Bitte wähle einen anderen Namen oder frage im Team nach."
-      });
-    }
-
-    // Team (Company) anlegen
-    const company = await prisma.company.create({
-      data: {
-        name,
-        description,
-        createdAt: new Date(),
-        users: {
-          connect: { email: session.user.email }
-        },
-      }
-    });
-
-    // User updaten: Team-Zuweisung und Sichtbarkeit/Nickname
-    await prisma.user.update({
-      where: { email: session.user.email },
-      data: {
-        companyId: company.id,
-        nickname,
-        showName: !!showName,
-        showNickname: !!showNickname,
-        showEmail: !!showEmail,
+  // Falls kein Team/Firma zugeordnet ist: auf Dashboard zurück
+  if (!session?.user?.companyId) {
+    return {
+      redirect: {
+        destination: "/dashboard",
+        permanent: false,
       },
-    });
-
-    return res.status(200).json({ teamId: company.id });
+    };
   }
 
-  // === TEAM LÖSCHEN ===
-  if (req.method === "DELETE") {
-    const session = await getServerSession(req, res, authOptions);
-    if (!session?.user?.companyId) {
-      return res.status(400).json({ error: "Kein Team zugeordnet" });
-    }
+  // Optional: Team-Name oder Description laden (z.B. via Prisma)
+  // Übergib sie ggf. als props, falls du sie auf der Seite anzeigen willst!
 
-    const companyId = session.user.companyId;
+  return { props: {} };
+};
 
-    // 1. Alle User vom Team lösen
-    await prisma.user.updateMany({
-      where: { companyId },
-      data: { companyId: null },
-    });
+export default function LohnUebersicht() {
+  const { data: session } = useSession();
 
-    // 2. Team/Firma löschen
-    await prisma.company.delete({
-      where: { id: companyId },
-    });
+  // Team-Infos aus der Session
+  const isTeam = !!session?.user?.companyId;
+  // Du kannst später hier auch Teamname/Description ausgeben (siehe Hinweis oben)
 
-    return res.status(200).json({ ok: true });
-  }
-
-  // === Andere Methoden: nicht erlaubt ===
-  return res.status(405).json({ error: "Method Not Allowed" });
+  return (
+    <Layout>
+      <div className="max-w-2xl mx-auto py-12 text-center">
+        <h1 className="text-3xl font-bold mb-6 text-blue-700 dark:text-blue-200">
+          Mein Lohn & Auswertung
+        </h1>
+        {isTeam && (
+          <div className="mb-4 p-3 bg-blue-50 dark:bg-blue-900/30 rounded text-sm text-blue-900 dark:text-blue-200">
+            <strong>Team-Modus aktiv:</strong> Du bist aktuell Teil eines Teams!
+            {/* Hier später: Teamname oder Description ausgeben */}
+          </div>
+        )}
+        <p className="text-gray-600 dark:text-gray-400">
+          Hier siehst du bald alle Schichten, Lohnabrechnungen und Auswertungen auf einen Blick.
+        </p>
+        <div className="mt-8 text-gray-400">[Demo-Ansicht – Inhalte folgen!]</div>
+      </div>
+    </Layout>
+  );
 }
