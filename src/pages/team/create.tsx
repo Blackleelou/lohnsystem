@@ -5,7 +5,8 @@ import { useRouter } from "next/router";
 export default function TeamCreatePage() {
   const [teamName, setTeamName] = useState("");
   const [description, setDescription] = useState("");
-  const [showName, setShowName] = useState(true); // Default: true
+  const [nickname, setNickname] = useState("");
+  const [showName, setShowName] = useState(true);
   const [showNickname, setShowNickname] = useState(false);
   const [showEmail, setShowEmail] = useState(false);
   const [saving, setSaving] = useState(false);
@@ -21,6 +22,7 @@ export default function TeamCreatePage() {
       body: JSON.stringify({
         name: teamName,
         description,
+        nickname,
         showName,
         showNickname,
         showEmail,
@@ -43,7 +45,7 @@ export default function TeamCreatePage() {
 
         <div className="mb-4 p-3 bg-blue-50 dark:bg-blue-900/30 rounded text-sm text-blue-900 dark:text-blue-200">
           <strong>Hinweis für Betriebsräte & Teamleiter:</strong><br />
-          Benenne dein Team (z.B. „SchnelleLogistik Zwickau – Betriebsrat“), damit alle Kolleg:innen es leicht wiederfinden. 
+          Benenne dein Team (z.B. „SchnelleLogistik Zwickau – Betriebsrat“), damit alle Kolleg:innen es leicht wiederfinden.
         </div>
 
         <form onSubmit={handleSubmit} className="space-y-6">
@@ -72,6 +74,21 @@ export default function TeamCreatePage() {
               value={description}
               onChange={e => setDescription(e.target.value)}
             />
+          </div>
+          <div>
+            <label className="block text-sm font-semibold mb-1">
+              Nickname <span className="text-gray-400">(optional)</span>
+            </label>
+            <input
+              className="w-full px-3 py-2 border rounded"
+              placeholder="z.B. ChrisJ, NightshiftPro, etc."
+              value={nickname}
+              onChange={e => setNickname(e.target.value)}
+              maxLength={32}
+            />
+            <span className="block mt-1 text-xs text-gray-500">
+              Dein Nickname wird angezeigt, falls du es erlaubst. Du kannst ihn später ändern.
+            </span>
           </div>
           <div className="bg-gray-50 dark:bg-gray-800 rounded-lg p-4">
             <label className="block font-semibold mb-2">
