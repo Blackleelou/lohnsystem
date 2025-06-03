@@ -1,3 +1,5 @@
+// src/pages/team/create.tsx
+
 import Layout from "@/components/common/Layout";
 import { useState } from "react";
 import { useRouter } from "next/router";
@@ -9,24 +11,27 @@ export default function TeamCreatePage() {
   const router = useRouter();
 
   const handleSubmit = async (e: React.FormEvent) => {
-  e.preventDefault();
-  setSaving(true);
+    e.preventDefault();
+    setSaving(true);
 
-  const res = await fetch("/api/team", {
-    method: "POST",
-    headers: { "Content-Type": "application/json" },
-    body: JSON.stringify({ name: teamName, description }),
-  });
+    const res = await fetch("/api/team", {
+      method: "POST",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify({ name: teamName, description }),
+    });
 
-  if (res.ok) {
-    // Erfolgreich: Weiter auf Dashboard/Einstellungen etc.
-    router.push("/dashboard?created=1");
-  } else {
-    alert("Fehler beim Anlegen: " + (await res.text()));
-    setSaving(false);
-  }
-};
+    if (res.ok) {
+      const data = await res.json();
+      // Sofort auf die Team-Seite weiterleiten!
+      router.push(`/team/${data.teamId}`);
+    } else {
+      alert("Fehler beim Anlegen: " + (await res.text()));
+      setSaving(false);
+    }
+  };
 
+  // ...Form wie bisher...
+}
   return (
     <Layout>
       <div className="max-w-xl mx-auto p-6 mt-8 bg-white dark:bg-gray-900 rounded-xl shadow">
