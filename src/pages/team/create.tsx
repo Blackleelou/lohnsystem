@@ -29,9 +29,7 @@ export default function TeamCreatePage() {
       setSaving(false);
     }
   };
-
-  // ...Form wie bisher...
-}
+  
   return (
     <Layout>
       <div className="max-w-xl mx-auto p-6 mt-8 bg-white dark:bg-gray-900 rounded-xl shadow">
