@@ -1,0 +1,52 @@
+// src/pages/team/index.tsx
+
+import Layout from "@/components/common/Layout";
+import { useEffect, useState } from "react";
+
+type Team = {
+  id: string;
+  name: string;
+  description?: string;
+  createdAt: string;
+};
+
+export default function TeamOverviewPage() {
+  const [team, setTeam] = useState<Team | null>(null);
+  const [loading, setLoading] = useState(true);
+
+  useEffect(() => {
+    fetch("/api/team/me")
+      .then(res => res.json())
+      .then(data => {
+        setTeam(data.team);
+        setLoading(false);
+      })
+      .catch(() => setLoading(false));
+  }, []);
+
+  return (
+    <Layout>
+      <div className="max-w-xl mx-auto p-8 mt-12 bg-white dark:bg-gray-900 rounded-xl shadow">
+        {loading ? (
+          <div>Lade Teamdaten…</div>
+        ) : team ? (
+          <>
+            <h1 className="text-2xl font-bold text-blue-700 mb-4">{team.name}</h1>
+            {team.description && (
+              <div className="mb-4 text-gray-600 dark:text-gray-300">{team.description}</div>
+            )}
+            <div className="text-xs text-gray-400 mb-6">
+              Angelegt am: {new Date(team.createdAt).toLocaleString()}
+            </div>
+            {/* Hier später: Mitglieder, Einladungen, Einstellungen, usw. */}
+            <div className="p-3 bg-blue-50 dark:bg-blue-900/30 rounded">
+              Hier folgt bald die Teamverwaltung (Mitglieder, Rollen, Einladungen usw.)
+            </div>
+          </>
+        ) : (
+          <div>Kein Team gefunden.</div>
+        )}
+      </div>
+    </Layout>
+  );
+}
