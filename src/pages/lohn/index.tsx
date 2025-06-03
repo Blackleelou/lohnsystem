@@ -1,10 +1,12 @@
-import Layout from "@/components/common/Layout";
+import type { GetServerSideProps, GetServerSidePropsContext } from "next";
 import { getServerSession } from "next-auth/next";
 import { authOptions } from "@/lib/authOptions";
+import Layout from "@/components/common/Layout";
 
-export async function getServerSideProps(context) {
+export const getServerSideProps: GetServerSideProps = async (context: GetServerSidePropsContext) => {
   const session = await getServerSession(context.req, context.res, authOptions);
 
+  // Wenn KEIN Team/Firma: zurück zum Dashboard
   if (!session?.user?.companyId) {
     return {
       redirect: {
@@ -15,7 +17,7 @@ export async function getServerSideProps(context) {
   }
 
   return { props: {} };
-}
+};
 
 export default function LohnUebersicht() {
   return (
