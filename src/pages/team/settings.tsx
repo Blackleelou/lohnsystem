@@ -21,7 +21,7 @@ export default function TeamSettings() {
       return;
     }
     setLoading(true);
-    fetch("/api/team/self")
+    fetch("/api/team/me")
       .then((res) => res.json())
       .then((data) => {
         if (!data?.name) router.replace("/dashboard");
