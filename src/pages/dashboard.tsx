@@ -4,6 +4,7 @@ import Layout from "@/components/common/Layout";
 import DashboardCard from "@/components/dashboard/DashboardCard";
 import { Users, User, Link2 } from "lucide-react";
 import { useRouter } from "next/router";
+import FAQ from "@/components/dashboard/FAQ";
 
 export const getServerSideProps: GetServerSideProps = requireAuth;
 
@@ -74,6 +75,9 @@ export default function Dashboard() {
             onClick={() => router.push("/dashboard?mode=solo")}
           />
         </div>
+
+        {/* FAQ unter den Kacheln */}
+        <FAQ />
       </div>
     </Layout>
   );
