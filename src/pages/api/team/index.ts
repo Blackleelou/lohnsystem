@@ -1,5 +1,3 @@
-// src/pages/api/team/index.ts
-
 import type { NextApiRequest, NextApiResponse } from "next";
 import { prisma } from "@/lib/prisma";
 import { getServerSession } from "next-auth/next";
@@ -15,10 +13,10 @@ export default async function handler(req: NextApiRequest, res: NextApiResponse)
     return res.status(401).json({ error: "Nicht eingeloggt" });
   }
 
-  const { name, description } = req.body;
+  const { name, description, showName, showNickname, showEmail } = req.body;
   if (!name) return res.status(400).json({ error: "Kein Name angegeben" });
 
-  // Neues Team anlegen
+  // Neues Team anlegen inkl. Sichtbarkeitsoptionen
   const company = await prisma.company.create({
     data: {
       name,
@@ -26,7 +24,15 @@ export default async function handler(req: NextApiRequest, res: NextApiResponse)
       users: {
         connect: { email: session.user.email }
       },
+      settings: {
+        create: {
+          showName: !!showName,
+          showNickname: !!showNickname,
+          showEmail: !!showEmail,
+        }
+      }
     },
+    include: { settings: true }
   });
 
   // User auf das Team setzen
@@ -35,9 +41,5 @@ export default async function handler(req: NextApiRequest, res: NextApiResponse)
     data: { companyId: company.id }
   });
 
-  // Optional: description speichern (wenn im Modell vorhanden)
-  // await prisma.company.update({ where: { id: company.id }, data: { description } });
-
-  // Team-ID zurückgeben
   return res.status(200).json({ teamId: company.id });
 }
