@@ -18,9 +18,9 @@ export const getServerSideProps: GetServerSideProps = async (ctx) => {
     where: { email: session.user.email },
     select: { hasChosenMode: true, companyId: true }
   });
-  // *** NUR wenn Modus gewählt UND ein Team vorhanden ist, nach /lohn umleiten! ***
+  // *** NUR wenn Modus gewählt UND ein Team vorhanden ist, nach /team umleiten! ***
   if (user?.hasChosenMode && user?.companyId) {
-    return { redirect: { destination: "/lohn", permanent: false } };
+    return { redirect: { destination: "/team", permanent: false } };
   }
   // Sonst: Dashboard anzeigen
   return { props: {} };
