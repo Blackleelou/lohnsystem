@@ -30,14 +30,15 @@ model User {
 }
 
 model Company {
-  id        String   @id @default(cuid())
-  name      String
-  createdAt DateTime @default(now())
+  id          String   @id @default(cuid())
+  name        String
+  description String?        // <--- NEU
+  createdAt   DateTime @default(now())
 
   users     User[]
   settings  CompanySettings?
-  payRules  PayRule[]   // <--- Rückbeziehung auf PayRule
-  shifts    Shift[]     // <--- Rückbeziehung auf Shift
+  payRules  PayRule[]
+  shifts    Shift[]
 }
 
 model VerificationCode {
