@@ -30,15 +30,17 @@ export default async function handler(req: NextApiRequest, res: NextApiResponse)
   });
 
   // User auf das Team setzen & Sichtbarkeitsoptionen setzen
-  await prisma.user.update({
-    where: { email: session.user.email },
-    data: {
-      companyId: company.id,
-      showName: showName ?? true,
-      showNickname: showNickname ?? false,
-      showEmail: showEmail ?? false
-    }
-  });
+  // User auf das Team setzen & persönliche Einstellungen/Nickname speichern
+await prisma.user.update({
+  where: { email: session.user.email },
+  data: {
+    companyId: company.id,
+    nickname, // NEU!
+    showName: !!showName,
+    showNickname: !!showNickname,
+    showEmail: !!showEmail,
+  },
+});
 
   return res.status(200).json({ teamId: company.id });
 }
