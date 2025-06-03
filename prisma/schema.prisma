@@ -24,15 +24,20 @@ model User {
   company     Company?   @relation(fields: [companyId], references: [id])
   role        String?    // "admin", "editor", "viewer"
 
+  // Sichtbarkeitsoptionen für jedes Teammitglied individuell:
+  showName     Boolean  @default(true)
+  showNickname Boolean  @default(false)
+  showEmail    Boolean  @default(false)
+
   accounts    Account[]
   sessions    Session[]
-  shifts      Shift[]    // <--- Rückbeziehung auf Shift
+  shifts      Shift[]
 }
 
 model Company {
   id          String   @id @default(cuid())
   name        String
-  description String?        // <--- NEU
+  description String?
   createdAt   DateTime @default(now())
 
   users     User[]
@@ -122,10 +127,7 @@ model CompanySettings {
   bgLight           String?
   bgDark            String?
   textColor         String?
-  // HIER ERGÄNZEN:
-  showName          Boolean  @default(true)
-  showNickname      Boolean  @default(false)
-  showEmail         Boolean  @default(false)
+
   company           Company  @relation(fields: [companyId], references: [id], onDelete: Cascade)
 }
 
