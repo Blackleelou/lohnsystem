@@ -1,5 +1,3 @@
-// src/pages/dashboard.tsx
-
 import { GetServerSideProps } from "next";
 import { getServerSession } from "next-auth";
 import { authOptions } from "@/lib/authOptions";
@@ -18,11 +16,13 @@ export const getServerSideProps: GetServerSideProps = async (ctx) => {
   }
   const user = await prisma.user.findUnique({
     where: { email: session.user.email },
-    select: { hasChosenMode: true }
+    select: { hasChosenMode: true, companyId: true }
   });
-  if (user?.hasChosenMode) {
+  // *** NUR wenn Modus gewählt UND ein Team vorhanden ist, nach /lohn umleiten! ***
+  if (user?.hasChosenMode && user?.companyId) {
     return { redirect: { destination: "/lohn", permanent: false } };
   }
+  // Sonst: Dashboard anzeigen
   return { props: {} };
 };
 
@@ -99,7 +99,6 @@ export default function Dashboard() {
             onClick={() => handleSelect("/dashboard?mode=solo")}
           />
         </div>
-
         {/* FAQ unter den Kacheln */}
         <FAQ />
       </div>
