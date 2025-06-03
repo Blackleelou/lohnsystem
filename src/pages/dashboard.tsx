@@ -12,28 +12,40 @@ export default function Dashboard() {
 
   return (
     <Layout>
-      <div className="flex min-h-[60vh] justify-center items-center bg-gradient-to-br from-blue-50 to-indigo-100 dark:from-gray-900 dark:to-gray-950">
-        <div className="grid grid-cols-1 md:grid-cols-3 gap-8 w-full max-w-5xl">
+      <div className="w-full max-w-5xl mx-auto mt-8">
+        {/* Headline und Intro */}
+        <div className="text-center mb-8 px-4">
+          <h1 className="text-2xl md:text-3xl font-extrabold text-blue-700 dark:text-blue-200 mb-2">
+            Willkommen im Team- & Solo-Dashboard
+          </h1>
+          <p className="text-gray-600 dark:text-gray-300 text-base md:text-lg">
+            <span className="font-semibold text-violet-700 dark:text-violet-300">Extra entwickelt für Betriebsräte, Teamleiter & engagierte Kolleginnen und Kollegen.</span>
+            <br />
+            Unterstütze dein Team, behalte alle Schichten & Rechte im Blick und arbeite gemeinsam an einem besseren Arbeitsplatz.
+          </p>
+        </div>
+        {/* Kacheln */}
+        <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 gap-6 px-2">
           <DashboardCard
-            icon={<User className="w-12 h-12 text-blue-500 dark:text-blue-300" />}
+            icon={<User className="w-10 h-10 text-blue-500 dark:text-blue-300" />}
             title="Solo-Modus"
-            text="Starte sofort & nutze alle Funktionen für dich alleine."
+            text="Starte sofort & nutze alle Funktionen für dich alleine – keine Freigabe, kein Stress."
             buttonText="Jetzt loslegen"
             color="text-blue-500"
             onClick={() => router.push("/dashboard?mode=solo")}
           />
           <DashboardCard
-            icon={<Users className="w-12 h-12 text-violet-500 dark:text-violet-300" />}
-            title="Team beitreten/erstellen"
-            text="Gründe ein Team für Kollegen, Betriebsrat oder deine Abteilung. Lade andere ein und arbeite gemeinsam!"
+            icon={<Users className="w-10 h-10 text-violet-500 dark:text-violet-300" />}
+            title="Team-Start"
+            text="Gründe ein Team für Kollegen, Betriebsrat oder Abteilung. Lade ein, verwalte gemeinsam!"
             buttonText="Team starten"
             color="text-violet-500"
             onClick={() => router.push("/team/create")}
           />
           <DashboardCard
-            icon={<Link2 className="w-12 h-12 text-green-500 dark:text-green-300" />}
+            icon={<Link2 className="w-10 h-10 text-green-500 dark:text-green-300" />}
             title="Mit Einladungslink beitreten"
-            text="Du hast einen Link bekommen? Klicke hier und trete dem Team direkt bei!"
+            text="Du hast einen Link bekommen? Klicke hier & werde Teil deines Teams."
             buttonText="Einladungslink einlösen"
             color="text-green-500"
             onClick={() => router.push("/invite/join")}
