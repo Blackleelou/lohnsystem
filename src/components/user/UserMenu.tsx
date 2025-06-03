@@ -3,12 +3,13 @@ import { signOut, useSession } from "next-auth/react";
 import LanguageSwitcher from "@/components/common/LanguageSwitcher";
 import ThemeSwitch from "@/components/common/ThemeSwitch";
 import Link from "next/link";
-import { LogOut, Settings, User, Shield, Palette } from "lucide-react"; // Palette hinzugefügt!
+import { LogOut, Settings, User, Shield, Palette, Building2 } from "lucide-react";
 
 export default function UserMenu() {
   const [isOpen, setIsOpen] = useState(false);
   const { data: session } = useSession();
   const isSuperadmin = session?.user?.email === "jantzen.chris@gmail.com";
+  const companyId = session?.user?.companyId;
 
   return (
     <div className="relative">
@@ -53,7 +54,19 @@ export default function UserMenu() {
             Einstellungen
           </Link>
 
-          {/* >>>>> Hier das Theme-Menü <<<<< */}
+          {/* Firmeneinstellungen, wenn User in Team/Firma */}
+          {companyId && (
+            <Link
+              href="/team/settings"
+              className="flex items-center gap-2 px-3 py-2 rounded-lg text-blue-700 dark:text-blue-400 font-semibold hover:bg-blue-50 dark:hover:bg-gray-800 transition"
+              onClick={() => setIsOpen(false)}
+            >
+              <Building2 className="w-5 h-5" />
+              Firmeneinstellungen
+            </Link>
+          )}
+
+          {/* Theme-Design */}
           <Link
             href="/admin/theme"
             className="flex items-center gap-2 px-3 py-2 rounded-lg text-gray-700 dark:text-gray-100 hover:bg-blue-50 dark:hover:bg-gray-800 transition"
@@ -62,8 +75,8 @@ export default function UserMenu() {
             <Palette className="w-5 h-5" />
             Design & Theme
           </Link>
-          {/* <<<<< Ende Theme-Menü >>>>> */}
 
+          {/* Superadmin-Menü */}
           {isSuperadmin && (
             <Link
               href="/superadmin"
