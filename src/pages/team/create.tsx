@@ -1,6 +1,7 @@
 import Layout from "@/components/common/Layout";
 import { useState } from "react";
 import { useRouter } from "next/router";
+import { useSession } from "next-auth/react"; // <--- NEU
 
 export default function TeamCreatePage() {
   const [teamName, setTeamName] = useState("");
@@ -12,6 +13,8 @@ export default function TeamCreatePage() {
   const [saving, setSaving] = useState(false);
   const [error, setError] = useState<string | null>(null);
   const router = useRouter();
+
+  const { update } = useSession(); // <--- NEU
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
@@ -32,7 +35,7 @@ export default function TeamCreatePage() {
     });
 
     if (res.ok) {
-      const data = await res.json();
+      await update();           // <--- Session live updaten!
       router.push("/team");
     } else {
       setError(await res.text());
