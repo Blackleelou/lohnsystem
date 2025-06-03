@@ -1,78 +1,79 @@
-import type { GetServerSideProps, GetServerSidePropsContext } from "next";
+// src/pages/api/team/index.ts
+
+import type { NextApiRequest, NextApiResponse } from "next";
+import { prisma } from "@/lib/prisma";
 import { getServerSession } from "next-auth/next";
 import { authOptions } from "@/lib/authOptions";
-import { prisma } from "@/lib/prisma";
-import Layout from "@/components/common/Layout";
 
-export const getServerSideProps: GetServerSideProps = async (context: GetServerSidePropsContext) => {
-  const session = await getServerSession(context.req, context.res, authOptions);
-
-  let teamMode = false;
-  let teamName = "";
-  let teamDescription = "";
-
-  if (session?.user?.companyId) {
-    teamMode = true;
-    // Hole echten Teamnamen & Beschreibung
-    const company = await prisma.company.findUnique({
-      where: { id: session.user.companyId },
-      select: { name: true, description: true },
-    });
-    if (company) {
-      teamName = company.name;
-      teamDescription = company.description || "";
+export default async function handler(req: NextApiRequest, res: NextApiResponse) {
+  // === TEAM ERSTELLEN ===
+  if (req.method === "POST") {
+    const session = await getServerSession(req, res, authOptions);
+    if (!session?.user?.email) {
+      return res.status(401).json({ error: "Nicht eingeloggt" });
     }
+
+    const { name, description, nickname, showName, showNickname, showEmail } = req.body;
+    if (!name) return res.status(400).json({ error: "Kein Name angegeben" });
+
+    // Team-Name auf Einzigartigkeit prüfen
+    const existing = await prisma.company.findFirst({ where: { name } });
+    if (existing) {
+      return res.status(400).json({
+        error: "Es gibt bereits ein Team/Firma mit diesem Namen. Bitte wähle einen anderen Namen oder frage im Team nach."
+      });
+    }
+
+    // Team (Company) anlegen
+    const company = await prisma.company.create({
+      data: {
+        name,
+        description,
+        createdAt: new Date(),
+        users: {
+          connect: { email: session.user.email }
+        },
+      }
+    });
+
+    // User updaten: Team-Zuweisung und Sichtbarkeit/Nickname
+    await prisma.user.update({
+      where: { email: session.user.email },
+      data: {
+        companyId: company.id,
+        nickname,
+        showName: !!showName,
+        showNickname: !!showNickname,
+        showEmail: !!showEmail,
+      },
+    });
+
+    return res.status(200).json({ teamId: company.id });
   }
 
-  return {
-    props: {
-      teamMode,
-      teamName,
-      teamDescription,
-    },
-  };
-};
+  // === TEAM LÖSCHEN ===
+  if (req.method === "DELETE") {
+    const session = await getServerSession(req, res, authOptions);
+    if (!session?.user?.companyId) {
+      return res.status(400).json({ error: "Kein Team zugeordnet" });
+    }
 
-export default function LohnUebersicht({
-  teamMode,
-  teamName,
-  teamDescription,
-}: {
-  teamMode: boolean;
-  teamName: string;
-  teamDescription?: string;
-}) {
-  return (
-    <Layout>
-      <div className="max-w-2xl mx-auto py-12 text-center">
-        <h1 className="text-3xl font-bold mb-6 text-blue-700 dark:text-blue-200">
-          Mein Lohn & Auswertung
-        </h1>
-        {teamMode && (
-          <div className="mb-8 p-3 bg-blue-50 dark:bg-blue-900/40 rounded text-blue-900 dark:text-blue-100 text-sm">
-            <span className="font-semibold">Team-Modus aktiv:</span>{" "}
-            <span>{teamName}</span>
-            {teamDescription && (
-              <span className="block mt-1 text-xs text-gray-600 dark:text-gray-300">
-                {teamDescription}
-              </span>
-            )}
-            <span className="block text-xs text-gray-500 dark:text-gray-400 mt-1">
-              Du nutzt die zentralen Einstellungen deines Teams. Alle Lohnregeln und Auswertungen werden automatisch übernommen!
-            </span>
-          </div>
-        )}
-        {!teamMode && (
-          <div className="mb-8 p-3 bg-gray-50 dark:bg-gray-800/40 rounded text-gray-800 dark:text-gray-300 text-sm">
-            <span className="font-semibold">Solo-Modus:</span>{" "}
-            Du nutzt eigene Einstellungen. Falls du später ein Team erstellst oder beitrittst, werden die Team-Regeln automatisch angewendet.
-          </div>
-        )}
-        <p className="text-gray-600 dark:text-gray-400">
-          Hier siehst du bald alle Schichten, Lohnabrechnungen und Auswertungen auf einen Blick.
-        </p>
-        <div className="mt-8 text-gray-400">[Demo-Ansicht – Inhalte folgen!]</div>
-      </div>
-    </Layout>
-  );
+    const companyId = session.user.companyId;
+
+    // 1. Alle User vom Team lösen
+    await prisma.user.updateMany({
+      where: { companyId },
+      data: { companyId: null },
+    });
+
+    // 2. Team/Firma löschen
+    await prisma.company.delete({
+      where: { id: companyId },
+    });
+
+    return res.status(200).json({ ok: true });
+  }
+
+  // === Andere Methoden: nicht erlaubt ===
+  return res.status(405).json({ error: "Method Not Allowed" });
 }
