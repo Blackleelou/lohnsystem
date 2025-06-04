@@ -1,6 +1,6 @@
 import { useState } from "react";
 import { useRouter } from "next/router";
-import { update } from "next-auth/react";
+
 
 export default function CreateCompanyForm() {
   const [companyName, setCompanyName] = useState("");
