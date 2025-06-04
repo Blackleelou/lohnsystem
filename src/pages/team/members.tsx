@@ -10,17 +10,17 @@ type Member = {
   role?: string | null;
   invited?: boolean;
   accepted?: boolean;
-  showName?: boolean;      // neu: Sichtbarkeit
-  showNickname?: boolean;  // neu: Sichtbarkeit
-  showEmail?: boolean;     // neu: Sichtbarkeit
+  showName?: boolean;
+  showNickname?: boolean;
+  showEmail?: boolean;
 };
 
 export default function TeamMembersPage() {
-  const { data: session, status } = useSession();
+  const { data: session, status, update } = useSession();
   const [members, setMembers] = useState<Member[]>([]);
   const [search, setSearch] = useState("");
   const [loading, setLoading] = useState(true);
-  const [roleChangedFor, setRoleChangedFor] = useState<string | null>(null);
+  const [roleChangeSuccess, setRoleChangeSuccess] = useState<string | null>(null);
 
   useEffect(() => {
     if (status !== "authenticated") return;
@@ -41,8 +41,7 @@ export default function TeamMembersPage() {
   });
 
   const handleRemove = async (id: string) => {
-    const confirmRemove = confirm("Diesen Benutzer wirklich aus dem Team entfernen?");
-    if (!confirmRemove) return;
+    if (!confirm("Diesen Benutzer wirklich aus dem Team entfernen?")) return;
 
     const res = await fetch("/api/team/remove-member", {
       method: "POST",
@@ -68,8 +67,14 @@ export default function TeamMembersPage() {
       setMembers((prev) =>
         prev.map((m) => (m.id === userId ? { ...m, role: newRole } : m))
       );
-      setRoleChangedFor(userId);
-      setTimeout(() => setRoleChangedFor(null), 3000); // Häkchen nach 3 Sekunden ausblenden
+
+      // Session aktualisieren, wenn aktuelle Nutzerrolle sich ändert
+      if (userId === session?.user?.id) {
+        await update();
+      }
+
+      setRoleChangeSuccess("Rolle erfolgreich geändert");
+      setTimeout(() => setRoleChangeSuccess(null), 2500);
     } else {
       alert("Rollenänderung fehlgeschlagen.");
     }
@@ -104,6 +109,12 @@ export default function TeamMembersPage() {
           />
         </div>
 
+        {roleChangeSuccess && (
+          <div className="mb-4 text-green-600 font-semibold">
+            ✅ {roleChangeSuccess}
+          </div>
+        )}
+
         {loading ? (
           <div className="text-center text-gray-500 dark:text-gray-400">Lade Mitglieder…</div>
         ) : filtered.length === 0 ? (
@@ -124,6 +135,8 @@ export default function TeamMembersPage() {
             <tbody>
               {filtered.map((m) => {
                 const status = getStatus(m);
+                const isAdmin = session?.user?.role === "admin";
+
                 return (
                   <tr key={m.id} className="hover:bg-gray-50 dark:hover:bg-gray-900">
                     <td className="p-2 border-b">
@@ -142,40 +155,23 @@ export default function TeamMembersPage() {
                     </td>
                     <td className={`p-2 border-b ${status.color}`}>{status.text}</td>
                     <td className="p-2 border-b">
-                      {session?.user?.role === "admin" ? (
-                        <div className="relative inline-block w-28">
-                          <select
-                            value={m.role ?? "viewer"}
-                            onChange={(e) => handleRoleChange(m.id, e.target.value)}
-                            className="appearance-none border rounded px-3 py-1 w-full bg-white dark:bg-gray-800 text-sm cursor-pointer hover:border-blue-600 focus:outline-none focus:ring-2 focus:ring-blue-500"
-                          >
-                            <option value="admin">Admin</option>
-                            <option value="editor">Editor</option>
-                            <option value="viewer">Viewer</option>
-                          </select>
-                          <div className="pointer-events-none absolute inset-y-0 right-0 flex items-center pr-2">
-                            <svg
-                              className="h-4 w-4 text-gray-400"
-                              xmlns="http://www.w3.org/2000/svg"
-                              fill="none"
-                              viewBox="0 0 24 24"
-                              stroke="currentColor"
-                            >
-                              <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M19 9l-7 7-7-7" />
-                            </svg>
-                          </div>
-                          {roleChangedFor === m.id && (
-                            <div className="absolute -top-5 right-0 text-green-600 text-xl font-bold select-none">
-                              ✓
-                            </div>
-                          )}
-                        </div>
+                      {isAdmin ? (
+                        <select
+                          value={m.role ?? "viewer"}
+                          onChange={(e) => handleRoleChange(m.id, e.target.value)}
+                          className="text-sm border rounded px-2 py-1 bg-white dark:bg-gray-800 appearance-none relative"
+                          style={{ paddingRight: "1.8rem" }} // Platz für Pfeil
+                        >
+                          <option value="admin">Admin</option>
+                          <option value="editor">Editor</option>
+                          <option value="viewer">Viewer</option>
+                        </select>
                       ) : (
                         <span className="text-xs text-gray-500 italic">{m.role || "viewer"}</span>
                       )}
                     </td>
                     <td className="p-2 border-b">
-                      {session?.user?.role === "admin" ? (
+                      {isAdmin ? (
                         <button
                           onClick={() => handleRemove(m.id)}
                           className="text-red-600 hover:underline text-xs"
