@@ -44,10 +44,13 @@ model Company {
   description String?
   createdAt   DateTime @default(now())
 
-  users     User[]
-  settings  CompanySettings?
-  payRules  PayRule[]
-  shifts    Shift[]
+  users       User[]
+  settings    CompanySettings?
+  payRules    PayRule[]
+  shifts      Shift[]
+
+  invitations Invitation[]     // ⬅️ Rückverweis für Invitation
+  accessCodes AccessCode[]     // ⬅️ Rückverweis für AccessCode
 }
 
 model VerificationCode {
