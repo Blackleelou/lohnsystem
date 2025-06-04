@@ -105,6 +105,13 @@ export default function DebugPage() {
         )}
       </li>
       <li>
+        {session.user.nickname ? (
+          <>✅ Nickname gesetzt: <strong>{session.user.nickname}</strong></>
+        ) : (
+          <>❌ Kein Nickname gesetzt</>
+        )}
+      </li>
+      <li>
         {typeof session.user.isAdmin === "boolean" ? (
           <>✅ isAdmin-Flag: <strong>{String(session.user.isAdmin)}</strong></>
         ) : (
