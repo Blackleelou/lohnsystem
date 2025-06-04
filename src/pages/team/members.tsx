@@ -20,6 +20,7 @@ export default function TeamMembersPage() {
   const [members, setMembers] = useState<Member[]>([]);
   const [search, setSearch] = useState("");
   const [loading, setLoading] = useState(true);
+  const [roleChangedFor, setRoleChangedFor] = useState<string | null>(null);
 
   useEffect(() => {
     if (status !== "authenticated") return;
@@ -32,7 +33,6 @@ export default function TeamMembersPage() {
 
   const filtered = members.filter((m) => {
     const q = search.toLowerCase();
-    // Suche sollte ignorieren, ob etwas privat ist oder nicht
     return (
       (m.name?.toLowerCase() || "").includes(q) ||
       (m.nickname?.toLowerCase() || "").includes(q) ||
@@ -68,6 +68,8 @@ export default function TeamMembersPage() {
       setMembers((prev) =>
         prev.map((m) => (m.id === userId ? { ...m, role: newRole } : m))
       );
+      setRoleChangedFor(userId);
+      setTimeout(() => setRoleChangedFor(null), 3000); // Häkchen nach 3 Sekunden ausblenden
     } else {
       alert("Rollenänderung fehlgeschlagen.");
     }
@@ -79,7 +81,6 @@ export default function TeamMembersPage() {
   };
 
   const getInitials = (m: Member) => {
-    // Initials lieber aus dem sichtbaren Namen oder Nickname holen
     const name = (m.showNickname ? m.nickname : null) || (m.showName ? m.name : null) || m.email;
     return name
       .split(" ")
@@ -142,15 +143,33 @@ export default function TeamMembersPage() {
                     <td className={`p-2 border-b ${status.color}`}>{status.text}</td>
                     <td className="p-2 border-b">
                       {session?.user?.role === "admin" ? (
-                        <select
-                          value={m.role ?? "viewer"}
-                          onChange={(e) => handleRoleChange(m.id, e.target.value)}
-                          className="text-sm border rounded px-2 py-1 bg-white dark:bg-gray-800"
-                        >
-                          <option value="admin">Admin</option>
-                          <option value="editor">Editor</option>
-                          <option value="viewer">Viewer</option>
-                        </select>
+                        <div className="relative inline-block w-28">
+                          <select
+                            value={m.role ?? "viewer"}
+                            onChange={(e) => handleRoleChange(m.id, e.target.value)}
+                            className="appearance-none border rounded px-3 py-1 w-full bg-white dark:bg-gray-800 text-sm cursor-pointer hover:border-blue-600 focus:outline-none focus:ring-2 focus:ring-blue-500"
+                          >
+                            <option value="admin">Admin</option>
+                            <option value="editor">Editor</option>
+                            <option value="viewer">Viewer</option>
+                          </select>
+                          <div className="pointer-events-none absolute inset-y-0 right-0 flex items-center pr-2">
+                            <svg
+                              className="h-4 w-4 text-gray-400"
+                              xmlns="http://www.w3.org/2000/svg"
+                              fill="none"
+                              viewBox="0 0 24 24"
+                              stroke="currentColor"
+                            >
+                              <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M19 9l-7 7-7-7" />
+                            </svg>
+                          </div>
+                          {roleChangedFor === m.id && (
+                            <div className="absolute -top-5 right-0 text-green-600 text-xl font-bold select-none">
+                              ✓
+                            </div>
+                          )}
+                        </div>
                       ) : (
                         <span className="text-xs text-gray-500 italic">{m.role || "viewer"}</span>
                       )}
