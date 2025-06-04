@@ -60,7 +60,7 @@ if (req.method === "DELETE") {
   }
 
   try {
-    // Hole aktuellen Nutzer aus DB (nicht aus der Session!)
+    // Hole aktuellen Nutzer aus DB (nicht Session!)
     const user = await prisma.user.findUnique({
       where: { email: session.user.email },
     });
@@ -71,20 +71,22 @@ if (req.method === "DELETE") {
 
     const companyId = user.companyId;
 
-    // 1. Alle User-Daten zurücksetzen
-    await prisma.user.updateMany({
-      where: { companyId },
-      data: {
-        companyId: null,
-        role: null,
-        nickname: null,
-        showName: true,
-        showNickname: false,
-        showEmail: false,
-      },
-    });
+    const users = await prisma.user.findMany({ where: { companyId } });
 
-    // 2. Firma löschen
+    for (const u of users) {
+      await prisma.user.update({
+        where: { id: u.id },
+        data: {
+          companyId: null,
+          role: null,
+          nickname: null,
+          showName: true,
+          showNickname: false,
+          showEmail: false,
+        },
+      });
+    }
+
     await prisma.company.delete({
       where: { id: companyId },
     });
@@ -95,6 +97,7 @@ if (req.method === "DELETE") {
     return res.status(500).json({ error: "Fehler beim Löschen des Teams" });
   }
 }
+
 
 
 // === Alle anderen Methoden ===
