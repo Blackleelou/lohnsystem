@@ -10,6 +10,9 @@ type Member = {
   role?: string | null;
   invited?: boolean;
   accepted?: boolean;
+  showName?: boolean;      // neu: Sichtbarkeit
+  showNickname?: boolean;  // neu: Sichtbarkeit
+  showEmail?: boolean;     // neu: Sichtbarkeit
 };
 
 export default function TeamMembersPage() {
@@ -29,9 +32,10 @@ export default function TeamMembersPage() {
 
   const filtered = members.filter((m) => {
     const q = search.toLowerCase();
+    // Suche sollte ignorieren, ob etwas privat ist oder nicht
     return (
-      m.name?.toLowerCase().includes(q) ||
-      m.nickname?.toLowerCase().includes(q) ||
+      (m.name?.toLowerCase() || "").includes(q) ||
+      (m.nickname?.toLowerCase() || "").includes(q) ||
       m.email.toLowerCase().includes(q)
     );
   });
@@ -75,7 +79,8 @@ export default function TeamMembersPage() {
   };
 
   const getInitials = (m: Member) => {
-    const name = m.nickname || m.name || m.email;
+    // Initials lieber aus dem sichtbaren Namen oder Nickname holen
+    const name = (m.showNickname ? m.nickname : null) || (m.showName ? m.name : null) || m.email;
     return name
       .split(" ")
       .map(part => part[0]?.toUpperCase())
@@ -125,9 +130,15 @@ export default function TeamMembersPage() {
                         {getInitials(m)}
                       </div>
                     </td>
-                    <td className="p-2 border-b">{m.name || "—"}</td>
-                    <td className="p-2 border-b">{m.nickname || "—"}</td>
-                    <td className="p-2 border-b">{m.email}</td>
+                    <td className="p-2 border-b">
+                      {m.showName ? m.name || "—" : <i className="italic text-gray-400">Inhalte privat</i>}
+                    </td>
+                    <td className="p-2 border-b">
+                      {m.showNickname ? m.nickname || "—" : <i className="italic text-gray-400">Inhalte privat</i>}
+                    </td>
+                    <td className="p-2 border-b">
+                      {m.showEmail ? m.email : <i className="italic text-gray-400">Inhalte privat</i>}
+                    </td>
                     <td className={`p-2 border-b ${status.color}`}>{status.text}</td>
                     <td className="p-2 border-b">
                       {session?.user?.role === "admin" ? (
