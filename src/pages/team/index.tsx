@@ -1,7 +1,6 @@
 // src/pages/team/index.tsx
 
 import { useState, useEffect } from "react";
-import TeamLayout from "@/components/team/TeamLayout";
 
 type Team = {
   id: string;
