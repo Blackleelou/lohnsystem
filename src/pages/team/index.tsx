@@ -1,9 +1,8 @@
+
 // src/pages/team/index.tsx
 
 import { useState, useEffect } from "react";
-import { useRouter } from "next/router";
-import TeamLayout from "@/components/team/TeamLayout"; // <-- richtig!
-import { useSession } from "next-auth/react";
+import TeamLayout from "@/components/team/TeamLayout";
 
 type Team = {
   id: string;
@@ -41,6 +40,7 @@ export default function TeamOverviewPage() {
               Angelegt am: {new Date(team.createdAt).toLocaleString()}
             </div>
             <div className="mt-10 p-3 bg-blue-50 dark:bg-blue-900/20 rounded">
+              {/* Platz für weitere Team-Inhalte */}
               Hier folgt bald die Teamverwaltung (Rollen, Einladungen, Einstellungen …)
             </div>
           </>
