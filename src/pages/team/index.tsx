@@ -1,7 +1,9 @@
 // src/pages/team/index.tsx
 
-import TeamLayout from "@/components/team/TeamLayout";
-import { useEffect, useState } from "react";
+import { useState, useEffect } from "react";
+import { useRouter } from "next/router";
+import TeamLayout from "@/components/team/TeamLayout"; // <-- richtig!
+import { useSession } from "next-auth/react";
 
 type Team = {
   id: string;
