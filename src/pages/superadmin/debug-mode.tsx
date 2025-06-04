@@ -113,7 +113,6 @@ export default function DebugPage() {
       </li>
     </ul>
   </section>
-)}
         {/* 3. Weitere Tools hier */}
       </div>
     </SuperadminLayout>
