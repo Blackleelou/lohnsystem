@@ -16,11 +16,19 @@ export default async function handler(req: NextApiRequest, res: NextApiResponse)
 
   const companyId = session.user.companyId;
 
-  // 1. Alle User rausnehmen
-  await prisma.user.updateMany({
-    where: { companyId },
-    data: { companyId: null },
-  });
+// 1. Alle User rausnehmen und Felder zurücksetzen
+await prisma.user.updateMany({
+  where: { companyId },
+  data: {
+    companyId: null,
+    role: null,
+    nickname: null,
+    showName: true,
+    showNickname: false,
+    showEmail: false,
+  },
+});
+
 
   // 2. Team löschen
   await prisma.company.delete({
