@@ -10,7 +10,8 @@ declare module "next-auth" {
       mode?: "solo" | "company";
       role?: "admin" | "editor" | "viewer";
       companyId?: string | null;
-      isAdmin?: boolean; // <--- HIER HINZUFÜGEN!
+      isAdmin?: boolean;
+      nickname?: string;
     };
   }
 }
