@@ -20,7 +20,7 @@ export default async function handler(req: NextApiRequest, res: NextApiResponse)
       code,
       companyId: session.user.companyId,
       password: password || null,
-      expiresAt,
+      validUntil,
       role: role || "viewer",
     },
   });
