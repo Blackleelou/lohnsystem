@@ -20,7 +20,7 @@ type Member = {
   email: string;
 };
 
-export default function TeamOverviewPage() {
+export default function TeamSettingsPage() {
   const { data: session, status, update } = useSession();
   const [team, setTeam] = useState<Team | null>(null);
   const [members, setMembers] = useState<Member[]>([]);
