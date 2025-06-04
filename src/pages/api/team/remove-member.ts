@@ -10,7 +10,6 @@ export default async function handler(req: NextApiRequest, res: NextApiResponse)
 
   const session = await getServerSession(req, res, authOptions);
 
-  // ⛔️ Abbruch, wenn keine gültige Session
   if (!session?.user?.companyId || session.user.role !== "admin") {
     return res.status(403).json({ error: "Nur Admins dürfen Mitglieder entfernen" });
   }
@@ -32,7 +31,14 @@ export default async function handler(req: NextApiRequest, res: NextApiResponse)
 
     await prisma.user.update({
       where: { id: userId },
-      data: { companyId: null },
+      data: {
+        companyId: null,
+        role: null,
+        nickname: null,
+        showName: true,
+        showNickname: false,
+        showEmail: false,
+      },
     });
 
     return res.status(200).json({ success: true });
