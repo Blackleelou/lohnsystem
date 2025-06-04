@@ -1,4 +1,3 @@
-
 // src/pages/team/index.tsx
 
 import { useState, useEffect } from "react";
@@ -11,7 +10,7 @@ type Team = {
   createdAt: string;
 };
 
-export default function TeamOverviewPage() {
+export default function TeamDashboardPage() {
   const [team, setTeam] = useState<Team | null>(null);
   const [loading, setLoading] = useState(true);
 
@@ -32,16 +31,15 @@ export default function TeamOverviewPage() {
           <div>Lade Teamdaten…</div>
         ) : team ? (
           <>
-            <h1 className="text-2xl font-bold text-blue-700 mb-2">{team.name}</h1>
+            <h1 className="text-2xl font-bold text-blue-700 mb-2">{team.name}: Lohnübersicht</h1>
             {team.description && (
               <div className="mb-3 text-gray-600 dark:text-gray-300">{team.description}</div>
             )}
-            <div className="text-xs text-gray-400 mb-6">
-              Angelegt am: {new Date(team.createdAt).toLocaleString()}
-            </div>
-            <div className="mt-10 p-3 bg-blue-50 dark:bg-blue-900/20 rounded">
-              {/* Platz für weitere Team-Inhalte */}
-              Hier folgt bald die Teamverwaltung (Rollen, Einladungen, Einstellungen …)
+            {/* Hier kommt später die Team-Lohnübersicht hin */}
+            <div className="p-3 bg-blue-50 dark:bg-blue-900/20 rounded mt-8">
+              <b>Team-Lohnübersicht:</b><br />
+              {/* Platzhalter oder Widgets */}
+              <div className="mt-2 text-gray-500">Hier erscheinen später alle gemeinsamen Schichten, Lohnabrechnungen und Team-Auswertungen.</div>
             </div>
           </>
         ) : (
