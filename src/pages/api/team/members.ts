@@ -9,9 +9,19 @@ export default async function handler(req: NextApiRequest, res: NextApiResponse)
   if (!session?.user?.companyId) {
     return res.status(404).json({ members: [] });
   }
+
   const members = await prisma.user.findMany({
     where: { companyId: session.user.companyId },
-    select: { id: true, name: true, nickname: true, email: true }
+    select: {
+      id: true,
+      name: true,
+      nickname: true,
+      email: true,
+      role: true,
+      invited: true,
+      accepted: true,
+    },
   });
+
   res.status(200).json({ members });
 }
