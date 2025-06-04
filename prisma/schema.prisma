@@ -25,6 +25,8 @@ model User {
   companyId   String?
   company     Company?   @relation(fields: [companyId], references: [id])
   role        String?    // "admin", "editor", "viewer"
+  invited     Boolean    @default(false)
+  accepted    Boolean    @default(true)
 
   // Sichtbarkeitsoptionen für jedes Teammitglied individuell:
   showName     Boolean  @default(true)
