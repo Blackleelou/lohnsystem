@@ -1,69 +1,40 @@
-import { useState } from "react";
-import { useRouter } from "next/router";
-import { useSession } from "next-auth/react"; // Session-Funktion importieren
+import { prisma } from "@/lib/prisma";
+import { getServerSession } from "next-auth";
+import { authOptions } from "@/lib/authOptions";
+import type { NextApiRequest, NextApiResponse } from "next";
 
-export default function CreateCompanyForm() {
-  const [companyName, setCompanyName] = useState("");
-  const [loading, setLoading] = useState(false);
-  const [errorMsg, setErrorMsg] = useState("");
-  const router = useRouter();
-  const { update } = useSession(); // <- Session-Aktualisierung nutzen
+export default async function handler(req: NextApiRequest, res: NextApiResponse) {
+  if (req.method !== "POST") {
+    return res.status(405).json({ error: "Methode nicht erlaubt" });
+  }
 
-  const handleSubmit = async (e: React.FormEvent) => {
-    e.preventDefault();
-    setErrorMsg("");
-    setLoading(true);
+  const session = await getServerSession(req, res, authOptions);
+  if (!session?.user?.email) {
+    return res.status(401).json({ error: "Nicht eingeloggt" });
+  }
 
-    try {
-      const res = await fetch("/api/company", {
-        method: "POST",
-        headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ name: companyName }),
-      });
+  const { name } = req.body;
+  if (!name) return res.status(400).json({ error: "Name fehlt" });
 
-      const data = await res.json();
+  const existing = await prisma.company.findFirst({ where: { name } });
+  if (existing) {
+    return res.status(400).json({ error: "Firma existiert bereits" });
+  }
 
-      if (!res.ok) {
-        setErrorMsg(data.error || "Unbekannter Fehler");
-        setLoading(false);
-        return;
-      }
+  const company = await prisma.company.create({
+    data: {
+      name,
+      createdAt: new Date(),
+    },
+  });
 
-      // ✅ Session aktualisieren, damit companyId + role verfügbar sind
-      await update();
+  await prisma.user.update({
+    where: { email: session.user.email },
+    data: {
+      companyId: company.id,
+      role: "admin",
+    },
+  });
 
-      // 🔁 Danach weiterleiten z. B. ins Dashboard
-      router.push("/dashboard");
-    } catch (err) {
-      console.error("Fehler beim Erstellen der Firma:", err);
-      setErrorMsg("Netzwerk- oder Serverfehler");
-    } finally {
-      setLoading(false);
-    }
-  };
-
-  return (
-    <form onSubmit={handleSubmit} className="max-w-md mx-auto mt-10 p-4 border rounded shadow-sm bg-white dark:bg-gray-900">
-      <h2 className="text-xl font-bold mb-4">Neue Firma anlegen</h2>
-
-      <label className="block mb-2 font-medium text-sm">Firmenname</label>
-      <input
-        type="text"
-        value={companyName}
-        onChange={(e) => setCompanyName(e.target.value)}
-        className="w-full border px-3 py-2 rounded mb-4 dark:bg-gray-800"
-        required
-      />
-
-      {errorMsg && <div className="text-red-600 text-sm mb-2">{errorMsg}</div>}
-
-      <button
-        type="submit"
-        disabled={loading}
-        className="bg-blue-600 text-white px-4 py-2 rounded hover:bg-blue-700 disabled:opacity-50"
-      >
-        {loading ? "Wird erstellt..." : "Firma erstellen"}
-      </button>
-    </form>
-  );
+  return res.status(200).json({ companyId: company.id });
 }
