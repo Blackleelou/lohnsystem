@@ -20,7 +20,13 @@ export const authOptions: AuthOptions = {
         if (!user || !user.password) return null;
         const isValid = await compare(credentials.password, user.password);
         if (!isValid) return null;
-        return { id: user.id, email: user.email };
+        return {
+  id: user.id,
+  email: user.email,
+  companyId: user.companyId,
+  role: user.role,
+  isAdmin: user.isAdmin,
+};
       },
     }),
     GoogleProvider({
