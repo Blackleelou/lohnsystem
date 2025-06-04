@@ -11,6 +11,7 @@ export default async function handler(req: NextApiRequest, res: NextApiResponse)
   if (!session?.user?.companyId) return res.status(401).end();
 
   const { role, expiresInHours } = req.body;
+
   const token = uuidv4();
   const expiresAt = new Date(Date.now() + (expiresInHours || 48) * 60 * 60 * 1000);
 
@@ -23,5 +24,16 @@ export default async function handler(req: NextApiRequest, res: NextApiResponse)
     },
   });
 
-  res.status(200).json({ token });
+  const baseUrl = process.env.NEXT_PUBLIC_APP_URL || "http://localhost:3000";
+  const joinUrl = `${baseUrl}/join/${invite.token}`;
+
+  res.status(200).json({
+    success: true,
+    invitation: {
+      token: invite.token,
+      role: invite.role,
+      expiresAt: invite.expiresAt,
+      joinUrl,
+    },
+  });
 }
