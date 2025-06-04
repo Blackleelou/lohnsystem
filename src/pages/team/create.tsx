@@ -1,7 +1,6 @@
 import Layout from "@/components/common/Layout";
 import { useState } from "react";
 import { useRouter } from "next/router";
-import { useSession } from "next-auth/react"; // <--- NEU
 
 export default function TeamCreatePage() {
   const [teamName, setTeamName] = useState("");
@@ -13,8 +12,6 @@ export default function TeamCreatePage() {
   const [saving, setSaving] = useState(false);
   const [error, setError] = useState<string | null>(null);
   const router = useRouter();
-
-  const { update } = useSession(); // <--- NEU
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
@@ -29,28 +26,22 @@ export default function TeamCreatePage() {
         description,
         nickname,
         showName,
-        showNickname: !!nickname && showNickname, // Falls Nickname leer, immer false!
+        showNickname: !!nickname && showNickname,
         showEmail,
       }),
     });
 
     if (res.ok) {
-      await update();           // <--- Session live updaten!
-      router.push("/team");
+      router.reload(); // Session vollständig aktualisieren (für Google Login)
     } else {
       setError(await res.text());
       setSaving(false);
     }
   };
 
-  // Nickname-Häkchen auto aktivieren/deaktivieren
   const handleNicknameChange = (val: string) => {
     setNickname(val);
-    if (val) {
-      setShowNickname(true);
-    } else {
-      setShowNickname(false);
-    }
+    setShowNickname(!!val);
   };
 
   return (
