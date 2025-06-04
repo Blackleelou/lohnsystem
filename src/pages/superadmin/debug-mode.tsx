@@ -83,7 +83,37 @@ export default function DebugPage() {
             </pre>
           )}
         </section>
-
+        
+  <section className="mb-6">
+    <h2 className="font-semibold text-lg mb-2">🔍 Analyse: Rolle & Team</h2>
+    <ul className="list-disc pl-6 space-y-1 text-sm">
+      <li>
+        ✅ <strong>User-ID:</strong> {session.user.id}
+      </li>
+      <li>
+        {session.user.companyId ? (
+          <>✅ Zugewiesen zu Firma: <code>{session.user.companyId}</code></>
+        ) : (
+          <>❌ Keine Firma verknüpft</>
+        )}
+      </li>
+      <li>
+        {session.user.role ? (
+          <>✅ Rolle gesetzt: <strong>{session.user.role}</strong></>
+        ) : (
+          <>❌ Keine Rolle gesetzt (role ist null)</>
+        )}
+      </li>
+      <li>
+        {typeof session.user.isAdmin === "boolean" ? (
+          <>✅ isAdmin-Flag: <strong>{String(session.user.isAdmin)}</strong></>
+        ) : (
+          <>❌ isAdmin-Flag fehlt</>
+        )}
+      </li>
+    </ul>
+  </section>
+)}
         {/* 3. Weitere Tools hier */}
       </div>
     </SuperadminLayout>
