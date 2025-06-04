@@ -9,8 +9,10 @@ export default async function handler(req: NextApiRequest, res: NextApiResponse)
   }
 
   const session = await getServerSession(req, res, authOptions);
-  if (!session?.user?.companyId) {
-    return res.status(403).json({ error: "Nicht berechtigt" });
+
+  // ⛔️ Abbruch, wenn keine gültige Session
+  if (!session?.user?.companyId || session.user.role !== "admin") {
+    return res.status(403).json({ error: "Nur Admins dürfen Mitglieder entfernen" });
   }
 
   const { userId } = req.body;
@@ -20,7 +22,6 @@ export default async function handler(req: NextApiRequest, res: NextApiResponse)
   }
 
   try {
-    // Nur Benutzer aus dem eigenen Team dürfen entfernt werden
     const userToRemove = await prisma.user.findUnique({
       where: { id: userId },
     });
