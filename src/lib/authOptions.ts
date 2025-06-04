@@ -67,6 +67,7 @@ export const authOptions: AuthOptions = {
         session.user.companyId = token.companyId as string | null;
         session.user.role = token.role as "admin" | "editor" | "viewer";
         session.user.isAdmin = typeof token.isAdmin === "boolean" ? token.isAdmin : undefined;
+        session.user.nickname = token.nickname as string | undefined;
       }
       return session;
     },
