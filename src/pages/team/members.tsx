@@ -1,5 +1,5 @@
 import Layout from "@/components/common/Layout";
-import TeamSidebar from "@/components/team/TeamSidebar";
+import TeamSidebar from "@/components/team/TeamLayout";
 export default function TeamMembersPage() {
   return (
     <Layout>
