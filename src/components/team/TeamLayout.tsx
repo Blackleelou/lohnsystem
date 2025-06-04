@@ -12,19 +12,19 @@ import {
   Trash,
   ChevronLeft,
   ChevronRight,
-  Building2,
-  List,
   BarChart2,
+  List,
+  Folder,
 } from "lucide-react";
 
 const links = [
-  { href: "/team", label: "Übersicht", icon: <Building2 /> },
   { href: "/team/settings", label: "Allgemein", icon: <Settings /> },
   { href: "/team/members", label: "Mitglieder", icon: <Users /> },
   { href: "/team/invites", label: "Einladungen", icon: <QrCode /> },
   { href: "/team/security", label: "Zugangs-Code", icon: <KeyRound /> },
   { href: "/team/payrules", label: "Zuschläge", icon: <BarChart2 /> },
   { href: "/team/shifts", label: "Schichten", icon: <List /> },
+  { href: "/team/files", label: "Dokumente", icon: <Folder /> }, // Neuer Link für Betriebsrat-Ablage
   { href: "/team/delete", label: "Team löschen", icon: <Trash />, danger: true },
 ];
 
