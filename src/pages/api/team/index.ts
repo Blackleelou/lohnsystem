@@ -55,14 +55,23 @@ export default async function handler(req: NextApiRequest, res: NextApiResponse)
 // === TEAM LÖSCHEN ===
 if (req.method === "DELETE") {
   const session = await getServerSession(req, res, authOptions);
-  if (!session?.user?.companyId) {
-    return res.status(400).json({ error: "Kein Team zugeordnet" });
+  if (!session?.user?.email) {
+    return res.status(401).json({ error: "Nicht eingeloggt" });
   }
 
-  const companyId = session.user.companyId;
-
   try {
-    // 1. Alle User-Daten zurücksetzen, die zu dieser Firma gehören
+    // Hole aktuellen Nutzer aus DB (nicht aus der Session!)
+    const user = await prisma.user.findUnique({
+      where: { email: session.user.email },
+    });
+
+    if (!user?.companyId) {
+      return res.status(400).json({ error: "Kein Team zugeordnet" });
+    }
+
+    const companyId = user.companyId;
+
+    // 1. Alle User-Daten zurücksetzen
     await prisma.user.updateMany({
       where: { companyId },
       data: {
@@ -86,6 +95,7 @@ if (req.method === "DELETE") {
     return res.status(500).json({ error: "Fehler beim Löschen des Teams" });
   }
 }
+
 
 // === Alle anderen Methoden ===
 return res.status(405).json({ error: "Method Not Allowed" });
