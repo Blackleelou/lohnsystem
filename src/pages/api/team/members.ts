@@ -20,6 +20,9 @@ export default async function handler(req: NextApiRequest, res: NextApiResponse)
       role: true,
       invited: true,
       accepted: true,
+      showName: true,        // Hier hinzugefügt
+      showNickname: true,    // Hier hinzugefügt
+      showEmail: true,       // Hier hinzugefügt
     },
   });
 
