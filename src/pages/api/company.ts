@@ -1,12 +1,13 @@
 import { useState } from "react";
 import { useRouter } from "next/router";
-
+import { useSession } from "next-auth/react"; // Session-Funktion importieren
 
 export default function CreateCompanyForm() {
   const [companyName, setCompanyName] = useState("");
   const [loading, setLoading] = useState(false);
   const [errorMsg, setErrorMsg] = useState("");
   const router = useRouter();
+  const { update } = useSession(); // <- Session-Aktualisierung nutzen
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
@@ -27,6 +28,9 @@ export default function CreateCompanyForm() {
         setLoading(false);
         return;
       }
+
+      // ✅ Session aktualisieren, damit companyId + role verfügbar sind
+      await update();
 
       // 🔁 Danach weiterleiten z. B. ins Dashboard
       router.push("/dashboard");
