@@ -28,9 +28,6 @@ export default function CreateCompanyForm() {
         return;
       }
 
-      // ✅ Session nach dem Update neu laden, damit role & companyId sichtbar werden
-      await update();
-
       // 🔁 Danach weiterleiten z. B. ins Dashboard
       router.push("/dashboard");
     } catch (err) {
