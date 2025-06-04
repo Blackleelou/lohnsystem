@@ -46,6 +46,7 @@ export const authOptions: AuthOptions = {
           token.companyId = dbUser.companyId;
           token.role = dbUser.role;
           token.isAdmin = dbUser.isAdmin;
+          token.nickname = dbUser.nickname;
         }
       }
       // Token refresh nach .update()
@@ -55,6 +56,7 @@ export const authOptions: AuthOptions = {
           token.companyId = dbUser.companyId;
           token.role = dbUser.role;
           token.isAdmin = dbUser.isAdmin;
+          token.nickname = dbUser.nickname;
         }
       }
       return token;
