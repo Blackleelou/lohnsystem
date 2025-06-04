@@ -53,28 +53,36 @@ export default async function handler(req: NextApiRequest, res: NextApiResponse)
   }
 
   // === TEAM LÖSCHEN ===
-  if (req.method === "DELETE") {
-    const session = await getServerSession(req, res, authOptions);
-    if (!session?.user?.companyId) {
-      return res.status(400).json({ error: "Kein Team zugeordnet" });
-    }
+if (req.method === "DELETE") {
+  const session = await getServerSession(req, res, authOptions);
+  if (!session?.user?.companyId) {
+    return res.status(400).json({ error: "Kein Team zugeordnet" });
+  }
 
-    const companyId = session.user.companyId;
+  const companyId = session.user.companyId;
 
-    // 1. Alle User vom Team lösen
+  try {
+    // 1. Alle User-Daten zurücksetzen, die zu dieser Firma gehören
     await prisma.user.updateMany({
       where: { companyId },
-      data: { companyId: null },
+      data: {
+        companyId: null,
+        role: null,
+        nickname: null,
+        showName: true,
+        showNickname: false,
+        showEmail: false,
+      },
     });
 
-    // 2. Team/Firma löschen
+    // 2. Firma löschen
     await prisma.company.delete({
       where: { id: companyId },
     });
 
     return res.status(200).json({ ok: true });
+  } catch (error) {
+    console.error("Fehler beim Team-Löschen:", error);
+    return res.status(500).json({ error: "Fehler beim Löschen des Teams" });
   }
-
-  // === Andere Methoden: nicht erlaubt ===
-  return res.status(405).json({ error: "Method Not Allowed" });
 }
