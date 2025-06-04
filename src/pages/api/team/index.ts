@@ -41,6 +41,7 @@ export default async function handler(req: NextApiRequest, res: NextApiResponse)
       where: { email: session.user.email },
       data: {
         companyId: company.id,
+        role: "admin",
         nickname,
         showName: !!showName,
         showNickname: !!showNickname,
