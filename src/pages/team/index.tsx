@@ -1,5 +1,6 @@
 // src/pages/team/index.tsx
 
+import Layout from "@/components/common/Layout"; // <--- Nur das Hauptlayout
 import { useState, useEffect } from "react";
 
 type Team = {
@@ -24,7 +25,7 @@ export default function TeamDashboardPage() {
   }, []);
 
   return (
-    <TeamLayout>
+    <Layout>
       <div className="max-w-2xl mx-auto p-8 mt-12 bg-white dark:bg-gray-900 rounded-xl shadow">
         {loading ? (
           <div>Lade Teamdaten…</div>
@@ -45,6 +46,6 @@ export default function TeamDashboardPage() {
           <div>Kein Team gefunden.</div>
         )}
       </div>
-    </TeamLayout>
+    </Layout>
   );
 }
