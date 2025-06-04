@@ -156,3 +156,30 @@ model Shift {
   user        User     @relation(fields: [userId], references: [id], onDelete: Cascade)
   company     Company  @relation(fields: [companyId], references: [id], onDelete: Cascade)
 }
+
+model Invitation {
+  id         String   @id @default(cuid())      // Interne ID
+  token      String   @unique                   // Link-Token (z. B. abc123)
+  companyId  String                             // Referenz auf das Team
+  role       String                             // Rolle, z. B. "editor", "viewer"
+  createdAt  DateTime @default(now())           // Wann erstellt
+  expiresAt  DateTime                           // Gültig bis
+  used       Boolean  @default(false)           // Schon benutzt?
+  createdBy  String?                            // Optional: ID des Admins
+
+  company    Company  @relation(fields: [companyId], references: [id], onDelete: Cascade)
+}
+
+model AccessCode {
+  id              String   @id @default(cuid())       // Interne ID
+  code            String   @unique                    // Z. B. "SCHICHT24"
+  companyId       String                              // Referenz auf Team
+  role            String                              // Welche Rolle wird vergeben
+  validFrom       DateTime                            // Start der Gültigkeit
+  validUntil      DateTime                            // Ende der Gültigkeit
+  requirePassword Boolean  @default(true)             // Muss ein Passwort eingegeben werden?
+  password        String?                              // Nur wenn requirePassword = true
+  createdAt       DateTime @default(now())
+
+  company         Company  @relation(fields: [companyId], references: [id], onDelete: Cascade)
+}
