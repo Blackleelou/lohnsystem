@@ -52,7 +52,7 @@ export default async function handler(req: NextApiRequest, res: NextApiResponse)
     return res.status(200).json({ teamId: company.id });
   }
 
-  // === TEAM LÖSCHEN ===
+// === TEAM LÖSCHEN ===
 if (req.method === "DELETE") {
   const session = await getServerSession(req, res, authOptions);
   if (!session?.user?.companyId) {
@@ -85,4 +85,8 @@ if (req.method === "DELETE") {
     console.error("Fehler beim Team-Löschen:", error);
     return res.status(500).json({ error: "Fehler beim Löschen des Teams" });
   }
+}
+
+// === Alle anderen Methoden ===
+return res.status(405).json({ error: "Method Not Allowed" });
 }
