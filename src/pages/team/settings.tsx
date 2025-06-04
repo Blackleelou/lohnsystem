@@ -3,7 +3,7 @@
 import { useState, useEffect } from "react";
 import { useRouter } from "next/router";
 import Layout from "@/components/common/Layout";
-import TeamSidebar from "@/components/team/TeamSidebar";
+import TeamSidebar from "@/components/team/TeamLayot";
 import { useSession } from "next-auth/react";
 
 // Typen für Team & Mitglieder
