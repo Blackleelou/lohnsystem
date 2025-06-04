@@ -1,10 +1,9 @@
-// pages/debug.tsx
 import { useSession } from "next-auth/react";
 import SuperadminLayout from "@/components/superadmin/SuperadminLayout";
 import { useState } from "react";
 
 export default function DebugPage() {
-  const { data: session, status } = useSession();
+  const { data: session, status, update } = useSession();
   const [testApiResult, setTestApiResult] = useState<string | null>(null);
 
   // Beispiel: API-Test
@@ -37,6 +36,38 @@ export default function DebugPage() {
           </pre>
         </section>
 
+        {/* 1b. Analyse: Rollen- und Firmenstatus */}
+        <section className="mb-6">
+          <h2 className="font-semibold text-lg mb-2">Analyse: Rolle & Team</h2>
+          <div className="bg-white border rounded p-4 text-sm space-y-2">
+            {session?.user?.companyId ? (
+              <p>
+                ✅ Zugewiesen zu Firma:{" "}
+                <code>{session.user.companyId}</code>
+              </p>
+            ) : (
+              <p className="text-red-600">
+                ❌ Kein Team zugewiesen (<code>companyId</code> fehlt)
+              </p>
+            )}
+
+            {session?.user?.role ? (
+              <>
+                <p>✅ Rolle erkannt: <strong>{session.user.role}</strong></p>
+                {session.user.role !== "admin" && (
+                  <p className="text-yellow-600">
+                    ⚠️ Du bist kein Admin – eingeschränkte Rechte für Teamfunktionen.
+                  </p>
+                )}
+              </>
+            ) : (
+              <p className="text-red-600">
+                ❌ Keine Rolle gesetzt (<code>role</code> ist null oder fehlt)
+              </p>
+            )}
+          </div>
+        </section>
+
         {/* 2. API-Test */}
         <section className="mb-6">
           <h2 className="font-semibold text-lg mb-2">API-Test (Demo)</h2>
@@ -47,12 +78,13 @@ export default function DebugPage() {
             Test /api/test-endpoint
           </button>
           {testApiResult && (
-            <pre className="bg-gray-100 p-3 rounded text-xs mt-2">{testApiResult}</pre>
+            <pre className="bg-gray-100 p-3 rounded text-xs mt-2">
+              {testApiResult}
+            </pre>
           )}
         </section>
 
-        {/* 3. Platz für weitere Tools */}
-        {/* Beispiel: Theme Preview, Mail-Test, Daten-Reset usw. */}
+        {/* 3. Weitere Tools hier */}
       </div>
     </SuperadminLayout>
   );
