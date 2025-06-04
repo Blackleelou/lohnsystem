@@ -35,7 +35,7 @@ export default function TeamCreatePage() {
 
     if (res.ok) {
       await update(); // 👈 Session aktualisieren (funktioniert auch mit Google)
-      router.push("/team"); // oder ein anderer Zielpfad
+      router.push("/team/settings"); // oder ein anderer Zielpfad
     } else {
       setError(await res.text());
       setSaving(false);
