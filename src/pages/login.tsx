@@ -28,7 +28,7 @@ export default function LoginPage() {
   } else {
     router.push('/dashboard');
   }
-}
+
     } else {
       if (res?.error?.includes('E-Mail')) {
         setError('Bitte bestätige zuerst deine E-Mail-Adresse.');
