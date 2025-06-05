@@ -1,14 +1,24 @@
 // src/hooks/usePollingSession.ts
-
-import { useSession, UseSessionOptions } from "next-auth/react";
+import { useEffect } from "react";
+import { useSession } from "next-auth/react";
 
 export function usePollingSession() {
-  // UseSessionOptions<false> → required = false (Session muss nicht zwingend existieren)
-  const options: UseSessionOptions<false> = {
-    required: false,
-    refetchInterval: 30,         // alle 30 Sekunden frisch abrufen
-    refetchOnWindowFocus: true,   // sofort neu abrufen, wenn Tab fokussiert
-  };
+  // Standard-useSession ohne Spezial-Optionen
+  const { data: session, status, update } = useSession({ required: false });
 
-  return useSession(options);
+  useEffect(() => {
+    // Sobald der User eingeloggt ist, führt update() alle 30 Sekunden aus
+    if (status === "authenticated") {
+      const iv = setInterval(() => {
+        update(); // holt sich die frischeste Session vom Server
+      }, 30 * 1000);
+
+      // Beim Unmount/Cleanup den Timer stoppen
+      return () => clearInterval(iv);
+    }
+    // falls nicht eingeloggt → kein Intervall
+    return;
+  }, [status, update]);
+
+  return { data: session, status };
 }
