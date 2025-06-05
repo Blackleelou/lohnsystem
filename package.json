@@ -33,6 +33,7 @@
     "next-auth": "^4.24.2",
     "prisma": "^6.8.2",
     "ra-data-simple-rest": "^5.8.3",
+    "react-icons": "^4.10.1",
     "react-qr-code": "^2.0.7",
     "react-device-detect": "^2.2.2",
     "react": "18.2.0",
