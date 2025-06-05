@@ -1,4 +1,3 @@
-
 import TeamLayout from "@/components/team/TeamLayout";
 import { useState } from "react";
 import QRCode from "react-qr-code";
