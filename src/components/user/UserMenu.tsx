@@ -5,7 +5,14 @@ import { signOut, useSession } from "next-auth/react";
 import LanguageSwitcher from "@/components/common/LanguageSwitcher";
 import ThemeSwitch from "@/components/common/ThemeSwitch";
 import Link from "next/link";
-import { LogOut, Settings, User, Shield, Palette, Building2 } from "lucide-react";
+import {
+  LogOut,
+  Settings,
+  User,
+  Shield,
+  Palette,
+  Building2,
+} from "lucide-react";
 
 export default function UserMenu() {
   const [isOpen, setIsOpen] = useState(false);
@@ -13,7 +20,7 @@ export default function UserMenu() {
 
   const isSuperadmin = session?.user?.email === "jantzen.chris@gmail.com";
   const companyId = session?.user?.companyId;
-  const role = session?.user?.role; // erwartet "admin", "editor" oder "viewer" etc.
+  const role = session?.user?.role; // hier erwarten wir "admin" | "editor" | "viewer" etc.
 
   return (
     <div className="relative">
@@ -25,16 +32,34 @@ export default function UserMenu() {
       >
         <span className="block w-6 h-6">
           <svg width="100%" height="100%" viewBox="0 0 24 24">
-            <rect y="4" width="24" height="2" rx="1" className="fill-gray-800 dark:fill-gray-100" />
-            <rect y="11" width="24" height="2" rx="1" className="fill-gray-800 dark:fill-gray-100" />
-            <rect y="18" width="24" height="2" rx="1" className="fill-gray-800 dark:fill-gray-100" />
+            <rect
+              y="4"
+              width="24"
+              height="2"
+              rx="1"
+              className="fill-gray-800 dark:fill-gray-100"
+            />
+            <rect
+              y="11"
+              width="24"
+              height="2"
+              rx="1"
+              className="fill-gray-800 dark:fill-gray-100"
+            />
+            <rect
+              y="18"
+              width="24"
+              height="2"
+              rx="1"
+              className="fill-gray-800 dark:fill-gray-100"
+            />
           </svg>
         </span>
       </button>
 
       {isOpen && (
         <div className="absolute right-0 top-12 bg-white dark:bg-gray-900 shadow-2xl border border-gray-200 dark:border-gray-800 rounded-2xl min-w-[220px] z-50 p-4 flex flex-col gap-2 animate-fade-in">
-          {/* ThemeSwitch oben */}
+          {/* ThemeSwitch ganz oben */}
           <div className="flex justify-center mb-2">
             <ThemeSwitch />
           </div>
@@ -50,7 +75,7 @@ export default function UserMenu() {
             Dashboard
           </Link>
 
-          {/* Persönliche Einstellungen: immer sichtbar */}
+          {/* „Mein Konto“ immer sichtbar */}
           <Link
             href="/settings"
             className="flex items-center gap-2 px-3 py-2 rounded-lg text-gray-700 dark:text-gray-100 hover:bg-blue-50 dark:hover:bg-gray-800 transition"
@@ -60,7 +85,7 @@ export default function UserMenu() {
             Mein Konto
           </Link>
 
-          {/* Team-Funktionen für Solo-User */}
+          {/* Trennlinie, falls noch kein Team */}
           {!companyId && (
             <>
               <Link
@@ -83,7 +108,7 @@ export default function UserMenu() {
             </>
           )}
 
-          {/* Firmeneinstellungen nur für Rollen ≠ "viewer" */}
+          {/* Firmeneinstellungen nur anzeigen, wenn ein Team existiert UND role != "viewer" */}
           {companyId && role !== "viewer" && (
             <Link
               href="/team/settings"
@@ -95,7 +120,7 @@ export default function UserMenu() {
             </Link>
           )}
 
-          {/* Design & Theme */}
+          {/* Design & Theme (immer anzeigen) */}
           <Link
             href="/admin/theme"
             className="flex items-center gap-2 px-3 py-2 rounded-lg text-gray-700 dark:text-gray-100 hover:bg-blue-50 dark:hover:bg-gray-800 transition"
