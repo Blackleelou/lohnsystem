@@ -1,13 +1,13 @@
 // src/components/team/TeamInviteGenerator.tsx
-
 import { useState } from "react";
 import QRCode from "react-qr-code";
-import { Mail, BrandWhatsapp } from "lucide-react"; // ← Hier importieren wir BrandWhatsapp
+import { Mail } from "lucide-react";      // weiterhin für das E-Mail-Icon
+import { FaWhatsapp } from "react-icons/fa"; // FontAwesome WhatsApp
 import { isMobile } from "react-device-detect";
 
 export default function TeamInviteGenerator() {
-  const [qrUrl, setQrUrl] = useState<string>("");
-  const [qrSecureUrl, setQrSecureUrl] = useState<string>("");
+  const [qrUrl, setQrUrl] = useState("");
+  const [qrSecureUrl, setQrSecureUrl] = useState("");
   const [loadingType, setLoadingType] = useState<"qr" | "secure" | "link-whatsapp" | "link-email" | null>(null);
 
   const createInvite = async (type: string, expiresInHours?: number) => {
@@ -49,7 +49,7 @@ export default function TeamInviteGenerator() {
     setLoadingType(null);
 
     if (mode === "whatsapp") {
-      // Auf dem Handy reicht window.location.href; auf Desktop öffnet es WhatsApp Web
+      // für mobile Kompatibilität
       window.location.href = `https://wa.me/?text=${encodedUrl}`;
     } else {
       window.location.href = `mailto:?subject=Team Einladung&body=${encodedUrl}`;
@@ -107,7 +107,7 @@ export default function TeamInviteGenerator() {
       {/* Option 2 */}
       <Card
         title="QR-Code mit Passwort"
-        description="Passwort wechselt alle 24 Stunden, der QR bleibt gültig. Passwort auf /team/security."
+        description="Passwort wechselt alle 24 Stunden, QR bleibt gültig. Passwort auf /team/security."
         buttonArea={
           <button
             onClick={handleSecureQr}
@@ -134,7 +134,7 @@ export default function TeamInviteGenerator() {
         description="Nach erstem Klick verfällt der Link. Direkt versenden an neue Teammitglieder."
         buttonArea={
           <div className="flex justify-center items-center gap-8">
-            {/* WhatsApp-Icon (Lucide: BrandWhatsapp) */}
+            {/* WhatsApp-Icon (react-icons/fa) */}
             <span
               onClick={() => generateAndSendLink("whatsapp")}
               className={`cursor-pointer ${
@@ -142,10 +142,10 @@ export default function TeamInviteGenerator() {
               }`}
               title="Per WhatsApp senden"
             >
-              <BrandWhatsapp className="w-8 h-8 text-green-500" />
+              <FaWhatsapp className="w-8 h-8 text-green-500" />
             </span>
 
-            {/* E-Mail-Icon (Lucide: Mail) */}
+            {/* E-Mail-Icon (lucide-react) */}
             <span
               onClick={() => generateAndSendLink("email")}
               className={`cursor-pointer ${
