@@ -21,7 +21,14 @@ export default function LoginPage() {
       redirect: false,
     });
     if (res?.ok) {
-      router.push('/dashboard');
+  const joinToken = sessionStorage.getItem("joinToken");
+  if (joinToken) {
+    sessionStorage.removeItem("joinToken");
+    router.push(`/join/${joinToken}`);
+  } else {
+    router.push('/dashboard');
+  }
+}
     } else {
       if (res?.error?.includes('E-Mail')) {
         setError('Bitte bestätige zuerst deine E-Mail-Adresse.');
