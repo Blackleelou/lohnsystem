@@ -37,7 +37,7 @@ export default function TeamInviteGenerator() {
   setLoadingType(mode === "whatsapp" ? "link-whatsapp" : "link-email");
   const res = await fetch("/api/team/create-invite", {
     method: "POST",
-    body: JSON.stringify({ type: "onetime" }),
+    body: JSON.stringify({ type: "single_use" }),
     headers: { "Content-Type": "application/json" },
   });
   const data = await res.json();
