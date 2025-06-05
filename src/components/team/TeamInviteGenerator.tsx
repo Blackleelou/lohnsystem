@@ -2,7 +2,7 @@
 
 import { useState } from "react";
 import QRCode from "react-qr-code";
-import { Mail, Whatsapp } from "lucide-react"; // Nur noch das Lucide-WhatsApp-Icon
+import { Mail, WhatsApp } from "lucide-react"; // Nur noch das Lucide-WhatsApp-Icon
 import { isMobile } from "react-device-detect";
 
 export default function TeamInviteGenerator() {
