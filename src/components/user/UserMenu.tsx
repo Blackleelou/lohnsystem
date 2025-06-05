@@ -1,3 +1,5 @@
+// src/components/user/UserMenu.tsx
+
 import { useState } from "react";
 import { signOut, useSession } from "next-auth/react";
 import LanguageSwitcher from "@/components/common/LanguageSwitcher";
@@ -8,8 +10,10 @@ import { LogOut, Settings, User, Shield, Palette, Building2 } from "lucide-react
 export default function UserMenu() {
   const [isOpen, setIsOpen] = useState(false);
   const { data: session } = useSession();
+
   const isSuperadmin = session?.user?.email === "jantzen.chris@gmail.com";
   const companyId = session?.user?.companyId;
+  const role = session?.user?.role; // erwartet "admin", "editor" oder "viewer" etc.
 
   return (
     <div className="relative">
@@ -28,7 +32,6 @@ export default function UserMenu() {
         </span>
       </button>
 
-      {/* ALLES INS DROPDOWN */}
       {isOpen && (
         <div className="absolute right-0 top-12 bg-white dark:bg-gray-900 shadow-2xl border border-gray-200 dark:border-gray-800 rounded-2xl min-w-[220px] z-50 p-4 flex flex-col gap-2 animate-fade-in">
           {/* ThemeSwitch oben */}
@@ -80,8 +83,8 @@ export default function UserMenu() {
             </>
           )}
 
-          {/* Firmeneinstellungen für Team-User */}
-          {companyId && (
+          {/* Firmeneinstellungen nur für Rollen ≠ "viewer" */}
+          {companyId && role !== "viewer" && (
             <Link
               href="/team/settings"
               className="flex items-center gap-2 px-3 py-2 rounded-lg text-blue-700 dark:text-blue-400 font-semibold hover:bg-blue-50 dark:hover:bg-gray-800 transition"
@@ -92,7 +95,7 @@ export default function UserMenu() {
             </Link>
           )}
 
-          {/* Theme-Design */}
+          {/* Design & Theme */}
           <Link
             href="/admin/theme"
             className="flex items-center gap-2 px-3 py-2 rounded-lg text-gray-700 dark:text-gray-100 hover:bg-blue-50 dark:hover:bg-gray-800 transition"
@@ -129,7 +132,10 @@ export default function UserMenu() {
           {/* Logout */}
           <button
             type="button"
-            onClick={() => signOut({ callbackUrl: "/" })}
+            onClick={() => {
+              signOut({ callbackUrl: "/" });
+              setIsOpen(false);
+            }}
             className="flex items-center gap-2 px-3 py-2 rounded-lg text-red-500 hover:bg-red-50 dark:hover:bg-gray-800 transition"
           >
             <LogOut className="w-5 h-5" />
