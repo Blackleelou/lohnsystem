@@ -1,3 +1,5 @@
+// src/pages/api/team/create-invite.ts
+
 import { NextApiRequest, NextApiResponse } from "next";
 import { prisma } from "@/lib/prisma";
 import { getServerSession } from "next-auth";
@@ -10,30 +12,43 @@ export default async function handler(req: NextApiRequest, res: NextApiResponse)
   const session = await getServerSession(req, res, authOptions);
   if (!session?.user?.companyId) return res.status(401).end();
 
-  const { role, expiresInHours } = req.body;
+  const {
+    role = "viewer",
+    expiresInHours = 48,
+    password = null,
+    note = null,
+    type = "qr_simple", // "qr_simple", "qr_protected", "single_use"
+  } = req.body;
 
   const token = uuidv4();
-  const expiresAt = new Date(Date.now() + (expiresInHours || 48) * 60 * 60 * 1000);
+  const now = new Date();
+  const expiresAt = new Date(now.getTime() + expiresInHours * 60 * 60 * 1000);
 
   const invite = await prisma.invitation.create({
     data: {
       token,
       companyId: session.user.companyId,
-      role: role || "viewer",
+      role,
       expiresAt,
+      password,
+      note,
+      type,
+      createdById: session.user.id,
     },
   });
 
   const baseUrl = process.env.NEXT_PUBLIC_APP_URL || "http://localhost:3000";
-  const joinUrl = `${baseUrl}/join/${invite.token}`;
+  const joinUrl = `${baseUrl}/team/join/${token}`;
 
-  res.status(200).json({
+  return res.status(200).json({
     success: true,
     invitation: {
-      token: invite.token,
-      role: invite.role,
-      expiresAt: invite.expiresAt,
+      token,
       joinUrl,
+      expiresAt,
+      role,
+      note,
+      type,
     },
   });
 }
