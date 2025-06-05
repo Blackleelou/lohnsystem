@@ -1,3 +1,5 @@
+// src/components/team/TeamInviteGenerator.tsx
+
 import { useState } from "react";
 import QRCode from "react-qr-code";
 
@@ -46,6 +48,7 @@ export default function TeamInviteGenerator() {
     setLoadingType(null);
 
     if (mode === "whatsapp") {
+      // Direktweiterleitung statt window.open für mobile Browser-Kompatibilität
       window.location.href = `https://wa.me/?text=${encodedUrl}`;
     } else {
       window.location.href = `mailto:?subject=Team Einladung&body=${encodedUrl}`;
@@ -125,22 +128,30 @@ export default function TeamInviteGenerator() {
             <span className="text-sm text-gray-600">Versenden via:</span>
             <button
               onClick={() => generateAndSendLink("whatsapp")}
+              title="WhatsApp"
               className="hover:opacity-80"
               disabled={loadingType === "link-whatsapp"}
-              title="WhatsApp"
             >
-              <svg xmlns="http://www.w3.org/2000/svg" className="w-6 h-6 text-green-500" viewBox="0 0 448 512">
-                <path d="M380.9 97.1C339.3 55.6 283.9 32 224.6 32..." />
+              <svg
+                xmlns="http://www.w3.org/2000/svg"
+                className="w-6 h-6 text-green-500"
+                viewBox="0 0 448 512"
+              >
+                <path d="M380.9 97.1C339.3 55.6 283.9 32 224.6 32 103.3 32 4.3 130.9.1 252.1c-.3 10.6.1 21.2 1.2 31.7L0 480l194.8-51.5c9.9 2.8 20.2 4.2 30.6 4.2 121.2 0 220.2-98.9 224.5-220.2 1.1-60.3-22.3-115.7-64.9-157.4z" />
               </svg>
             </button>
             <button
               onClick={() => generateAndSendLink("email")}
+              title="E-Mail"
               className="hover:opacity-80"
               disabled={loadingType === "link-email"}
-              title="E-Mail"
             >
-              <svg xmlns="http://www.w3.org/2000/svg" className="w-6 h-6 text-blue-500" viewBox="0 0 512 512">
-                <path d="M502.3 190.8 327.4 338..." />
+              <svg
+                xmlns="http://www.w3.org/2000/svg"
+                className="w-6 h-6 text-blue-500"
+                viewBox="0 0 512 512"
+              >
+                <path d="M502.3 190.8 327.4 338c-18.8 15.7-44.7 24-71.4 24s-52.6-8.3-71.4-24L9.7 190.8C3.8 185.5 0 177.9 0 169.7c0-17.7 14.3-32 32-32h448c17.7 0 32 14.3 32 32 0 8.2-3.8 15.8-9.7 20.1z" />
               </svg>
             </button>
           </div>
