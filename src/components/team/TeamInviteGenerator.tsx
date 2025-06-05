@@ -1,15 +1,23 @@
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import QRCode from "react-qr-code";
-import { isMobile } from "react-device-detect";
 
 export default function TeamInviteGenerator() {
   const [inviteUrl, setInviteUrl] = useState("");
   const [role, setRole] = useState("viewer");
-  const [expiresIn, setExpiresIn] = useState(720); // 720h = 30 Tage
+  const [expiresIn, setExpiresIn] = useState(720); // max. 30 Tage
   const [withPassword, setWithPassword] = useState(false);
   const [password, setPassword] = useState("");
   const [note, setNote] = useState("");
   const [loading, setLoading] = useState(false);
+  const [isMobile, setIsMobile] = useState(false);
+
+  useEffect(() => {
+    // einfache mobile Detection ohne extra Paket
+    if (typeof window !== "undefined") {
+      const ua = navigator.userAgent.toLowerCase();
+      setIsMobile(/iphone|ipad|android|mobile/.test(ua));
+    }
+  }, []);
 
   const handleCreateQRCode = async () => {
     setLoading(true);
@@ -59,26 +67,30 @@ export default function TeamInviteGenerator() {
       <h2 className="text-2xl font-bold mb-4 text-center">Team-Zugang erstellen</h2>
 
       <div className="space-y-4">
-        <label className="block font-semibold">Rolle:</label>
-        <select
-          value={role}
-          onChange={(e) => setRole(e.target.value)}
-          className="w-full p-2 border rounded"
-        >
-          <option value="viewer">Viewer</option>
-          <option value="editor">Editor</option>
-          <option value="admin">Admin</option>
-        </select>
+        <div>
+          <label className="block font-semibold">Rolle:</label>
+          <select
+            value={role}
+            onChange={(e) => setRole(e.target.value)}
+            className="w-full p-2 border rounded"
+          >
+            <option value="viewer">Viewer</option>
+            <option value="editor">Editor</option>
+            <option value="admin">Admin</option>
+          </select>
+        </div>
 
-        <label className="block font-semibold">Gültigkeit (in Stunden):</label>
-        <input
-          type="number"
-          value={expiresIn}
-          onChange={(e) => setExpiresIn(Number(e.target.value))}
-          className="w-full p-2 border rounded"
-          min={1}
-          max={720}
-        />
+        <div>
+          <label className="block font-semibold">Gültigkeit (in Stunden):</label>
+          <input
+            type="number"
+            value={expiresIn}
+            onChange={(e) => setExpiresIn(Number(e.target.value))}
+            className="w-full p-2 border rounded"
+            min={1}
+            max={720}
+          />
+        </div>
 
         <label className="flex items-center gap-2">
           <input
