@@ -8,28 +8,16 @@ export default async function handler(req: NextApiRequest, res: NextApiResponse)
   if (req.method !== "POST") return res.status(405).end();
 
   const session = await getServerSession(req, res, authOptions);
-  if (!session?.user?.companyId || !session.user.id) return res.status(401).end();
+  if (!session?.user?.companyId || !session.user?.id) return res.status(401).end();
 
-  const { role, type, password, note } = req.body;
+  const { role, expiresInHours, type, note, password } = req.body;
 
-  const validTypes = ["qr_basic", "qr_password", "link_once"];
-  if (!validTypes.includes(type)) {
-    return res.status(400).json({ success: false, message: "Ungültiger Einladungs-Typ." });
+  if (!["qr_simple", "qr_protected", "single_use"].includes(type)) {
+    return res.status(400).json({ error: "Ungültiger Einladungstyp" });
   }
-
-  // Ablaufdauer je nach Typ
-  let expiresInMs: number;
-  if (type === "qr_basic") {
-    expiresInMs = 1000 * 60 * 60 * 24 * 30; // 30 Tage
-  } else if (type === "qr_password") {
-    expiresInMs = 1000 * 60 * 60 * 24 * 7; // 7 Tage (konfigurierbar)
-  } else {
-    expiresInMs = 1000 * 60 * 10; // Einmal-Link: nur 10 Minuten aktiv
-  }
-
-  const expiresAt = new Date(Date.now() + expiresInMs);
 
   const token = uuidv4();
+  const expiresAt = new Date(Date.now() + (expiresInHours || 48) * 60 * 60 * 1000);
 
   const invite = await prisma.invitation.create({
     data: {
@@ -38,37 +26,24 @@ export default async function handler(req: NextApiRequest, res: NextApiResponse)
       role: role || "viewer",
       expiresAt,
       used: false,
-      createdBy: session.user.id,
+      createdBy: session.user.name || "System",
+      createdById: session.user.id,
+      type,
+      note: note || null,
+      password: type === "qr_protected" ? password || "" : null,
     },
   });
 
-  // Falls AccessCode nötig ist
-  if (type === "qr_password") {
-    await prisma.accessCode.create({
-      data: {
-        code: token.slice(0, 6).toUpperCase(), // z. B. „B3F92Z“
-        companyId: session.user.companyId,
-        role: role || "viewer",
-        validFrom: new Date(),
-        validUntil: new Date(Date.now() + 1000 * 60 * 60 * 24), // 24h Passwort gültig
-        requirePassword: true,
-        password: password || "",
-      },
-    });
-  }
-
   const baseUrl = process.env.NEXT_PUBLIC_APP_URL || "http://localhost:3000";
-  const joinUrl = `${baseUrl}/join/${token}`;
+  const joinUrl = `${baseUrl}/join/${invite.token}`;
 
   res.status(200).json({
     success: true,
     invitation: {
-      token,
+      token: invite.token,
+      role: invite.role,
+      expiresAt: invite.expiresAt,
       joinUrl,
-      type,
-      expiresAt,
-      note: note || null,
-      password: password || null,
     },
   });
 }
