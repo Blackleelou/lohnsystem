@@ -2,7 +2,7 @@
 
 import { useState } from "react";
 import QRCode from "react-qr-code";
-import { Mail } from "lucide-react"; // Icon für E-Mail
+import { Mail } from "lucide-react"; // Lucide-Mail-Icon
 import { isMobile } from "react-device-detect";
 
 export default function TeamInviteGenerator() {
@@ -12,7 +12,7 @@ export default function TeamInviteGenerator() {
     "qr" | "secure" | "link-whatsapp" | "link-email" | null
   >(null);
 
-  // Hilfsfunktion, um die API aufzurufen
+  // --- Hilfsfunktion, die per fetch einen Eintrag erzeugt und zurückliefert
   const createInvite = async (type: string, expiresInHours?: number) => {
     const res = await fetch("/api/team/create-invite", {
       method: "POST",
@@ -22,7 +22,7 @@ export default function TeamInviteGenerator() {
     return await res.json();
   };
 
-  // Option 1: QR-Code ohne Passwort
+  // --- Option 1: QR-Code ohne Passwort (30 Tage)
   const handleQr = async () => {
     setLoadingType("qr");
     const data = await createInvite("qr_simple", 720);
@@ -30,7 +30,7 @@ export default function TeamInviteGenerator() {
     setLoadingType(null);
   };
 
-  // Option 2: QR-Code mit Passwort
+  // --- Option 2: QR-Code mit Passwort (7 Tage in diesem Beispiel)
   const handleSecureQr = async () => {
     setLoadingType("secure");
     const data = await createInvite("qr_protected", 168);
@@ -38,7 +38,7 @@ export default function TeamInviteGenerator() {
     setLoadingType(null);
   };
 
-  // Option 3: Einmal-Link per WhatsApp oder E-Mail
+  // --- Option 3: Einmal-Link per WhatsApp oder E-Mail (single_use)
   const generateAndSendLink = async (mode: "whatsapp" | "email") => {
     setLoadingType(mode === "whatsapp" ? "link-whatsapp" : "link-email");
     const data = await createInvite("single_use");
@@ -49,18 +49,20 @@ export default function TeamInviteGenerator() {
       return;
     }
 
+    // Einladungstext mit Emoji, URL muss URL-encoded sein
     const encodedUrl = encodeURIComponent(`🎉 Einladung zum Team: ${url}`);
     setLoadingType(null);
 
     if (mode === "whatsapp") {
-      // Mobile Browser: einfach auf wa.me weiterleiten
+      // Auf wa.me weiterleiten (funktioniert in den meisten mobilen Browsern)
       window.location.href = `https://wa.me/?text=${encodedUrl}`;
     } else {
+      // Standard-Mailto-Link
       window.location.href = `mailto:?subject=Team Einladung&body=${encodedUrl}`;
     }
   };
 
-  // Wiederverwendbare Card-Komponente
+  // --- Card-Komponente: Vereinheitlichtes Styling für jede Option
   const Card = ({
     title,
     description,
@@ -82,22 +84,21 @@ export default function TeamInviteGenerator() {
 
   return (
     <div className="max-w-3xl mx-auto px-4 py-8 space-y-8">
-      {/* Überschrift */}
       <h1 className="text-2xl font-bold text-center text-gray-800">
         Teameinladungen verwalten
       </h1>
 
-      {/* Option 1: QR-Code ohne Passwort */}
+      {/* === Option 1: QR-Code ohne Passwort === */}
       <Card
         title="QR-Code ohne Passwort"
-        description="Dieser QR-Code ist 30 Tage gültig. Ideal für Aushänge oder interne Weitergabe."
+        description="Dieser QR-Code bleibt 30 Tage gültig. Ideal zum Aushang oder interne Weitergabe."
         buttonArea={
           <button
             onClick={handleQr}
             className="w-full md:w-auto bg-violet-600 text-white px-4 py-2 rounded hover:bg-violet-700 transition"
             disabled={loadingType === "qr"}
           >
-            {loadingType === "qr" ? "Erzeuge QR-Code…" : "QR-Code generieren"}
+            {loadingType === "qr" ? "Erzeuge QR-Code …" : "QR-Code generieren"}
           </button>
         }
         content={
@@ -109,10 +110,10 @@ export default function TeamInviteGenerator() {
         }
       />
 
-      {/* Option 2: QR-Code mit Passwort */}
+      {/* === Option 2: QR-Code mit Passwort === */}
       <Card
         title="QR-Code mit Passwort"
-        description="Dieser QR-Code ist passwortgeschützt (Passwort siehst du unter /team/security). Das Passwort wechselt alle 24 Stunden, der QR bleibt aber gültig."
+        description="Dieser QR-Code ist passwortgeschützt (Passwort siehst du unter /team/security). Passwort wechselt alle 24 Stunden, QR bleibt gültig."
         buttonArea={
           <button
             onClick={handleSecureQr}
@@ -120,7 +121,7 @@ export default function TeamInviteGenerator() {
             disabled={loadingType === "secure"}
           >
             {loadingType === "secure"
-              ? "Erzeuge geschützten QR-Code…"
+              ? "Erzeuge geschützten QR-Code …"
               : "QR-Code mit Passwort generieren"}
           </button>
         }
@@ -133,19 +134,18 @@ export default function TeamInviteGenerator() {
         }
       />
 
-      {/* Option 3: Einmal-Link nur über Icons */}
+      {/* === Option 3: Einmal-Link per WhatsApp/E-Mail (nur Icons) === */}
       <Card
-        title="Einmal-Link per WhatsApp oder E-Mail"
+        title="Einmal-Link per WhatsApp/E-Mail"
         description="Dieser Link ist nach dem ersten Klick ungültig. Ideal zum direkten Versand an neue Teammitglieder."
         buttonArea={
           <div className="flex justify-center items-center gap-8">
             {/* WhatsApp-Icon */}
             <span
               onClick={() => generateAndSendLink("whatsapp")}
-              className={`
-                cursor-pointer
-                ${loadingType === "link-whatsapp" ? "opacity-50" : "hover:opacity-80"}
-              `}
+              className={`cursor-pointer ${
+                loadingType === "link-whatsapp" ? "opacity-50" : "hover:opacity-80"
+              }`}
               title="Per WhatsApp senden"
             >
               <svg
@@ -161,10 +161,9 @@ export default function TeamInviteGenerator() {
             {/* E-Mail-Icon */}
             <span
               onClick={() => generateAndSendLink("email")}
-              className={`
-                cursor-pointer
-                ${loadingType === "link-email" ? "opacity-50" : "hover:opacity-80"}
-              `}
+              className={`cursor-pointer ${
+                loadingType === "link-email" ? "opacity-50" : "hover:opacity-80"
+              }`}
               title="Per E-Mail senden"
             >
               <Mail className="w-8 h-8 text-blue-500" />
