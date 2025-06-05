@@ -176,3 +176,17 @@ model Invitation {
 
   company      Company  @relation(fields: [companyId], references: [id], onDelete: Cascade)
 }
+
+model AccessCode {
+  id              String   @id @default(cuid())       // Interne ID
+  code            String   @unique                    // Z. B. "SCHICHT24"
+  companyId       String                              // Referenz auf Team
+  role            String                              // Welche Rolle wird vergeben
+  validFrom       DateTime                            // Start der Gültigkeit
+  validUntil      DateTime                            // Ende der Gültigkeit
+  requirePassword Boolean  @default(true)             // Muss ein Passwort eingegeben werden?
+  password        String?                             // Nur wenn requirePassword = true
+  createdAt       DateTime @default(now())
+
+  company         Company  @relation(fields: [companyId], references: [id], onDelete: Cascade)
+}
