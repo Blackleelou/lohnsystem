@@ -1,6 +1,5 @@
 import { useState } from "react";
 import QRCode from "react-qr-code";
-import { isMobile } from "react-device-detect";
 
 export default function TeamInviteGenerator() {
   const [qrUrl, setQrUrl] = useState("");
@@ -59,7 +58,7 @@ export default function TeamInviteGenerator() {
     title: string;
     description: string;
     button: JSX.Element;
-    content?: JSX.Element;
+    content?: JSX.Element | null;
   }) => (
     <section className="bg-white rounded-xl shadow-md p-6 border border-gray-200">
       <h2 className="text-lg font-semibold mb-1">{title}</h2>
@@ -89,7 +88,7 @@ export default function TeamInviteGenerator() {
             <div className="flex flex-col items-center gap-2">
               <QRCode value={qrUrl} />
             </div>
-          )
+          ) : null
         }
       />
 
@@ -111,7 +110,7 @@ export default function TeamInviteGenerator() {
             <div className="flex flex-col items-center gap-2">
               <QRCode value={qrSecureUrl} />
             </div>
-          )
+          ) : null
         }
       />
 
