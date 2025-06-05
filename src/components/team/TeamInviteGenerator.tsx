@@ -31,23 +31,27 @@ export default function TeamInviteGenerator() {
   };
 
   const generateAndSendLink = async (mode: "whatsapp" | "email") => {
-    setLoadingType(mode === "whatsapp" ? "link-whatsapp" : "link-email");
-    const data = await createInvite("single_use");
-    const url = data.invitation?.joinUrl;
-    if (!url) {
-      alert("Fehler: Kein Link generiert.");
-      setLoadingType(null);
-      return;
-    }
-    setLinkUrl(url);
+  setLoadingType(mode === "whatsapp" ? "link-whatsapp" : "link-email");
+
+  const data = await createInvite("single_use");
+  const url = data.invitation?.joinUrl;
+  if (!url) {
+    alert("Fehler: Kein Link generiert.");
     setLoadingType(null);
-    const encodedUrl = encodeURIComponent(url);
-    if (mode === "whatsapp") {
-      window.open(`https://wa.me/?text=${encodedUrl}`, "_blank");
-    } else {
-      window.location.href = `mailto:?subject=Team Einladung&body=${encodedUrl}`;
-    }
-  };
+    return;
+  }
+
+  const encodedUrl = encodeURIComponent(`🎉 Einladung zum Team: ${url}`);
+  setLinkUrl(url);
+  setLoadingType(null);
+
+  if (mode === "whatsapp") {
+    // 👉 Direktweiterleitung statt window.open für mobile Browser-Kompatibilität
+    window.location.href = `https://wa.me/?text=${encodedUrl}`;
+  } else {
+    window.location.href = `mailto:?subject=Team Einladung&body=${encodedUrl}`;
+  }
+};
 
   const Card = ({
     title,
