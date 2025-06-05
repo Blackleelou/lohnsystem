@@ -2,7 +2,7 @@
 
 import { useState } from "react";
 import QRCode from "react-qr-code";
-import { Mail, WhatsApp } from "lucide-react"; // Nur noch das Lucide-WhatsApp-Icon
+import { Mail, WhatsApp } from "lucide-react"; // <-- Korrigiert: "WhatsApp" mit großem "A"
 import { isMobile } from "react-device-detect";
 
 export default function TeamInviteGenerator() {
@@ -84,7 +84,7 @@ export default function TeamInviteGenerator() {
         Teameinladungen verwalten
       </h1>
 
-      {/* === Option 1 === */}
+      {/* === Option 1: QR-Code ohne Passwort === */}
       <Card
         title="QR-Code ohne Passwort"
         description="30 Tage gültig, ideal für Aushänge oder interne Weitergabe."
@@ -106,7 +106,7 @@ export default function TeamInviteGenerator() {
         }
       />
 
-      {/* === Option 2 === */}
+      {/* === Option 2: QR-Code mit Passwort === */}
       <Card
         title="QR-Code mit Passwort"
         description="Passwort wechselt alle 24 Stunden, QR bleibt gültig. Passwort anzeigen unter /team/security."
@@ -130,13 +130,13 @@ export default function TeamInviteGenerator() {
         }
       />
 
-      {/* === Option 3: Nur Icons === */}
+      {/* === Option 3: Einmal-Link per WhatsApp oder E-Mail (nur Icons) === */}
       <Card
         title="Einmal-Link per WhatsApp oder E-Mail"
         description="Nach dem ersten Klick verfällt dieser Link. Direkt an neue Teammitglieder senden."
         buttonArea={
           <div className="flex justify-center items-center gap-8">
-            {/* --- WhatsApp-Icon (Lucide) --- */}
+            {/* --- WhatsApp Icon (Lucide) --- */}
             <span
               onClick={() => generateAndSendLink("whatsapp")}
               className={`cursor-pointer ${
@@ -144,10 +144,10 @@ export default function TeamInviteGenerator() {
               }`}
               title="Per WhatsApp senden"
             >
-              <Whatsapp className="w-8 h-8 text-green-500" />
+              <WhatsApp className="w-8 h-8 text-green-500" />
             </span>
 
-            {/* --- E-Mail-Icon (Lucide) --- */}
+            {/* --- E-Mail Icon (Lucide) --- */}
             <span
               onClick={() => generateAndSendLink("email")}
               className={`cursor-pointer ${
