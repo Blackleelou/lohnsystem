@@ -29,7 +29,7 @@ export const authOptions: AuthOptions = {
         const isValid = await compare(credentials.password, user.password);
         if (!isValid) return null;
 
-        // Wir geben hier nur die nötigsten Felder zurück – 
+        // Wir geben hier nur die nötigsten Felder zurück –
         // weitere Infos (companyId, role, isAdmin, nickname) landen im JWT‐Callback.
         return {
           id: user.id,
@@ -47,7 +47,7 @@ export const authOptions: AuthOptions = {
   session: { strategy: "jwt" },
 
   callbacks: {
-    // ‼️ Wird beim ersten Login (Credentials oder Google) und bei jedem `session.update()` aufgerufen.
+    // Wird beim ersten Login (Credentials oder Google) und bei jedem session.update() aufgerufen.
     async jwt({ token, user, trigger }) {
       // 1) Erstes Login: user ist gesetzt
       if (user && user.email) {
@@ -73,7 +73,7 @@ export const authOptions: AuthOptions = {
         }
       }
 
-      // 2) Trigger "update": Manuelles Session‐Update (z. B. session.update()) will erneute Werte nachladen
+      // 2) Trigger "update": Manuelles Session‐Update (z. B. session.update()) lädt die aktuellen Werte nach
       if (trigger === "update" && token.email) {
         const dbUser = await prisma.user.findUnique({
           where: { email: token.email as string },
@@ -96,7 +96,7 @@ export const authOptions: AuthOptions = {
     },
 
     // Wird bei jedem Aufruf von getSession()/useSession() (Client‐Seite) aufgerufen.
-    // Wir übernehmen hier die im JWT gespeicherten Werte in session.user.
+    // Hier übernehmen wir die im JWT gespeicherten Werte in session.user.
     async session({ session, token }) {
       if (session.user) {
         session.user.id = token.id as string;
@@ -104,7 +104,8 @@ export const authOptions: AuthOptions = {
         session.user.companyId = token.companyId as string | null;
         session.user.role = token.role as "admin" | "editor" | "viewer";
         session.user.isAdmin = token.isAdmin as boolean;
-        session.user.nickname = token.nickname as string | null;
+        // ↳ Hier wandeln wir `null` in `undefined` um, damit der Typ stimmt:
+        session.user.nickname = (token.nickname as string | null) ?? undefined;
       }
       return session;
     },
