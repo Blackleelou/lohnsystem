@@ -1,12 +1,13 @@
 import { useState } from "react";
 import QRCode from "react-qr-code";
 import { isMobile } from "react-device-detect";
+import { Mail, MessageCircle } from "lucide-react";
 
 export default function TeamInviteGenerator() {
   const [qrUrl, setQrUrl] = useState("");
   const [qrSecureUrl, setQrSecureUrl] = useState("");
   const [linkUrl, setLinkUrl] = useState("");
-  const [loadingType, setLoadingType] = useState<"qr" | "secure" | "link" | null>(null);
+  const [loadingType, setLoadingType] = useState<"qr" | "secure" | "link-whatsapp" | "link-email" | null>(null);
 
   const handleQr = async () => {
     setLoadingType("qr");
@@ -32,8 +33,8 @@ export default function TeamInviteGenerator() {
     setLoadingType(null);
   };
 
-  const handleLink = async () => {
-    setLoadingType("link");
+  const generateAndSendLink = async (mode: "whatsapp" | "email") => {
+    setLoadingType(mode === "whatsapp" ? "link-whatsapp" : "link-email");
     const res = await fetch("/api/team/create-invite", {
       method: "POST",
       body: JSON.stringify({ type: "onetime" }),
@@ -43,13 +44,12 @@ export default function TeamInviteGenerator() {
     setLinkUrl(data.url);
     setLoadingType(null);
 
-    setTimeout(() => {
-      if (isMobile && data.url) {
-        window.open(`https://wa.me/?text=${encodeURIComponent(data.url)}`, "_blank");
-      } else {
-        window.location.href = `mailto:?subject=Team Einladung&body=${encodeURIComponent(data.url)}`;
-      }
-    }, 300);
+    const encodedUrl = encodeURIComponent(data.url);
+    if (mode === "whatsapp") {
+      window.open(`https://wa.me/?text=${encodedUrl}`, "_blank");
+    } else {
+      window.location.href = `mailto:?subject=Team Einladung&body=${encodedUrl}`;
+    }
   };
 
   return (
@@ -102,13 +102,24 @@ export default function TeamInviteGenerator() {
         <p className="text-sm text-gray-500 mb-4">
           Dieser Link ist nach dem ersten Klick ungültig. Ideal zum direkten Versand an neue Teammitglieder.
         </p>
-        <button
-          onClick={handleLink}
-          className="bg-green-600 text-white px-4 py-2 rounded hover:bg-green-700"
-          disabled={loadingType === "link"}
-        >
-          {loadingType === "link" ? "Erzeuge Link…" : isMobile ? "Per WhatsApp/E-Mail senden" : "Per E-Mail senden"}
-        </button>
+        <div className="flex flex-col sm:flex-row gap-4">
+          <button
+            onClick={() => generateAndSendLink("whatsapp")}
+            className="bg-green-600 text-white px-4 py-2 rounded hover:bg-green-700 flex items-center justify-center"
+            disabled={loadingType === "link-whatsapp"}
+          >
+            <MessageCircle className="w-5 h-5 mr-2" />
+            {loadingType === "link-whatsapp" ? "Lade…" : "Per WhatsApp senden"}
+          </button>
+          <button
+            onClick={() => generateAndSendLink("email")}
+            className="bg-blue-600 text-white px-4 py-2 rounded hover:bg-blue-700 flex items-center justify-center"
+            disabled={loadingType === "link-email"}
+          >
+            <Mail className="w-5 h-5 mr-2" />
+            {loadingType === "link-email" ? "Lade…" : "Per E-Mail senden"}
+          </button>
+        </div>
         {linkUrl && (
           <p className="mt-4 text-sm text-center break-all">{linkUrl}</p>
         )}
