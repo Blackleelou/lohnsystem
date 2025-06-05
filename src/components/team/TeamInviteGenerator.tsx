@@ -34,23 +34,31 @@ export default function TeamInviteGenerator() {
   };
 
   const generateAndSendLink = async (mode: "whatsapp" | "email") => {
-    setLoadingType(mode === "whatsapp" ? "link-whatsapp" : "link-email");
-    const res = await fetch("/api/team/create-invite", {
-      method: "POST",
-      body: JSON.stringify({ type: "onetime" }),
-      headers: { "Content-Type": "application/json" },
-    });
-    const data = await res.json();
-    setLinkUrl(data.url);
-    setLoadingType(null);
+  setLoadingType(mode === "whatsapp" ? "link-whatsapp" : "link-email");
+  const res = await fetch("/api/team/create-invite", {
+    method: "POST",
+    body: JSON.stringify({ type: "onetime" }),
+    headers: { "Content-Type": "application/json" },
+  });
+  const data = await res.json();
+  const url = data.invitation?.joinUrl;
 
-    const encodedUrl = encodeURIComponent(data.url);
-    if (mode === "whatsapp") {
-      window.open(`https://wa.me/?text=${encodedUrl}`, "_blank");
-    } else {
-      window.location.href = `mailto:?subject=Team Einladung&body=${encodedUrl}`;
-    }
-  };
+  if (!url) {
+    alert("Fehler: Kein Link generiert.");
+    setLoadingType(null);
+    return;
+  }
+
+  setLinkUrl(url);
+  setLoadingType(null);
+
+  const encodedUrl = encodeURIComponent(url);
+  if (mode === "whatsapp") {
+    window.open(`https://wa.me/?text=${encodedUrl}`, "_blank");
+  } else {
+    window.location.href = `mailto:?subject=Team Einladung&body=${encodedUrl}`;
+  }
+};
 
   return (
     <div className="max-w-3xl mx-auto px-4 py-10 space-y-10 text-gray-800">
