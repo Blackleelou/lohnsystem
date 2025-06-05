@@ -85,7 +85,7 @@ export default function TeamInviteGenerator() {
           </button>
         }
         content={
-          qrUrl && (
+          qrUrl ? (
             <div className="flex flex-col items-center gap-2">
               <QRCode value={qrUrl} />
             </div>
@@ -107,7 +107,7 @@ export default function TeamInviteGenerator() {
           </button>
         }
         content={
-          qrSecureUrl && (
+          qrSecureUrl ? (
             <div className="flex flex-col items-center gap-2">
               <QRCode value={qrSecureUrl} />
             </div>
