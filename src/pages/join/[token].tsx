@@ -1,9 +1,11 @@
 import { useEffect, useState } from "react";
 import { useRouter } from "next/router";
+import { useSession } from "next-auth/react";
 
 export default function JoinTokenPage() {
   const router = useRouter();
   const { token } = router.query;
+  const { data: session, status: sessionStatus } = useSession();
 
   const [status, setStatus] = useState<"checking" | "success" | "error">("checking");
   const [message, setMessage] = useState("");
@@ -11,6 +13,18 @@ export default function JoinTokenPage() {
   useEffect(() => {
     if (!token || typeof token !== "string") return;
 
+    if (sessionStatus === "loading") return;
+
+    // 👇 nicht eingeloggt → Login-Seite mit Rücksprung
+    if (!session) {
+      if (typeof window !== "undefined") {
+        sessionStorage.setItem("joinToken", token);
+      }
+      router.push(`/login?callbackUrl=/join/${token}`);
+      return;
+    }
+
+    // 👇 eingeloggt: Einladung einlösen
     fetch("/api/team/join", {
       method: "POST",
       headers: { "Content-Type": "application/json" },
@@ -31,7 +45,7 @@ export default function JoinTokenPage() {
         setStatus("error");
         setMessage("Ein unerwarteter Fehler ist aufgetreten.");
       });
-  }, [token, router]);
+  }, [token, session, sessionStatus, router]);
 
   return (
     <div className="min-h-screen flex items-center justify-center bg-gray-50 text-center p-6">
