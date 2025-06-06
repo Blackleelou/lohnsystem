@@ -1,4 +1,5 @@
-// pages/join/[token].tsx
+// src/pages/join/[token].tsx
+
 import { useEffect, useState } from "react";
 import { useRouter } from "next/router";
 import { useSession } from "next-auth/react";
@@ -7,101 +8,137 @@ import VisibilityConsentForm from "@/components/VisibilityConsentForm";
 export default function JoinTokenPage() {
   const router = useRouter();
   const { token } = router.query;
-  const { data: session, status, update } = useSession();
-  const [stage, setStage] = useState<"loading" | "consent" | "join" | "done">("loading");
+  const { data: session, status: sessionStatus, update } = useSession({
+    required: false,
+    // alle 30 Sekunden neu abfragen, ob sich die Session verändert hat
+    refetchInterval: 30,
+    refetchOnWindowFocus: true,
+  });
+
+  // Lokale States für Consent‐Logik
+  const [hasConsent, setHasConsent] = useState(false);
+  const [consentData, setConsentData] = useState<{
+    showName: boolean;
+    showEmail: boolean;
+    showNickname: boolean;
+  } | null>(null);
+
+  // Lifecycle‐State: "checking" | "waitingConsent" | "success" | "error"
+  const [stage, setStage] = useState<
+    "checking" | "waitingConsent" | "success" | "error"
+  >("checking");
   const [message, setMessage] = useState("");
 
+  // 1) Effekt: Sobald token, session & sessionStatus bekannt sind, steuern wir die Consent‐ und Join‐Logik
   useEffect(() => {
-    if (status === "loading") return;
+    if (!token || typeof token !== "string") return;
+    if (sessionStatus === "loading") return;
 
-    // 1. Wenn noch nicht eingeloggt
+    // a) Ist der User noch nicht eingeloggt?
     if (!session) {
-      // Speichere den Token in sessionStorage, damit wir ihn nach Registrierung wieder abrufen können
-      if (typeof window !== "undefined" && typeof token === "string") {
+      // Speichere den Token zwischen (z. B. nach Registrierung wiederverwenden) und leite auf Login
+      if (typeof window !== "undefined") {
         sessionStorage.setItem("joinToken", token);
-        // Weiterleiten nicht nur an /login, sondern an /login mit callback zu /register
-        router.replace(`/login?callbackUrl=/register`);
       }
+      router.push(`/login?callbackUrl=/join/${token}`);
       return;
     }
 
-    // 2. Wenn eingeloggt, aber gerade frisch von der Registrierung hierher gekommen:
-    //    Falls wir in sessionStorage noch einen joinToken haben, setzen wir router so, dass wir neu auf diesen Join-Prozess gehen.
-    if (session && !stage.startsWith("consent") && !stage.startsWith("join")) {
-      const stored = typeof window !== "undefined" ? sessionStorage.getItem("joinToken") : null;
-      if (stored) {
-        // Den Token „umleiten“ – jetzt sind wir eingeloggt, also zurück zu /join/[token]
-        sessionStorage.removeItem("joinToken");
-        router.replace(`/join/${stored}`);
-        return;
-      }
+    // b) Ist der User eingeloggt, aber hat noch keine Consent‐Daten abgegeben?
+    if (!hasConsent) {
+      setStage("waitingConsent");
+      return;
     }
 
-    // 3. Nun sind wir sicher eingeloggt und evtl zurück zu /join/[token]. Prüfen, ob Datenschutzeinwilligung nötig:
-    if (!session.user.hasChosenMode) {
-      setStage("consent");
-    } else {
-      setStage("join");
-    }
-  }, [session, status, token, router, stage]);
-
-  // Handler, wenn Consent‐Formular abgeschlossen ist
-  async function handleConsentComplete() {
-    await update(); // Session neu laden, damit hasChosenMode auf true steht
-    setStage("join");
-  }
-
-  // Einladung einlösen
-  useEffect(() => {
-    if (stage !== "join" || !token || typeof token !== "string") return;
-
+    // c) Eingeloggt + Consent abgegeben → Einladung einlösen
+    setStage("checking");
     fetch("/api/team/join", {
       method: "POST",
       headers: { "Content-Type": "application/json" },
-      body: JSON.stringify({ token }),
+      // hier übergeben wir Token + Consent‐Daten ans Backend
+      body: JSON.stringify({ token, ...consentData }),
     })
-      .then(res => res.json())
-      .then(data => {
+      .then((res) => res.json())
+      .then((data) => {
         if (data.success) {
-          setStage("done");
-          setMessage("Beitritt erfolgreich! Du wirst weitergeleitet …");
-          setTimeout(() => router.push("/dashboard"), 2000);
+          setStage("success");
+          setMessage("Du wurdest erfolgreich zum Team hinzugefügt. Weiterleitung…");
+          // Session neu laden, damit Navbar etc. sofort die neue companyId kennen
+          update();
+          setTimeout(() => router.push("/dashboard"), 2500);
         } else {
-          setStage("done");
+          setStage("error");
           setMessage(data.error || "Einladungslink ungültig oder abgelaufen.");
         }
       })
       .catch(() => {
-        setStage("done");
+        setStage("error");
         setMessage("Ein unerwarteter Fehler ist aufgetreten.");
       });
-  }, [stage, token, router]);
+  }, [token, session, sessionStatus, hasConsent, consentData, router, update]);
 
-  return (
-    <div className="min-h-screen flex items-center justify-center bg-gray-50 p-6">
-      <div className="max-w-md bg-white p-6 rounded shadow text-center">
-        {stage === "loading" && <p>Einladung wird geprüft …</p>}
+  // 2) Falls der User gerade frisch registriert wurde: Token aus sessionStorage holen und erneut auf /join/[token] leiten
+  useEffect(() => {
+    if (session && !token && typeof window !== "undefined") {
+      const storedToken = sessionStorage.getItem("joinToken");
+      if (storedToken) {
+        router.replace(`/join/${storedToken}`);
+      }
+    }
+  }, [session, token, router]);
 
-        {stage === "consent" && (
-          <>
-            <h1 className="text-xl font-bold mb-2">Datenschutz-Einstellungen</h1>
-            <VisibilityConsentForm onComplete={handleConsentComplete} />
-          </>
-        )}
+  // Callback, den wir an <VisibilityConsentForm> übergeben:
+  function handleConsentSubmit(data: {
+    showName: boolean;
+    showEmail: boolean;
+    showNickname: boolean;
+  }) {
+    setConsentData(data);
+    setHasConsent(true);
+  }
 
-        {stage === "join" && <p>Einladung wird eingelöst …</p>}
+  // 3) Hier rendern wir je nach Stage den passenden Screen:
 
-        {stage === "done" && (
-          <>
-            {message.startsWith("Beitritt") ? (
-              <h1 className="text-green-600 font-bold text-xl mb-2">Erfolg</h1>
-            ) : (
-              <h1 className="text-red-600 font-bold text-xl mb-2">Fehler</h1>
-            )}
-            <p>{message}</p>
-          </>
-        )}
+  if (stage === "checking") {
+    return (
+      <div className="min-h-screen flex items-center justify-center bg-gray-50 text-center p-6">
+        <div className="max-w-md bg-white p-6 rounded shadow">
+          <p>Einladung wird geprüft…</p>
+        </div>
       </div>
-    </div>
-  );
+    );
+  }
+
+  if (stage === "waitingConsent") {
+    return (
+      <div className="min-h-screen flex items-center justify-center bg-gray-50 text-center p-6">
+        <VisibilityConsentForm onSubmit={handleConsentSubmit} />
+      </div>
+    );
+  }
+
+  if (stage === "success") {
+    return (
+      <div className="min-h-screen flex items-center justify-center bg-gray-50 text-center p-6">
+        <div className="max-w-md bg-white p-6 rounded shadow">
+          <h1 className="text-green-600 font-bold text-xl mb-2">Beitritt erfolgreich</h1>
+          <p>{message}</p>
+        </div>
+      </div>
+    );
+  }
+
+  if (stage === "error") {
+    return (
+      <div className="min-h-screen flex items-center justify-center bg-gray-50 text-center p-6">
+        <div className="max-w-md bg-white p-6 rounded shadow">
+          <h1 className="text-red-600 font-bold text-xl mb-2">Fehler</h1>
+          <p>{message}</p>
+        </div>
+      </div>
+    );
+  }
+
+  // Sollte eigentlich nie hier landen – aber für die Typsicherheit geben wir null zurück
+  return null;
 }
