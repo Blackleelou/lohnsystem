@@ -37,12 +37,11 @@ export default function TeamLayout({ children }: { children: React.ReactNode }) 
     <div className="min-h-screen bg-gray-50 dark:bg-gray-950">
       {/* Sidebar */}
       <aside
-       className={`fixed top-4 z-50 p-2 rounded-full shadow bg-white dark:bg-gray-800 transition-all duration-300 ${
-        collapsed ? "ml-[4rem]" : "ml-[16rem]"
-      }`}
-
+        className={`fixed top-0 left-0 h-screen z-40 transition-all duration-300 ease-in-out 
+          bg-white dark:bg-gray-900 shadow-md flex flex-col 
+          ${collapsed ? "w-16" : "w-64"}`}
       >
-        {/* Sidebar-Titel (nur wenn offen) */}
+        {/* Sidebar-Titel (nur sichtbar wenn offen) */}
         <div
           className={`px-6 py-4 items-center border-b dark:border-gray-800 ${
             collapsed ? "hidden" : "flex"
@@ -78,10 +77,10 @@ export default function TeamLayout({ children }: { children: React.ReactNode }) 
         </nav>
       </aside>
 
-      {/* Ein-/Ausklapp-Button (außerhalb der Sidebar) */}
+      {/* Ein-/Ausklapp-Button */}
       <button
-        className={`fixed top-4 z-50 p-2 rounded-full shadow bg-white dark:bg-gray-800 transition-all duration-300 
-          ${collapsed ? "left-16" : "left-64"}`}
+        className={`fixed top-4 z-50 p-2 rounded-full shadow bg-white dark:bg-gray-800 transition-all duration-300
+          ${collapsed ? "ml-[4rem]" : "ml-[16rem]"}`}
         onClick={() => setCollapsed((c) => !c)}
         aria-label={collapsed ? "Sidebar ausklappen" : "Sidebar einklappen"}
       >
@@ -94,7 +93,7 @@ export default function TeamLayout({ children }: { children: React.ReactNode }) 
         </span>
       </button>
 
-      {/* Hauptbereich mit linker Einrückung je nach Sidebar */}
+      {/* Hauptinhalt mit dynamischer Einrückung */}
       <div className={`transition-all duration-300 ease-in-out ${collapsed ? "ml-16" : "ml-64"}`}>
         <header className="bg-white dark:bg-gray-900 shadow px-6 py-3 flex justify-end items-center sticky top-0 z-50">
           <UserMenu />
