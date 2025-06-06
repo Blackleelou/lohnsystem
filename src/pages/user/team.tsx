@@ -7,11 +7,12 @@ import UserSettingsLayout from "@/components/user/UserSettingsLayout";
 import { Trash2 } from "lucide-react";
 import { useSession } from "next-auth/react";
 import { useRouter } from "next/router";
+import toast, { Toaster } from "react-hot-toast";
 
 export const getServerSideProps: GetServerSideProps = requireAuth;
 
 export default function TeamSettingsPage() {
-  const { data: session, update } = useSession() // mit refetch-Option (update)
+  const { data: session, update } = useSession();
   const router = useRouter();
   const [loading, setLoading] = useState(false);
   const [showConfirm, setShowConfirm] = useState(false);
@@ -23,17 +24,17 @@ export default function TeamSettingsPage() {
 
     if (res.ok) {
       setShowConfirm(false);
-      // Session sofort neu laden, damit das Menü aktualisiert wird
       await update();
-      alert("Du bist jetzt aus dem Team ausgetreten.");
-      router.push("/dashboard") // Optional: router.push("/dashboard");
+      toast.success("Du bist jetzt aus dem Team ausgetreten.");
+      router.push("/dashboard");
     } else {
-      alert("Fehler beim Verlassen des Teams");
+      toast.error("Fehler beim Verlassen des Teams");
     }
   };
 
   return (
     <div className="max-w-xl mx-auto py-10 px-4 space-y-6">
+      <Toaster position="top-center" />
       <h1 className="text-2xl font-bold mb-2 text-center">Team-Einstellungen</h1>
 
       {/* Schlanker „Team verlassen“ Bereich */}
@@ -92,7 +93,6 @@ export default function TeamSettingsPage() {
   );
 }
 
-// Hier wird das Layout nur einmalig über getLayout angehängt:
 TeamSettingsPage.getLayout = (page: ReactElement) => (
   <UserSettingsLayout>{page}</UserSettingsLayout>
 );

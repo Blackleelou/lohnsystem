@@ -111,7 +111,7 @@ export default function UserMenu() {
           {/* Firmeneinstellungen nur anzeigen, wenn ein Team existiert UND role != "viewer" */}
           {companyId && role !== "viewer" && (
             <Link
-              href="/team/settings"
+              href="/team/members"
               className="flex items-center gap-2 px-3 py-2 rounded-lg text-blue-700 dark:text-blue-400 font-semibold hover:bg-blue-50 dark:hover:bg-gray-800 transition"
               onClick={() => setIsOpen(false)}
             >

@@ -1,9 +1,15 @@
+<<<<<<< HEAD
 // src/components/user/UserSettingsLayout.tsx
 
 import Link from "next/link";
 import { useRouter } from "next/router";
 import { useState } from "react";
 import { useSession } from "next-auth/react";
+=======
+import { useRouter } from "next/router";
+import { useState, useEffect } from "react"; // <-- WICHTIG!
+import Link from "next/link";
+>>>>>>> 1f0a90d (🛠️ Mein Änderungskommentar hier)
 import UserMenu from "@/components/user/UserMenu";
 import {
   User as UserIcon,
@@ -14,11 +20,37 @@ import {
   ChevronRight,
 } from "lucide-react";
 
+<<<<<<< HEAD
 export default function UserSettingsLayout({ children }: { children: React.ReactNode }) {
   const router = useRouter();
   const { data: session } = useSession();
   const companyId = session?.user?.companyId;
   const [collapsed, setCollapsed] = useState(false);
+=======
+const links = [
+  { href: "/team/members", label: "Mitglieder", icon: <Users /> },
+  { href: "/team/invites", label: "Einladungen", icon: <QrCode /> },
+  { href: "/team/security", label: "Zugangs-Code", icon: <KeyRound /> },
+  { href: "/team/payrules", label: "Zuschläge", icon: <BarChart2 /> },
+  { href: "/team/shifts", label: "Schichten", icon: <List /> },
+  { href: "/team/files", label: "Dokumente", icon: <Folder /> },
+  { href: "/team/delete", label: "Team löschen", icon: <Trash />, danger: true },
+];
+
+export default function TeamLayout({ children }: { children: React.ReactNode }) {
+  const router = useRouter();
+
+  const [collapsed, setCollapsed] = useState(() => {
+    if (typeof window !== "undefined") {
+      return localStorage.getItem("sidebar-collapsed") === "true";
+    }
+    return false;
+  });
+
+  useEffect(() => {
+    localStorage.setItem("sidebar-collapsed", String(collapsed));
+  }, [collapsed]);
+>>>>>>> 1f0a90d (🛠️ Mein Änderungskommentar hier)
 
   const baseLinks = [
     { href: "/user/profile", label: "Profil‐Einstellungen", icon: <UserIcon /> },
@@ -34,6 +66,8 @@ export default function UserSettingsLayout({ children }: { children: React.React
 
   return (
     <div className="min-h-screen flex bg-gray-50 dark:bg-gray-950">
+      {/* Hier geht dein Layout weiter */}
+
       {/* Sidebar */}
       <aside
         className={`bg-white dark:bg-gray-900 shadow-md flex flex-col min-h-screen sticky top-0 z-40 transition-all duration-200 ${collapsed ? "w-16" : "w-64"}`}

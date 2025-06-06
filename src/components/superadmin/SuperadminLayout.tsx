@@ -1,8 +1,21 @@
 import Link from "next/link";
 import { useRouter } from "next/router";
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import UserMenu from "@/components/user/UserMenu";
-import { ShieldCheck, List, Building2, ClipboardCheck, Bug, Activity, Users, Settings2, Server, BarChart2, ChevronLeft, ChevronRight } from "lucide-react";
+import {
+  ShieldCheck,
+  List,
+  Building2,
+  ClipboardCheck,
+  Bug,
+  Activity,
+  Users,
+  Settings2,
+  Server,
+  BarChart2,
+  ChevronLeft,
+  ChevronRight,
+} from "lucide-react";
 
 const links = [
   { href: "/superadmin", label: "Übersicht", icon: <ShieldCheck /> },
@@ -20,7 +33,17 @@ const links = [
 
 export default function SuperadminLayout({ children }: { children: React.ReactNode }) {
   const router = useRouter();
-  const [collapsed, setCollapsed] = useState(false);
+
+  const [collapsed, setCollapsed] = useState(() => {
+    if (typeof window !== "undefined") {
+      return localStorage.getItem("superadmin-sidebar-collapsed") === "true";
+    }
+    return false;
+  });
+
+  useEffect(() => {
+    localStorage.setItem("superadmin-sidebar-collapsed", String(collapsed));
+  }, [collapsed]);
 
   return (
     <div className="min-h-screen flex bg-gray-50">
@@ -38,11 +61,15 @@ export default function SuperadminLayout({ children }: { children: React.ReactNo
         >
           {collapsed ? <ChevronRight /> : <ChevronLeft />}
         </button>
+
+        {/* Sidebar-Titel */}
         <div className={`px-6 py-4 items-center border-b ${collapsed ? "hidden" : "flex"}`}>
           <span className="text-lg font-bold text-blue-700">Superadmin</span>
         </div>
+
+        {/* Navigation */}
         <nav className="flex-1 flex flex-col gap-2 px-2 py-6">
-          {links.map(link => (
+          {links.map((link) => (
             <Link
               key={link.href}
               href={link.href}
@@ -51,7 +78,7 @@ export default function SuperadminLayout({ children }: { children: React.ReactNo
                   ? "bg-blue-50 text-blue-700 font-semibold"
                   : "text-gray-700 hover:bg-blue-100"
               }`}
-              title={link.label}
+              title={collapsed ? link.label : undefined}
             >
               <span className="w-5 h-5">{link.icon}</span>
               {!collapsed && <span>{link.label}</span>}
