@@ -17,7 +17,7 @@ import {
   Folder,
 } from "lucide-react";
 
-// Navigationslinks definieren
+// Navigationseinträge
 const links = [
   { href: "/team/settings", label: "Allgemein", icon: <Settings /> },
   { href: "/team/members", label: "Mitglieder", icon: <Users /> },
@@ -34,11 +34,12 @@ export default function TeamLayout({ children }: { children: React.ReactNode }) 
   const [collapsed, setCollapsed] = useState(false);
 
   return (
-    <div className="min-h-screen flex bg-gray-50 dark:bg-gray-950">
+    <div className="min-h-screen bg-gray-50 dark:bg-gray-950">
       {/* Sidebar */}
       <aside
-        className={`bg-white dark:bg-gray-900 shadow-md flex flex-col min-h-screen sticky top-0 
-        z-[9999] transition-all duration-200 ${collapsed ? "w-16" : "w-64"}`}
+        className={`fixed top-0 left-0 h-screen z-40 transition-all duration-200 
+          bg-white dark:bg-gray-900 shadow-md flex flex-col 
+          ${collapsed ? "w-16" : "w-64"}`}
       >
         {/* Collapse/Expand Button */}
         <button
@@ -49,14 +50,18 @@ export default function TeamLayout({ children }: { children: React.ReactNode }) 
           {collapsed ? <ChevronRight /> : <ChevronLeft />}
         </button>
 
-        {/* Sidebar-Titel (nur wenn nicht eingeklappt) */}
-        <div className={`px-6 py-4 items-center border-b dark:border-gray-800 ${collapsed ? "hidden" : "flex"}`}>
+        {/* Titel (nur wenn offen) */}
+        <div
+          className={`px-6 py-4 items-center border-b dark:border-gray-800 ${
+            collapsed ? "hidden" : "flex"
+          }`}
+        >
           <span className="text-lg font-bold text-blue-700 dark:text-blue-200">Team-Menü</span>
         </div>
 
         {/* Navigation */}
         <nav className="flex-1 flex flex-col gap-2 px-2 py-6">
-          {links.map(link => (
+          {links.map((link) => (
             <Link
               key={link.href}
               href={link.href}
@@ -79,12 +84,12 @@ export default function TeamLayout({ children }: { children: React.ReactNode }) 
         </nav>
       </aside>
 
-      {/* Content-Bereich */}
-      <div className="flex-1 flex flex-col">
-        <header className="bg-white dark:bg-gray-900 shadow px-6 py-3 flex justify-end items-center sticky top-0 z-0">
+      {/* Content-Bereich, eingerückt je nach Sidebar-Zustand */}
+      <div className={`ml-${collapsed ? "16" : "64"} transition-all duration-200`}>
+        <header className="bg-white dark:bg-gray-900 shadow px-6 py-3 flex justify-end items-center sticky top-0 z-50">
           <UserMenu />
         </header>
-        <main className="flex-1 p-6 relative z-0">{children}</main>
+        <main className="p-6">{children}</main>
       </div>
     </div>
   );
