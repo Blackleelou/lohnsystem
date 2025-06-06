@@ -17,7 +17,7 @@ const links = [
   { href: "/user/profile", label: "Profil‐Einstellungen", icon: <UserIcon /> },
   { href: "/user/security", label: "Sicherheit", icon: <Key /> },
   { href: "/user/notifications", label: "Benachrichtigungen", icon: <Bell /> },
-  { href: "/team/settings", label: "Team‐Einstellungen", icon: <TeamIcon /> },
+  { href: "/team/team", label: "Team‐Einstellungen", icon: <TeamIcon /> },
 ];
 
 export default function UserSettingsLayout({ children }: { children: React.ReactNode }) {
