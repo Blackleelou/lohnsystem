@@ -1,15 +1,12 @@
-<<<<<<< HEAD
 // src/components/user/UserSettingsLayout.tsx
 
 import Link from "next/link";
 import { useRouter } from "next/router";
 import { useState } from "react";
 import { useSession } from "next-auth/react";
-=======
 import { useRouter } from "next/router";
 import { useState, useEffect } from "react"; // <-- WICHTIG!
 import Link from "next/link";
->>>>>>> 1f0a90d (🛠️ Mein Änderungskommentar hier)
 import UserMenu from "@/components/user/UserMenu";
 import {
   User as UserIcon,
@@ -20,13 +17,13 @@ import {
   ChevronRight,
 } from "lucide-react";
 
-<<<<<<< HEAD
+
 export default function UserSettingsLayout({ children }: { children: React.ReactNode }) {
   const router = useRouter();
   const { data: session } = useSession();
   const companyId = session?.user?.companyId;
   const [collapsed, setCollapsed] = useState(false);
-=======
+
 const links = [
   { href: "/team/members", label: "Mitglieder", icon: <Users /> },
   { href: "/team/invites", label: "Einladungen", icon: <QrCode /> },
@@ -50,7 +47,7 @@ export default function TeamLayout({ children }: { children: React.ReactNode }) 
   useEffect(() => {
     localStorage.setItem("sidebar-collapsed", String(collapsed));
   }, [collapsed]);
->>>>>>> 1f0a90d (🛠️ Mein Änderungskommentar hier)
+
 
   const baseLinks = [
     { href: "/user/profile", label: "Profil‐Einstellungen", icon: <UserIcon /> },
