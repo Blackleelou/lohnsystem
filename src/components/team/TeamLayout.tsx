@@ -1,5 +1,3 @@
-// src/components/team/TeamLayout.tsx
-
 import Link from "next/link";
 import { useRouter } from "next/router";
 import { useState } from "react";
@@ -17,7 +15,6 @@ import {
   Folder,
 } from "lucide-react";
 
-// Navigationsstruktur
 const links = [
   { href: "/team/settings", label: "Allgemein", icon: <Settings /> },
   { href: "/team/members", label: "Mitglieder", icon: <Users /> },
@@ -38,10 +35,9 @@ export default function TeamLayout({ children }: { children: React.ReactNode }) 
       {/* Sidebar */}
       <aside
         className={`fixed top-0 left-0 h-screen z-40 transition-all duration-300 ease-in-out 
-          bg-white dark:bg-gray-900 shadow-md flex flex-col 
-          ${collapsed ? "w-16" : "w-64"}`}
+        bg-white dark:bg-gray-900 shadow-md flex flex-col
+        ${collapsed ? "w-16" : "w-64"}`}
       >
-        {/* Sidebar-Titel (nur sichtbar wenn offen) */}
         <div
           className={`px-6 py-4 items-center border-b dark:border-gray-800 ${
             collapsed ? "hidden" : "flex"
@@ -50,7 +46,6 @@ export default function TeamLayout({ children }: { children: React.ReactNode }) 
           <span className="text-lg font-bold text-blue-700 dark:text-blue-200">Team-Menü</span>
         </div>
 
-        {/* Navigation */}
         <nav className="flex-1 flex flex-col gap-2 px-2 py-6">
           {links.map((link) => (
             <Link
@@ -77,10 +72,13 @@ export default function TeamLayout({ children }: { children: React.ReactNode }) 
         </nav>
       </aside>
 
-      {/* Ein-/Ausklapp-Button */}
+      {/* Toggle Button */}
       <button
-        className={`fixed top-4 z-50 p-2 rounded-full shadow bg-white dark:bg-gray-800 transition-all duration-300
-          ${collapsed ? "ml-[4rem]" : "ml-[16rem]"}`}
+        className={`
+          fixed top-4 left-16 z-50 p-2 rounded-full shadow bg-white dark:bg-gray-800
+          transition-all duration-300 ease-in-out
+          ${!collapsed ? "translate-x-48" : ""}
+        `}
         onClick={() => setCollapsed((c) => !c)}
         aria-label={collapsed ? "Sidebar ausklappen" : "Sidebar einklappen"}
       >
@@ -93,7 +91,7 @@ export default function TeamLayout({ children }: { children: React.ReactNode }) 
         </span>
       </button>
 
-      {/* Hauptinhalt mit dynamischer Einrückung */}
+      {/* Main Area */}
       <div className={`transition-all duration-300 ease-in-out ${collapsed ? "ml-16" : "ml-64"}`}>
         <header className="bg-white dark:bg-gray-900 shadow px-6 py-3 flex justify-end items-center sticky top-0 z-50">
           <UserMenu />
