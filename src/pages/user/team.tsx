@@ -1,4 +1,4 @@
-// src/pages/user/settings/team.tsx
+// src/pages/user/team.tsx
 
 import { ReactElement, useState } from "react";
 import { GetServerSideProps } from "next";
