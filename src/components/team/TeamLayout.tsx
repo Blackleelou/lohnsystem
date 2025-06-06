@@ -37,9 +37,10 @@ export default function TeamLayout({ children }: { children: React.ReactNode }) 
     <div className="min-h-screen bg-gray-50 dark:bg-gray-950">
       {/* Sidebar */}
       <aside
-        className={`fixed top-0 left-0 h-screen z-40 transition-all duration-300 ease-in-out 
-          bg-white dark:bg-gray-900 shadow-md flex flex-col 
-          ${collapsed ? "w-16" : "w-64"}`}
+       className={`fixed top-4 z-50 p-2 rounded-full shadow bg-white dark:bg-gray-800 transition-all duration-300 ${
+        collapsed ? "ml-[4rem]" : "ml-[16rem]"
+      }`}
+
       >
         {/* Sidebar-Titel (nur wenn offen) */}
         <div
