@@ -3,35 +3,42 @@
 import Link from "next/link";
 import { useRouter } from "next/router";
 import { useState } from "react";
-import UserMenu from "@/components/user/UserMenu";
 import {
-  User as UserIcon,
-  Key,
+  Settings as SettingsIcon,
+  KeyRound,
   Bell,
-  Trash2,
+  Building2,
   ChevronLeft,
   ChevronRight,
 } from "lucide-react";
 
-const links = [
-  { href: "/user/profile", label: "Profil Einstellungen", icon: <UserIcon /> },
-  { href: "/user/security", label: "Sicherheit", icon: <Key /> },
-  { href: "/user/notifications", label: "Benachrichtigungen", icon: <Bell /> },
-  {
-    href: "/user/delete",
-    label: "Account löschen",
-    icon: <Trash2 />,
-    danger: true,
-  },
-];
-
-export default function UserSettingsLayout({
-  children,
-}: {
-  children: React.ReactNode;
-}) {
+export default function UserSettingsLayout({ children }: { children: React.ReactNode }) {
   const router = useRouter();
   const [collapsed, setCollapsed] = useState(false);
+
+  // Definieren der Sidebar-Links für die Benutzer-Einstellungen
+  const links = [
+    {
+      href: "/user/settings",
+      label: "Profil",
+      icon: <SettingsIcon />,
+    },
+    {
+      href: "/user/settings/security",
+      label: "Sicherheit",
+      icon: <KeyRound />,
+    },
+    {
+      href: "/user/settings/notifications",
+      label: "Benachrichtigungen",
+      icon: <Bell />,
+    },
+    {
+      href: "/user/settings/team",
+      label: "Team-Einstellungen",
+      icon: <Building2 />,
+    },
+  ];
 
   return (
     <div className="min-h-screen flex bg-gray-50 dark:bg-gray-950">
@@ -49,19 +56,16 @@ export default function UserSettingsLayout({
         >
           {collapsed ? <ChevronRight /> : <ChevronLeft />}
         </button>
-
-        {/* Sidebar Header (nur sichtbar, wenn nicht collapsed) */}
         <div
           className={`px-6 py-4 items-center border-b dark:border-gray-800 ${
             collapsed ? "hidden" : "flex"
           }`}
         >
           <span className="text-lg font-bold text-blue-700 dark:text-blue-200">
-            Einstellungen
+            Meine Einstellungen
           </span>
         </div>
 
-        {/* Navigationslinks */}
         <nav className="flex-1 flex flex-col gap-2 px-2 py-6">
           {links.map((link) => (
             <Link
@@ -71,7 +75,7 @@ export default function UserSettingsLayout({
                 router.pathname === link.href
                   ? "bg-blue-50 dark:bg-gray-800 text-blue-700 dark:text-blue-300 font-semibold"
                   : "text-gray-700 dark:text-gray-200 hover:bg-blue-100 dark:hover:bg-gray-800"
-              } ${link.danger ? "text-red-600 dark:text-red-400" : ""}`}
+              }`}
               title={link.label}
             >
               <span className="w-5 h-5">{link.icon}</span>
@@ -81,11 +85,8 @@ export default function UserSettingsLayout({
         </nav>
       </aside>
 
-      {/* Inhalt */}
+      {/* Content Area */}
       <div className="flex-1 flex flex-col">
-        <header className="bg-white dark:bg-gray-900 shadow px-6 py-3 flex justify-end items-center sticky top-0 z-50">
-          <UserMenu />
-        </header>
         <main className="flex-1 p-6">{children}</main>
       </div>
     </div>
