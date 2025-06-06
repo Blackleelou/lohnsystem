@@ -4,6 +4,8 @@ import { ReactElement, useState } from "react";
 import { signOut } from "next-auth/react";
 import { Trash2, LogOut } from "lucide-react";
 
+import UserSettingsLayout from "@/components/user/UserSettingsLayout";
+
 export default function ProfilePage() {
   const [loading, setLoading] = useState(false);
   const [showDelete, setShowDelete] = useState(false);
