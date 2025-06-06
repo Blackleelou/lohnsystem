@@ -17,7 +17,7 @@ import {
   Folder,
 } from "lucide-react";
 
-// Navigationseinträge
+// Navigationsstruktur
 const links = [
   { href: "/team/settings", label: "Allgemein", icon: <Settings /> },
   { href: "/team/members", label: "Mitglieder", icon: <Users /> },
@@ -37,20 +37,11 @@ export default function TeamLayout({ children }: { children: React.ReactNode }) 
     <div className="min-h-screen bg-gray-50 dark:bg-gray-950">
       {/* Sidebar */}
       <aside
-        className={`fixed top-0 left-0 h-screen z-40 transition-all duration-200 
+        className={`fixed top-0 left-0 h-screen z-40 transition-all duration-300 ease-in-out 
           bg-white dark:bg-gray-900 shadow-md flex flex-col 
           ${collapsed ? "w-16" : "w-64"}`}
       >
-        {/* Collapse/Expand Button */}
-        <button
-          className="p-2 self-end mt-2 mr-2 rounded hover:bg-gray-100 dark:hover:bg-gray-800 transition"
-          onClick={() => setCollapsed((c) => !c)}
-          aria-label={collapsed ? "Sidebar ausklappen" : "Sidebar einklappen"}
-        >
-          {collapsed ? <ChevronRight /> : <ChevronLeft />}
-        </button>
-
-        {/* Titel (nur wenn offen) */}
+        {/* Sidebar-Titel (nur wenn offen) */}
         <div
           className={`px-6 py-4 items-center border-b dark:border-gray-800 ${
             collapsed ? "hidden" : "flex"
@@ -65,9 +56,9 @@ export default function TeamLayout({ children }: { children: React.ReactNode }) 
             <Link
               key={link.href}
               href={link.href}
-              className={`flex w-full items-center ${
+              className={`group flex w-full items-center ${
                 collapsed ? "justify-center" : "justify-start"
-              } gap-3 px-3 py-2 rounded-lg transition
+              } gap-3 px-3 py-2 rounded-lg transition-all duration-200
                 ${
                   router.pathname === link.href
                     ? "bg-blue-50 dark:bg-gray-800 text-blue-700 dark:text-blue-300 font-semibold"
@@ -77,15 +68,33 @@ export default function TeamLayout({ children }: { children: React.ReactNode }) 
               `}
               title={link.label}
             >
-              <span className="w-5 h-5 flex-shrink-0">{link.icon}</span>
-              {!collapsed && <span className="truncate">{link.label}</span>}
+              <span className="w-5 h-5 flex-shrink-0 group-hover:scale-110 transition-transform duration-200">
+                {link.icon}
+              </span>
+              {!collapsed && <span className="truncate transition-opacity duration-200">{link.label}</span>}
             </Link>
           ))}
         </nav>
       </aside>
 
-      {/* Content-Bereich, eingerückt je nach Sidebar-Zustand */}
-      <div className={`ml-${collapsed ? "16" : "64"} transition-all duration-200`}>
+      {/* Ein-/Ausklapp-Button (außerhalb der Sidebar) */}
+      <button
+        className={`fixed top-4 z-50 p-2 rounded-full shadow bg-white dark:bg-gray-800 transition-all duration-300 
+          ${collapsed ? "left-16" : "left-64"}`}
+        onClick={() => setCollapsed((c) => !c)}
+        aria-label={collapsed ? "Sidebar ausklappen" : "Sidebar einklappen"}
+      >
+        <span
+          className={`transition-transform duration-300 ease-in-out ${
+            collapsed ? "rotate-180" : "rotate-0"
+          }`}
+        >
+          {collapsed ? <ChevronRight /> : <ChevronLeft />}
+        </span>
+      </button>
+
+      {/* Hauptbereich mit linker Einrückung je nach Sidebar */}
+      <div className={`transition-all duration-300 ease-in-out ${collapsed ? "ml-16" : "ml-64"}`}>
         <header className="bg-white dark:bg-gray-900 shadow px-6 py-3 flex justify-end items-center sticky top-0 z-50">
           <UserMenu />
         </header>
