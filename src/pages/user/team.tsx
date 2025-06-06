@@ -24,7 +24,7 @@ export default function TeamSettingsPage() {
       // Session sofort neu laden, damit das Menü aktualisiert wird
       await fetch("/api/auth/session?update");
       alert("Du bist jetzt aus dem Team ausgetreten.");
-      router.push("/dashboard") // Optional: router.push("/dashboard");
+      router.replace("/dashboard") // Optional: router.push("/dashboard");
     } else {
       alert("Fehler beim Verlassen des Teams");
     }
