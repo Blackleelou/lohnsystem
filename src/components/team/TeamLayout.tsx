@@ -1,70 +1,47 @@
-// src/components/user/UserSettingsLayout.tsx
+// src/components/team/TeamLayout.tsx
 
 import Link from "next/link";
 import { useRouter } from "next/router";
-import { useState } from "react";
-import { useSession } from "next-auth/react";
-import { useRouter } from "next/router";
-import { useState, useEffect } from "react"; // <-- WICHTIG!
-import Link from "next/link";
+import { useState, useEffect } from "react";
 import UserMenu from "@/components/user/UserMenu";
 import {
-  User as UserIcon,
-  Key,
-  Bell,
-  Settings as TeamIcon,
+  Users,
+  QrCode,
+  KeyRound,
+  BarChart2,
+  List,
+  Folder,
+  Trash,
   ChevronLeft,
   ChevronRight,
 } from "lucide-react";
-
-
-export default function UserSettingsLayout({ children }: { children: React.ReactNode }) {
-  const router = useRouter();
-  const { data: session } = useSession();
-  const companyId = session?.user?.companyId;
-  const [collapsed, setCollapsed] = useState(false);
-
-const links = [
-  { href: "/team/members", label: "Mitglieder", icon: <Users /> },
-  { href: "/team/invites", label: "Einladungen", icon: <QrCode /> },
-  { href: "/team/security", label: "Zugangs-Code", icon: <KeyRound /> },
-  { href: "/team/payrules", label: "Zuschläge", icon: <BarChart2 /> },
-  { href: "/team/shifts", label: "Schichten", icon: <List /> },
-  { href: "/team/files", label: "Dokumente", icon: <Folder /> },
-  { href: "/team/delete", label: "Team löschen", icon: <Trash />, danger: true },
-];
 
 export default function TeamLayout({ children }: { children: React.ReactNode }) {
   const router = useRouter();
 
   const [collapsed, setCollapsed] = useState(() => {
     if (typeof window !== "undefined") {
-      return localStorage.getItem("sidebar-collapsed") === "true";
+      return localStorage.getItem("team-sidebar-collapsed") === "true";
     }
     return false;
   });
 
   useEffect(() => {
-    localStorage.setItem("sidebar-collapsed", String(collapsed));
+    localStorage.setItem("team-sidebar-collapsed", String(collapsed));
   }, [collapsed]);
 
-
-  const baseLinks = [
-    { href: "/user/profile", label: "Profil‐Einstellungen", icon: <UserIcon /> },
-    { href: "/user/security", label: "Sicherheit", icon: <Key /> },
-    { href: "/user/notifications", label: "Benachrichtigungen", icon: <Bell /> },
+  const links = [
+    { href: "/team/members", label: "Mitglieder", icon: <Users /> },
+    { href: "/team/invites", label: "Einladungen", icon: <QrCode /> },
+    { href: "/team/security", label: "Zugangs-Code", icon: <KeyRound /> },
+    { href: "/team/payrules", label: "Zuschläge", icon: <BarChart2 /> },
+    { href: "/team/shifts", label: "Schichten", icon: <List /> },
+    { href: "/team/files", label: "Dokumente", icon: <Folder /> },
+    { href: "/team/delete", label: "Team löschen", icon: <Trash />, danger: true },
   ];
-
-  const teamLink = companyId
-    ? [{ href: "/user/team", label: "Team‐Einstellungen", icon: <TeamIcon /> }]
-    : [];
-
-  const links = [...baseLinks, ...teamLink];
 
   return (
     <div className="min-h-screen flex bg-gray-50 dark:bg-gray-950">
-      {/* Hier geht dein Layout weiter */}
-
       {/* Sidebar */}
       <aside
         className={`bg-white dark:bg-gray-900 shadow-md flex flex-col min-h-screen sticky top-0 z-40 transition-all duration-200 ${collapsed ? "w-16" : "w-64"}`}
@@ -81,7 +58,7 @@ export default function TeamLayout({ children }: { children: React.ReactNode }) 
         {/* Sidebar Header */}
         <div className={`px-6 py-4 items-center border-b dark:border-gray-800 ${collapsed ? "hidden" : "flex"}`}>
           <span className="text-lg font-bold text-blue-700 dark:text-blue-200">
-            Einstellungen
+            Teambereich
           </span>
         </div>
 
@@ -100,7 +77,7 @@ export default function TeamLayout({ children }: { children: React.ReactNode }) 
                 }
                 ${link.danger ? "text-red-600 dark:text-red-400" : ""}`}
               title={link.label}
-              prefetch={false} // wichtig: verhindert automatisches Verhalten
+              prefetch={false}
               scroll={false}
               replace={false}
             >
