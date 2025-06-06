@@ -11,7 +11,7 @@ import { useRouter } from "next/router";
 export const getServerSideProps: GetServerSideProps = requireAuth;
 
 export default function TeamSettingsPage() {
-  const { data: session } = useSession(); // ohne refetch-Optionen
+  const { data: session, update } = useSession() // mit refetch-Option (update)
   const router = useRouter();
   const [loading, setLoading] = useState(false);
   const [showConfirm, setShowConfirm] = useState(false);
