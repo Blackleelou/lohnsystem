@@ -30,14 +30,13 @@ export default async function handler(
       return res.status(404).json({ message: "User not found" });
     }
 
-    // companyId auf null setzen (aus dem Team austreten)
+    // companyId, role und nickname auf null setzen (aus dem Team austreten)
     await prisma.user.update({
       where: { id: dbUser.id },
       data: {
         companyId: null,
-        // Falls ihr das Rollen-Feld ebenfalls zurücksetzen möchtet, 
-        // könnt ihr hier z.B. role: null oder role: "viewer" setzen.
-        // role: null,
+        role: null,
+        nickname: null,
       },
     });
 
