@@ -28,14 +28,11 @@ export default function TeamSettingsPage() {
   return (
     <div className="max-w-xl mx-auto py-10 px-4 space-y-6">
       <h1 className="text-2xl font-bold mb-2 text-center">Team-Einstellungen</h1>
-      <p className="text-center text-gray-600 dark:text-gray-300">
-        Hier kannst du deine Team-Einstellungen verwalten. (Dummy-Seite)
-      </p>
 
       {/* Schlanker „Team löschen“ Bereich */}
       <div className="bg-white dark:bg-gray-900 rounded-lg shadow border border-gray-100 dark:border-gray-800 p-4 text-sm">
         <div className="flex items-center justify-between">
-          <span className="text-gray-800 dark:text-gray-200">Team löschen</span>
+          <span className="text-gray-800 dark:text-gray-200">Team verlassen</span>
           <button
             onClick={() => setShowConfirm(true)}
             disabled={loading}
@@ -45,14 +42,6 @@ export default function TeamSettingsPage() {
             Löschen
           </button>
         </div>
-      </div>
-
-      {/* Platzhalter-Inhalt */}
-      <div className="mt-4 bg-white dark:bg-gray-900 rounded-2xl shadow-lg border border-gray-100 dark:border-gray-800 p-6">
-        <p className="text-gray-700 dark:text-gray-200">
-          Diese Seite ist derzeit nur ein Platzhalter. Später können hier Optionen wie Team-Name ändern,
-          Rollen verwalten oder andere Team-spezifische Einstellungen folgen.
-        </p>
       </div>
 
       {/* Bestätigungs-Dialog */}
