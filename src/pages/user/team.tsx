@@ -6,6 +6,7 @@ import { requireAuth } from "@/lib/authRequired";
 import UserSettingsLayout from "@/components/user/UserSettingsLayout";
 import { Trash2 } from "lucide-react";
 import { useSession } from "next-auth/react";
+import { useRouter } from "next/router";
 
 export const getServerSideProps: GetServerSideProps = requireAuth;
 
@@ -24,7 +25,7 @@ export default function TeamSettingsPage() {
       // Session sofort neu laden, damit das Menü aktualisiert wird
       await fetch("/api/auth/session?update");
       alert("Du bist jetzt aus dem Team ausgetreten.");
-      router.replace("/dashboard") // Optional: router.push("/dashboard");
+      router.push("/dashboard") // Optional: router.push("/dashboard");
     } else {
       alert("Fehler beim Verlassen des Teams");
     }
