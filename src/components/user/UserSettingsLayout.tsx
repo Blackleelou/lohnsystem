@@ -3,50 +3,36 @@
 import Link from "next/link";
 import { useRouter } from "next/router";
 import { useState } from "react";
+import UserMenu from "@/components/user/UserMenu";
 import {
-  Settings as SettingsIcon,
-  KeyRound,
+  User as UserIcon,
+  Key,
   Bell,
-  Building2,
+  Settings as TeamIcon, // Verwenden wir für "Team-Einstellungen"
   ChevronLeft,
   ChevronRight,
 } from "lucide-react";
+
+const links = [
+  { href: "/user/profile", label: "Profil‐Einstellungen", icon: <UserIcon /> },
+  { href: "/user/security", label: "Sicherheit", icon: <Key /> },
+  { href: "/user/notifications", label: "Benachrichtigungen", icon: <Bell /> },
+  { href: "/team/settings", label: "Team‐Einstellungen", icon: <TeamIcon /> },
+];
 
 export default function UserSettingsLayout({ children }: { children: React.ReactNode }) {
   const router = useRouter();
   const [collapsed, setCollapsed] = useState(false);
 
-  // Definieren der Sidebar-Links für die Benutzer-Einstellungen
-  const links = [
-    {
-      href: "/user/settings",
-      label: "Profil",
-      icon: <SettingsIcon />,
-    },
-    {
-      href: "/user/settings/security",
-      label: "Sicherheit",
-      icon: <KeyRound />,
-    },
-    {
-      href: "/user/settings/notifications",
-      label: "Benachrichtigungen",
-      icon: <Bell />,
-    },
-    {
-      href: "/user/settings/team",
-      label: "Team-Einstellungen",
-      icon: <Building2 />,
-    },
-  ];
-
   return (
     <div className="min-h-screen flex bg-gray-50 dark:bg-gray-950">
-      {/* Sidebar */}
+      {/* ================= Sidebar ================= */}
       <aside
-        className={`bg-white dark:bg-gray-900 shadow-md flex flex-col min-h-screen sticky top-0 z-40 transition-all duration-200 ${
-          collapsed ? "w-16" : "w-64"
-        }`}
+        className={`
+          bg-white dark:bg-gray-900 shadow-md flex flex-col min-h-screen sticky top-0 z-40
+          transition-all duration-200
+          ${collapsed ? "w-16" : "w-64"}
+        `}
       >
         {/* Collapse/Expand Button */}
         <button
@@ -56,26 +42,33 @@ export default function UserSettingsLayout({ children }: { children: React.React
         >
           {collapsed ? <ChevronRight /> : <ChevronLeft />}
         </button>
+
+        {/* Header‐Titel nur sichtbar, wenn nicht collapsed */}
         <div
-          className={`px-6 py-4 items-center border-b dark:border-gray-800 ${
-            collapsed ? "hidden" : "flex"
-          }`}
+          className={`
+            px-6 py-4 items-center border-b dark:border-gray-800
+            ${collapsed ? "hidden" : "flex"}
+          `}
         >
           <span className="text-lg font-bold text-blue-700 dark:text-blue-200">
-            Meine Einstellungen
+            Einstellungen
           </span>
         </div>
 
+        {/* Navigationslinks */}
         <nav className="flex-1 flex flex-col gap-2 px-2 py-6">
           {links.map((link) => (
             <Link
               key={link.href}
               href={link.href}
-              className={`flex items-center gap-3 px-3 py-2 rounded-lg transition ${
-                router.pathname === link.href
-                  ? "bg-blue-50 dark:bg-gray-800 text-blue-700 dark:text-blue-300 font-semibold"
-                  : "text-gray-700 dark:text-gray-200 hover:bg-blue-100 dark:hover:bg-gray-800"
-              }`}
+              className={`
+                flex items-center gap-3 px-3 py-2 rounded-lg transition
+                ${
+                  router.pathname === link.href
+                    ? "bg-blue-50 dark:bg-gray-800 text-blue-700 dark:text-blue-300 font-semibold"
+                    : "text-gray-700 dark:text-gray-200 hover:bg-blue-100 dark:hover:bg-gray-800"
+                }
+              `}
               title={link.label}
             >
               <span className="w-5 h-5">{link.icon}</span>
@@ -85,8 +78,11 @@ export default function UserSettingsLayout({ children }: { children: React.React
         </nav>
       </aside>
 
-      {/* Content Area */}
+      {/* ================ Content Area ================= */}
       <div className="flex-1 flex flex-col">
+        <header className="bg-white dark:bg-gray-900 shadow px-6 py-3 flex justify-end items-center sticky top-0 z-50">
+          <UserMenu />
+        </header>
         <main className="flex-1 p-6">{children}</main>
       </div>
     </div>
