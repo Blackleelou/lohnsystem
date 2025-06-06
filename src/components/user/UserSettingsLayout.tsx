@@ -3,26 +3,36 @@
 import Link from "next/link";
 import { useRouter } from "next/router";
 import { useState } from "react";
+import { useSession } from "next-auth/react";
 import UserMenu from "@/components/user/UserMenu";
 import {
   User as UserIcon,
   Key,
   Bell,
-  Settings as TeamIcon, // Verwenden wir für "Team-Einstellungen"
+  Settings as TeamIcon, // Icon für "Team-Einstellungen"
   ChevronLeft,
   ChevronRight,
 } from "lucide-react";
 
-const links = [
-  { href: "/user/profile", label: "Profil‐Einstellungen", icon: <UserIcon /> },
-  { href: "/user/security", label: "Sicherheit", icon: <Key /> },
-  { href: "/user/notifications", label: "Benachrichtigungen", icon: <Bell /> },
-  { href: "/user/team", label: "Team‐Einstellungen", icon: <TeamIcon /> },
-];
-
 export default function UserSettingsLayout({ children }: { children: React.ReactNode }) {
   const router = useRouter();
+  const { data: session } = useSession();
+  const companyId = session?.user?.companyId;
   const [collapsed, setCollapsed] = useState(false);
+
+  // Basis‐Links
+  const baseLinks = [
+    { href: "/user/profile", label: "Profil‐Einstellungen", icon: <UserIcon /> },
+    { href: "/user/security", label: "Sicherheit", icon: <Key /> },
+    { href: "/user/notifications", label: "Benachrichtigungen", icon: <Bell /> },
+  ];
+
+  // Link nur anzeigen, wenn companyId vorhanden (im Team)
+  const teamLink = companyId
+    ? [{ href: "/user/team", label: "Team‐Einstellungen", icon: <TeamIcon /> }]
+    : [];
+
+  const links = [...baseLinks, ...teamLink];
 
   return (
     <div className="min-h-screen flex bg-gray-50 dark:bg-gray-950">
