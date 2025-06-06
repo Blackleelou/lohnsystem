@@ -75,9 +75,10 @@ export default function TeamLayout({ children }: { children: React.ReactNode }) 
       {/* Toggle Button */}
       <button
         className={`
-          fixed top-4 left-16 z-50 p-2 rounded-full shadow bg-white dark:bg-gray-800
+          fixed top-4 left-0 z-[999] p-2 rounded-full shadow 
+          bg-white dark:bg-gray-800 border border-gray-200 dark:border-gray-700
           transition-all duration-300 ease-in-out
-          ${!collapsed ? "translate-x-48" : ""}
+          ${collapsed ? "translate-x-[4.5rem]" : "translate-x-[15rem]"}
         `}
         onClick={() => setCollapsed((c) => !c)}
         aria-label={collapsed ? "Sidebar ausklappen" : "Sidebar einklappen"}
@@ -91,7 +92,7 @@ export default function TeamLayout({ children }: { children: React.ReactNode }) 
         </span>
       </button>
 
-      {/* Main Area */}
+      {/* Hauptinhalt mit dynamischer Einrückung */}
       <div className={`transition-all duration-300 ease-in-out ${collapsed ? "ml-16" : "ml-64"}`}>
         <header className="bg-white dark:bg-gray-900 shadow px-6 py-3 flex justify-end items-center sticky top-0 z-50">
           <UserMenu />
