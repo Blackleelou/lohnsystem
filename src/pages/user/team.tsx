@@ -5,6 +5,8 @@ import { GetServerSideProps } from "next";
 import { requireAuth } from "@/lib/authRequired";
 import { Trash2 } from "lucide-react";
 
+import UserSettingsLayout from "@/components/user/UserSettingsLayout";
+
 // KEIN UserSettingsLayout hier im JSX-Return
 export default function TeamSettingsPage() {
   const [loading, setLoading] = useState(false);
