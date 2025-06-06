@@ -77,7 +77,7 @@ export default function UserMenu() {
 
           {/* „Mein Konto“ immer sichtbar (neuer Pfad /user/settings) */}
           <Link
-            href="/user/settings"
+            href="/user/profile"
             className="flex items-center gap-2 px-3 py-2 rounded-lg text-gray-700 dark:text-gray-100 hover:bg-blue-50 dark:hover:bg-gray-800 transition"
             onClick={() => setIsOpen(false)}
           >
