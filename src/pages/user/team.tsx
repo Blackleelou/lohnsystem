@@ -1,4 +1,4 @@
-// src/pages/user/settings/team.tsx
+// src/pages/user/team.tsx
 
 import { ReactElement, useState } from "react";
 import { GetServerSideProps } from "next";
@@ -10,17 +10,11 @@ import { useSession } from "next-auth/react";
 export const getServerSideProps: GetServerSideProps = requireAuth;
 
 export default function TeamSettingsPage() {
-  const { data: session, status } = useSession({
-    required: false,
-    // alle 30 Sekunden neu abfragen
-    refetchInterval: 30 * 1000,
-    // beim Tab-Wechsel ebenfalls direkt neu abfragen
-    refetchOnWindowFocus: true,
-  });
+  const { data: session } = useSession(); // ganz normal ohne refetchInterval
   const [loading, setLoading] = useState(false);
   const [showConfirm, setShowConfirm] = useState(false);
 
-  const deleteTeam = async () => {
+  const leaveTeam = async () => {
     setLoading(true);
     const res = await fetch("/api/team/leave", { method: "POST" });
     setLoading(false);
@@ -28,12 +22,11 @@ export default function TeamSettingsPage() {
     if (res.ok) {
       setShowConfirm(false);
 
-      // Session-Endpoint mit update-Parameter aufrufen, damit NextAuth den JWT neu lädt:
+      // Session manuell neu laden:
       await fetch("/api/auth/session?update");
 
       alert("Du bist jetzt aus dem Team ausgetreten.");
-      // Bei Bedarf: hier direkt zurück zum Dashboard navigieren
-      // router.push("/dashboard");
+      // Optional: router.push("/dashboard");
     } else {
       alert("Fehler beim Verlassen des Teams");
     }
@@ -43,9 +36,6 @@ export default function TeamSettingsPage() {
     <UserSettingsLayout>
       <div className="max-w-xl mx-auto py-10 px-4 space-y-6">
         <h1 className="text-2xl font-bold mb-2 text-center">Team-Einstellungen</h1>
-        <p className="text-center text-gray-600 dark:text-gray-300">
-          Hier kannst du deine Team-Einstellungen verwalten. (Dummy – Platzhalter)
-        </p>
 
         {/* Schlanker „Team verlassen“ Bereich */}
         <div className="bg-white dark:bg-gray-900 rounded-lg shadow border border-gray-100 dark:border-gray-800 p-4 text-sm">
@@ -64,8 +54,8 @@ export default function TeamSettingsPage() {
 
         {/* Platzhalter-Inhalt */}
         <div className="mt-4 bg-white dark:bg-gray-900 rounded-2xl shadow-lg border border-gray-100 dark:border-gray-800 p-6">
-          <p className="text-gray-700 dark:text-gray-200">
-            Diese Seite ist aktuell nur ein Platzhalter. Später können hier Optionen wie Team-Name ändern, Rollen verwalten usw. folgen.
+          <p className="text-gray-700 dark:text-gray-200 text-center">
+            Diese Seite ist aktuell nur ein Platzhalter. Später folgen Optionen wie Team-Name ändern, Rollen verwalten, etc.
           </p>
         </div>
 
@@ -78,11 +68,11 @@ export default function TeamSettingsPage() {
                 Team wirklich verlassen?
               </h3>
               <p className="text-sm text-red-500 mb-4">
-                Möchtest du dieses Team wirklich verlassen? Diese Aktion kann nicht rückgängig gemacht werden.
+                Möchtest du dieses Team dauerhaft verlassen? Diese Aktion kann nicht rückgängig gemacht werden.
               </p>
               <div className="flex justify-end gap-3">
                 <button
-                  onClick={deleteTeam}
+                  onClick={leaveTeam}
                   className="bg-red-500 hover:bg-red-600 text-white text-sm font-medium rounded px-3 py-1 transition disabled:opacity-50"
                   disabled={loading}
                 >
