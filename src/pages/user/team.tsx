@@ -12,6 +12,7 @@ export const getServerSideProps: GetServerSideProps = requireAuth;
 
 export default function TeamSettingsPage() {
   const { data: session } = useSession(); // ohne refetch-Optionen
+  const router = useRouter();
   const [loading, setLoading] = useState(false);
   const [showConfirm, setShowConfirm] = useState(false);
 
