@@ -56,15 +56,20 @@ export default function TeamLayout({ children }: { children: React.ReactNode }) 
             <Link
   key={link.href}
   href={link.href}
-  className={`flex items-center gap-3 px-3 py-2 rounded-lg transition ${
-    router.pathname === link.href
-      ? "bg-blue-50 dark:bg-gray-800 text-blue-700 dark:text-blue-300 font-semibold"
-      : "text-gray-700 dark:text-gray-200 hover:bg-blue-100 dark:hover:bg-gray-800"
-  } ${link.danger ? "text-red-600 dark:text-red-400" : ""}`}
+  className={`flex w-full items-center ${
+    collapsed ? "justify-center" : "justify-start"
+  } gap-3 px-3 py-2 rounded-lg transition
+    ${
+      router.pathname === link.href
+        ? "bg-blue-50 dark:bg-gray-800 text-blue-700 dark:text-blue-300 font-semibold"
+        : "text-gray-700 dark:text-gray-200 hover:bg-blue-100 dark:hover:bg-gray-800"
+    }
+    ${link.danger ? "text-red-600 dark:text-red-400" : ""}
+  `}
   title={link.label}
 >
-  <span className="w-5 h-5">{link.icon}</span>
-  {!collapsed && <span>{link.label}</span>}
+  <span className="w-5 h-5 flex-shrink-0">{link.icon}</span>
+  {!collapsed && <span className="truncate">{link.label}</span>}
 </Link>
           ))}
         </nav>
