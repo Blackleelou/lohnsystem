@@ -24,7 +24,12 @@ export default function TeamMembersPage() {
 
   useEffect(() => {
     if (status !== "authenticated") return;
-
+    
+    if (session?.user && session.user.companyId === null) {
+      window.location.href = "/dashboard";
+      return;
+    }
+    
     fetch("/api/team/members")
       .then(res => res.json())
       .then(data => setMembers(data.members || []))
