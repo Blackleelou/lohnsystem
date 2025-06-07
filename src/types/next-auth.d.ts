@@ -12,6 +12,7 @@ declare module "next-auth" {
       companyId?: string | null;
       isAdmin?: boolean;
       nickname?: string;
+      session.user.promotedToAdmin = user.promotedToAdmin;
     };
   }
 }
