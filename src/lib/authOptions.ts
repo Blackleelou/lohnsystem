@@ -20,7 +20,6 @@ export const authOptions: AuthOptions = {
         if (!credentials?.email || !credentials?.password) {
           return null;
         }
-        // Benutzer aus der DB holen
         const user = await prisma.user.findUnique({
           where: { email: credentials.email },
         });
@@ -29,8 +28,6 @@ export const authOptions: AuthOptions = {
         const isValid = await compare(credentials.password, user.password);
         if (!isValid) return null;
 
-        // Wir geben hier nur die nötigsten Felder zurück –
-        // weitere Infos (companyId, role, isAdmin, nickname) landen im JWT‐Callback.
         return {
           id: user.id,
           email: user.email,
@@ -43,15 +40,11 @@ export const authOptions: AuthOptions = {
     }),
   ],
 
-  // Wir arbeiten mit JSON Web Tokens als Session‐Strategie
   session: { strategy: "jwt" },
 
   callbacks: {
-    // Wird beim ersten Login (Credentials oder Google) und bei jedem session.update() aufgerufen.
     async jwt({ token, user, trigger }) {
-      // 1) Erstes Login: user ist gesetzt
       if (user && user.email) {
-        // Vollständige User‐Daten (inkl. companyId, role, isAdmin, nickname) aus der DB holen
         const dbUser = await prisma.user.findUnique({
           where: { email: user.email },
           select: {
@@ -61,7 +54,7 @@ export const authOptions: AuthOptions = {
             role: true,
             isAdmin: true,
             nickname: true,
-            name: true,
+            name: true, // ✅ hinzugefügt
           },
         });
         if (dbUser) {
@@ -71,10 +64,10 @@ export const authOptions: AuthOptions = {
           token.role = dbUser.role;
           token.isAdmin = dbUser.isAdmin;
           token.nickname = dbUser.nickname;
+          token.name = dbUser.name; // ✅ hinzugefügt
         }
       }
 
-      // 2) Trigger "update": Manuelles Session‐Update (z. B. session.update()) lädt die aktuellen Werte nach
       if (trigger === "update" && token.email) {
         const dbUser = await prisma.user.findUnique({
           where: { email: token.email as string },
@@ -83,6 +76,7 @@ export const authOptions: AuthOptions = {
             role: true,
             isAdmin: true,
             nickname: true,
+            name: true, // ✅ hinzugefügt
           },
         });
         if (dbUser) {
@@ -90,14 +84,13 @@ export const authOptions: AuthOptions = {
           token.role = dbUser.role;
           token.isAdmin = dbUser.isAdmin;
           token.nickname = dbUser.nickname;
+          token.name = dbUser.name; // ✅ hinzugefügt
         }
       }
 
       return token;
     },
 
-    // Wird bei jedem Aufruf von getSession()/useSession() (Client‐Seite) aufgerufen.
-    // Hier übernehmen wir die im JWT gespeicherten Werte in session.user.
     async session({ session, token }) {
       if (session.user) {
         session.user.id = token.id as string;
@@ -105,8 +98,8 @@ export const authOptions: AuthOptions = {
         session.user.companyId = token.companyId as string | null;
         session.user.role = token.role as "admin" | "editor" | "viewer";
         session.user.isAdmin = token.isAdmin as boolean;
-        // ↳ Hier wandeln wir `null` in `undefined` um, damit der Typ stimmt:
         session.user.nickname = (token.nickname as string | null) ?? undefined;
+        session.user.name = token.name as string | undefined; // ✅ hinzugefügt
       }
       return session;
     },
