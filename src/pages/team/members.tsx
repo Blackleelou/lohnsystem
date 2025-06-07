@@ -46,20 +46,25 @@ export default function TeamMembersPage() {
   });
 
   const handleRemove = async (id: string) => {
-    if (!confirm("Diesen Benutzer wirklich aus dem Team entfernen?")) return;
+  if (!confirm("Diesen Benutzer wirklich aus dem Team entfernen?")) return;
 
-    const res = await fetch("/api/team/remove-member", {
-      method: "POST",
-      headers: { "Content-Type": "application/json" },
-      body: JSON.stringify({ userId: id }),
-    });
+  const res = await fetch("/api/team/remove-member", {
+    method: "POST",
+    headers: { "Content-Type": "application/json" },
+    body: JSON.stringify({ userId: id }),
+  });
 
-    if (res.ok) {
-      setMembers((prev) => prev.filter((m) => m.id !== id));
-    } else {
-      alert("Fehler beim Entfernen.");
+  if (res.ok) {
+    setMembers((prev) => prev.filter((m) => m.id !== id));
+
+    // Wenn ich mich selbst entfernt habe → Session aktualisieren
+    if (id === session?.user?.id) {
+      await update();
     }
-  };
+  } else {
+    alert("Fehler beim Entfernen.");
+  }
+};
 
   const handleRoleChange = async (userId: string, newRole: string) => {
     const res = await fetch("/api/team/change-role", {
