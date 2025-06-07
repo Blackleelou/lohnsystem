@@ -10,6 +10,7 @@ declare module "next-auth" {
       isAdmin?: boolean;
       nickname?: string;
       promotedToAdmin?: boolean; // 👈 HIER ERGÄNZT
+      name?: string;
     };
   }
 
