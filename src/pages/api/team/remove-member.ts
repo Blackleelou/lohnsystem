@@ -1,3 +1,5 @@
+// src/pages/api/team/remove-members.ts
+
 import type { NextApiRequest, NextApiResponse } from "next";
 import { getServerSession } from "next-auth/next";
 import { authOptions } from "@/lib/authOptions";
@@ -23,12 +25,16 @@ export default async function handler(req: NextApiRequest, res: NextApiResponse)
   try {
     const userToRemove = await prisma.user.findUnique({
       where: { id: userId },
+      select: { id: true, companyId: true, role: true },
     });
 
     if (!userToRemove || userToRemove.companyId !== session.user.companyId) {
       return res.status(404).json({ error: "Benutzer nicht gefunden oder nicht im Team" });
     }
 
+    const { companyId, role } = userToRemove;
+
+    // Erst entfernen
     await prisma.user.update({
       where: { id: userId },
       data: {
@@ -40,6 +46,43 @@ export default async function handler(req: NextApiRequest, res: NextApiResponse)
         showEmail: false,
       },
     });
+
+    // Falls der entfernte ein Admin war: neuen Admin suchen
+    if (role === "admin") {
+      const remainingAdmins = await prisma.user.count({
+        where: { companyId, role: "admin" },
+      });
+
+      if (remainingAdmins === 0) {
+        const nextEditor = await prisma.user.findFirst({
+          where: { companyId, role: "editor" },
+        });
+
+        if (nextEditor) {
+          await prisma.user.update({
+            where: { id: nextEditor.id },
+            data: {
+              role: "admin",
+              promotedToAdmin: true,
+            },
+          });
+        } else {
+          const nextViewer = await prisma.user.findFirst({
+            where: { companyId, role: "viewer" },
+          });
+
+          if (nextViewer) {
+            await prisma.user.update({
+              where: { id: nextViewer.id },
+              data: {
+                role: "admin",
+                promotedToAdmin: true,
+              },
+            });
+          }
+        }
+      }
+    }
 
     return res.status(200).json({ success: true });
   } catch (error) {
