@@ -43,8 +43,10 @@ export default function TeamLayout({ children }: { children: React.ReactNode }) 
 
   return (
     <div className="min-h-screen flex bg-gray-50 dark:bg-gray-950">
-      <aside
-        className={`bg-white dark:bg-gray-900 shadow-md flex flex-col min-h-screen sticky top-0 z-40 transition-all duration-200 ${collapsed ? "w-16" : "w-64"}`}
+      <motion.aside
+        className="bg-white dark:bg-gray-900 shadow-md flex flex-col min-h-screen sticky top-0 z-40"
+        animate={{ width: collapsed ? 64 : 256 }}
+        transition={{ duration: 0.3, ease: "easeInOut" }}
       >
         <button
           className="p-2 self-end mt-2 mr-2 rounded hover:bg-gray-100 dark:hover:bg-gray-800 transition"
@@ -54,9 +56,16 @@ export default function TeamLayout({ children }: { children: React.ReactNode }) 
           {collapsed ? <ChevronRight /> : <ChevronLeft />}
         </button>
 
-        <div className={`px-6 py-4 items-center border-b dark:border-gray-800 ${collapsed ? "hidden" : "flex"}`}>
-          <span className="text-lg font-bold text-blue-700 dark:text-blue-200">Teambereich</span>
-        </div>
+        {!collapsed && (
+          <motion.div
+            className="px-6 py-4 items-center border-b dark:border-gray-800 flex"
+            initial={{ opacity: 0 }}
+            animate={{ opacity: 1 }}
+            exit={{ opacity: 0 }}
+          >
+            <span className="text-lg font-bold text-blue-700 dark:text-blue-200">Teambereich</span>
+          </motion.div>
+        )}
 
         <nav className="flex-1 flex flex-col gap-2 px-2 py-6">
           {links.map((link) => {
@@ -102,7 +111,7 @@ export default function TeamLayout({ children }: { children: React.ReactNode }) 
             );
           })}
         </nav>
-      </aside>
+      </motion.aside>
 
       <div className="flex-1 flex flex-col">
         <header className="bg-white dark:bg-gray-900 shadow px-6 py-3 flex justify-end items-center sticky top-0 z-50">
