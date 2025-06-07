@@ -8,28 +8,27 @@ import { Users, User, Link2 } from "lucide-react";
 import { useRouter } from "next/router";
 import FAQ from "@/components/dashboard/FAQ";
 
-// SSR: Nur neuen Usern das Dashboard zeigen!
 export const getServerSideProps: GetServerSideProps = async (ctx) => {
   const session = await getServerSession(ctx.req, ctx.res, authOptions);
   if (!session) {
     return { redirect: { destination: "/login", permanent: false } };
   }
+
   const user = await prisma.user.findUnique({
     where: { email: session.user.email },
-    select: { hasChosenMode: true, companyId: true }
+    select: { companyId: true },
   });
-  // *** NUR wenn Modus gewählt UND ein Team vorhanden ist, nach /team umleiten! ***
-  if (user?.hasChosenMode && user?.companyId) {
+
+  if (user?.companyId) {
     return { redirect: { destination: "/team", permanent: false } };
   }
-  // Sonst: Dashboard anzeigen
+
   return { props: {} };
 };
 
 export default function Dashboard() {
   const router = useRouter();
 
-  // Setzt das Flag per API und leitet dann weiter
   const handleSelect = async (ziel: string) => {
     await fetch("/api/user/choose-mode", { method: "POST" });
     router.push(ziel);
@@ -38,7 +37,6 @@ export default function Dashboard() {
   return (
     <Layout>
       <div className="w-full max-w-5xl mx-auto mt-8">
-        {/* Persönlicher Claim & Intro */}
         <div className="text-center mb-8 px-4">
           <h1 className="text-3xl font-extrabold text-blue-700 dark:text-blue-200 mb-3">
             Willkommen bei <span className="text-violet-700 dark:text-violet-300">meinLohn</span>!
@@ -55,7 +53,6 @@ export default function Dashboard() {
             </span>
           </p>
         </div>
-        {/* Kacheln: Team zuerst */}
         <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 gap-6 px-2">
           <DashboardCard
             icon={<Users className="w-10 h-10 text-violet-500 dark:text-violet-300" />}
@@ -99,7 +96,6 @@ export default function Dashboard() {
             onClick={() => handleSelect("/dashboard?mode=solo")}
           />
         </div>
-        {/* FAQ unter den Kacheln */}
         <FAQ />
       </div>
     </Layout>
