@@ -2,7 +2,7 @@
 
 import Link from "next/link";
 import { useRouter } from "next/router";
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import { useSession } from "next-auth/react";
 import UserMenu from "@/components/user/UserMenu";
 import {
@@ -19,7 +19,16 @@ export default function UserSettingsLayout({ children }: { children: React.React
   const router = useRouter();
   const { data: session } = useSession();
   const companyId = session?.user?.companyId;
-  const [collapsed, setCollapsed] = useState(false);
+  const [collapsed, setCollapsed] = useState(() => {
+    if (typeof window !== "undefined") {
+      return localStorage.getItem("user-sidebar-collapsed") === "true";
+    }
+    return false;
+  });
+
+  useEffect(() => {
+    localStorage.setItem("user-sidebar-collapsed", String(collapsed));
+  }, [collapsed]);
 
   const baseLinks = [
     { href: "/user/profile", label: "Profil‐Einstellungen", icon: <UserIcon /> },
@@ -35,12 +44,10 @@ export default function UserSettingsLayout({ children }: { children: React.React
 
   return (
     <div className="min-h-screen flex bg-gray-50 dark:bg-gray-950">
-      <aside
-        className={`
-          bg-white dark:bg-gray-900 shadow-md flex flex-col min-h-screen sticky top-0 z-40
-          transition-all duration-300 ease-in-out
-          ${collapsed ? "w-16" : "w-64"}
-        `}
+      <motion.aside
+        className="bg-white dark:bg-gray-900 shadow-md flex flex-col min-h-screen sticky top-0 z-40"
+        animate={{ width: collapsed ? 64 : 256 }}
+        transition={{ duration: 0.3, ease: "easeInOut" }}
       >
         <button
           className="p-2 self-end mt-2 mr-2 rounded hover:bg-gray-100 dark:hover:bg-gray-800 transition"
@@ -66,32 +73,46 @@ export default function UserSettingsLayout({ children }: { children: React.React
         </AnimatePresence>
 
         <nav className="flex-1 flex flex-col gap-2 px-2 py-6">
-          {links.map((link) => (
-            <motion.div
-              key={link.href}
-              initial={{ opacity: 0, x: -10 }}
-              animate={{ opacity: 1, x: 0 }}
-              transition={{ duration: 0.2 }}
-            >
+          {links.map((link) => {
+            const isActive = router.pathname === link.href;
+            return (
               <Link
+                key={link.href}
                 href={link.href}
-                className={`
-                  flex items-center gap-3 px-3 py-2 rounded-lg transition
+                className={`group flex items-center gap-3 px-3 py-2 rounded-lg transition overflow-hidden
+                  ${collapsed ? "justify-center" : "justify-start"}
                   ${
-                    router.pathname === link.href
+                    isActive
                       ? "bg-blue-50 dark:bg-gray-800 text-blue-700 dark:text-blue-300 font-semibold"
                       : "text-gray-700 dark:text-gray-200 hover:bg-blue-100 dark:hover:bg-gray-800"
-                  }
-                `}
+                  }`}
                 title={link.label}
               >
-                <span className="w-5 h-5">{link.icon}</span>
-                {!collapsed && <span>{link.label}</span>}
+                <motion.span
+                  className="w-5 h-5 flex-shrink-0"
+                  whileHover={{ scale: 1.2 }}
+                  transition={{ type: "spring", stiffness: 300 }}
+                >
+                  {link.icon}
+                </motion.span>
+                <AnimatePresence>
+                  {!collapsed && (
+                    <motion.span
+                      className="truncate"
+                      initial={{ opacity: 0 }}
+                      animate={{ opacity: 1 }}
+                      exit={{ opacity: 0 }}
+                      transition={{ duration: 0.2 }}
+                    >
+                      {link.label}
+                    </motion.span>
+                  )}
+                </AnimatePresence>
               </Link>
-            </motion.div>
-          ))}
+            );
+          })}
         </nav>
-      </aside>
+      </motion.aside>
 
       <div className="flex-1 flex flex-col">
         <header className="bg-white dark:bg-gray-900 shadow px-6 py-3 flex justify-end items-center sticky top-0 z-50">
