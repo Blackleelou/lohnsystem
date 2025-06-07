@@ -1,6 +1,9 @@
 import { useEffect, useState } from "react";
 import TeamLayout from "@/components/team/TeamLayout";
 import { useSession } from "next-auth/react";
+import toast, { Toaster } from "react-hot-toast";
+import { Trash2 } from "lucide-react";
+import { useRouter } from "next/router";
 
 type Member = {
   id: string;
@@ -17,22 +20,27 @@ type Member = {
 
 export default function TeamMembersPage() {
   const { data: session, status, update } = useSession();
+  const router = useRouter();
   const [members, setMembers] = useState<Member[]>([]);
   const [search, setSearch] = useState("");
   const [loading, setLoading] = useState(true);
   const [roleChangeSuccess, setRoleChangeSuccess] = useState<string | null>(null);
+  const [showConfirmId, setShowConfirmId] = useState<string | null>(null);
 
   useEffect(() => {
     if (status !== "authenticated") return;
-    
-    if (session?.user && session.user.companyId === null) {
-      window.location.href = "/dashboard";
+    if (session?.user?.companyId === null) {
+      router.replace("/dashboard");
       return;
     }
-    
+
     fetch("/api/team/members")
-      .then(res => res.json())
-      .then(data => setMembers(data.members || []))
+      .then((res) => {
+        if (!res.ok) throw new Error("Fehler beim Laden");
+        return res.json();
+      })
+      .then((data) => setMembers(data.members || []))
+      .catch(() => toast.error("Fehler beim Laden der Mitglieder."))
       .finally(() => setLoading(false));
   }, [status]);
 
@@ -46,25 +54,39 @@ export default function TeamMembersPage() {
   });
 
   const handleRemove = async (id: string) => {
-  if (!confirm("Diesen Benutzer wirklich aus dem Team entfernen?")) return;
+    setShowConfirmId(null);
+    setLoading(true);
 
-  const res = await fetch("/api/team/remove-member", {
-    method: "POST",
-    headers: { "Content-Type": "application/json" },
-    body: JSON.stringify({ userId: id }),
-  });
+    try {
+      const res = await fetch("/api/team/remove-member", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ userId: id }),
+      });
 
-  if (res.ok) {
-    setMembers((prev) => prev.filter((m) => m.id !== id));
+      if (!res.ok) {
+        const data = await res.json();
+        toast.error(data.error || "Fehler beim Entfernen.");
+        return;
+      }
 
-    // Wenn ich mich selbst entfernt habe → Session aktualisieren
-    if (id === session?.user?.id) {
-      await update();
+      setMembers((prev) => prev.filter((m) => m.id !== id));
+
+      if (id === session?.user?.id) {
+        toast.dismiss("left-team");
+        toast.success("Du hast das Team verlassen.", { id: "left-team" });
+        await update();
+        router.replace("/dashboard");
+      } else {
+        toast.dismiss("left-team");
+        toast.success("Mitglied erfolgreich entfernt.", { id: "left-team" });
+      }
+    } catch (err) {
+      toast.error("Netzwerk- oder Serverfehler.");
+    } finally {
+      setLoading(false);
     }
-  } else {
-    alert("Fehler beim Entfernen.");
-  }
-};
+  };
 
   const handleRoleChange = async (userId: string, newRole: string) => {
     const res = await fetch("/api/team/change-role", {
@@ -77,16 +99,11 @@ export default function TeamMembersPage() {
       setMembers((prev) =>
         prev.map((m) => (m.id === userId ? { ...m, role: newRole } : m))
       );
-
-      // Session aktualisieren, wenn aktuelle Nutzerrolle sich ändert
-      if (userId === session?.user?.id) {
-        await update();
-      }
-
+      if (userId === session?.user?.id) await update();
       setRoleChangeSuccess("Rolle erfolgreich geändert");
       setTimeout(() => setRoleChangeSuccess(null), 2500);
     } else {
-      alert("Rollenänderung fehlgeschlagen.");
+      toast.error("Rollenänderung fehlgeschlagen.");
     }
   };
 
@@ -99,7 +116,7 @@ export default function TeamMembersPage() {
     const name = (m.showNickname ? m.nickname : null) || (m.showName ? m.name : null) || m.email;
     return name
       .split(" ")
-      .map(part => part[0]?.toUpperCase())
+      .map((part) => part[0]?.toUpperCase())
       .join("")
       .slice(0, 2);
   };
@@ -119,11 +136,7 @@ export default function TeamMembersPage() {
           />
         </div>
 
-        {roleChangeSuccess && (
-          <div className="mb-4 text-green-600 font-semibold">
-            ✅ {roleChangeSuccess}
-          </div>
-        )}
+        {roleChangeSuccess && <div className="mb-4 text-green-600 font-semibold">✅ {roleChangeSuccess}</div>}
 
         {loading ? (
           <div className="text-center text-gray-500 dark:text-gray-400">Lade Mitglieder…</div>
@@ -146,7 +159,6 @@ export default function TeamMembersPage() {
               {filtered.map((m) => {
                 const status = getStatus(m);
                 const isAdmin = session?.user?.role === "admin";
-
                 return (
                   <tr key={m.id} className="hover:bg-gray-50 dark:hover:bg-gray-900">
                     <td className="p-2 border-b">
@@ -170,7 +182,7 @@ export default function TeamMembersPage() {
                           value={m.role ?? "viewer"}
                           onChange={(e) => handleRoleChange(m.id, e.target.value)}
                           className="text-sm border rounded px-2 py-1 bg-white dark:bg-gray-800 appearance-none relative"
-                          style={{ paddingRight: "1.8rem" }} // Platz für Pfeil
+                          style={{ paddingRight: "1.8rem" }}
                         >
                           <option value="admin">Admin</option>
                           <option value="editor">Editor</option>
@@ -183,7 +195,7 @@ export default function TeamMembersPage() {
                     <td className="p-2 border-b">
                       {isAdmin ? (
                         <button
-                          onClick={() => handleRemove(m.id)}
+                          onClick={() => setShowConfirmId(m.id)}
                           className="text-red-600 hover:underline text-xs"
                         >
                           Entfernen
@@ -199,6 +211,37 @@ export default function TeamMembersPage() {
           </table>
         )}
       </div>
+
+      {showConfirmId && (
+        <div className="fixed inset-0 bg-black/50 flex items-center justify-center z-50">
+          <div className="bg-white dark:bg-gray-900 rounded-lg p-6 shadow-xl border border-gray-200 dark:border-gray-700 max-w-sm w-full">
+            <h3 className="text-lg font-semibold text-red-700 mb-2 flex items-center gap-2">
+              <Trash2 className="w-5 h-5 text-red-500" />
+              Mitglied wirklich entfernen?
+            </h3>
+            <p className="text-sm text-red-500 mb-4">
+              Möchtest du dieses Mitglied wirklich aus dem Team entfernen?
+              {showConfirmId === session?.user?.id && (
+                <><br />Achtung: Du verlässt damit das Team selbst!</>
+              )}
+            </p>
+            <div className="flex justify-end gap-3">
+              <button
+                onClick={() => handleRemove(showConfirmId)}
+                className="bg-red-500 hover:bg-red-600 text-white text-sm font-medium rounded px-3 py-1 transition"
+              >
+                Ja, entfernen
+              </button>
+              <button
+                onClick={() => setShowConfirmId(null)}
+                className="bg-gray-200 dark:bg-gray-800 text-gray-800 dark:text-gray-200 text-sm font-medium rounded px-3 py-1 hover:bg-gray-300 dark:hover:bg-gray-700 transition"
+              >
+                Abbrechen
+              </button>
+            </div>
+          </div>
+        </div>
+      )}
     </TeamLayout>
   );
 }

@@ -41,7 +41,6 @@ export default function TeamDeletePage() {
 
   return (
     <TeamLayout>
-      <Toaster position="top-center" />
       <div className="max-w-xl mx-auto mt-12 p-6 bg-white dark:bg-gray-900 rounded shadow">
         <h1 className="text-xl font-bold mb-4 text-red-600">Team unwiderruflich löschen</h1>
         <p className="text-sm text-gray-600 dark:text-gray-300 mb-6">

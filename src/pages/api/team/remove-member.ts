@@ -1,4 +1,4 @@
-// src/pages/api/team/remove-members.ts
+// src/pages/api/team/remove-member.ts
 
 import type { NextApiRequest, NextApiResponse } from "next";
 import { getServerSession } from "next-auth/next";
@@ -22,71 +22,85 @@ export default async function handler(req: NextApiRequest, res: NextApiResponse)
     return res.status(400).json({ error: "Kein Benutzer angegeben" });
   }
 
-  try {
-    const userToRemove = await prisma.user.findUnique({
-      where: { id: userId },
-      select: { id: true, companyId: true, role: true },
+try {
+  const userToRemove = await prisma.user.findUnique({
+    where: { id: userId },
+    select: { id: true, companyId: true, role: true },
+  });
+
+  if (!userToRemove || userToRemove.companyId !== session.user.companyId) {
+    return res.status(404).json({ error: "Benutzer nicht gefunden oder nicht im Team" });
+  }
+
+  // 💾 Vor dem Entfernen sichern:
+  const companyId = userToRemove.companyId;
+  const role = userToRemove.role;
+
+  // Benutzer entfernen
+  await prisma.user.update({
+    where: { id: userId },
+    data: {
+      companyId: null,
+      role: null,
+      nickname: null,
+      showName: true,
+      showNickname: false,
+      showEmail: false,
+    },
+  });
+
+  // Wenn letzter Admin → Nachfolger bestimmen
+  if (role === "admin") {
+    const remainingAdmins = await prisma.user.count({
+      where: { companyId, role: "admin" },
     });
 
-    if (!userToRemove || userToRemove.companyId !== session.user.companyId) {
-      return res.status(404).json({ error: "Benutzer nicht gefunden oder nicht im Team" });
-    }
-
-    const { companyId, role } = userToRemove;
-
-    // Erst entfernen
-    await prisma.user.update({
-      where: { id: userId },
-      data: {
-        companyId: null,
-        role: null,
-        nickname: null,
-        showName: true,
-        showNickname: false,
-        showEmail: false,
-      },
-    });
-
-    // Falls der entfernte ein Admin war: neuen Admin suchen
-    if (role === "admin") {
-      const remainingAdmins = await prisma.user.count({
-        where: { companyId, role: "admin" },
+    if (remainingAdmins === 0) {
+      const nextEditor = await prisma.user.findFirst({
+        where: { companyId, role: "editor" },
       });
 
-      if (remainingAdmins === 0) {
-        const nextEditor = await prisma.user.findFirst({
-          where: { companyId, role: "editor" },
+      if (nextEditor) {
+        await prisma.user.update({
+          where: { id: nextEditor.id },
+          data: {
+            role: "admin",
+            promotedToAdmin: true,
+          },
+        });
+      } else {
+        const nextViewer = await prisma.user.findFirst({
+          where: { companyId, role: "viewer" },
         });
 
-        if (nextEditor) {
+        if (nextViewer) {
           await prisma.user.update({
-            where: { id: nextEditor.id },
+            where: { id: nextViewer.id },
             data: {
               role: "admin",
               promotedToAdmin: true,
             },
           });
-        } else {
-          const nextViewer = await prisma.user.findFirst({
-            where: { companyId, role: "viewer" },
-          });
-
-          if (nextViewer) {
-            await prisma.user.update({
-              where: { id: nextViewer.id },
-              data: {
-                role: "admin",
-                promotedToAdmin: true,
-              },
-            });
-          }
         }
       }
     }
-
-    return res.status(200).json({ success: true });
-  } catch (error) {
-    console.error("Fehler beim Entfernen des Teammitglieds:", error);
-    return res.status(500).json({ error: "Serverfehler" });
   }
+
+  // Team löschen, wenn keine Mitglieder mehr
+  const remainingMembers = await prisma.user.count({
+    where: { companyId },
+  });
+
+  if (remainingMembers === 0) {
+    await prisma.company.delete({
+      where: { id: companyId },
+    });
+  }
+
+  return res.status(200).json({ success: true });
+
+} catch (error) {
+  console.error("Fehler beim Entfernen des Teammitglieds:", error);
+  return res.status(500).json({ error: "Serverfehler" });
+}
 }

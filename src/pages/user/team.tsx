@@ -22,19 +22,18 @@ export default function TeamSettingsPage() {
     const res = await fetch("/api/team/leave", { method: "POST" });
     setLoading(false);
 
-    if (res.ok) {
-      setShowConfirm(false);
-      await update();
-      toast.success("Du bist jetzt aus dem Team ausgetreten.");
-      router.push("/dashboard");
-    } else {
-      toast.error("Fehler beim Verlassen des Teams");
-    }
+if (res.ok) {
+  setShowConfirm(false);
+  await update();
+  toast.success("Du bist jetzt aus dem Team ausgetreten.", { id: "left-team-final" });
+  router.push("/dashboard");
+}
+
+
   };
 
   return (
     <div className="max-w-xl mx-auto py-10 px-4 space-y-6">
-      <Toaster position="top-center" />
       <h1 className="text-2xl font-bold mb-2 text-center">Team-Einstellungen</h1>
 
       {/* Schlanker „Team verlassen“ Bereich */}

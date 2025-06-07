@@ -1,13 +1,15 @@
 // src/components/team/TeamInviteGenerator.tsx
 import { useState } from "react";
 import QRCode from "react-qr-code";
-import { Mail } from "lucide-react";      // weiterhin für das E-Mail-Icon
-import { FaWhatsapp } from "react-icons/fa"; // FontAwesome WhatsApp
+import { Mail } from "lucide-react";
+import { FaWhatsapp } from "react-icons/fa";
 import { isMobile } from "react-device-detect";
+import { toast } from "react-hot-toast";
 
 export default function TeamInviteGenerator() {
   const [qrUrl, setQrUrl] = useState("");
   const [qrSecureUrl, setQrSecureUrl] = useState("");
+  const [lastLink, setLastLink] = useState(""); // für Kopierfunktion
   const [loadingType, setLoadingType] = useState<"qr" | "secure" | "link-whatsapp" | "link-email" | null>(null);
 
   const createInvite = async (type: string, expiresInHours?: number) => {
@@ -19,44 +21,54 @@ export default function TeamInviteGenerator() {
     return await res.json();
   };
 
-  // Option 1: QR-Code ohne Passwort (30 Tage)
   const handleQr = async () => {
     setLoadingType("qr");
     const data = await createInvite("qr_simple", 720);
-    setQrUrl(data.invitation?.joinUrl || "");
+    const url = data.invitation?.joinUrl || "";
+    setQrUrl(url);
+    setLastLink(url);
     setLoadingType(null);
   };
 
-  // Option 2: QR-Code mit Passwort (7 Tage)
   const handleSecureQr = async () => {
     setLoadingType("secure");
     const data = await createInvite("qr_protected", 168);
-    setQrSecureUrl(data.invitation?.joinUrl || "");
+    const url = data.invitation?.joinUrl || "";
+    setQrSecureUrl(url);
+    setLastLink(url);
     setLoadingType(null);
   };
 
-  // Option 3: Einmal-Link per WhatsApp / E-Mail
   const generateAndSendLink = async (mode: "whatsapp" | "email") => {
     setLoadingType(mode === "whatsapp" ? "link-whatsapp" : "link-email");
     const data = await createInvite("single_use");
     const url = data.invitation?.joinUrl;
+
     if (!url) {
-      alert("Fehler: Kein Link generiert.");
+      toast.error("Fehler: Kein Link generiert.");
       setLoadingType(null);
       return;
     }
+
     const encodedUrl = encodeURIComponent(`🎉 Team-Einladung: ${url}`);
+    setLastLink(url);
     setLoadingType(null);
 
     if (mode === "whatsapp") {
-      // für mobile Kompatibilität
-      window.location.href = `https://wa.me/?text=${encodedUrl}`;
+      const whatsappUrl = `https://wa.me/?text=${encodedUrl}`;
+      window.open(whatsappUrl, "_blank");
     } else {
-      window.location.href = `mailto:?subject=Team Einladung&body=${encodedUrl}`;
+      if (!isMobile) {
+        window.location.href = `mailto:?subject=Team Einladung&body=${encodedUrl}`;
+        setTimeout(() => {
+          toast("Es scheint kein E-Mail-Programm eingerichtet zu sein. Link wurde bereitgestellt.");
+        }, 1500);
+      } else {
+        window.location.href = `mailto:?subject=Team Einladung&body=${encodedUrl}`;
+      }
     }
   };
 
-  // Wiederverwendbare Card-Komponente
   const Card = ({
     title,
     description,
@@ -133,30 +145,53 @@ export default function TeamInviteGenerator() {
         title="Einmal-Link per WhatsApp oder E-Mail"
         description="Nach erstem Klick verfällt der Link. Direkt versenden an neue Teammitglieder."
         buttonArea={
-          <div className="flex justify-center items-center gap-8">
-            {/* WhatsApp-Icon (react-icons/fa) */}
-            <span
-              onClick={() => generateAndSendLink("whatsapp")}
-              className={`cursor-pointer ${
-                loadingType === "link-whatsapp" ? "opacity-50" : "hover:opacity-80"
-              }`}
-              title="Per WhatsApp senden"
-            >
-              <FaWhatsapp className="w-8 h-8 text-green-500" />
-            </span>
+  <div className="flex justify-center items-center gap-8">
+    {/* WhatsApp */}
+    <span
+      onClick={() => generateAndSendLink("whatsapp")}
+      className={`cursor-pointer ${
+        loadingType === "link-whatsapp" ? "opacity-50" : "hover:opacity-80"
+      }`}
+      title="Per WhatsApp senden"
+    >
+      <FaWhatsapp className="w-8 h-8 text-green-500" />
+    </span>
 
-            {/* E-Mail-Icon (lucide-react) */}
-            <span
-              onClick={() => generateAndSendLink("email")}
-              className={`cursor-pointer ${
-                loadingType === "link-email" ? "opacity-50" : "hover:opacity-80"
-              }`}
-              title="Per E-Mail senden"
-            >
-              <Mail className="w-8 h-8 text-blue-500" />
-            </span>
-          </div>
-        }
+    {/* E-Mail */}
+    <span
+      onClick={() => generateAndSendLink("email")}
+      className={`cursor-pointer ${
+        loadingType === "link-email" ? "opacity-50" : "hover:opacity-80"
+      }`}
+      title="Per E-Mail senden"
+    >
+      <Mail className="w-8 h-8 text-blue-500" />
+    </span>
+
+    {/* Link kopieren Icon */}
+    {!isMobile && lastLink && (
+      <span
+        onClick={async () => {
+          await navigator.clipboard.writeText(lastLink);
+          toast.success("Link wurde in die Zwischenablage kopiert");
+        }}
+        className="cursor-pointer hover:opacity-80"
+        title="Link kopieren"
+      >
+        <svg
+          xmlns="http://www.w3.org/2000/svg"
+          className="w-8 h-8 text-gray-500"
+          fill="none"
+          viewBox="0 0 24 24"
+          stroke="currentColor"
+        >
+          <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M8 16h8m-4-4h4m-4-4h4M7 8h.01M7 16h.01M3 4a1 1 0 011-1h13.586a1 1 0 01.707.293l2.414 2.414a1 1 0 01.293.707V20a1 1 0 01-1 1H4a1 1 0 01-1-1V4z" />
+        </svg>
+      </span>
+    )}
+  </div>
+}
+
       />
     </div>
   );
