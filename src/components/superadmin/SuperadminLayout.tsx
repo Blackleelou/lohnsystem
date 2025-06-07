@@ -16,6 +16,7 @@ import {
   ChevronLeft,
   ChevronRight,
 } from "lucide-react";
+import { motion, AnimatePresence } from "framer-motion";
 
 const links = [
   { href: "/superadmin", label: "Übersicht", icon: <ShieldCheck /> },
@@ -47,13 +48,11 @@ export default function SuperadminLayout({ children }: { children: React.ReactNo
 
   return (
     <div className="min-h-screen flex bg-gray-50">
-      {/* Sidebar */}
-      <aside
-        className={`bg-white shadow-md flex flex-col min-h-screen sticky top-0 z-40 transition-all duration-200 ${
-          collapsed ? "w-16" : "w-64"
-        }`}
+      <motion.aside
+        className="bg-white shadow-md flex flex-col min-h-screen sticky top-0 z-40"
+        animate={{ width: collapsed ? 64 : 256 }}
+        transition={{ duration: 0.3, ease: "easeInOut" }}
       >
-        {/* Collapse/Expand Button */}
         <button
           className="p-2 self-end mt-2 mr-2 rounded hover:bg-gray-100 transition"
           onClick={() => setCollapsed((c) => !c)}
@@ -62,32 +61,61 @@ export default function SuperadminLayout({ children }: { children: React.ReactNo
           {collapsed ? <ChevronRight /> : <ChevronLeft />}
         </button>
 
-        {/* Sidebar-Titel */}
-        <div className={`px-6 py-4 items-center border-b ${collapsed ? "hidden" : "flex"}`}>
-          <span className="text-lg font-bold text-blue-700">Superadmin</span>
-        </div>
-
-        {/* Navigation */}
-        <nav className="flex-1 flex flex-col gap-2 px-2 py-6">
-          {links.map((link) => (
-            <Link
-              key={link.href}
-              href={link.href}
-              className={`flex items-center gap-3 px-3 py-2 rounded-lg transition ${
-                router.pathname === link.href
-                  ? "bg-blue-50 text-blue-700 font-semibold"
-                  : "text-gray-700 hover:bg-blue-100"
-              }`}
-              title={collapsed ? link.label : undefined}
+        <AnimatePresence>
+          {!collapsed && (
+            <motion.div
+              className="px-6 py-4 items-center border-b flex"
+              initial={{ opacity: 0, y: -10 }}
+              animate={{ opacity: 1, y: 0 }}
+              exit={{ opacity: 0, y: -10 }}
             >
-              <span className="w-5 h-5">{link.icon}</span>
-              {!collapsed && <span>{link.label}</span>}
-            </Link>
-          ))}
-        </nav>
-      </aside>
+              <span className="text-lg font-bold text-blue-700">Superadmin</span>
+            </motion.div>
+          )}
+        </AnimatePresence>
 
-      {/* Content Area */}
+        <nav className="flex-1 flex flex-col gap-2 px-2 py-6">
+          {links.map((link) => {
+            const isActive = router.pathname === link.href;
+            return (
+              <Link
+                key={link.href}
+                href={link.href}
+                className={`group flex items-center gap-3 px-3 py-2 rounded-lg transition overflow-hidden
+                  ${collapsed ? "justify-center" : "justify-start"}
+                  ${
+                    isActive
+                      ? "bg-blue-50 text-blue-700 font-semibold"
+                      : "text-gray-700 hover:bg-blue-100"
+                  }`}
+                title={link.label}
+              >
+                <motion.span
+                  className="w-5 h-5 flex-shrink-0"
+                  whileHover={{ scale: 1.2 }}
+                  transition={{ type: "spring", stiffness: 300 }}
+                >
+                  {link.icon}
+                </motion.span>
+                <AnimatePresence>
+                  {!collapsed && (
+                    <motion.span
+                      className="truncate"
+                      initial={{ opacity: 0 }}
+                      animate={{ opacity: 1 }}
+                      exit={{ opacity: 0 }}
+                      transition={{ duration: 0.2 }}
+                    >
+                      {link.label}
+                    </motion.span>
+                  )}
+                </AnimatePresence>
+              </Link>
+            );
+          })}
+        </nav>
+      </motion.aside>
+
       <div className="flex-1 flex flex-col">
         <header className="bg-white shadow px-6 py-3 flex justify-end items-center sticky top-0 z-50">
           <UserMenu />
