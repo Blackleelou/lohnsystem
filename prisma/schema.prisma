@@ -20,6 +20,7 @@ model User {
   createdAt     DateTime @default(now())
   resetTokens   PasswordResetToken[]
   hasChosenMode Boolean @default(false)
+  promotedToAdmin Boolean @default(false)
 
   // Modus- und Firmenlogik
   companyId   String?
