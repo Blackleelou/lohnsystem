@@ -42,8 +42,9 @@ export default function JoinTokenPage() {
 
   // 4) Haupt-Effect: Sobald token + session bekannt sind, Consent- oder Join-Flow starten
   useEffect(() => {
-  if (!token || typeof token !== "string") return;
-  if (sessionStatus === "loading") return;
+    if (!token || typeof token !== "string" || token.length < 10) return;
+    if (sessionStatus === "loading") return;
+
 
   // a) Nicht eingeloggt → Login + Token zwischenspeichern
   if (!session) {
@@ -60,6 +61,7 @@ export default function JoinTokenPage() {
     try {
       const res = await fetch(`/api/team/validate-invite?token=${token}`);
       if (!res.ok) {
+        console.warn("FEHLER bei validate-invite:", res.status);
         setStage("error");
         setMessage("Einladungslink ungültig oder abgelaufen.");
         return;
@@ -67,6 +69,9 @@ export default function JoinTokenPage() {
 
       const data = await res.json();
       setCompanyName(data.companyName || null);
+      // test console
+      console.log("validate-invite response:", data);
+
 
       if (!hasConsent) {
         setStage("waitingConsent");
