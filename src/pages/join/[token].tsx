@@ -1,3 +1,5 @@
+// src/pages/join/[token].tsx
+
 import { useEffect, useState } from 'react';
 import { useRouter } from 'next/router';
 import { useSession } from 'next-auth/react';
@@ -62,7 +64,7 @@ export default function JoinTokenPage() {
         const data = await res.json();
         setCompanyName(data.companyName || null);
 
-        // ⚠️ Selbst-Degradierung verhindern (z. B. admin → viewer)
+        // ⚠️ Selbst-Degradierung verhindern (frühzeitig)
         if (
           session?.user?.role &&
           data?.role &&
@@ -71,15 +73,12 @@ export default function JoinTokenPage() {
         ) {
           setStage('error');
           setMessage(
-            '⚠️ Einladung verweigert: Du würdest dich selbst zurückstufen. Du wirst zur Teamübersicht weitergeleitet.'
+            '⚠️ Einladung verweigert: Du würdest dich selbst zurückstufen.'
           );
-          setTimeout(() => {
-            router.push('/team/members');
-          }, 3000);
           return;
         }
 
-        // Sichtbarkeitsabfrage nur, wenn noch nicht erfolgt
+        // 🟡 Erst jetzt Sichtbarkeitsabfrage anzeigen
         if (!hasConsent || !consentData) {
           setStage('waitingConsent');
           return;
@@ -169,22 +168,35 @@ export default function JoinTokenPage() {
     );
   }
 
-  if (stage === 'error') {
-  return (
-    <div className="min-h-screen flex items-center justify-center bg-gray-50 p-6 text-center">
-      <div className="max-w-md bg-white p-6 rounded shadow">
-        <h1 className="text-red-600 font-bold text-xl mb-2">Fehler</h1>
-        <p>{message}</p>
-
-        {message.includes('zurückstufen') && (
-          <button
-            onClick={() => router.push('/team/members')}
-            className="mt-6 bg-blue-600 text-white px-4 py-2 rounded hover:bg-blue-700 transition"
-          >
-            Zur Teamübersicht
-          </button>
-        )}
+  if (stage === 'success') {
+    return (
+      <div className="min-h-screen flex items-center justify-center bg-gray-50 p-6 text-center">
+        <div className="max-w-md bg-white p-6 rounded shadow">
+          <h1 className="text-green-600 font-bold text-xl mb-2">Beitritt erfolgreich</h1>
+          <p>{message}</p>
+        </div>
       </div>
-    </div>
-  );
+    );
+  }
+
+  if (stage === 'error') {
+    return (
+      <div className="min-h-screen flex items-center justify-center bg-gray-50 p-6 text-center">
+        <div className="max-w-md bg-white p-6 rounded shadow">
+          <h1 className="text-red-600 font-bold text-xl mb-2">Fehler</h1>
+          <p>{message}</p>
+          {message.includes('zurückstufen') && (
+            <button
+              onClick={() => router.push('/team/members')}
+              className="mt-6 bg-blue-600 text-white px-4 py-2 rounded hover:bg-blue-700 transition"
+            >
+              Zur Teamübersicht
+            </button>
+          )}
+        </div>
+      </div>
+    );
+  }
+
+  return null;
 }
