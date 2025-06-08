@@ -1,3 +1,5 @@
+// src/pages/api/team/join.ts
+
 import { NextApiRequest, NextApiResponse } from 'next';
 import { prisma } from '@/lib/prisma';
 import { getServerSession } from 'next-auth';
@@ -24,8 +26,24 @@ export default async function handler(req: NextApiRequest, res: NextApiResponse)
   }
 
   const invitation = await prisma.invitation.findUnique({ where: { token } });
+
   if (!invitation || invitation.expiresAt < new Date()) {
     return res.status(410).json({ error: 'Ungültige oder abgelaufene Einladung.' });
+  }
+
+  // ✅ Selbst-Degradierung verhindern
+  const currentRole = session.user.role;
+  const targetRole = invitation.role;
+
+  if (
+    currentRole &&
+    targetRole &&
+    currentRole !== targetRole &&
+    (currentRole === 'admin' || currentRole === 'editor')
+  ) {
+    return res.status(403).json({
+      error: '⚠️ Einladung verweigert: Du würdest dich selbst zurückstufen.',
+    });
   }
 
   await prisma.user.update({
