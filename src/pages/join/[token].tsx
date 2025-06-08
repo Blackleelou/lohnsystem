@@ -1,5 +1,3 @@
-// src/pages/join/[token].tsx
-
 import { useEffect, useState } from 'react';
 import { useRouter } from 'next/router';
 import { useSession } from 'next-auth/react';
@@ -56,7 +54,6 @@ export default function JoinTokenPage() {
       try {
         const res = await fetch(`/api/team/validate-invite?token=${token}`);
         if (!res.ok) {
-          console.warn('FEHLER bei validate-invite:', res.status);
           setStage('error');
           setMessage('Einladungslink ungültig oder abgelaufen.');
           return;
@@ -65,23 +62,24 @@ export default function JoinTokenPage() {
         const data = await res.json();
         setCompanyName(data.companyName || null);
 
-        // ⚠️ Schutz vor Selbst-Degradierung (z. B. admin → viewer)
+        // ⚠️ Selbst-Degradierung verhindern (z. B. admin → viewer)
         if (
-          session?.user?.id &&
-          session.user.role &&
+          session?.user?.role &&
           data?.role &&
           ['admin', 'editor'].includes(session.user.role) &&
           session.user.role !== data.role
         ) {
           setStage('error');
-          setMessage('⚠️ Einladung verweigert: Du würdest dich selbst zurückstufen. Weiterleitung…');
-
+          setMessage(
+            '⚠️ Einladung verweigert: Du würdest dich selbst zurückstufen. Du wirst zur Teamübersicht weitergeleitet.'
+          );
           setTimeout(() => {
             router.push('/team/members');
           }, 3000);
           return;
         }
 
+        // Sichtbarkeitsabfrage nur, wenn noch nicht erfolgt
         if (!hasConsent || !consentData) {
           setStage('waitingConsent');
           return;
@@ -94,8 +92,9 @@ export default function JoinTokenPage() {
         });
 
         if (!joinRes.ok) {
+          const err = await joinRes.json();
           setStage('error');
-          setMessage('Fehler beim Beitritt. Bitte versuche es erneut.');
+          setMessage(err?.error || 'Fehler beim Beitritt. Bitte versuche es erneut.');
           return;
         }
 
