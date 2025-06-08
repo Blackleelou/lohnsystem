@@ -1,3 +1,5 @@
+// src/pages/join/[token].tsx
+
 import { useEffect, useState } from 'react';
 import { useRouter } from 'next/router';
 import { useSession } from 'next-auth/react';
@@ -11,7 +13,7 @@ export default function JoinTokenPage() {
 
   const [companyName, setCompanyName] = useState<string | null>(null);
   const [hasConsent, setHasConsent] = useState(false);
-  const [joined, setJoined] = useState(false); // ✅ verhindert doppelte Verarbeitung
+  const [joined, setJoined] = useState(false);
   const [consentData, setConsentData] = useState<{
     nickname: string;
     showName: boolean;
@@ -19,9 +21,7 @@ export default function JoinTokenPage() {
     showNickname: boolean;
   } | null>(null);
 
-  const [stage, setStage] = useState<'checking' | 'waitingConsent' | 'success' | 'error'>(
-    'checking'
-  );
+  const [stage, setStage] = useState<'checking' | 'waitingConsent' | 'success' | 'error'>('checking');
   const [message, setMessage] = useState('');
 
   const { data: session, status: sessionStatus, update } = useSession({ required: false });
@@ -65,23 +65,23 @@ export default function JoinTokenPage() {
         const data = await res.json();
         setCompanyName(data.companyName || null);
 
-        // ✅ Verhindere, dass eingeloggte Nutzer sich selbst zurückstufen
-if (
-  session?.user?.role &&
-  data?.role &&
-  ['admin', 'editor'].includes(session.user.role) &&
-  session.user.role !== data.role
-) {
-  setStage('error');
-  setMessage(
-    '⚠️ Einladung verweigert: Du würdest dich selbst zurückstufen.\nDu wirst zur Teamverwaltung geleitet …'
-  );
-  setTimeout(() => {
-    router.push('/team/members');
-  }, 3000);
-  return;
-}
-        
+        // ⚠️ Schutz vor Selbst-Degradierung (z. B. admin → viewer)
+        if (
+          session?.user?.id &&
+          session.user.role &&
+          data?.role &&
+          ['admin', 'editor'].includes(session.user.role) &&
+          session.user.role !== data.role
+        ) {
+          setStage('error');
+          setMessage('⚠️ Einladung verweigert: Du würdest dich selbst zurückstufen. Weiterleitung…');
+
+          setTimeout(() => {
+            router.push('/team/members');
+          }, 3000);
+          return;
+        }
+
         if (!hasConsent || !consentData) {
           setStage('waitingConsent');
           return;
@@ -102,7 +102,7 @@ if (
         const joinData = await joinRes.json();
 
         if (joinData?.success) {
-          setJoined(true); // ✅ Setze Flag, um weitere Prüfungen zu blockieren
+          setJoined(true);
           setStage('success');
           setMessage('Du wurdest erfolgreich zum Team hinzugefügt. Weiterleitung…');
           update();
