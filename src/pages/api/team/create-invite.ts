@@ -16,8 +16,25 @@ export default async function handler(req: NextApiRequest, res: NextApiResponse)
     return res.status(400).json({ error: 'Ungültiger Einladungstyp' });
   }
 
-  const token = uuidv4();
-  const expiresAt = new Date(Date.now() + (expiresInHours || 48) * 60 * 60 * 1000);
+  // Token- und Ablaufzeit vorbereiten
+const token = uuidv4();
+let expiresAt = new Date();
+let singleUse = false;
+let invitePassword: string | null = null;
+
+// Einladungstyp-spezifische Regeln
+if (type === 'qr_simple') {
+  // QR-Code ohne Passwort → 30 Tage gültig
+  expiresAt.setDate(expiresAt.getDate() + 30);
+} else if (type === 'qr_protected') {
+  // QR-Code mit Passwort → dauerhaft gültig, Passwort wird täglich erneuert (separater Mechanismus)
+  expiresAt.setFullYear(expiresAt.getFullYear() + 10); // quasi "unendlich"
+  invitePassword = password || ''; // beim Erstellen leer oder gesetzt
+} else if (type === 'single_use') {
+  // Einmal-Link → nur 1 Tag gültig & nur einmal verwendbar
+  expiresAt.setDate(expiresAt.getDate() + 1);
+  singleUse = true;
+}
 
   const invite = await prisma.invitation.create({
     data: {
