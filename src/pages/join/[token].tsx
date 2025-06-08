@@ -33,7 +33,7 @@ export default function JoinTokenPage() {
   useEffect(() => {
     if (!token || typeof token !== "string" || token.length < 10) return;
 
-    let activeToken = token;
+    let activeToken: string | null = token;
     if (!activeToken && typeof window !== "undefined") {
       activeToken = sessionStorage.getItem("joinToken");
     }
