@@ -11,7 +11,7 @@ export default async function handler(req: NextApiRequest, res: NextApiResponse)
   const session = await getServerSession(req, res, authOptions);
   if (!session?.user?.id) return res.status(401).end();
 
-  const { token, nickname, showName, showNickname, showEmail } = req.body;
+  const { token, nickname, showName, showNickname, showEmail, password } = req.body;
 
   if (!token || typeof token !== 'string') {
     return res.status(400).json({ error: 'Kein gültiger Token übergeben.' });
@@ -30,6 +30,21 @@ export default async function handler(req: NextApiRequest, res: NextApiResponse)
   if (!invitation || invitation.expiresAt < new Date()) {
     return res.status(410).json({ error: 'Ungültige oder abgelaufene Einladung.' });
   }
+
+  if (invitation.type === 'qr_protected') {
+  const accessCode = await prisma.accessCode.findFirst({
+    where: {
+      companyId: invitation.companyId,
+      validFrom: { lte: new Date() },
+      validUntil: { gte: new Date() },
+    },
+  });
+
+  if (!accessCode || accessCode.password !== password) {
+    return res.status(403).json({ error: 'Falsches oder fehlendes QR-Passwort.' });
+  }
+}
+
 
   // ✅ Selbst-Degradierung verhindern
   const currentRole = session.user.role;

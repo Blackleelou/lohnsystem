@@ -83,9 +83,37 @@ export default function AccessCodePanel() {
             <p className="text-gray-700 mb-2">Aktuelles Passwort:</p>
             <p className="text-2xl font-mono mb-4">{password || '–'}</p>
 
-            <p className="text-sm text-gray-500 mb-4">
-              Gültig bis: <strong>{validUntil || '–'}</strong>
-            </p>
+{validUntil && (
+  <div className="text-sm text-gray-500 flex flex-wrap gap-4 mb-4">
+    <span>
+      Gültig bis:{" "}
+      <strong>
+        {new Date(validUntil).toLocaleString("de-DE", {
+          day: "2-digit",
+          month: "2-digit",
+          year: "numeric",
+          hour: "2-digit",
+          minute: "2-digit",
+        })}
+      </strong>
+    </span>
+    <span className="text-gray-400 text-sm">
+      Noch gültig für:{" "}
+      <strong>
+        {(() => {
+          const diff = new Date(validUntil).getTime() - new Date().getTime();
+          if (diff <= 0) return "abgelaufen";
+          const hours = Math.floor(diff / (1000 * 60 * 60));
+          const minutes = Math.floor((diff % (1000 * 60 * 60)) / (1000 * 60));
+          return `${hours}h ${minutes}min`;
+        })()}
+      </strong>
+    </span>
+  </div>
+)}
+
+
+
 
             <button
               onClick={regeneratePassword}

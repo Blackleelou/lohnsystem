@@ -24,8 +24,11 @@ export default async function handler(req: NextApiRequest, res: NextApiResponse)
   }
 
   return res.status(200).json({
-    ok: true,
-    companyName: invite.company?.name || null,
-    role: invite.role, // <- neu
-  });
+  ok: true,
+  companyName: invite.company?.name || null,
+  role: invite.role,
+  type: invite.type,
+  requirePassword: invite.type === 'qr_protected',
+});
+
 }

@@ -13,6 +13,8 @@ export default function JoinTokenPage() {
   const [hasConsent, setHasConsent] = useState(false);
   const [joined, setJoined] = useState(false);
   const [invitationValid, setInvitationValid] = useState(false);
+  const [requirePassword, setRequirePassword] = useState(false);
+  const [enteredPassword, setEnteredPassword] = useState('');
   const [consentData, setConsentData] = useState<{
     nickname: string;
     showName: boolean;
@@ -20,7 +22,7 @@ export default function JoinTokenPage() {
     showNickname: boolean;
   } | null>(null);
 
-  const [stage, setStage] = useState<'checking' | 'waitingConsent' | 'success' | 'error'>('checking');
+  const [stage, setStage] = useState<'checking' | 'waitingPassword' | 'waitingConsent' | 'success' | 'error'>('checking');
   const [message, setMessage] = useState('');
 
   const { data: session, status: sessionStatus, update } = useSession({ required: false });
@@ -30,7 +32,6 @@ export default function JoinTokenPage() {
     return () => clearInterval(handle);
   }, [update]);
 
-  // Session-Weiterleitung
   useEffect(() => {
     if (!token || token.length < 10) return;
     if (sessionStatus === 'loading') return;
@@ -43,7 +44,6 @@ export default function JoinTokenPage() {
     }
   }, [token, session, sessionStatus, router]);
 
-  // Validierung & Join-Versuch
   useEffect(() => {
     if (!session || !token || sessionStatus !== 'authenticated' || joined) return;
 
@@ -60,6 +60,7 @@ export default function JoinTokenPage() {
 
         const data = await res.json();
         setCompanyName(data.companyName || null);
+        setRequirePassword(data.requirePassword || false);
 
         if (
           session?.user?.role &&
@@ -72,11 +73,12 @@ export default function JoinTokenPage() {
           return;
         }
 
-        setInvitationValid(true); // ✅ Einladung ist gültig
-        if (!consentData) {
+        if (data.requirePassword) {
+          setStage('waitingPassword');
+        } else {
+          setInvitationValid(true);
           setStage('waitingConsent');
         }
-
       } catch (error) {
         console.error('Fehler bei Einladung:', error);
         setStage('error');
@@ -87,7 +89,28 @@ export default function JoinTokenPage() {
     runValidation();
   }, [session, token, sessionStatus, joined]);
 
-  // Wenn Einladung gültig UND Consent vorhanden → Team beitreten
+  const verifyPassword = async () => {
+    try {
+      const res = await fetch('/api/team/verify-access-password', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ token, password: enteredPassword }),
+      });
+
+      if (!res.ok) {
+        const data = await res.json();
+        setMessage(data?.error || 'Passwort falsch oder abgelaufen');
+        return;
+      }
+
+      setInvitationValid(true);
+      setStage('waitingConsent');
+    } catch (err) {
+      console.error('Fehler bei Passwortprüfung:', err);
+      setMessage('Ein unerwarteter Fehler ist aufgetreten.');
+    }
+  };
+
   useEffect(() => {
     if (!invitationValid || !consentData || joined) return;
 
@@ -127,7 +150,6 @@ export default function JoinTokenPage() {
     joinTeam();
   }, [invitationValid, consentData, joined, token, router, update]);
 
-  // Nach Login SessionStorage prüfen
   useEffect(() => {
     if (session && !token && typeof window !== 'undefined') {
       const storedToken = sessionStorage.getItem('joinToken');
@@ -152,6 +174,31 @@ export default function JoinTokenPage() {
       <div className="min-h-screen flex items-center justify-center bg-gray-50 p-6 text-center">
         <div className="max-w-md bg-white p-6 rounded shadow">
           <p>Einladung wird geprüft…</p>
+        </div>
+      </div>
+    );
+  }
+
+  if (stage === 'waitingPassword') {
+    return (
+      <div className="min-h-screen flex items-center justify-center bg-gray-50 p-6 text-center">
+        <div className="max-w-md bg-white p-6 rounded shadow space-y-4">
+          <h1 className="text-lg font-bold">Passwort erforderlich</h1>
+          <p className="text-sm text-gray-600">Diese Einladung erfordert ein temporäres Passwort.</p>
+          <input
+            type="text"
+            placeholder="Passwort eingeben"
+            value={enteredPassword}
+            onChange={(e) => setEnteredPassword(e.target.value)}
+            className="w-full px-3 py-2 border rounded"
+          />
+          <button
+            onClick={verifyPassword}
+            className="w-full bg-blue-600 text-white py-2 rounded hover:bg-blue-700 transition"
+          >
+            Prüfen
+          </button>
+          {message && <p className="text-sm text-red-500">{message}</p>}
         </div>
       </div>
     );
