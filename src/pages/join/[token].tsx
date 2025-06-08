@@ -9,7 +9,18 @@ export default function JoinTokenPage() {
   const router = useRouter();
   const rawToken = router.query.token;
   const token = typeof rawToken === "string" ? rawToken : Array.isArray(rawToken) ? rawToken[0] : null;
+
   const [companyName, setCompanyName] = useState<string | null>(null);
+  const [hasConsent, setHasConsent] = useState(false);
+  const [joined, setJoined] = useState(false); // ✅ verhindert doppelte Verarbeitung
+  const [consentData, setConsentData] = useState<{
+    showName: boolean;
+    showEmail: boolean;
+    showNickname: boolean;
+  } | null>(null);
+
+  const [stage, setStage] = useState<"checking" | "waitingConsent" | "success" | "error">("checking");
+  const [message, setMessage] = useState("");
 
   const { data: session, status: sessionStatus, update } = useSession({ required: false });
 
@@ -20,24 +31,8 @@ export default function JoinTokenPage() {
     return () => clearInterval(handle);
   }, [update]);
 
-  const [hasConsent, setHasConsent] = useState(false);
-  const [consentData, setConsentData] = useState<{
-    showName: boolean;
-    showEmail: boolean;
-    showNickname: boolean;
-  } | null>(null);
-
-  const [stage, setStage] = useState<"checking" | "waitingConsent" | "success" | "error">("checking");
-  const [message, setMessage] = useState("");
-
   useEffect(() => {
-    if (!token || typeof token !== "string" || token.length < 10) return;
-
-    let activeToken: string | null = token;
-    if (!activeToken && typeof window !== "undefined") {
-      activeToken = sessionStorage.getItem("joinToken");
-    }
-    if (!activeToken || activeToken.length < 10) return;
+    if (!token || token.length < 10) return;
     if (sessionStatus === "loading") return;
 
     if (!session) {
@@ -49,10 +44,15 @@ export default function JoinTokenPage() {
     }
 
     const validateAndContinue = async () => {
+      if (joined) {
+        console.log("⛔ Join bereits abgeschlossen – keine weitere Validierung.");
+        return;
+      }
+
       setStage("checking");
 
       try {
-        const res = await fetch(`/api/team/validate-invite?token=${activeToken}`);
+        const res = await fetch(`/api/team/validate-invite?token=${token}`);
         if (!res.ok) {
           console.warn("FEHLER bei validate-invite:", res.status);
           setStage("error");
@@ -62,7 +62,6 @@ export default function JoinTokenPage() {
 
         const data = await res.json();
         setCompanyName(data.companyName || null);
-        console.log("validate-invite response:", data);
 
         if (!hasConsent) {
           setStage("waitingConsent");
@@ -72,7 +71,7 @@ export default function JoinTokenPage() {
         const joinRes = await fetch("/api/team/join", {
           method: "POST",
           headers: { "Content-Type": "application/json" },
-          body: JSON.stringify({ token: activeToken, ...consentData }),
+          body: JSON.stringify({ token, ...consentData }),
         });
 
         if (!joinRes.ok) {
@@ -84,6 +83,7 @@ export default function JoinTokenPage() {
         const joinData = await joinRes.json();
 
         if (joinData?.success) {
+          setJoined(true); // ✅ Setze Flag, um weitere Prüfungen zu blockieren
           setStage("success");
           setMessage("Du wurdest erfolgreich zum Team hinzugefügt. Weiterleitung…");
           update();
@@ -100,7 +100,7 @@ export default function JoinTokenPage() {
     };
 
     validateAndContinue();
-  }, [token, session, sessionStatus, hasConsent, consentData, router, update]);
+  }, [token, session, sessionStatus, hasConsent, consentData, joined, router, update]);
 
   useEffect(() => {
     if (session && !token && typeof window !== "undefined") {
