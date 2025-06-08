@@ -75,23 +75,24 @@ export default function JoinTokenPage() {
 
       // Einlösung der Einladung mit Token und Consent
       setStage("checking");
-      const joinRes = await fetch("/api/team/join", {
-        method: "POST",
-        headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ token, ...consentData }),
-      });
+if (!joinRes.ok) {
+  setStage("error");
+  setMessage("Fehler beim Beitritt. Bitte versuche es erneut.");
+  return;
+}
 
-      const joinData = await joinRes.json();
+const joinData = await joinRes.json();
 
-      if (joinData.success) {
-        setStage("success");
-        setMessage("Du wurdest erfolgreich zum Team hinzugefügt. Weiterleitung…");
-        update();
-        setTimeout(() => router.push("/dashboard"), 2500);
-      } else {
-        setStage("error");
-        setMessage(joinData.error || "Einladungslink ungültig oder abgelaufen.");
-      }
+if (joinData?.success) {
+  setStage("success");
+  setMessage("Du wurdest erfolgreich zum Team hinzugefügt. Weiterleitung…");
+  update();
+  setTimeout(() => router.push("/dashboard"), 2500);
+} else {
+  setStage("error");
+  setMessage(joinData?.error || "Einladung fehlgeschlagen oder bereits verwendet.");
+}
+
     } catch (err) {
       console.error("Fehler beim Validieren oder Beitreten:", err);
       setStage("error");
