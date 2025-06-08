@@ -65,6 +65,23 @@ export default function JoinTokenPage() {
         const data = await res.json();
         setCompanyName(data.companyName || null);
 
+        // ✅ Verhindere, dass eingeloggte Nutzer sich selbst zurückstufen
+if (
+  session?.user?.role &&
+  data?.role &&
+  ['admin', 'editor'].includes(session.user.role) &&
+  session.user.role !== data.role
+) {
+  setStage('error');
+  setMessage(
+    '⚠️ Einladung verweigert: Du würdest dich selbst zurückstufen.\nDu wirst zur Teamverwaltung geleitet …'
+  );
+  setTimeout(() => {
+    router.push('/team/members');
+  }, 3000);
+  return;
+}
+        
         if (!hasConsent || !consentData) {
           setStage('waitingConsent');
           return;
