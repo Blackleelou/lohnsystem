@@ -117,12 +117,17 @@ export default function JoinTokenPage() {
     if (!invitationValid || !consentData || joined) return;
 
     const joinTeam = async () => {
-      try {
-        const res = await fetch('/api/team/join', {
-          method: 'POST',
-          headers: { 'Content-Type': 'application/json' },
-          body: JSON.stringify({ token, ...consentData }),
-        });
+  try {
+    const res = await fetch('/api/team/join', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({
+        token,
+        ...consentData,
+        password: requirePassword ? enteredPassword : undefined, // 🔑
+      }),
+    });
+
 
         if (!res.ok) {
           const err = await res.json();
