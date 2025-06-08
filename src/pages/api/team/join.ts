@@ -10,6 +10,10 @@ export default async function handler(req: NextApiRequest, res: NextApiResponse)
   if (!session?.user?.id) return res.status(401).end();
 
   const { token } = req.body;
+  if (!token || typeof token !== "string") {
+   return res.status(400).json({ error: "Kein gültiger Token übergeben." });
+  }
+
 
   const invitation = await prisma.invitation.findUnique({ where: { token } });
   if (!invitation || invitation.expiresAt < new Date()) {
