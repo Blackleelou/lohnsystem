@@ -1,5 +1,3 @@
-// src/pages/api/test/check-token.ts
-
 import { prisma } from "@/lib/prisma";
 import type { NextApiRequest, NextApiResponse } from "next";
 
@@ -25,9 +23,18 @@ export default async function handler(req: NextApiRequest, res: NextApiResponse)
     const now = new Date();
     const expired = invitation.expiresAt < now;
 
+    // Versuch, einen Nutzer zu finden, der dieser Einladung bereits gefolgt ist
+    const alreadyJoined = await prisma.user.findFirst({
+      where: {
+        companyId: invitation.companyId,
+        invited: true,
+      },
+    });
+
     return res.status(200).json({
       status: expired ? "expired" : "valid",
       reason: expired ? "Token ist abgelaufen." : "Token ist gültig.",
+      alreadyUsed: !!alreadyJoined,
       companyName: invitation.company?.name || null,
       expiresAt: invitation.expiresAt,
       createdAt: invitation.createdAt,
