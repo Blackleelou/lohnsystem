@@ -14,6 +14,7 @@ export default function JoinTokenPage() {
   const [companyName, setCompanyName] = useState<string | null>(null);
   const [hasConsent, setHasConsent] = useState(false);
   const [joined, setJoined] = useState(false);
+  const [invitationValid, setInvitationValid] = useState(false);
   const [consentData, setConsentData] = useState<{
     nickname: string;
     showName: boolean;
@@ -27,12 +28,11 @@ export default function JoinTokenPage() {
   const { data: session, status: sessionStatus, update } = useSession({ required: false });
 
   useEffect(() => {
-    const handle = setInterval(() => {
-      update();
-    }, 30 * 1000);
+    const handle = setInterval(() => update(), 30 * 1000);
     return () => clearInterval(handle);
   }, [update]);
 
+  // Session-Weiterleitung
   useEffect(() => {
     if (!token || token.length < 10) return;
     if (sessionStatus === 'loading') return;
@@ -42,15 +42,14 @@ export default function JoinTokenPage() {
         sessionStorage.setItem('joinToken', token);
       }
       router.push(`/login?callbackUrl=/join/${token}`);
-      return;
     }
+  }, [token, session, sessionStatus, router]);
 
-    const validateAndContinue = async () => {
-      if (joined) {
-        console.log('⛔ Join bereits abgeschlossen – keine weitere Validierung.');
-        return;
-      }
+  // Validierung & Join-Versuch
+  useEffect(() => {
+    if (!session || !token || sessionStatus !== 'authenticated' || joined) return;
 
+    const runValidation = async () => {
       setStage('checking');
 
       try {
@@ -64,7 +63,6 @@ export default function JoinTokenPage() {
         const data = await res.json();
         setCompanyName(data.companyName || null);
 
-        // ⚠️ Selbst-Degradierung verhindern (frühzeitig)
         if (
           session?.user?.role &&
           data?.role &&
@@ -72,37 +70,42 @@ export default function JoinTokenPage() {
           session.user.role !== data.role
         ) {
           setStage('error');
-setMessage(
-  '⚠️ Einladung verweigert: Du würdest dich selbst zurückstufen. Du wirst zur Teamübersicht weitergeleitet.'
-);
-setTimeout(() => {
-  router.push('/team/members');
-}, 3000);
-return;
-        }
-
-        // 🟡 Erst jetzt Sichtbarkeitsabfrage anzeigen
-        if (!hasConsent || !consentData) {
-          setStage('waitingConsent');
+          setMessage('⚠️ Einladung verweigert: Du würdest dich selbst zurückstufen.');
           return;
         }
 
-        const joinRes = await fetch('/api/team/join', {
+        setInvitationValid(true); // ✅ Einladung ist gültig
+      } catch (error) {
+        console.error('Fehler bei Einladung:', error);
+        setStage('error');
+        setMessage('Ein unerwarteter Fehler ist aufgetreten.');
+      }
+    };
+
+    runValidation();
+  }, [session, token, sessionStatus, joined]);
+
+  // Wenn Einladung gültig UND Consent vorhanden → Team beitreten
+  useEffect(() => {
+    if (!invitationValid || !consentData || joined) return;
+
+    const joinTeam = async () => {
+      try {
+        const res = await fetch('/api/team/join', {
           method: 'POST',
           headers: { 'Content-Type': 'application/json' },
           body: JSON.stringify({ token, ...consentData }),
         });
 
-        if (!joinRes.ok) {
-          const err = await joinRes.json();
+        if (!res.ok) {
+          const err = await res.json();
           setStage('error');
-          setMessage(err?.error || 'Fehler beim Beitritt. Bitte versuche es erneut.');
+          setMessage(err?.error || 'Beitritt fehlgeschlagen.');
           return;
         }
 
-        const joinData = await joinRes.json();
-
-        if (joinData?.success) {
+        const data = await res.json();
+        if (data?.success) {
           setJoined(true);
           setStage('success');
           setMessage('Du wurdest erfolgreich zum Team hinzugefügt. Weiterleitung…');
@@ -110,18 +113,19 @@ return;
           setTimeout(() => router.push('/dashboard'), 2500);
         } else {
           setStage('error');
-          setMessage(joinData?.error || 'Einladung fehlgeschlagen oder bereits verwendet.');
+          setMessage(data?.error || 'Einladung konnte nicht verarbeitet werden.');
         }
       } catch (err) {
-        console.error('Fehler beim Validieren oder Beitreten:', err);
+        console.error('Beitritt fehlgeschlagen:', err);
         setStage('error');
         setMessage('Ein unerwarteter Fehler ist aufgetreten.');
       }
     };
 
-    validateAndContinue();
-  }, [token, session, sessionStatus, hasConsent, consentData, joined, router, update]);
+    joinTeam();
+  }, [invitationValid, consentData, joined, token, router, update]);
 
+  // Nach Login SessionStorage prüfen
   useEffect(() => {
     if (session && !token && typeof window !== 'undefined') {
       const storedToken = sessionStorage.getItem('joinToken');
@@ -151,7 +155,7 @@ return;
     );
   }
 
-  if (stage === 'waitingConsent') {
+  if (stage === 'waitingConsent' || (invitationValid && !consentData)) {
     return (
       <div className="min-h-screen flex items-center justify-center bg-gray-50 p-6 text-center">
         <div className="space-y-6 max-w-2xl mx-auto">
