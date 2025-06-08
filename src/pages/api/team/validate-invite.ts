@@ -13,7 +13,7 @@ export default async function handler(req: NextApiRequest, res: NextApiResponse)
     include: {
       company: {
         select: {
-          name: true, // wir wollen den Namen anzeigen
+          name: true,
         },
       },
     },
@@ -26,5 +26,6 @@ export default async function handler(req: NextApiRequest, res: NextApiResponse)
   return res.status(200).json({
     ok: true,
     companyName: invite.company?.name || null,
+    role: invite.role, // <- neu
   });
 }
