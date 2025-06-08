@@ -7,7 +7,8 @@ import VisibilityConsentForm from "@/components/VisibilityConsentForm";
 
 export default function JoinTokenPage() {
   const router = useRouter();
-  const { token } = router.query;
+  const tokenRaw = router.query.token;
+  const token = typeof tokenRaw === "string" ? tokenRaw : Array.isArray(tokenRaw) ? tokenRaw[0] : null;
   const [companyName, setCompanyName] = useState<string | null>(null);
 
 
