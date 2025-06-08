@@ -168,27 +168,44 @@ export default function TeamInviteGenerator() {
       <Mail className="w-8 h-8 text-blue-500" />
     </span>
 
-    {/* Link kopieren Icon */}
-    {!isMobile && lastLink && (
-      <span
-        onClick={async () => {
-          await navigator.clipboard.writeText(lastLink);
-          toast.success("Link wurde in die Zwischenablage kopiert");
-        }}
-        className="cursor-pointer hover:opacity-80"
-        title="Link kopieren"
-      >
-        <svg
-          xmlns="http://www.w3.org/2000/svg"
-          className="w-8 h-8 text-gray-500"
-          fill="none"
-          viewBox="0 0 24 24"
-          stroke="currentColor"
-        >
-          <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M8 16h8m-4-4h4m-4-4h4M7 8h.01M7 16h.01M3 4a1 1 0 011-1h13.586a1 1 0 01.707.293l2.414 2.414a1 1 0 01.293.707V20a1 1 0 01-1 1H4a1 1 0 01-1-1V4z" />
-        </svg>
-      </span>
-    )}
+    {/* Link kopieren Icon (erzeugt neuen Token) */}
+{!isMobile && (
+  <span
+    onClick={async () => {
+      setLoadingType("link-copy");
+      try {
+        const data = await createInvite("single_use");
+        const url = data.invitation?.joinUrl;
+
+        if (!url) {
+          toast.error("Fehler: Kein Link generiert.");
+          return;
+        }
+
+        await navigator.clipboard.writeText(url);
+        setLastLink(url);
+        toast.success("Einladungslink wurde in die Zwischenablage kopiert!");
+      } catch (err) {
+        toast.error("Konnte keinen Link generieren.");
+      } finally {
+        setLoadingType(null);
+      }
+    }}
+    className={`cursor-pointer ${loadingType === "link-copy" ? "opacity-50" : "hover:opacity-80"}`}
+    title="Link kopieren"
+  >
+    <svg
+      xmlns="http://www.w3.org/2000/svg"
+      className="w-8 h-8 text-gray-500"
+      fill="none"
+      viewBox="0 0 24 24"
+      stroke="currentColor"
+    >
+      <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M8 16h8m-4-4h4m-4-4h4M7 8h.01M7 16h.01M3 4a1 1 0 011-1h13.586a1 1 0 01.707.293l2.414 2.414a1 1 0 01.293.707V20a1 1 0 01-1 1H4a1 1 0 01-1-1V4z" />
+    </svg>
+  </span>
+)}
+
   </div>
 }
 
