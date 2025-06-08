@@ -1,89 +1,72 @@
-import { useState } from 'react';
+import { useEffect, useState } from 'react';
 
 export default function AccessCodePanel() {
-  const [code, setCode] = useState('');
   const [password, setPassword] = useState('');
-  const [role, setRole] = useState('viewer');
-  const [expiresIn, setExpiresIn] = useState(24);
+  const [validUntil, setValidUntil] = useState('');
   const [loading, setLoading] = useState(false);
-  const [generatedCode, setGeneratedCode] = useState('');
+  const [regenerating, setRegenerating] = useState(false);
 
-  const handleCreateCode = async () => {
+  // Passwort vom Server abrufen
+  const fetchPassword = async () => {
     setLoading(true);
     try {
-      const res = await fetch('/api/team/create-access-code', {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ password, expiresInHours: expiresIn, role }),
-      });
-
+      const res = await fetch('/api/team/get-access-password');
       const data = await res.json();
-      if (res.ok && data.code) {
-        setGeneratedCode(data.code);
-      } else {
-        alert('Fehler beim Erstellen');
+      if (res.ok && data.password) {
+        setPassword(data.password);
+        setValidUntil(data.validUntil);
       }
     } catch (err) {
-      console.error(err);
-      alert('Netzwerkfehler');
+      console.error('Fehler beim Abrufen des Passworts', err);
     } finally {
       setLoading(false);
     }
   };
 
+  // Passwort manuell neu generieren
+  const regeneratePassword = async () => {
+    setRegenerating(true);
+    try {
+      const res = await fetch('/api/team/rotate-access-password', { method: 'POST' });
+      const data = await res.json();
+      if (res.ok && data.password) {
+        setPassword(data.password);
+        setValidUntil(data.validUntil);
+      }
+    } catch (err) {
+      console.error('Fehler beim Generieren', err);
+    } finally {
+      setRegenerating(false);
+    }
+  };
+
+  useEffect(() => {
+    fetchPassword();
+  }, []);
+
   return (
     <div className="p-4 border rounded shadow max-w-xl mx-auto bg-white">
-      <h2 className="text-xl font-bold mb-4">Zugangs-Code erstellen</h2>
+      <h2 className="text-xl font-bold mb-4">QR-Passwort (geschützte Einladung)</h2>
 
-      <label className="block font-medium mb-1">Rolle:</label>
-      <select
-        value={role}
-        onChange={(e) => setRole(e.target.value)}
-        className="w-full mb-3 p-2 border rounded"
-      >
-        <option value="viewer">Viewer</option>
-        <option value="editor">Editor</option>
-        <option value="admin">Admin</option>
-      </select>
+      {loading ? (
+        <p>Lade…</p>
+      ) : (
+        <>
+          <p className="text-gray-700 mb-2">Aktuelles Passwort:</p>
+          <p className="text-2xl font-mono mb-4">{password || '–'}</p>
 
-      <label className="block font-medium mb-1">Passwort (optional):</label>
-      <input
-        type="text"
-        value={password}
-        onChange={(e) => setPassword(e.target.value)}
-        className="w-full mb-3 p-2 border rounded"
-        placeholder="Optional"
-      />
+          <p className="text-sm text-gray-500 mb-4">
+            Gültig bis: <strong>{validUntil || '–'}</strong>
+          </p>
 
-      <label className="block font-medium mb-1">Gültigkeit (in Stunden):</label>
-      <input
-        type="number"
-        value={expiresIn}
-        onChange={(e) => setExpiresIn(Number(e.target.value))}
-        className="w-full mb-3 p-2 border rounded"
-        min={1}
-        max={168}
-      />
-
-      <button
-        onClick={handleCreateCode}
-        disabled={loading}
-        className="w-full bg-blue-600 text-white py-2 rounded hover:bg-blue-700 transition disabled:opacity-50"
-      >
-        {loading ? 'Erstelle...' : 'Code generieren'}
-      </button>
-
-      {generatedCode && (
-        <div className="mt-6 p-4 bg-gray-100 rounded text-center">
-          <p className="font-bold mb-1">Zugangscode:</p>
-          <p className="text-xl font-mono">{generatedCode}</p>
           <button
-            className="mt-2 text-sm text-blue-600 underline"
-            onClick={() => navigator.clipboard.writeText(generatedCode)}
+            onClick={regeneratePassword}
+            disabled={regenerating}
+            className="w-full bg-blue-600 text-white py-2 rounded hover:bg-blue-700 transition disabled:opacity-50"
           >
-            Code kopieren
+            {regenerating ? 'Erzeuge neues Passwort…' : 'Jetzt manuell erneuern'}
           </button>
-        </div>
+        </>
       )}
     </div>
   );
