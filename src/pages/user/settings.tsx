@@ -1,20 +1,13 @@
 // src/pages/user/settings.tsx
 
-import { signOut } from "next-auth/react";
-import { useRouter } from "next/router";
-import { useState } from "react";
-import { GetServerSideProps } from "next";
-import { requireAuth } from "@/lib/authRequired";
-import {
-  LogOut,
-  Trash2,
-  KeyRound,
-  Bell,
-  Moon,
-  Sun,
-} from "lucide-react";
+import { signOut } from 'next-auth/react';
+import { useRouter } from 'next/router';
+import { useState } from 'react';
+import { GetServerSideProps } from 'next';
+import { requireAuth } from '@/lib/authRequired';
+import { LogOut, Trash2, KeyRound, Bell, Moon, Sun } from 'lucide-react';
 
-import UserSettingsLayout from "@/components/user/UserSettingsLayout";
+import UserSettingsLayout from '@/components/user/UserSettingsLayout';
 
 // Authentifizierung erzwingen
 export const getServerSideProps: GetServerSideProps = requireAuth;
@@ -25,58 +18,58 @@ export default function SettingsPage() {
   const [showDelete, setShowDelete] = useState(false);
 
   // Passwort‐Änderung
-  const [oldPw, setOldPw] = useState("");
-  const [pw1, setPw1] = useState("");
-  const [pw2, setPw2] = useState("");
+  const [oldPw, setOldPw] = useState('');
+  const [pw1, setPw1] = useState('');
+  const [pw2, setPw2] = useState('');
   const [pwLoading, setPwLoading] = useState(false);
-  const [pwMessage, setPwMessage] = useState("");
+  const [pwMessage, setPwMessage] = useState('');
 
   // Dummy‐State für Theme
-  const [theme, setTheme] = useState("light");
+  const [theme, setTheme] = useState('light');
 
   const deleteAccount = async () => {
     setLoading(true);
-    const res = await fetch("/api/user/delete", { method: "DELETE" });
+    const res = await fetch('/api/user/delete', { method: 'DELETE' });
     setLoading(false);
     if (res.ok) {
       setShowDelete(false);
-      alert("Account gelöscht");
-      signOut({ callbackUrl: "/" });
+      alert('Account gelöscht');
+      signOut({ callbackUrl: '/' });
     } else {
-      alert("Fehler beim Löschen des Accounts");
+      alert('Fehler beim Löschen des Accounts');
     }
   };
 
   const handleChangePassword = async (e: React.FormEvent) => {
     e.preventDefault();
-    setPwMessage("");
+    setPwMessage('');
     if (oldPw.length < 6) {
-      setPwMessage("Bitte dein aktuelles Passwort eingeben!");
+      setPwMessage('Bitte dein aktuelles Passwort eingeben!');
       return;
     }
     if (pw1.length < 6) {
-      setPwMessage("Mindestens 6 Zeichen!");
+      setPwMessage('Mindestens 6 Zeichen!');
       return;
     }
     if (pw1 !== pw2) {
-      setPwMessage("Die Passwörter stimmen nicht überein!");
+      setPwMessage('Die Passwörter stimmen nicht überein!');
       return;
     }
     setPwLoading(true);
-    const res = await fetch("/api/user/change-password", {
-      method: "POST",
-      headers: { "Content-Type": "application/json" },
+    const res = await fetch('/api/user/change-password', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
       body: JSON.stringify({ oldPassword: oldPw, newPassword: pw1 }),
     });
     setPwLoading(false);
     if (res.ok) {
-      setPwMessage("Passwort geändert!");
-      setOldPw("");
-      setPw1("");
-      setPw2("");
+      setPwMessage('Passwort geändert!');
+      setOldPw('');
+      setPw1('');
+      setPw2('');
     } else {
       const data = await res.json();
-      setPwMessage(data.message || "Fehler beim Ändern.");
+      setPwMessage(data.message || 'Fehler beim Ändern.');
     }
   };
 
@@ -124,11 +117,9 @@ export default function SettingsPage() {
               disabled={pwLoading}
               className="bg-blue-600 hover:bg-blue-700 text-white font-semibold rounded-md px-4 py-2 transition"
             >
-              {pwLoading ? "Speichern..." : "Speichern"}
+              {pwLoading ? 'Speichern...' : 'Speichern'}
             </button>
-            {pwMessage && (
-              <div className="text-sm mt-1 text-center text-blue-600">{pwMessage}</div>
-            )}
+            {pwMessage && <div className="text-sm mt-1 text-center text-blue-600">{pwMessage}</div>}
           </form>
         </section>
 
@@ -148,7 +139,7 @@ export default function SettingsPage() {
             disabled={loading}
             className="bg-red-600 hover:bg-red-700 text-white font-semibold rounded-md px-4 py-2 transition"
           >
-            {loading ? "Lösche..." : "Account löschen"}
+            {loading ? 'Lösche...' : 'Account löschen'}
           </button>
         </section>
 
@@ -160,8 +151,8 @@ export default function SettingsPage() {
                 <Trash2 className="w-5 h-5 text-red-400" /> Account wirklich löschen?
               </h3>
               <p className="mb-4 text-red-500 text-sm">
-                Willst du deinen Account wirklich dauerhaft löschen? Das kann NICHT
-                rückgängig gemacht werden.
+                Willst du deinen Account wirklich dauerhaft löschen? Das kann NICHT rückgängig
+                gemacht werden.
               </p>
               <div className="flex gap-3 mt-4">
                 <button
@@ -169,7 +160,7 @@ export default function SettingsPage() {
                   className="flex-1 bg-red-600 text-white font-semibold rounded px-4 py-2 hover:bg-red-700 transition"
                   disabled={loading}
                 >
-                  {loading ? "Lösche..." : "Ja, löschen"}
+                  {loading ? 'Lösche...' : 'Ja, löschen'}
                 </button>
                 <button
                   onClick={() => setShowDelete(false)}

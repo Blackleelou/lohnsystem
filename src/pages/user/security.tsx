@@ -1,5 +1,5 @@
-import { ReactElement } from "react";
-import UserSettingsLayout from "@/components/user/UserSettingsLayout";
+import { ReactElement } from 'react';
+import UserSettingsLayout from '@/components/user/UserSettingsLayout';
 
 export default function SecurityPage() {
   return (

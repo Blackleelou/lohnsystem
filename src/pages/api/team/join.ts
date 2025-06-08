@@ -1,23 +1,22 @@
-import { NextApiRequest, NextApiResponse } from "next";
-import { prisma } from "@/lib/prisma";
-import { getServerSession } from "next-auth";
-import { authOptions } from "@/lib/authOptions";
+import { NextApiRequest, NextApiResponse } from 'next';
+import { prisma } from '@/lib/prisma';
+import { getServerSession } from 'next-auth';
+import { authOptions } from '@/lib/authOptions';
 
 export default async function handler(req: NextApiRequest, res: NextApiResponse) {
-  if (req.method !== "POST") return res.status(405).end();
+  if (req.method !== 'POST') return res.status(405).end();
 
   const session = await getServerSession(req, res, authOptions);
   if (!session?.user?.id) return res.status(401).end();
 
   const { token } = req.body;
-  if (!token || typeof token !== "string") {
-   return res.status(400).json({ error: "Kein gültiger Token übergeben." });
+  if (!token || typeof token !== 'string') {
+    return res.status(400).json({ error: 'Kein gültiger Token übergeben.' });
   }
-
 
   const invitation = await prisma.invitation.findUnique({ where: { token } });
   if (!invitation || invitation.expiresAt < new Date()) {
-    return res.status(410).json({ error: "Ungültige oder abgelaufene Einladung." });
+    return res.status(410).json({ error: 'Ungültige oder abgelaufene Einladung.' });
   }
 
   await prisma.user.update({

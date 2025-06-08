@@ -1,23 +1,23 @@
-import { useEffect, useState } from "react";
-import ThemeSelector, { ThemeSettings } from "@/components/admin/ThemeSelector";
-import Layout from "@/components/common/Layout"; // <- Das zentrale Layout mit Bürger-Menü
+import { useEffect, useState } from 'react';
+import ThemeSelector, { ThemeSettings } from '@/components/admin/ThemeSelector';
+import Layout from '@/components/common/Layout'; // <- Das zentrale Layout mit Bürger-Menü
 
 // Hilfsfunktion, um Theme-Settings vom Server zu holen
 async function fetchSettings(): Promise<ThemeSettings> {
-  const res = await fetch("/api/company/settings");
-  if (!res.ok) throw new Error("Fehler beim Laden der Einstellungen");
+  const res = await fetch('/api/company/settings');
+  if (!res.ok) throw new Error('Fehler beim Laden der Einstellungen');
   const data = await res.json();
   return data.settings;
 }
 
 // Hilfsfunktion, um Theme-Settings zu speichern
 async function saveSettings(settings: ThemeSettings): Promise<ThemeSettings> {
-  const res = await fetch("/api/company/settings", {
-    method: "POST",
-    headers: { "Content-Type": "application/json" },
+  const res = await fetch('/api/company/settings', {
+    method: 'POST',
+    headers: { 'Content-Type': 'application/json' },
     body: JSON.stringify(settings),
   });
-  if (!res.ok) throw new Error("Fehler beim Speichern der Einstellungen");
+  if (!res.ok) throw new Error('Fehler beim Speichern der Einstellungen');
   const data = await res.json();
   return data.settings;
 }

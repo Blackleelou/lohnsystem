@@ -1,20 +1,20 @@
 // src/lib/authOptions.ts
 
-import type { AuthOptions } from "next-auth";
-import CredentialsProvider from "next-auth/providers/credentials";
-import GoogleProvider from "next-auth/providers/google";
-import { PrismaAdapter } from "@auth/prisma-adapter";
-import { prisma } from "@/lib/prisma";
-import { compare } from "bcryptjs";
+import type { AuthOptions } from 'next-auth';
+import CredentialsProvider from 'next-auth/providers/credentials';
+import GoogleProvider from 'next-auth/providers/google';
+import { PrismaAdapter } from '@auth/prisma-adapter';
+import { prisma } from '@/lib/prisma';
+import { compare } from 'bcryptjs';
 
 export const authOptions: AuthOptions = {
   adapter: PrismaAdapter(prisma),
   providers: [
     CredentialsProvider({
-      name: "Credentials",
+      name: 'Credentials',
       credentials: {
-        email: { label: "E-Mail", type: "text" },
-        password: { label: "Passwort", type: "password" },
+        email: { label: 'E-Mail', type: 'text' },
+        password: { label: 'Passwort', type: 'password' },
       },
       async authorize(credentials) {
         if (!credentials?.email || !credentials?.password) {
@@ -40,7 +40,7 @@ export const authOptions: AuthOptions = {
     }),
   ],
 
-  session: { strategy: "jwt" },
+  session: { strategy: 'jwt' },
 
   callbacks: {
     async jwt({ token, user, trigger }) {
@@ -68,7 +68,7 @@ export const authOptions: AuthOptions = {
         }
       }
 
-      if (trigger === "update" && token.email) {
+      if (trigger === 'update' && token.email) {
         const dbUser = await prisma.user.findUnique({
           where: { email: token.email as string },
           select: {
@@ -96,7 +96,7 @@ export const authOptions: AuthOptions = {
         session.user.id = token.id as string;
         session.user.email = token.email as string;
         session.user.companyId = token.companyId as string | null;
-        session.user.role = token.role as "admin" | "editor" | "viewer";
+        session.user.role = token.role as 'admin' | 'editor' | 'viewer';
         session.user.isAdmin = token.isAdmin as boolean;
         session.user.nickname = (token.nickname as string | null) ?? undefined;
         session.user.name = token.name as string | undefined; // ✅ hinzugefügt
@@ -106,7 +106,7 @@ export const authOptions: AuthOptions = {
   },
 
   pages: {
-    signIn: "/login",
+    signIn: '/login',
   },
 
   secret: process.env.NEXTAUTH_SECRET,

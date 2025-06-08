@@ -1,13 +1,13 @@
 // src/pages/user/team.tsx
 
-import { ReactElement, useState } from "react";
-import { GetServerSideProps } from "next";
-import { requireAuth } from "@/lib/authRequired";
-import UserSettingsLayout from "@/components/user/UserSettingsLayout";
-import { Trash2 } from "lucide-react";
-import { useSession } from "next-auth/react";
-import { useRouter } from "next/router";
-import toast, { Toaster } from "react-hot-toast";
+import { ReactElement, useState } from 'react';
+import { GetServerSideProps } from 'next';
+import { requireAuth } from '@/lib/authRequired';
+import UserSettingsLayout from '@/components/user/UserSettingsLayout';
+import { Trash2 } from 'lucide-react';
+import { useSession } from 'next-auth/react';
+import { useRouter } from 'next/router';
+import toast, { Toaster } from 'react-hot-toast';
 
 export const getServerSideProps: GetServerSideProps = requireAuth;
 
@@ -19,17 +19,15 @@ export default function TeamSettingsPage() {
 
   const leaveTeam = async () => {
     setLoading(true);
-    const res = await fetch("/api/team/leave", { method: "POST" });
+    const res = await fetch('/api/team/leave', { method: 'POST' });
     setLoading(false);
 
-if (res.ok) {
-  setShowConfirm(false);
-  await update();
-  toast.success("Du bist jetzt aus dem Team ausgetreten.", { id: "left-team-final" });
-  router.push("/dashboard");
-}
-
-
+    if (res.ok) {
+      setShowConfirm(false);
+      await update();
+      toast.success('Du bist jetzt aus dem Team ausgetreten.', { id: 'left-team-final' });
+      router.push('/dashboard');
+    }
   };
 
   return (
@@ -54,7 +52,8 @@ if (res.ok) {
       {/* Platzhalter-Inhalt */}
       <div className="mt-4 bg-white dark:bg-gray-900 rounded-2xl shadow-lg border border-gray-100 dark:border-gray-800 p-6">
         <p className="text-gray-700 dark:text-gray-200 text-center">
-          Diese Seite ist aktuell nur ein Platzhalter. Später folgen Optionen wie Team-Name ändern, Rollen verwalten, etc.
+          Diese Seite ist aktuell nur ein Platzhalter. Später folgen Optionen wie Team-Name ändern,
+          Rollen verwalten, etc.
         </p>
       </div>
 
@@ -67,7 +66,8 @@ if (res.ok) {
               Team wirklich verlassen?
             </h3>
             <p className="text-sm text-red-500 mb-4">
-              Möchtest du dieses Team dauerhaft verlassen? Diese Aktion kann nicht rückgängig gemacht werden.
+              Möchtest du dieses Team dauerhaft verlassen? Diese Aktion kann nicht rückgängig
+              gemacht werden.
             </p>
             <div className="flex justify-end gap-3">
               <button
@@ -75,7 +75,7 @@ if (res.ok) {
                 className="bg-red-500 hover:bg-red-600 text-white text-sm font-medium rounded px-3 py-1 transition disabled:opacity-50"
                 disabled={loading}
               >
-                {loading ? "Verlasse…" : "Ja, verlassen"}
+                {loading ? 'Verlasse…' : 'Ja, verlassen'}
               </button>
               <button
                 onClick={() => setShowConfirm(false)}

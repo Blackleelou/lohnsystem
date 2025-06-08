@@ -24,14 +24,14 @@ export default async function handler(req: NextApiRequest, res: NextApiResponse)
     return res.status(401).json({ message: 'Login fehlgeschlagen' });
   }
 
-  const cookie = serialize("userId", user.id, {
-    path: "/",
+  const cookie = serialize('userId', user.id, {
+    path: '/',
     httpOnly: false,
-    sameSite: "lax",
-    secure: process.env.NODE_ENV === "production",
+    sameSite: 'lax',
+    secure: process.env.NODE_ENV === 'production',
     maxAge: 60 * 60 * 24,
   });
 
-  res.setHeader("Set-Cookie", cookie);
+  res.setHeader('Set-Cookie', cookie);
   return res.status(200).end();
 }

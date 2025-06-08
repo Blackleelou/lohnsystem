@@ -1,7 +1,7 @@
 // src/pages/team/index.tsx
 
-import Layout from "@/components/common/Layout";
-import { useState, useEffect } from "react";
+import Layout from '@/components/common/Layout';
+import { useState, useEffect } from 'react';
 
 type Team = {
   id: string;
@@ -15,11 +15,11 @@ export default function TeamDashboardPage() {
   const [loading, setLoading] = useState(true);
 
   useEffect(() => {
-    fetch("/api/team/me")
-      .then(res => res.json())
-      .then(data => {
+    fetch('/api/team/me')
+      .then((res) => res.json())
+      .then((data) => {
         if (!data.team) {
-          window.location.href = "/dashboard";
+          window.location.href = '/dashboard';
         } else {
           setTeam(data.team);
           setLoading(false);
@@ -40,9 +40,11 @@ export default function TeamDashboardPage() {
               <div className="mb-3 text-gray-600 dark:text-gray-300">{team.description}</div>
             )}
             <div className="p-3 bg-blue-50 dark:bg-blue-900/20 rounded mt-8">
-              <b>Team-Lohnübersicht:</b><br />
+              <b>Team-Lohnübersicht:</b>
+              <br />
               <div className="mt-2 text-gray-500">
-                Hier erscheinen später alle gemeinsamen Schichten, Lohnabrechnungen und Team-Auswertungen.
+                Hier erscheinen später alle gemeinsamen Schichten, Lohnabrechnungen und
+                Team-Auswertungen.
               </div>
             </div>
           </>

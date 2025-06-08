@@ -1,9 +1,9 @@
 // pages/api/admin/board/import.ts
 
-import { NextApiRequest, NextApiResponse } from "next";
-import formidable, { File } from "formidable";
-import fs from "fs/promises";
-import { prisma } from "@/lib/prisma";
+import { NextApiRequest, NextApiResponse } from 'next';
+import formidable, { File } from 'formidable';
+import fs from 'fs/promises';
+import { prisma } from '@/lib/prisma';
 
 export const config = {
   api: {
@@ -21,7 +21,7 @@ type Entry = {
 };
 
 export default async function handler(req: NextApiRequest, res: NextApiResponse) {
-  if (req.method !== "POST") return res.status(405).end("Method Not Allowed");
+  if (req.method !== 'POST') return res.status(405).end('Method Not Allowed');
 
   const form = formidable({ maxFileSize: 2 * 1024 * 1024 });
 
@@ -35,10 +35,10 @@ export default async function handler(req: NextApiRequest, res: NextApiResponse)
 
     const uploadedFile = files.file as File;
     if (!uploadedFile || !uploadedFile.filepath) {
-      return res.status(400).json({ message: "Keine Datei gefunden." });
+      return res.status(400).json({ message: 'Keine Datei gefunden.' });
     }
 
-    const fileContent = await fs.readFile(uploadedFile.filepath, "utf-8");
+    const fileContent = await fs.readFile(uploadedFile.filepath, 'utf-8');
     const incomingEntries: Entry[] = JSON.parse(fileContent);
 
     let importCount = 0;
@@ -62,7 +62,8 @@ export default async function handler(req: NextApiRequest, res: NextApiResponse)
         const isIdentical =
           existing.title === entry.title &&
           existing.status === entry.status &&
-          JSON.stringify([...existing.category].sort()) === JSON.stringify([...entryCategory].sort()) &&
+          JSON.stringify([...existing.category].sort()) ===
+            JSON.stringify([...entryCategory].sort()) &&
           existing.notes === entry.notes &&
           incomingCompletedAt === existingCompletedAt;
 
@@ -99,9 +100,11 @@ export default async function handler(req: NextApiRequest, res: NextApiResponse)
       }
     }
 
-    return res.status(200).json({ message: `Import abgeschlossen (${importCount} Einträge verarbeitet)` });
+    return res
+      .status(200)
+      .json({ message: `Import abgeschlossen (${importCount} Einträge verarbeitet)` });
   } catch (err) {
-    console.error("Fehler beim Import:", err);
-    return res.status(500).json({ message: "Import fehlgeschlagen." });
+    console.error('Fehler beim Import:', err);
+    return res.status(500).json({ message: 'Import fehlgeschlagen.' });
   }
 }

@@ -1,5 +1,5 @@
-import React, { MutableRefObject, ChangeEvent } from "react";
-import { Entry } from "./types";
+import React, { MutableRefObject, ChangeEvent } from 'react';
+import { Entry } from './types';
 
 type FilterPanelProps = {
   filteredEntries: Entry[];
@@ -28,18 +28,24 @@ export default function FilterPanel({
   hideImport = false,
   hideExport = false,
 }: FilterPanelProps) {
-  const toggleCheckbox = (value: string, group: "status" | "category") => {
-    const current = group === "status" ? selectedStatuses : selectedCategories;
-    const updater = group === "status" ? setSelectedStatuses : setSelectedCategories;
+  const toggleCheckbox = (value: string, group: 'status' | 'category') => {
+    const current = group === 'status' ? selectedStatuses : selectedCategories;
+    const updater = group === 'status' ? setSelectedStatuses : setSelectedCategories;
 
     updater(current.includes(value) ? current.filter((v) => v !== value) : [...current, value]);
   };
 
   const categoryOptions = [
-    "IT", "Personal", "Finanzen", "Organisation", "Kommunikation", "Projekte", "Sonstiges",
+    'IT',
+    'Personal',
+    'Finanzen',
+    'Organisation',
+    'Kommunikation',
+    'Projekte',
+    'Sonstiges',
   ];
 
-  const statusOrder = ["offen", "geplant", "in Bearbeitung", "getestet", "fertig"];
+  const statusOrder = ['offen', 'geplant', 'in Bearbeitung', 'getestet', 'fertig'];
 
   return (
     <div className="mb-6 bg-white border border-gray-200 p-4 rounded shadow-sm">
@@ -67,11 +73,11 @@ export default function FilterPanel({
           <button
             onClick={() => {
               const data = JSON.stringify(filteredEntries, null, 2);
-              const blob = new Blob([data], { type: "application/json" });
+              const blob = new Blob([data], { type: 'application/json' });
               const url = URL.createObjectURL(blob);
-              const a = document.createElement("a");
+              const a = document.createElement('a');
               a.href = url;
-              a.download = `Export_ToDo_${new Date().toISOString().replace(/[:.]/g, "_")}.json`;
+              a.download = `Export_ToDo_${new Date().toISOString().replace(/[:.]/g, '_')}.json`;
               a.click();
             }}
             className="bg-blue-600 hover:bg-blue-700 text-white px-4 py-2 rounded-md text-sm"
@@ -88,11 +94,11 @@ export default function FilterPanel({
             {statusOrder.map((s) => (
               <button
                 key={s}
-                onClick={() => toggleCheckbox(s, "status")}
+                onClick={() => toggleCheckbox(s, 'status')}
                 className={`px-3 py-1 rounded-md text-sm border ${
                   selectedStatuses.includes(s)
-                    ? "bg-blue-600 text-white"
-                    : "bg-gray-100 text-gray-700"
+                    ? 'bg-blue-600 text-white'
+                    : 'bg-gray-100 text-gray-700'
                 }`}
               >
                 {s}
@@ -107,11 +113,11 @@ export default function FilterPanel({
             {categoryOptions.map((c) => (
               <button
                 key={c}
-                onClick={() => toggleCheckbox(c.toLowerCase(), "category")}
+                onClick={() => toggleCheckbox(c.toLowerCase(), 'category')}
                 className={`px-3 py-1 rounded-md text-sm border ${
                   selectedCategories.includes(c.toLowerCase())
-                    ? "bg-blue-600 text-white"
-                    : "bg-gray-100 text-gray-700"
+                    ? 'bg-blue-600 text-white'
+                    : 'bg-gray-100 text-gray-700'
                 }`}
               >
                 {c}

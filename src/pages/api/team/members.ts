@@ -1,8 +1,8 @@
 // src/pages/api/team/members.ts
-import type { NextApiRequest, NextApiResponse } from "next";
-import { getServerSession } from "next-auth/next";
-import { authOptions } from "@/lib/authOptions";
-import { prisma } from "@/lib/prisma";
+import type { NextApiRequest, NextApiResponse } from 'next';
+import { getServerSession } from 'next-auth/next';
+import { authOptions } from '@/lib/authOptions';
+import { prisma } from '@/lib/prisma';
 
 export default async function handler(req: NextApiRequest, res: NextApiResponse) {
   const session = await getServerSession(req, res, authOptions);
@@ -20,9 +20,9 @@ export default async function handler(req: NextApiRequest, res: NextApiResponse)
       role: true,
       invited: true,
       accepted: true,
-      showName: true,        // Hier hinzugefügt
-      showNickname: true,    // Hier hinzugefügt
-      showEmail: true,       // Hier hinzugefügt
+      showName: true, // Hier hinzugefügt
+      showNickname: true, // Hier hinzugefügt
+      showEmail: true, // Hier hinzugefügt
     },
   });
 

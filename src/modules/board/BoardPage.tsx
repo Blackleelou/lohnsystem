@@ -1,15 +1,15 @@
 // components/Board/BoardPage.tsx
 
-import { useEffect, useState, useRef } from "react";
-import { useSession } from "next-auth/react";
-import { useRouter } from "next/router";
-import SuperadminLayout from "@/components/superadmin/SuperadminLayout";
-import { Entry } from "./types";
-import FormPanel from "./FormPanel";
-import FilterPanel from "./FilterPanel";
-import EntryCard from "./EntryCard";
-import EntryModal from "./EntryModal";
-import { STATUS_OPTIONS } from "./constants";
+import { useEffect, useState, useRef } from 'react';
+import { useSession } from 'next-auth/react';
+import { useRouter } from 'next/router';
+import SuperadminLayout from '@/components/superadmin/SuperadminLayout';
+import { Entry } from './types';
+import FormPanel from './FormPanel';
+import FilterPanel from './FilterPanel';
+import EntryCard from './EntryCard';
+import EntryModal from './EntryModal';
+import { STATUS_OPTIONS } from './constants';
 
 export default function BoardPage() {
   const { data: session, status } = useSession();
@@ -21,18 +21,18 @@ export default function BoardPage() {
   const [selectedCategories, setSelectedCategories] = useState<string[]>([]);
   const [selectedEntry, setSelectedEntry] = useState<Entry | null>(null);
 
-  const [newTitle, setNewTitle] = useState("");
-  const [newStatus, setNewStatus] = useState("");
+  const [newTitle, setNewTitle] = useState('');
+  const [newStatus, setNewStatus] = useState('');
   const [newCategory, setNewCategory] = useState<string[]>([]);
-  const [newNotes, setNewNotes] = useState("");
+  const [newNotes, setNewNotes] = useState('');
 
-  const [activeSection, setActiveSection] = useState<"manual" | "import" | "export" | null>(null);
+  const [activeSection, setActiveSection] = useState<'manual' | 'import' | 'export' | null>(null);
   const fileInputRef = useRef<HTMLInputElement | null>(null);
 
   useEffect(() => {
-    if (status === "loading") return;
-    if (!session || session.user?.email !== "jantzen.chris@gmail.com") {
-      router.replace("/dashboard");
+    if (status === 'loading') return;
+    if (!session || session.user?.email !== 'jantzen.chris@gmail.com') {
+      router.replace('/dashboard');
     }
   }, [session, status]);
 
@@ -42,7 +42,7 @@ export default function BoardPage() {
   };
 
   const loadEntries = async () => {
-    const res = await fetch("/api/admin/board");
+    const res = await fetch('/api/admin/board');
     const data = await res.json();
     setEntries(data.entries);
   };
@@ -56,23 +56,23 @@ export default function BoardPage() {
     if (!file) return;
 
     const formData = new FormData();
-    formData.append("file", file);
+    formData.append('file', file);
 
-    const res = await fetch("/api/admin/board/import", {
-      method: "POST",
+    const res = await fetch('/api/admin/board/import', {
+      method: 'POST',
       body: formData,
     });
 
     const result = await res.json();
 
     if (res.ok) {
-      showToast(result.message || "Import abgeschlossen.");
+      showToast(result.message || 'Import abgeschlossen.');
       await loadEntries();
     } else {
-      showToast(result.message || "Fehler beim Import.");
+      showToast(result.message || 'Fehler beim Import.');
     }
 
-    if (fileInputRef.current) fileInputRef.current.value = "";
+    if (fileInputRef.current) fileInputRef.current.value = '';
   };
 
   const handleManualAdd = async () => {
@@ -82,67 +82,67 @@ export default function BoardPage() {
       category: newCategory,
       notes: newNotes,
     };
-    const res = await fetch("/api/admin/board/create", {
-      method: "POST",
-      headers: { "Content-Type": "application/json" },
+    const res = await fetch('/api/admin/board/create', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
       body: JSON.stringify(payload),
     });
 
     if (res.ok) {
-      showToast("Eintrag hinzugefügt.");
-      setNewTitle("");
-      setNewStatus("");
+      showToast('Eintrag hinzugefügt.');
+      setNewTitle('');
+      setNewStatus('');
       setNewCategory([]);
-      setNewNotes("");
+      setNewNotes('');
       await loadEntries();
     } else {
-      showToast("Fehler beim Speichern.");
+      showToast('Fehler beim Speichern.');
     }
   };
 
   const handleUpdate = async (data: Partial<Entry> & { id: string }) => {
-    const res = await fetch("/api/admin/board/update", {
-      method: "PATCH",
-      headers: { "Content-Type": "application/json" },
+    const res = await fetch('/api/admin/board/update', {
+      method: 'PATCH',
+      headers: { 'Content-Type': 'application/json' },
       body: JSON.stringify(data),
     });
 
     if (res.ok) {
-      showToast("Eintrag aktualisiert.");
+      showToast('Eintrag aktualisiert.');
       await loadEntries();
     } else {
-      showToast("Fehler beim Aktualisieren.");
+      showToast('Fehler beim Aktualisieren.');
     }
   };
 
   const handleDelete = async (id: string) => {
-    if (!confirm("Eintrag wirklich löschen?")) return;
-    const res = await fetch("/api/admin/board/delete", {
-      method: "DELETE",
-      headers: { "Content-Type": "application/json" },
+    if (!confirm('Eintrag wirklich löschen?')) return;
+    const res = await fetch('/api/admin/board/delete', {
+      method: 'DELETE',
+      headers: { 'Content-Type': 'application/json' },
       body: JSON.stringify({ id }),
     });
 
     if (res.ok) {
-      showToast("Eintrag gelöscht.");
+      showToast('Eintrag gelöscht.');
       await loadEntries();
     } else {
-      showToast("Fehler beim Löschen.");
+      showToast('Fehler beim Löschen.');
     }
   };
 
   const filteredEntries = entries.filter((e) => {
-  const entryStatus = e.status.toLowerCase();
-  const matchesStatus =
-    selectedStatuses.length === 0 ||
-    selectedStatuses.map((s) => s.toLowerCase()).includes(entryStatus);
+    const entryStatus = e.status.toLowerCase();
+    const matchesStatus =
+      selectedStatuses.length === 0 ||
+      selectedStatuses.map((s) => s.toLowerCase()).includes(entryStatus);
 
-  const matchesCategory =
-    selectedCategories.length === 0 ||
-    e.category.map((c) => c.toLowerCase()).some((cat) => selectedCategories.includes(cat));
+    const matchesCategory =
+      selectedCategories.length === 0 ||
+      e.category.map((c) => c.toLowerCase()).some((cat) => selectedCategories.includes(cat));
 
-  return matchesStatus && matchesCategory;
-});
+    return matchesStatus && matchesCategory;
+  });
 
   const uniqueStatuses = Array.from(new Set(entries.map((e) => e.status.toLowerCase())));
   const uniqueCategories = Array.from(
@@ -154,15 +154,17 @@ export default function BoardPage() {
       <h1 className="text-2xl font-bold text-blue-700 mb-4">Superadmin Board</h1>
 
       <div className="flex gap-4 mb-6">
-        {["manual", "import", "export"].map((s) => (
+        {['manual', 'import', 'export'].map((s) => (
           <button
             key={s}
-            onClick={() => setActiveSection((prev) => (prev === s ? null : s as typeof activeSection))}
+            onClick={() =>
+              setActiveSection((prev) => (prev === s ? null : (s as typeof activeSection)))
+            }
             className={`px-4 py-1 text-sm rounded border ${
-              activeSection === s ? "bg-blue-600 text-white" : "bg-white text-gray-700"
+              activeSection === s ? 'bg-blue-600 text-white' : 'bg-white text-gray-700'
             }`}
           >
-            {s === "manual" ? "Manuell" : s.charAt(0).toUpperCase() + s.slice(1)}
+            {s === 'manual' ? 'Manuell' : s.charAt(0).toUpperCase() + s.slice(1)}
           </button>
         ))}
       </div>
@@ -177,11 +179,11 @@ export default function BoardPage() {
         fileInputRef={fileInputRef}
         handleUpload={handleUpload}
         filteredEntries={filteredEntries}
-        hideImport={activeSection !== "import"}
-        hideExport={activeSection !== "export"}
+        hideImport={activeSection !== 'import'}
+        hideExport={activeSection !== 'export'}
       />
 
-      {activeSection === "manual" && (
+      {activeSection === 'manual' && (
         <FormPanel
           isEditing={false}
           title={newTitle}
@@ -194,10 +196,10 @@ export default function BoardPage() {
           onChangeNotes={setNewNotes}
           onSave={handleManualAdd}
           onCancel={() => {
-            setNewTitle("");
-            setNewStatus("");
+            setNewTitle('');
+            setNewStatus('');
             setNewCategory([]);
-            setNewNotes("");
+            setNewNotes('');
           }}
         />
       )}
@@ -214,9 +216,7 @@ export default function BoardPage() {
         ))}
       </div>
 
-      {selectedEntry && (
-        <EntryModal entry={selectedEntry} onClose={() => setSelectedEntry(null)} />
-      )}
+      {selectedEntry && <EntryModal entry={selectedEntry} onClose={() => setSelectedEntry(null)} />}
 
       {toast && (
         <div className="fixed top-4 right-4 z-50 bg-blue-600 text-white px-4 py-2 rounded shadow">
@@ -227,6 +227,4 @@ export default function BoardPage() {
   );
 }
 
-BoardPage.getLayout = (page: React.ReactNode) => (
-  <SuperadminLayout>{page}</SuperadminLayout>
-);
+BoardPage.getLayout = (page: React.ReactNode) => <SuperadminLayout>{page}</SuperadminLayout>;

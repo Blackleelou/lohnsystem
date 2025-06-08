@@ -1,10 +1,10 @@
 // src/components/user/UserSettingsLayout.tsx
 
-import Link from "next/link";
-import { useRouter } from "next/router";
-import { useState, useEffect } from "react";
-import { useSession } from "next-auth/react";
-import UserMenu from "@/components/user/UserMenu";
+import Link from 'next/link';
+import { useRouter } from 'next/router';
+import { useState, useEffect } from 'react';
+import { useSession } from 'next-auth/react';
+import UserMenu from '@/components/user/UserMenu';
 import {
   User as UserIcon,
   Key,
@@ -12,32 +12,32 @@ import {
   Settings as TeamIcon,
   ChevronLeft,
   ChevronRight,
-} from "lucide-react";
-import { motion, AnimatePresence } from "framer-motion";
+} from 'lucide-react';
+import { motion, AnimatePresence } from 'framer-motion';
 
 export default function UserSettingsLayout({ children }: { children: React.ReactNode }) {
   const router = useRouter();
   const { data: session } = useSession();
   const companyId = session?.user?.companyId;
   const [collapsed, setCollapsed] = useState(() => {
-    if (typeof window !== "undefined") {
-      return localStorage.getItem("user-sidebar-collapsed") === "true";
+    if (typeof window !== 'undefined') {
+      return localStorage.getItem('user-sidebar-collapsed') === 'true';
     }
     return false;
   });
 
   useEffect(() => {
-    localStorage.setItem("user-sidebar-collapsed", String(collapsed));
+    localStorage.setItem('user-sidebar-collapsed', String(collapsed));
   }, [collapsed]);
 
   const baseLinks = [
-    { href: "/user/profile", label: "Profil‐Einstellungen", icon: <UserIcon /> },
-    { href: "/user/security", label: "Sicherheit", icon: <Key /> },
-    { href: "/user/notifications", label: "Benachrichtigungen", icon: <Bell /> },
+    { href: '/user/profile', label: 'Profil‐Einstellungen', icon: <UserIcon /> },
+    { href: '/user/security', label: 'Sicherheit', icon: <Key /> },
+    { href: '/user/notifications', label: 'Benachrichtigungen', icon: <Bell /> },
   ];
 
   const teamLink = companyId
-    ? [{ href: "/user/team", label: "Team‐Einstellungen", icon: <TeamIcon /> }]
+    ? [{ href: '/user/team', label: 'Team‐Einstellungen', icon: <TeamIcon /> }]
     : [];
 
   const links = [...baseLinks, ...teamLink];
@@ -47,12 +47,12 @@ export default function UserSettingsLayout({ children }: { children: React.React
       <motion.aside
         className="bg-white dark:bg-gray-900 shadow-md flex flex-col min-h-screen sticky top-0 z-40"
         animate={{ width: collapsed ? 64 : 256 }}
-        transition={{ duration: 0.3, ease: "easeInOut" }}
+        transition={{ duration: 0.3, ease: 'easeInOut' }}
       >
         <button
           className="p-2 self-end mt-2 mr-2 rounded hover:bg-gray-100 dark:hover:bg-gray-800 transition"
           onClick={() => setCollapsed((c) => !c)}
-          aria-label={collapsed ? "Sidebar ausklappen" : "Sidebar einklappen"}
+          aria-label={collapsed ? 'Sidebar ausklappen' : 'Sidebar einklappen'}
         >
           {collapsed ? <ChevronRight /> : <ChevronLeft />}
         </button>
@@ -80,18 +80,18 @@ export default function UserSettingsLayout({ children }: { children: React.React
                 key={link.href}
                 href={link.href}
                 className={`group flex items-center gap-3 px-3 py-2 rounded-lg transition overflow-hidden
-                  ${collapsed ? "justify-center" : "justify-start"}
+                  ${collapsed ? 'justify-center' : 'justify-start'}
                   ${
                     isActive
-                      ? "bg-blue-50 dark:bg-gray-800 text-blue-700 dark:text-blue-300 font-semibold"
-                      : "text-gray-700 dark:text-gray-200 hover:bg-blue-100 dark:hover:bg-gray-800"
+                      ? 'bg-blue-50 dark:bg-gray-800 text-blue-700 dark:text-blue-300 font-semibold'
+                      : 'text-gray-700 dark:text-gray-200 hover:bg-blue-100 dark:hover:bg-gray-800'
                   }`}
                 title={link.label}
               >
                 <motion.span
                   className="w-5 h-5 flex-shrink-0"
                   whileHover={{ scale: 1.2 }}
-                  transition={{ type: "spring", stiffness: 300 }}
+                  transition={{ type: 'spring', stiffness: 300 }}
                 >
                   {link.icon}
                 </motion.span>

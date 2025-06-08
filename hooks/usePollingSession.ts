@@ -1,6 +1,6 @@
 // src/hooks/usePollingSession.ts
-import { useEffect } from "react";
-import { useSession } from "next-auth/react";
+import { useEffect } from 'react';
+import { useSession } from 'next-auth/react';
 
 export function usePollingSession() {
   // Standard-useSession ohne Spezial-Optionen
@@ -8,7 +8,7 @@ export function usePollingSession() {
 
   useEffect(() => {
     // Sobald der User eingeloggt ist, führt update() alle 30 Sekunden aus
-    if (status === "authenticated") {
+    if (status === 'authenticated') {
       const iv = setInterval(() => {
         update(); // holt sich die frischeste Session vom Server
       }, 30 * 1000);

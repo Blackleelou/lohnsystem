@@ -1,19 +1,19 @@
-import { useState } from "react";
+import { useState } from 'react';
 
 export default function AccessCodePanel() {
-  const [code, setCode] = useState("");
-  const [password, setPassword] = useState("");
-  const [role, setRole] = useState("viewer");
+  const [code, setCode] = useState('');
+  const [password, setPassword] = useState('');
+  const [role, setRole] = useState('viewer');
   const [expiresIn, setExpiresIn] = useState(24);
   const [loading, setLoading] = useState(false);
-  const [generatedCode, setGeneratedCode] = useState("");
+  const [generatedCode, setGeneratedCode] = useState('');
 
   const handleCreateCode = async () => {
     setLoading(true);
     try {
-      const res = await fetch("/api/team/create-access-code", {
-        method: "POST",
-        headers: { "Content-Type": "application/json" },
+      const res = await fetch('/api/team/create-access-code', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({ password, expiresInHours: expiresIn, role }),
       });
 
@@ -21,11 +21,11 @@ export default function AccessCodePanel() {
       if (res.ok && data.code) {
         setGeneratedCode(data.code);
       } else {
-        alert("Fehler beim Erstellen");
+        alert('Fehler beim Erstellen');
       }
     } catch (err) {
       console.error(err);
-      alert("Netzwerkfehler");
+      alert('Netzwerkfehler');
     } finally {
       setLoading(false);
     }
@@ -36,7 +36,11 @@ export default function AccessCodePanel() {
       <h2 className="text-xl font-bold mb-4">Zugangs-Code erstellen</h2>
 
       <label className="block font-medium mb-1">Rolle:</label>
-      <select value={role} onChange={(e) => setRole(e.target.value)} className="w-full mb-3 p-2 border rounded">
+      <select
+        value={role}
+        onChange={(e) => setRole(e.target.value)}
+        className="w-full mb-3 p-2 border rounded"
+      >
         <option value="viewer">Viewer</option>
         <option value="editor">Editor</option>
         <option value="admin">Admin</option>
@@ -66,7 +70,7 @@ export default function AccessCodePanel() {
         disabled={loading}
         className="w-full bg-blue-600 text-white py-2 rounded hover:bg-blue-700 transition disabled:opacity-50"
       >
-        {loading ? "Erstelle..." : "Code generieren"}
+        {loading ? 'Erstelle...' : 'Code generieren'}
       </button>
 
       {generatedCode && (

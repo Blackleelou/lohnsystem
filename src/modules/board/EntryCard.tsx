@@ -1,6 +1,6 @@
-import React, { useState } from "react";
-import { Entry } from "./types";
-import { STATUS_OPTIONS, CATEGORY_OPTIONS } from "./constants";
+import React, { useState } from 'react';
+import { Entry } from './types';
+import { STATUS_OPTIONS, CATEGORY_OPTIONS } from './constants';
 
 type EntryCardProps = {
   entry: Entry;
@@ -9,20 +9,15 @@ type EntryCardProps = {
   onClick: () => void;
 };
 
-export default function EntryCard({
-  entry,
-  handleUpdate,
-  handleDelete,
-  onClick,
-}: EntryCardProps) {
-  const isFertig = entry.status.toLowerCase() === "fertig";
+export default function EntryCard({ entry, handleUpdate, handleDelete, onClick }: EntryCardProps) {
+  const isFertig = entry.status.toLowerCase() === 'fertig';
 
   const [isEditing, setIsEditing] = useState(false);
   const [editData, setEditData] = useState({
     title: entry.title,
     status: entry.status,
     category: entry.category,
-    notes: entry.notes || "",
+    notes: entry.notes || '',
   });
 
   const toggleCategory = (value: string) => {
@@ -34,7 +29,7 @@ export default function EntryCard({
     }));
   };
 
-  const statusOrder = ["offen", "geplant", "in Bearbeitung", "getestet", "fertig"];
+  const statusOrder = ['offen', 'geplant', 'in Bearbeitung', 'getestet', 'fertig'];
 
   const saveChanges = () => {
     handleUpdate({
@@ -51,7 +46,7 @@ export default function EntryCard({
     <div
       onClick={!isEditing ? onClick : undefined}
       className={`border p-4 rounded-md shadow-sm transition ${
-        isFertig ? "bg-green-50 border-green-200" : "bg-white"
+        isFertig ? 'bg-green-50 border-green-200' : 'bg-white'
       }`}
     >
       {isEditing ? (
@@ -71,8 +66,8 @@ export default function EntryCard({
                   onClick={() => setEditData({ ...editData, status: opt })}
                   className={`px-3 py-1 rounded-md border text-sm transition ${
                     editData.status === opt
-                      ? "bg-blue-600 text-white border-blue-600"
-                      : "bg-gray-100 text-gray-700 hover:bg-gray-200"
+                      ? 'bg-blue-600 text-white border-blue-600'
+                      : 'bg-gray-100 text-gray-700 hover:bg-gray-200'
                   }`}
                 >
                   {opt}
@@ -90,8 +85,8 @@ export default function EntryCard({
                   onClick={() => toggleCategory(opt)}
                   className={`px-3 py-1 rounded-md border text-sm transition ${
                     editData.category.includes(opt)
-                      ? "bg-blue-600 text-white border-blue-600"
-                      : "bg-gray-100 text-gray-700 hover:bg-gray-200"
+                      ? 'bg-blue-600 text-white border-blue-600'
+                      : 'bg-gray-100 text-gray-700 hover:bg-gray-200'
                   }`}
                 >
                   {opt}
@@ -128,7 +123,7 @@ export default function EntryCard({
             {entry.title}
             {isFertig && <span className="text-green-600 font-bold text-sm">✔</span>}
           </h2>
-          <p className="text-sm text-gray-500">Kategorie: {entry.category.join(", ")}</p>
+          <p className="text-sm text-gray-500">Kategorie: {entry.category.join(', ')}</p>
           <p className="text-sm text-gray-500">Status: {entry.status}</p>
           {entry.notes && <p className="text-sm text-gray-700 mt-2">{entry.notes}</p>}
           <p className="text-xs text-gray-400 mt-4">

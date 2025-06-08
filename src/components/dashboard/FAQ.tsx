@@ -1,26 +1,26 @@
-import { useState } from "react";
-import { ChevronDown, ChevronUp } from "lucide-react";
+import { useState } from 'react';
+import { ChevronDown, ChevronUp } from 'lucide-react';
 
 const QUESTIONS = [
   {
-    q: "Was bringt mir meinLohn?",
-    a: "Du behältst deine Schichten, Zuschläge und Abrechnungen immer im Blick. Du kannst nachrechnen, vergleichen und eventuelle Fehler frühzeitig entdecken – für mehr Fairness im Job.",
+    q: 'Was bringt mir meinLohn?',
+    a: 'Du behältst deine Schichten, Zuschläge und Abrechnungen immer im Blick. Du kannst nachrechnen, vergleichen und eventuelle Fehler frühzeitig entdecken – für mehr Fairness im Job.',
   },
   {
-    q: "Für wen ist meinLohn gedacht?",
-    a: "Für alle Arbeitnehmer:innen, Teams, Betriebsräte oder engagierte Kolleg:innen, die sich gemeinsam für korrekte Abrechnungen und transparente Lohnstrukturen einsetzen wollen.",
+    q: 'Für wen ist meinLohn gedacht?',
+    a: 'Für alle Arbeitnehmer:innen, Teams, Betriebsräte oder engagierte Kolleg:innen, die sich gemeinsam für korrekte Abrechnungen und transparente Lohnstrukturen einsetzen wollen.',
   },
   {
-    q: "Was kann ich als Betriebsrat oder Teamleiter tun?",
-    a: "Du kannst ein Team anlegen, Kollegen einladen, Einstellungen und Zuschläge für alle zentral pflegen und dabei helfen, den Aufwand für jeden Einzelnen zu reduzieren.",
+    q: 'Was kann ich als Betriebsrat oder Teamleiter tun?',
+    a: 'Du kannst ein Team anlegen, Kollegen einladen, Einstellungen und Zuschläge für alle zentral pflegen und dabei helfen, den Aufwand für jeden Einzelnen zu reduzieren.',
   },
   {
-    q: "Ist meinLohn auch für Einzelpersonen geeignet?",
-    a: "Absolut! Du kannst das System auch komplett solo nutzen, deine eigenen Schichten verwalten und deine Abrechnung gegenchecken.",
+    q: 'Ist meinLohn auch für Einzelpersonen geeignet?',
+    a: 'Absolut! Du kannst das System auch komplett solo nutzen, deine eigenen Schichten verwalten und deine Abrechnung gegenchecken.',
   },
   {
-    q: "Was kostet das?",
-    a: "Die Grundfunktionen sind dauerhaft kostenlos nutzbar. Für erweiterte Tools und Support gibt es später optionale Zusatzpakete – aber der Grundgedanke bleibt: Fairness für alle!",
+    q: 'Was kostet das?',
+    a: 'Die Grundfunktionen sind dauerhaft kostenlos nutzbar. Für erweiterte Tools und Support gibt es später optionale Zusatzpakete – aber der Grundgedanke bleibt: Fairness für alle!',
   },
 ];
 

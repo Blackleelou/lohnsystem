@@ -1,4 +1,4 @@
-import React from "react";
+import React from 'react';
 
 type Props = { children: React.ReactNode };
 
@@ -15,13 +15,13 @@ export class ErrorBoundary extends React.Component<Props, State> {
   }
 
   componentDidCatch(error: Error, info: React.ErrorInfo) {
-    console.error("ErrorBoundary caught an error", error, info);
+    console.error('ErrorBoundary caught an error', error, info);
   }
 
   render() {
     if (this.state.hasError) {
       return (
-        <div style={{ padding: "2rem", textAlign: "center" }}>
+        <div style={{ padding: '2rem', textAlign: 'center' }}>
           <h1>Uups, da ist etwas schiefgelaufen</h1>
           <p>Bitte versuch es später nochmal oder kontaktiere den Support.</p>
         </div>

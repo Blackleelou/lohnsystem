@@ -1,6 +1,15 @@
 import { useState } from 'react';
 import { useRouter } from 'next/router';
-import { Eye, EyeOff, Mail, Lock, UserPlus, Loader2, ChevronRight, ShieldCheck } from "lucide-react";
+import {
+  Eye,
+  EyeOff,
+  Mail,
+  Lock,
+  UserPlus,
+  Loader2,
+  ChevronRight,
+  ShieldCheck,
+} from 'lucide-react';
 
 export default function RegisterPage() {
   const [email, setEmail] = useState('');
@@ -54,7 +63,7 @@ export default function RegisterPage() {
       if (!res.ok) {
         setError(data.message || 'Fehler bei der Registrierung.');
       } else {
-        sessionStorage.setItem("initialPassword", password);
+        sessionStorage.setItem('initialPassword', password);
         await fetch('/api/user/send-code', {
           method: 'POST',
           headers: { 'Content-Type': 'application/json' },
@@ -81,7 +90,15 @@ export default function RegisterPage() {
           Registrieren
         </h2>
 
-        <input type="text" name="honeypot" value={honeypot} onChange={(e) => setHoneypot(e.target.value)} className="hidden" autoComplete="off" tabIndex={-1} />
+        <input
+          type="text"
+          name="honeypot"
+          value={honeypot}
+          onChange={(e) => setHoneypot(e.target.value)}
+          className="hidden"
+          autoComplete="off"
+          tabIndex={-1}
+        />
 
         <div>
           <label className="block text-xs font-semibold text-gray-500 mb-1" htmlFor="email">
@@ -127,7 +144,7 @@ export default function RegisterPage() {
               onClick={() => setShowPassword(!showPassword)}
               tabIndex={-1}
               className="ml-2 text-blue-400 dark:text-gray-400 focus:outline-none"
-              title={showPassword ? "Passwort verbergen" : "Passwort anzeigen"}
+              title={showPassword ? 'Passwort verbergen' : 'Passwort anzeigen'}
             >
               {showPassword ? <EyeOff className="w-4 h-4" /> : <Eye className="w-4 h-4" />}
             </button>
@@ -145,7 +162,7 @@ export default function RegisterPage() {
         {/* Passwort-Stärke-Anzeige */}
         <div className="h-2 w-full rounded bg-gray-200 dark:bg-gray-800 mb-2">
           <div
-            className={`h-2 rounded transition-all duration-300 ${strength <= 2 ? "bg-red-500" : strength <= 4 ? "bg-yellow-500" : "bg-green-500"}`}
+            className={`h-2 rounded transition-all duration-300 ${strength <= 2 ? 'bg-red-500' : strength <= 4 ? 'bg-yellow-500' : 'bg-green-500'}`}
             style={{ width: `${(strength / 5) * 100}%` }}
           />
         </div>
@@ -161,7 +178,10 @@ export default function RegisterPage() {
 
         {/* Passwort bestätigen */}
         <div>
-          <label className="block text-xs font-semibold text-gray-500 mb-1" htmlFor="confirm-password">
+          <label
+            className="block text-xs font-semibold text-gray-500 mb-1"
+            htmlFor="confirm-password"
+          >
             Passwort wiederholen
           </label>
           <div className="flex items-center rounded-lg bg-blue-50 dark:bg-gray-800 px-3 py-2">
@@ -181,7 +201,7 @@ export default function RegisterPage() {
               onClick={() => setShowConfirmPassword(!showConfirmPassword)}
               tabIndex={-1}
               className="ml-2 text-blue-400 dark:text-gray-400 focus:outline-none"
-              title={showConfirmPassword ? "Passwort verbergen" : "Passwort anzeigen"}
+              title={showConfirmPassword ? 'Passwort verbergen' : 'Passwort anzeigen'}
             >
               {showConfirmPassword ? <EyeOff className="w-4 h-4" /> : <Eye className="w-4 h-4" />}
             </button>
@@ -195,14 +215,23 @@ export default function RegisterPage() {
           disabled={loading}
           className="flex items-center justify-center gap-2 py-2 rounded-xl bg-blue-600 hover:bg-blue-700 transition text-white font-bold shadow-md mt-2"
         >
-          {loading ? <Loader2 className="w-5 h-5 animate-spin" /> : <UserPlus className="w-5 h-5" />}
+          {loading ? (
+            <Loader2 className="w-5 h-5 animate-spin" />
+          ) : (
+            <UserPlus className="w-5 h-5" />
+          )}
           {loading ? 'Wird verarbeitet...' : 'Registrieren'}
         </button>
 
         <div className="flex flex-col gap-1 text-xs mt-3 text-center">
-          <a href="/reset-request" className="text-blue-600 hover:underline">Passwort vergessen?</a>
+          <a href="/reset-request" className="text-blue-600 hover:underline">
+            Passwort vergessen?
+          </a>
           <span className="text-gray-400">Schon ein Konto?</span>
-          <a href="/login" className="inline-flex items-center text-blue-600 hover:underline font-semibold justify-center gap-1">
+          <a
+            href="/login"
+            className="inline-flex items-center text-blue-600 hover:underline font-semibold justify-center gap-1"
+          >
             <ChevronRight className="w-3 h-3" /> Zur Anmeldung
           </a>
         </div>

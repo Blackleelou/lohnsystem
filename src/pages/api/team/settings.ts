@@ -1,10 +1,10 @@
-import type { NextApiRequest, NextApiResponse } from "next";
-import { getServerSession } from "next-auth/next";
-import { authOptions } from "@/lib/authOptions";
-import { prisma } from "@/lib/prisma";
+import type { NextApiRequest, NextApiResponse } from 'next';
+import { getServerSession } from 'next-auth/next';
+import { authOptions } from '@/lib/authOptions';
+import { prisma } from '@/lib/prisma';
 
 export default async function handler(req: NextApiRequest, res: NextApiResponse) {
-  if (req.method !== "POST") return res.status(405).end();
+  if (req.method !== 'POST') return res.status(405).end();
 
   const session = await getServerSession(req, res, authOptions);
   if (!session?.user?.email) return res.status(401).end();
@@ -17,7 +17,7 @@ export default async function handler(req: NextApiRequest, res: NextApiResponse)
       showName: !!showName,
       showNickname: !!showNickname,
       showEmail: !!showEmail,
-    }
+    },
   });
 
   return res.status(200).json({ success: true });

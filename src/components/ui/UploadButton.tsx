@@ -1,5 +1,5 @@
-import { useRef } from "react";
-import { CloudArrowUpIcon } from "@heroicons/react/24/solid";
+import { useRef } from 'react';
+import { CloudArrowUpIcon } from '@heroicons/react/24/solid';
 
 type UploadButtonProps = {
   onFileSelect: (file: File) => void;
@@ -16,7 +16,7 @@ export default function UploadButton({ onFileSelect, uploading }: UploadButtonPr
   const handleFileChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     const file = e.target.files?.[0];
     if (file) onFileSelect(file);
-    if (fileInputRef.current) fileInputRef.current.value = ""; // Reset
+    if (fileInputRef.current) fileInputRef.current.value = ''; // Reset
   };
 
   return (
@@ -34,7 +34,7 @@ export default function UploadButton({ onFileSelect, uploading }: UploadButtonPr
         className="flex items-center gap-2 bg-blue-600 hover:bg-blue-700 text-white px-4 py-2 text-sm rounded transition"
       >
         <CloudArrowUpIcon className="w-5 h-5" />
-        {uploading ? "Hochladen..." : "Datei auswählen"}
+        {uploading ? 'Hochladen...' : 'Datei auswählen'}
       </button>
     </div>
   );

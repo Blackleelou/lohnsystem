@@ -1,9 +1,9 @@
 // src/components/team/TeamLayout.tsx
 
-import Link from "next/link";
-import { useRouter } from "next/router";
-import { useState, useEffect } from "react";
-import UserMenu from "@/components/user/UserMenu";
+import Link from 'next/link';
+import { useRouter } from 'next/router';
+import { useState, useEffect } from 'react';
+import UserMenu from '@/components/user/UserMenu';
 import {
   Users,
   QrCode,
@@ -14,31 +14,31 @@ import {
   Trash,
   ChevronLeft,
   ChevronRight,
-} from "lucide-react";
-import { motion, AnimatePresence } from "framer-motion";
+} from 'lucide-react';
+import { motion, AnimatePresence } from 'framer-motion';
 
 export default function TeamLayout({ children }: { children: React.ReactNode }) {
   const router = useRouter();
 
   const [collapsed, setCollapsed] = useState(() => {
-    if (typeof window !== "undefined") {
-      return localStorage.getItem("team-sidebar-collapsed") === "true";
+    if (typeof window !== 'undefined') {
+      return localStorage.getItem('team-sidebar-collapsed') === 'true';
     }
     return false;
   });
 
   useEffect(() => {
-    localStorage.setItem("team-sidebar-collapsed", String(collapsed));
+    localStorage.setItem('team-sidebar-collapsed', String(collapsed));
   }, [collapsed]);
 
   const links = [
-    { href: "/team/members", label: "Mitglieder", icon: <Users /> },
-    { href: "/team/invites", label: "Einladungen", icon: <QrCode /> },
-    { href: "/team/security", label: "Zugangs-Code", icon: <KeyRound /> },
-    { href: "/team/payrules", label: "Zuschläge", icon: <BarChart2 /> },
-    { href: "/team/shifts", label: "Schichten", icon: <List /> },
-    { href: "/team/files", label: "Dokumente", icon: <Folder /> },
-    { href: "/team/delete", label: "Team löschen", icon: <Trash />, danger: true },
+    { href: '/team/members', label: 'Mitglieder', icon: <Users /> },
+    { href: '/team/invites', label: 'Einladungen', icon: <QrCode /> },
+    { href: '/team/security', label: 'Zugangs-Code', icon: <KeyRound /> },
+    { href: '/team/payrules', label: 'Zuschläge', icon: <BarChart2 /> },
+    { href: '/team/shifts', label: 'Schichten', icon: <List /> },
+    { href: '/team/files', label: 'Dokumente', icon: <Folder /> },
+    { href: '/team/delete', label: 'Team löschen', icon: <Trash />, danger: true },
   ];
 
   return (
@@ -46,12 +46,12 @@ export default function TeamLayout({ children }: { children: React.ReactNode }) 
       <motion.aside
         className="bg-white dark:bg-gray-900 shadow-md flex flex-col min-h-screen sticky top-0 z-40"
         animate={{ width: collapsed ? 64 : 256 }}
-        transition={{ duration: 0.3, ease: "easeInOut" }}
+        transition={{ duration: 0.3, ease: 'easeInOut' }}
       >
         <button
           className="p-2 self-end mt-2 mr-2 rounded hover:bg-gray-100 dark:hover:bg-gray-800 transition"
           onClick={() => setCollapsed((c) => !c)}
-          aria-label={collapsed ? "Sidebar ausklappen" : "Sidebar einklappen"}
+          aria-label={collapsed ? 'Sidebar ausklappen' : 'Sidebar einklappen'}
         >
           {collapsed ? <ChevronRight /> : <ChevronLeft />}
         </button>
@@ -75,13 +75,13 @@ export default function TeamLayout({ children }: { children: React.ReactNode }) 
                 key={link.href}
                 href={link.href}
                 className={`group flex items-center gap-3 px-3 py-2 rounded-lg transition overflow-hidden
-                  ${collapsed ? "justify-center" : "justify-start"}
+                  ${collapsed ? 'justify-center' : 'justify-start'}
                   ${
                     isActive
-                      ? "bg-blue-50 dark:bg-gray-800 text-blue-700 dark:text-blue-300 font-semibold"
-                      : "text-gray-700 dark:text-gray-200 hover:bg-blue-100 dark:hover:bg-gray-800"
+                      ? 'bg-blue-50 dark:bg-gray-800 text-blue-700 dark:text-blue-300 font-semibold'
+                      : 'text-gray-700 dark:text-gray-200 hover:bg-blue-100 dark:hover:bg-gray-800'
                   }
-                  ${link.danger ? "text-red-600 dark:text-red-400" : ""}`}
+                  ${link.danger ? 'text-red-600 dark:text-red-400' : ''}`}
                 title={link.label}
                 prefetch={false}
                 scroll={false}
@@ -90,7 +90,7 @@ export default function TeamLayout({ children }: { children: React.ReactNode }) 
                 <motion.span
                   className="w-5 h-5 flex-shrink-0"
                   whileHover={{ scale: 1.2 }}
-                  transition={{ type: "spring", stiffness: 300 }}
+                  transition={{ type: 'spring', stiffness: 300 }}
                 >
                   {link.icon}
                 </motion.span>

@@ -1,6 +1,6 @@
 // components/dashboard/DashboardCard.tsx
 
-import React from "react";
+import React from 'react';
 
 interface DashboardCardProps {
   icon: React.ReactNode;
@@ -25,7 +25,7 @@ export default function DashboardCard({
       <h2 className="text-xl font-bold mb-2">{title}</h2>
       <p className="text-gray-500 dark:text-gray-400 text-center mb-6">{text}</p>
       <button
-        className={`px-4 py-2 rounded font-semibold ${color || "bg-blue-500 text-white"}`}
+        className={`px-4 py-2 rounded font-semibold ${color || 'bg-blue-500 text-white'}`}
         onClick={onClick}
       >
         {buttonText}

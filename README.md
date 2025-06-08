@@ -206,3 +206,4 @@ MIT – frei verwendbar mit Quellenangabe.
 Hinweis:
 Die gesamte Struktur ist konsequent modular. Große Funktionsbereiche (wie Board) sind unter src/modules/ gekapselt, UI-Komponenten nach Verantwortlichkeit sortiert.
 Das Projekt ist damit zukunftssicher, skalierbar und teamfähig!
+```

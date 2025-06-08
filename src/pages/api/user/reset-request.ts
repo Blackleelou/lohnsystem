@@ -24,7 +24,9 @@ export default async function handler(req: NextApiRequest, res: NextApiResponse)
 
     return res.status(200).json({ success: true });
   } catch (err) {
-    console.error("Reset-Mail Fehler:", err);
-    return res.status(500).json({ error: 'Fehler beim Zurücksetzen. Bitte später erneut versuchen.' });
+    console.error('Reset-Mail Fehler:', err);
+    return res
+      .status(500)
+      .json({ error: 'Fehler beim Zurücksetzen. Bitte später erneut versuchen.' });
   }
 }

@@ -1,6 +1,6 @@
 // src/components/VisibilityConsentForm.tsx
 
-import { useState, useEffect } from "react";
+import { useState, useEffect } from 'react';
 
 interface VisibilityConsentFormProps {
   // callback, der aufgerufen wird, wenn der Nutzer seine Auswahl bestätigt hat
@@ -21,7 +21,10 @@ export default function VisibilityConsentForm({ onSubmit }: VisibilityConsentFor
   };
 
   return (
-    <form onSubmit={handleSubmit} className="max-w-md mx-auto bg-white p-6 rounded shadow space-y-4">
+    <form
+      onSubmit={handleSubmit}
+      className="max-w-md mx-auto bg-white p-6 rounded shadow space-y-4"
+    >
       <h2 className="text-lg font-semibold">Welche Daten sollen angezeigt werden?</h2>
 
       <label className="flex items-center gap-2">

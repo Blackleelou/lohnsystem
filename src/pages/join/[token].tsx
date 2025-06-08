@@ -1,14 +1,15 @@
 // src/pages/join/[token].tsx
 
-import { useEffect, useState } from "react";
-import { useRouter } from "next/router";
-import { useSession } from "next-auth/react";
-import VisibilityConsentForm from "@/components/VisibilityConsentForm";
+import { useEffect, useState } from 'react';
+import { useRouter } from 'next/router';
+import { useSession } from 'next-auth/react';
+import VisibilityConsentForm from '@/components/VisibilityConsentForm';
 
 export default function JoinTokenPage() {
   const router = useRouter();
   const rawToken = router.query.token;
-  const token = typeof rawToken === "string" ? rawToken : Array.isArray(rawToken) ? rawToken[0] : null;
+  const token =
+    typeof rawToken === 'string' ? rawToken : Array.isArray(rawToken) ? rawToken[0] : null;
 
   const [companyName, setCompanyName] = useState<string | null>(null);
   const [hasConsent, setHasConsent] = useState(false);
@@ -19,8 +20,10 @@ export default function JoinTokenPage() {
     showNickname: boolean;
   } | null>(null);
 
-  const [stage, setStage] = useState<"checking" | "waitingConsent" | "success" | "error">("checking");
-  const [message, setMessage] = useState("");
+  const [stage, setStage] = useState<'checking' | 'waitingConsent' | 'success' | 'error'>(
+    'checking'
+  );
+  const [message, setMessage] = useState('');
 
   const { data: session, status: sessionStatus, update } = useSession({ required: false });
 
@@ -33,11 +36,11 @@ export default function JoinTokenPage() {
 
   useEffect(() => {
     if (!token || token.length < 10) return;
-    if (sessionStatus === "loading") return;
+    if (sessionStatus === 'loading') return;
 
     if (!session) {
-      if (typeof window !== "undefined") {
-        sessionStorage.setItem("joinToken", token);
+      if (typeof window !== 'undefined') {
+        sessionStorage.setItem('joinToken', token);
       }
       router.push(`/login?callbackUrl=/join/${token}`);
       return;
@@ -45,18 +48,18 @@ export default function JoinTokenPage() {
 
     const validateAndContinue = async () => {
       if (joined) {
-        console.log("⛔ Join bereits abgeschlossen – keine weitere Validierung.");
+        console.log('⛔ Join bereits abgeschlossen – keine weitere Validierung.');
         return;
       }
 
-      setStage("checking");
+      setStage('checking');
 
       try {
         const res = await fetch(`/api/team/validate-invite?token=${token}`);
         if (!res.ok) {
-          console.warn("FEHLER bei validate-invite:", res.status);
-          setStage("error");
-          setMessage("Einladungslink ungültig oder abgelaufen.");
+          console.warn('FEHLER bei validate-invite:', res.status);
+          setStage('error');
+          setMessage('Einladungslink ungültig oder abgelaufen.');
           return;
         }
 
@@ -64,19 +67,19 @@ export default function JoinTokenPage() {
         setCompanyName(data.companyName || null);
 
         if (!hasConsent) {
-          setStage("waitingConsent");
+          setStage('waitingConsent');
           return;
         }
 
-        const joinRes = await fetch("/api/team/join", {
-          method: "POST",
-          headers: { "Content-Type": "application/json" },
+        const joinRes = await fetch('/api/team/join', {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
           body: JSON.stringify({ token, ...consentData }),
         });
 
         if (!joinRes.ok) {
-          setStage("error");
-          setMessage("Fehler beim Beitritt. Bitte versuche es erneut.");
+          setStage('error');
+          setMessage('Fehler beim Beitritt. Bitte versuche es erneut.');
           return;
         }
 
@@ -84,18 +87,18 @@ export default function JoinTokenPage() {
 
         if (joinData?.success) {
           setJoined(true); // ✅ Setze Flag, um weitere Prüfungen zu blockieren
-          setStage("success");
-          setMessage("Du wurdest erfolgreich zum Team hinzugefügt. Weiterleitung…");
+          setStage('success');
+          setMessage('Du wurdest erfolgreich zum Team hinzugefügt. Weiterleitung…');
           update();
-          setTimeout(() => router.push("/dashboard"), 2500);
+          setTimeout(() => router.push('/dashboard'), 2500);
         } else {
-          setStage("error");
-          setMessage(joinData?.error || "Einladung fehlgeschlagen oder bereits verwendet.");
+          setStage('error');
+          setMessage(joinData?.error || 'Einladung fehlgeschlagen oder bereits verwendet.');
         }
       } catch (err) {
-        console.error("Fehler beim Validieren oder Beitreten:", err);
-        setStage("error");
-        setMessage("Ein unerwarteter Fehler ist aufgetreten.");
+        console.error('Fehler beim Validieren oder Beitreten:', err);
+        setStage('error');
+        setMessage('Ein unerwarteter Fehler ist aufgetreten.');
       }
     };
 
@@ -103,8 +106,8 @@ export default function JoinTokenPage() {
   }, [token, session, sessionStatus, hasConsent, consentData, joined, router, update]);
 
   useEffect(() => {
-    if (session && !token && typeof window !== "undefined") {
-      const storedToken = sessionStorage.getItem("joinToken");
+    if (session && !token && typeof window !== 'undefined') {
+      const storedToken = sessionStorage.getItem('joinToken');
       if (storedToken) {
         router.replace(`/join/${storedToken}`);
       }
@@ -120,7 +123,7 @@ export default function JoinTokenPage() {
     setHasConsent(true);
   }
 
-  if (stage === "checking") {
+  if (stage === 'checking') {
     return (
       <div className="min-h-screen flex items-center justify-center bg-gray-50 p-6 text-center">
         <div className="max-w-md bg-white p-6 rounded shadow">
@@ -130,24 +133,27 @@ export default function JoinTokenPage() {
     );
   }
 
-  if (stage === "waitingConsent") {
+  if (stage === 'waitingConsent') {
     return (
       <div className="min-h-screen flex items-center justify-center bg-gray-50 p-6 text-center">
         <div className="space-y-6 max-w-2xl mx-auto">
           <h1 className="text-xl font-bold text-gray-800">Willkommen bei meinLohn!</h1>
           {companyName && (
             <p className="text-gray-600">
-              Du wurdest in das Team <span className="font-semibold text-gray-800">{companyName}</span> eingeladen.
+              Du wurdest in das Team{' '}
+              <span className="font-semibold text-gray-800">{companyName}</span> eingeladen.
             </p>
           )}
-          <p className="text-gray-600">Bitte wähle, welche deiner Daten im Team sichtbar sein sollen:</p>
+          <p className="text-gray-600">
+            Bitte wähle, welche deiner Daten im Team sichtbar sein sollen:
+          </p>
           <VisibilityConsentForm onSubmit={handleConsentSubmit} />
         </div>
       </div>
     );
   }
 
-  if (stage === "success") {
+  if (stage === 'success') {
     return (
       <div className="min-h-screen flex items-center justify-center bg-gray-50 p-6 text-center">
         <div className="max-w-md bg-white p-6 rounded shadow">
@@ -158,7 +164,7 @@ export default function JoinTokenPage() {
     );
   }
 
-  if (stage === "error") {
+  if (stage === 'error') {
     return (
       <div className="min-h-screen flex items-center justify-center bg-gray-50 p-6 text-center">
         <div className="max-w-md bg-white p-6 rounded shadow">

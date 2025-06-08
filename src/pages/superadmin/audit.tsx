@@ -1,9 +1,9 @@
 // Datei: pages/admin/audit.tsx
 
-import { useEffect, useState } from "react";
-import { useSession } from "next-auth/react";
-import { useRouter } from "next/router";
-import SuperadminLayout from "@/components/superadmin/SuperadminLayout";
+import { useEffect, useState } from 'react';
+import { useSession } from 'next-auth/react';
+import { useRouter } from 'next/router';
+import SuperadminLayout from '@/components/superadmin/SuperadminLayout';
 
 type LogEntry = {
   id: string;
@@ -19,29 +19,29 @@ export default function AuditPage() {
   const [logs, setLogs] = useState<LogEntry[]>([]);
 
   useEffect(() => {
-    if (status === "loading") return;
-    if (!session || session.user?.email !== "jantzen.chris@gmail.com") {
-      router.replace("/dashboard");
+    if (status === 'loading') return;
+    if (!session || session.user?.email !== 'jantzen.chris@gmail.com') {
+      router.replace('/dashboard');
     }
   }, [session, status]);
 
   useEffect(() => {
-    fetch("/api/admin/audit")
+    fetch('/api/admin/audit')
       .then((res) => res.json())
       .then((data) => setLogs(data.logs))
       .catch(() => setLogs([]));
   }, []);
 
   const handleExport = () => {
-    const header = "Zeit;Aktion;UserID;IP";
-    const rows = logs.map((log) =>
-      `${new Date(log.timestamp).toISOString()};${log.action};${log.userId};${log.ip}`
+    const header = 'Zeit;Aktion;UserID;IP';
+    const rows = logs.map(
+      (log) => `${new Date(log.timestamp).toISOString()};${log.action};${log.userId};${log.ip}`
     );
-    const csvContent = [header, ...rows].join("\n");
-    const blob = new Blob([csvContent], { type: "text/csv" });
+    const csvContent = [header, ...rows].join('\n');
+    const blob = new Blob([csvContent], { type: 'text/csv' });
     const url = URL.createObjectURL(blob);
 
-    const a = document.createElement("a");
+    const a = document.createElement('a');
     a.href = url;
     a.download = `audit-log-${new Date().toISOString()}.csv`;
     a.click();
@@ -85,6 +85,4 @@ export default function AuditPage() {
 }
 
 // SuperadminLayout zuweisen
-AuditPage.getLayout = (page: React.ReactNode) => (
-  <SuperadminLayout>{page}</SuperadminLayout>
-);
+AuditPage.getLayout = (page: React.ReactNode) => <SuperadminLayout>{page}</SuperadminLayout>;

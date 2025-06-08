@@ -1,7 +1,7 @@
 import { useState } from 'react';
 import { useRouter } from 'next/router';
-import { signIn } from "next-auth/react";
-import { Eye, EyeOff, Lock, Loader2, ShieldCheck } from "lucide-react";
+import { signIn } from 'next-auth/react';
+import { Eye, EyeOff, Lock, Loader2, ShieldCheck } from 'lucide-react';
 
 export default function ResetPasswordPage() {
   const [password, setPassword] = useState('');
@@ -45,12 +45,12 @@ export default function ResetPasswordPage() {
     if (res.ok) {
       setMessage('Passwort erfolgreich geändert. Du wirst jetzt eingeloggt...');
       // Automatisch einloggen!
-      const userEmail = (typeof email === "string" && email) ? email : (data.email || "");
+      const userEmail = typeof email === 'string' && email ? email : data.email || '';
       if (userEmail) {
-        await signIn("credentials", {
+        await signIn('credentials', {
           email: userEmail,
           password,
-          callbackUrl: "/dashboard",
+          callbackUrl: '/dashboard',
         });
       } else {
         setTimeout(() => router.push('/login'), 2000);
@@ -79,7 +79,7 @@ export default function ResetPasswordPage() {
             <Lock className="w-4 h-4 mr-2 text-blue-400 dark:text-gray-500" />
             <input
               id="password"
-              type={showPassword ? "text" : "password"}
+              type={showPassword ? 'text' : 'password'}
               placeholder="Neues Passwort"
               value={password}
               onChange={(e) => {
@@ -95,7 +95,7 @@ export default function ResetPasswordPage() {
               onClick={() => setShowPassword(!showPassword)}
               tabIndex={-1}
               className="ml-2 text-blue-400 dark:text-gray-400 focus:outline-none"
-              title={showPassword ? "Passwort verbergen" : "Passwort anzeigen"}
+              title={showPassword ? 'Passwort verbergen' : 'Passwort anzeigen'}
             >
               {showPassword ? <EyeOff className="w-4 h-4" /> : <Eye className="w-4 h-4" />}
             </button>
@@ -112,7 +112,7 @@ export default function ResetPasswordPage() {
         {/* Fortschrittsbalken */}
         <div className="h-2 w-full rounded bg-gray-200 dark:bg-gray-800 mb-2">
           <div
-            className={`h-2 rounded transition-all duration-300 ${strength <= 2 ? "bg-red-500" : strength <= 4 ? "bg-yellow-500" : "bg-green-500"}`}
+            className={`h-2 rounded transition-all duration-300 ${strength <= 2 ? 'bg-red-500' : strength <= 4 ? 'bg-yellow-500' : 'bg-green-500'}`}
             style={{ width: `${(strength / 5) * 100}%` }}
           />
         </div>
@@ -132,7 +132,7 @@ export default function ResetPasswordPage() {
             <Lock className="w-4 h-4 mr-2 text-blue-400 dark:text-gray-500" />
             <input
               id="confirm"
-              type={showConfirm ? "text" : "password"}
+              type={showConfirm ? 'text' : 'password'}
               placeholder="Passwort wiederholen"
               value={confirm}
               onChange={(e) => setConfirm(e.target.value)}
@@ -145,7 +145,7 @@ export default function ResetPasswordPage() {
               onClick={() => setShowConfirm(!showConfirm)}
               tabIndex={-1}
               className="ml-2 text-blue-400 dark:text-gray-400 focus:outline-none"
-              title={showConfirm ? "Passwort verbergen" : "Passwort anzeigen"}
+              title={showConfirm ? 'Passwort verbergen' : 'Passwort anzeigen'}
             >
               {showConfirm ? <EyeOff className="w-4 h-4" /> : <Eye className="w-4 h-4" />}
             </button>
@@ -155,13 +155,15 @@ export default function ResetPasswordPage() {
           type="submit"
           className="flex items-center justify-center gap-2 py-2 rounded-xl bg-blue-600 hover:bg-blue-700 transition text-white font-bold shadow-md mt-2"
         >
-          <Loader2 className={`w-5 h-5 ${message ? "animate-spin" : ""}`} />
+          <Loader2 className={`w-5 h-5 ${message ? 'animate-spin' : ''}`} />
           Zurücksetzen
         </button>
         {message && <p className="text-green-600 text-center mt-2 text-sm">{message}</p>}
         {error && <p className="text-red-600 text-center mt-2 text-sm">{error}</p>}
         <p className="text-center mt-3 text-xs">
-          <a href="/login" className="text-blue-600 hover:underline">Zur Anmeldung</a>
+          <a href="/login" className="text-blue-600 hover:underline">
+            Zur Anmeldung
+          </a>
         </p>
       </form>
     </div>

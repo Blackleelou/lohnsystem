@@ -3,22 +3,22 @@ export async function sendResetMail(email: string, token: string) {
   const appUrl = process.env.APP_URL;
 
   if (!apiKey || !appUrl) {
-    throw new Error("BREVO_API_KEY or APP_URL is missing");
+    throw new Error('BREVO_API_KEY or APP_URL is missing');
   }
 
-  const response = await fetch("https://api.brevo.com/v3/smtp/email", {
-    method: "POST",
+  const response = await fetch('https://api.brevo.com/v3/smtp/email', {
+    method: 'POST',
     headers: {
-      "Content-Type": "application/json",
-      "api-key": apiKey,
+      'Content-Type': 'application/json',
+      'api-key': apiKey,
     },
     body: JSON.stringify({
       sender: {
-        name: "Lohnsystem",
-        email: "noreply@meinlohn.app"
+        name: 'Lohnsystem',
+        email: 'noreply@meinlohn.app',
       },
       to: [{ email }],
-      subject: "Passwort zurücksetzen",
+      subject: 'Passwort zurücksetzen',
       htmlContent: `<p>Klicke auf den folgenden Link, um dein Passwort zurückzusetzen:</p><p><a href="${appUrl}/reset-password?token=${token}">${appUrl}/reset-password?token=${token}</a></p>`,
       textContent: `Setze dein Passwort zurück unter: ${appUrl}/reset-password?token=${token}`,
     }),
@@ -26,7 +26,7 @@ export async function sendResetMail(email: string, token: string) {
 
   if (!response.ok) {
     const error = await response.text();
-    console.error("Brevo-Fehler:", error);
+    console.error('Brevo-Fehler:', error);
     throw new Error(`Brevo API error: ${response.status}`);
   }
 }

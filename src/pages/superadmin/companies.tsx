@@ -1,5 +1,5 @@
-import { useEffect, useState } from "react";
-import SuperadminLayout from "@/components/superadmin/SuperadminLayout";
+import { useEffect, useState } from 'react';
+import SuperadminLayout from '@/components/superadmin/SuperadminLayout';
 
 type Company = {
   id: string;
@@ -13,7 +13,7 @@ export default function CompaniesPage() {
 
   // Firmen abrufen
   const fetchCompanies = () => {
-    fetch("/api/admin/companies")
+    fetch('/api/admin/companies')
       .then((res) => res.json())
       .then((data) => {
         setCompanies(data);
@@ -27,12 +27,12 @@ export default function CompaniesPage() {
 
   // Firma löschen
   const handleDelete = async (id: string) => {
-    if (!window.confirm("Willst du diese Firma wirklich löschen?")) return;
-    const res = await fetch(`/api/admin/companies/${id}`, { method: "DELETE" });
+    if (!window.confirm('Willst du diese Firma wirklich löschen?')) return;
+    const res = await fetch(`/api/admin/companies/${id}`, { method: 'DELETE' });
     if (res.ok) {
       setCompanies((prev) => prev.filter((c) => c.id !== id));
     } else {
-      alert("Fehler beim Löschen!");
+      alert('Fehler beim Löschen!');
     }
   };
 
@@ -58,7 +58,9 @@ export default function CompaniesPage() {
                 {companies.map((company) => (
                   <tr key={company.id} className="border-t hover:bg-blue-50">
                     <td className="px-3 py-2">{company.name}</td>
-                    <td className="px-3 py-2">{new Date(company.createdAt).toLocaleDateString()}</td>
+                    <td className="px-3 py-2">
+                      {new Date(company.createdAt).toLocaleDateString()}
+                    </td>
                     <td className="px-3 py-2 text-center">
                       <button
                         className="bg-red-500 hover:bg-red-700 text-white px-3 py-1 rounded"

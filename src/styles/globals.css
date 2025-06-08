@@ -18,9 +18,9 @@
     @apply dark:bg-lohn-cardDark dark:text-lohn-textDark dark:border-lohn-borderDark;
   }
 
-.btn-primary {
-  @apply flex items-center justify-center gap-2 px-4 py-1.5 text-sm font-semibold rounded-md text-white bg-lohn-primary hover:bg-lohn-primaryHover;
-}
+  .btn-primary {
+    @apply flex items-center justify-center gap-2 px-4 py-1.5 text-sm font-semibold rounded-md text-white bg-lohn-primary hover:bg-lohn-primaryHover;
+  }
 
   .input-box {
     @apply border border-lohn-borderLight rounded-md bg-white dark:border-lohn-borderDark dark:bg-lohn-cardDark;

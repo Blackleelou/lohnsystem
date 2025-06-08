@@ -1,5 +1,5 @@
 import { useState } from 'react';
-import { Mail, Loader2, LogIn } from "lucide-react";
+import { Mail, Loader2, LogIn } from 'lucide-react';
 
 export default function ResetRequestPage() {
   const [email, setEmail] = useState('');
@@ -62,12 +62,14 @@ export default function ResetRequestPage() {
           className="flex items-center justify-center gap-2 py-2 rounded-xl bg-blue-600 hover:bg-blue-700 transition text-white font-bold shadow-md"
         >
           {loading ? <Loader2 className="w-5 h-5 animate-spin" /> : <LogIn className="w-5 h-5" />}
-          {loading ? "Sende..." : "Link anfordern"}
+          {loading ? 'Sende...' : 'Link anfordern'}
         </button>
         {message && <p className="text-green-600 text-center mt-2 text-sm">{message}</p>}
         {error && <p className="text-red-600 text-center mt-2 text-sm">{error}</p>}
         <p className="text-center mt-3 text-xs">
-          <a href="/login" className="text-blue-600 hover:underline">Zur Anmeldung</a>
+          <a href="/login" className="text-blue-600 hover:underline">
+            Zur Anmeldung
+          </a>
         </p>
       </form>
     </div>

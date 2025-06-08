@@ -1,24 +1,17 @@
 // src/components/user/UserMenu.tsx
 
-import { useState } from "react";
-import { signOut, useSession } from "next-auth/react";
-import LanguageSwitcher from "@/components/common/LanguageSwitcher";
-import ThemeSwitch from "@/components/common/ThemeSwitch";
-import Link from "next/link";
-import {
-  LogOut,
-  Settings,
-  User,
-  Shield,
-  Palette,
-  Building2,
-} from "lucide-react";
+import { useState } from 'react';
+import { signOut, useSession } from 'next-auth/react';
+import LanguageSwitcher from '@/components/common/LanguageSwitcher';
+import ThemeSwitch from '@/components/common/ThemeSwitch';
+import Link from 'next/link';
+import { LogOut, Settings, User, Shield, Palette, Building2 } from 'lucide-react';
 
 export default function UserMenu() {
   const [isOpen, setIsOpen] = useState(false);
   const { data: session } = useSession();
 
-  const isSuperadmin = session?.user?.email === "jantzen.chris@gmail.com";
+  const isSuperadmin = session?.user?.email === 'jantzen.chris@gmail.com';
   const companyId = session?.user?.companyId;
   const role = session?.user?.role; // hier erwarten wir "admin" | "editor" | "viewer" etc.
 
@@ -32,13 +25,7 @@ export default function UserMenu() {
       >
         <span className="block w-6 h-6">
           <svg width="100%" height="100%" viewBox="0 0 24 24">
-            <rect
-              y="4"
-              width="24"
-              height="2"
-              rx="1"
-              className="fill-gray-800 dark:fill-gray-100"
-            />
+            <rect y="4" width="24" height="2" rx="1" className="fill-gray-800 dark:fill-gray-100" />
             <rect
               y="11"
               width="24"
@@ -109,7 +96,7 @@ export default function UserMenu() {
           )}
 
           {/* Firmeneinstellungen nur anzeigen, wenn ein Team existiert UND role != "viewer" */}
-          {companyId && role !== "viewer" && (
+          {companyId && role !== 'viewer' && (
             <Link
               href="/team/members"
               className="flex items-center gap-2 px-3 py-2 rounded-lg text-blue-700 dark:text-blue-400 font-semibold hover:bg-blue-50 dark:hover:bg-gray-800 transition"
@@ -158,7 +145,7 @@ export default function UserMenu() {
           <button
             type="button"
             onClick={() => {
-              signOut({ callbackUrl: "/" });
+              signOut({ callbackUrl: '/' });
               setIsOpen(false);
             }}
             className="flex items-center gap-2 px-3 py-2 rounded-lg text-red-500 hover:bg-red-50 dark:hover:bg-gray-800 transition"

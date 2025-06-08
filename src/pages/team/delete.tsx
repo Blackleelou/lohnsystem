@@ -1,11 +1,11 @@
 // src/pages/team/delete.tsx
 
-import { useRouter } from "next/router";
-import { useState } from "react";
-import { useSession } from "next-auth/react";
-import TeamLayout from "@/components/team/TeamLayout";
-import { Trash2 } from "lucide-react";
-import toast, { Toaster } from "react-hot-toast";
+import { useRouter } from 'next/router';
+import { useState } from 'react';
+import { useSession } from 'next-auth/react';
+import TeamLayout from '@/components/team/TeamLayout';
+import { Trash2 } from 'lucide-react';
+import toast, { Toaster } from 'react-hot-toast';
 
 export default function TeamDeletePage() {
   const router = useRouter();
@@ -19,20 +19,20 @@ export default function TeamDeletePage() {
     setError(null);
 
     try {
-      const res = await fetch("/api/team/delete", {
-        method: "POST",
+      const res = await fetch('/api/team/delete', {
+        method: 'POST',
       });
 
       if (res.ok) {
         await update();
-        toast.success("Das Team wurde erfolgreich gelöscht.");
-        router.replace("/dashboard");
+        toast.success('Das Team wurde erfolgreich gelöscht.');
+        router.replace('/dashboard');
       } else {
         const data = await res.json();
-        toast.error(data.error || "Unbekannter Fehler beim Löschen.");
+        toast.error(data.error || 'Unbekannter Fehler beim Löschen.');
       }
     } catch (err) {
-      toast.error("Fehler beim Senden der Anfrage.");
+      toast.error('Fehler beim Senden der Anfrage.');
     } finally {
       setLoading(false);
       setShowConfirm(false);
@@ -44,14 +44,15 @@ export default function TeamDeletePage() {
       <div className="max-w-xl mx-auto mt-12 p-6 bg-white dark:bg-gray-900 rounded shadow">
         <h1 className="text-xl font-bold mb-4 text-red-600">Team unwiderruflich löschen</h1>
         <p className="text-sm text-gray-600 dark:text-gray-300 mb-6">
-          Wenn du fortfährst, wird das Team dauerhaft gelöscht und alle Mitglieder wechseln automatisch in den Solo-Modus.
+          Wenn du fortfährst, wird das Team dauerhaft gelöscht und alle Mitglieder wechseln
+          automatisch in den Solo-Modus.
         </p>
         <button
           onClick={() => setShowConfirm(true)}
           disabled={loading}
           className="bg-red-600 hover:bg-red-700 text-white font-semibold px-6 py-2 rounded disabled:opacity-50"
         >
-          {loading ? "Lösche..." : "Team löschen"}
+          {loading ? 'Lösche...' : 'Team löschen'}
         </button>
         {error && <p className="mt-4 text-red-500 text-sm">{error}</p>}
       </div>
@@ -64,7 +65,8 @@ export default function TeamDeletePage() {
               Team wirklich löschen?
             </h3>
             <p className="text-sm text-red-500 mb-4">
-              Möchtest du dieses Team dauerhaft löschen? Diese Aktion kann nicht rückgängig gemacht werden.
+              Möchtest du dieses Team dauerhaft löschen? Diese Aktion kann nicht rückgängig gemacht
+              werden.
             </p>
             <div className="flex justify-end gap-3">
               <button
@@ -72,7 +74,7 @@ export default function TeamDeletePage() {
                 className="bg-red-500 hover:bg-red-600 text-white text-sm font-medium rounded px-3 py-1 transition disabled:opacity-50"
                 disabled={loading}
               >
-                {loading ? "Lösche..." : "Ja, löschen"}
+                {loading ? 'Lösche...' : 'Ja, löschen'}
               </button>
               <button
                 onClick={() => setShowConfirm(false)}

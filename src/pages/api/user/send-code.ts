@@ -9,7 +9,8 @@ export default async function handler(req: NextApiRequest, res: NextApiResponse)
   if (req.method !== 'POST') return res.status(405).json({ message: 'Method Not Allowed' });
 
   const { email } = req.body;
-  if (!email || typeof email !== 'string') return res.status(400).json({ message: 'Ungültige E-Mail.' });
+  if (!email || typeof email !== 'string')
+    return res.status(400).json({ message: 'Ungültige E-Mail.' });
 
   const code = nanoid();
   const expires = new Date(Date.now() + 10 * 60 * 1000);
@@ -27,7 +28,7 @@ export default async function handler(req: NextApiRequest, res: NextApiResponse)
         sender: { name: 'Lohnsystem', email: 'noreply@meinlohn.app' },
         to: [{ email }],
         subject: 'Dein Verifizierungscode',
-        htmlContent: `<p>Hallo,<br><br>Dein Code lautet: <strong>${code}</strong><br>Er ist 10 Minuten gültig.<br><br>Viele Grüße,<br>Lohnsystem</p>`
+        htmlContent: `<p>Hallo,<br><br>Dein Code lautet: <strong>${code}</strong><br>Er ist 10 Minuten gültig.<br><br>Viele Grüße,<br>Lohnsystem</p>`,
       },
       {
         headers: {

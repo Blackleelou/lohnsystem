@@ -1,6 +1,6 @@
 // components/Board/EntryModal.tsx
 
-import { Entry } from "./types";
+import { Entry } from './types';
 
 type EntryModalProps = {
   entry: Entry;
@@ -9,7 +9,10 @@ type EntryModalProps = {
 
 export default function EntryModal({ entry, onClose }: EntryModalProps) {
   return (
-    <div className="fixed inset-0 bg-black bg-opacity-50 flex justify-center items-center z-50" onClick={onClose}>
+    <div
+      className="fixed inset-0 bg-black bg-opacity-50 flex justify-center items-center z-50"
+      onClick={onClose}
+    >
       <div
         className="bg-white rounded-lg shadow-lg max-w-md w-full p-6 relative"
         onClick={(e) => e.stopPropagation()}
@@ -22,8 +25,12 @@ export default function EntryModal({ entry, onClose }: EntryModalProps) {
           ×
         </button>
         <h2 className="text-xl font-semibold text-gray-800 mb-2">{entry.title}</h2>
-        <p className="text-sm text-gray-600 mb-1"><strong>Kategorie:</strong> {entry.category}</p>
-        <p className="text-sm text-gray-600 mb-3"><strong>Status:</strong> {entry.status}</p>
+        <p className="text-sm text-gray-600 mb-1">
+          <strong>Kategorie:</strong> {entry.category}
+        </p>
+        <p className="text-sm text-gray-600 mb-3">
+          <strong>Status:</strong> {entry.status}
+        </p>
         {entry.notes && <p className="text-sm text-gray-700 mb-3">{entry.notes}</p>}
         <p className="text-xs text-gray-400">
           Erstellt: {new Date(entry.createdAt).toLocaleString()}

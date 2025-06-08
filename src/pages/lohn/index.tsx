@@ -1,21 +1,23 @@
 // src/pages/lohn/index.tsx
 
-import type { GetServerSideProps, GetServerSidePropsContext } from "next";
-import { getServerSession } from "next-auth/next";
-import { authOptions } from "@/lib/authOptions";
-import Layout from "@/components/common/Layout";
-import { useSession } from "next-auth/react";
-import { useEffect, useState } from "react";
-import Link from "next/link";
+import type { GetServerSideProps, GetServerSidePropsContext } from 'next';
+import { getServerSession } from 'next-auth/next';
+import { authOptions } from '@/lib/authOptions';
+import Layout from '@/components/common/Layout';
+import { useSession } from 'next-auth/react';
+import { useEffect, useState } from 'react';
+import Link from 'next/link';
 
 // Server Side: Auth prüfen (aber kein Redirect wegen Team!)
-export const getServerSideProps: GetServerSideProps = async (context: GetServerSidePropsContext) => {
+export const getServerSideProps: GetServerSideProps = async (
+  context: GetServerSidePropsContext
+) => {
   const session = await getServerSession(context.req, context.res, authOptions);
 
   if (!session) {
     return {
       redirect: {
-        destination: "/login",
+        destination: '/login',
         permanent: false,
       },
     };
@@ -32,9 +34,9 @@ export default function LohnUebersicht() {
   // Wenn User im Team: Teamdaten per API holen (damit auch Name & Beschreibung sichtbar sind)
   useEffect(() => {
     if (session?.user?.companyId) {
-      fetch("/api/team/me")
-        .then(res => res.json())
-        .then(data => setTeamInfo(data?.team ?? null))
+      fetch('/api/team/me')
+        .then((res) => res.json())
+        .then((data) => setTeamInfo(data?.team ?? null))
         .catch(() => setTeamInfo(null));
     }
   }, [session?.user?.companyId]);
@@ -49,7 +51,8 @@ export default function LohnUebersicht() {
         </h1>
         {isTeam && teamInfo && (
           <div className="mb-4 p-3 bg-blue-50 dark:bg-blue-900/30 rounded text-sm text-blue-900 dark:text-blue-200">
-            <strong>Team-Modus aktiv:</strong><br />
+            <strong>Team-Modus aktiv:</strong>
+            <br />
             Du bist Teil des Teams <span className="font-semibold">{teamInfo.name}</span>
             {teamInfo.description && (
               <>

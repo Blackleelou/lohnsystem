@@ -1,4 +1,4 @@
-import SuperadminLayout from "@/components/superadmin/SuperadminLayout";
+import SuperadminLayout from '@/components/superadmin/SuperadminLayout';
 
 export default function SuperadminErrorsPage() {
   return (

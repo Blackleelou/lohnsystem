@@ -1,14 +1,14 @@
-import { useRouter } from "next/router";
-import { useState, useEffect } from "react";
-import axios from "axios";
+import { useRouter } from 'next/router';
+import { useState, useEffect } from 'react';
+import axios from 'axios';
 
 export default function PasswordReset() {
   const router = useRouter();
-  const [token, setToken] = useState("");
-  const [newPassword, setNewPassword] = useState("");
-  const [confirmPassword, setConfirmPassword] = useState("");
-  const [message, setMessage] = useState("");
-  const [error, setError] = useState("");
+  const [token, setToken] = useState('');
+  const [newPassword, setNewPassword] = useState('');
+  const [confirmPassword, setConfirmPassword] = useState('');
+  const [message, setMessage] = useState('');
+  const [error, setError] = useState('');
 
   useEffect(() => {
     const urlToken = router.query.token as string;
@@ -19,20 +19,20 @@ export default function PasswordReset() {
 
   const handleSubmit = async () => {
     if (newPassword !== confirmPassword) {
-      setError("Passwörter stimmen nicht überein.");
+      setError('Passwörter stimmen nicht überein.');
       return;
     }
 
     try {
-      await axios.post("/api/user/reset-confirm", {
+      await axios.post('/api/user/reset-confirm', {
         token,
         newPassword,
       });
-      setMessage("Passwort wurde erfolgreich zurückgesetzt.");
-      setError("");
+      setMessage('Passwort wurde erfolgreich zurückgesetzt.');
+      setError('');
     } catch (err) {
-      setError("Fehler beim Zurücksetzen des Passworts.");
-      setMessage("");
+      setError('Fehler beim Zurücksetzen des Passworts.');
+      setMessage('');
     }
   };
 
@@ -55,10 +55,7 @@ export default function PasswordReset() {
         onChange={(e) => setConfirmPassword(e.target.value)}
       />
 
-      <button
-        className="bg-blue-600 text-white px-4 py-2 rounded w-full"
-        onClick={handleSubmit}
-      >
+      <button className="bg-blue-600 text-white px-4 py-2 rounded w-full" onClick={handleSubmit}>
         Passwort setzen
       </button>
 

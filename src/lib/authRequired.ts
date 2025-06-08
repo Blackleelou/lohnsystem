@@ -1,7 +1,7 @@
 // lib/authRequired.ts
-import { GetServerSidePropsContext } from "next";
-import { getServerSession } from "next-auth";
-import { authOptions } from "@/lib/authOptions";
+import { GetServerSidePropsContext } from 'next';
+import { getServerSession } from 'next-auth';
+import { authOptions } from '@/lib/authOptions';
 
 export async function requireAuth(context: GetServerSidePropsContext) {
   const session = await getServerSession(context.req, context.res, authOptions);
@@ -9,7 +9,7 @@ export async function requireAuth(context: GetServerSidePropsContext) {
   if (!session) {
     return {
       redirect: {
-        destination: "/login",
+        destination: '/login',
         permanent: false,
       },
     };

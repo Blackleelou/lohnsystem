@@ -1,5 +1,5 @@
-import TeamLayout from "@/components/team/TeamLayout";
-import AccessCodePanel from "@/components/team/AccessCodePanel";
+import TeamLayout from '@/components/team/TeamLayout';
+import AccessCodePanel from '@/components/team/AccessCodePanel';
 
 export default function SecurityPage() {
   return (

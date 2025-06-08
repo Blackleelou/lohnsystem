@@ -1,11 +1,11 @@
-import type { NextApiRequest, NextApiResponse } from "next";
-import { prisma } from "@/lib/prisma";
+import type { NextApiRequest, NextApiResponse } from 'next';
+import { prisma } from '@/lib/prisma';
 
 export default async function handler(req: NextApiRequest, res: NextApiResponse) {
   const { token } = req.query;
 
-  if (!token || typeof token !== "string") {
-    return res.status(400).json({ error: "Kein gültiger Token übergeben" });
+  if (!token || typeof token !== 'string') {
+    return res.status(400).json({ error: 'Kein gültiger Token übergeben' });
   }
 
   const invite = await prisma.invitation.findUnique({
@@ -20,7 +20,7 @@ export default async function handler(req: NextApiRequest, res: NextApiResponse)
   });
 
   if (!invite || new Date(invite.expiresAt) < new Date()) {
-    return res.status(410).json({ error: "Einladung ungültig oder abgelaufen" });
+    return res.status(410).json({ error: 'Einladung ungültig oder abgelaufen' });
   }
 
   return res.status(200).json({

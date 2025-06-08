@@ -1,10 +1,10 @@
 // src/pages/user/profile.tsx
 
-import { ReactElement, useState } from "react";
-import { signOut } from "next-auth/react";
-import { Trash2 } from "lucide-react";
+import { ReactElement, useState } from 'react';
+import { signOut } from 'next-auth/react';
+import { Trash2 } from 'lucide-react';
 
-import UserSettingsLayout from "@/components/user/UserSettingsLayout";
+import UserSettingsLayout from '@/components/user/UserSettingsLayout';
 
 export default function ProfilePage() {
   const [loading, setLoading] = useState(false);
@@ -12,14 +12,14 @@ export default function ProfilePage() {
 
   const deleteAccount = async () => {
     setLoading(true);
-    const res = await fetch("/api/user/delete", { method: "DELETE" });
+    const res = await fetch('/api/user/delete', { method: 'DELETE' });
     setLoading(false);
     if (res.ok) {
       setShowConfirm(false);
-      alert("Account gelöscht");
-      signOut({ callbackUrl: "/" });
+      alert('Account gelöscht');
+      signOut({ callbackUrl: '/' });
     } else {
-      alert("Fehler beim Löschen des Accounts");
+      alert('Fehler beim Löschen des Accounts');
     }
   };
 
@@ -51,8 +51,7 @@ export default function ProfilePage() {
               Account wirklich löschen?
             </h3>
             <p className="text-sm text-red-500 mb-4">
-              Willst du deinen Account dauerhaft löschen? Das kann nicht
-              rückgängig gemacht werden.
+              Willst du deinen Account dauerhaft löschen? Das kann nicht rückgängig gemacht werden.
             </p>
             <div className="flex justify-end gap-3">
               <button
@@ -60,7 +59,7 @@ export default function ProfilePage() {
                 className="bg-red-500 hover:bg-red-600 text-white text-sm font-medium rounded px-3 py-1 transition disabled:opacity-50"
                 disabled={loading}
               >
-                {loading ? "Lösche…" : "Ja, löschen"}
+                {loading ? 'Lösche…' : 'Ja, löschen'}
               </button>
               <button
                 onClick={() => setShowConfirm(false)}
