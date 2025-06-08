@@ -1,7 +1,7 @@
 import { useEffect, useState } from 'react';
 import TeamLayout from '@/components/team/TeamLayout';
 import { useSession } from 'next-auth/react';
-import toast, { Toaster } from 'react-hot-toast';
+import toast from 'react-hot-toast';
 import { Trash2 } from 'lucide-react';
 import { useRouter } from 'next/router';
 
@@ -110,14 +110,7 @@ export default function TeamMembersPage() {
     return { text: 'Aktiv', color: 'text-green-600' };
   };
 
-  const getInitials = (m: Member) => {
-    const name = (m.showNickname ? m.nickname : null) || (m.showName ? m.name : null) || m.email;
-    return name
-      .split(' ')
-      .map((part) => part[0]?.toUpperCase())
-      .join('')
-      .slice(0, 2);
-  };
+  const isAdmin = session?.user?.role === 'admin';
 
   return (
     <TeamLayout>
@@ -145,84 +138,63 @@ export default function TeamMembersPage() {
             Keine Mitglieder gefunden.
           </div>
         ) : (
-          <table className="w-full text-sm border-collapse">
-            <thead>
-              <tr className="text-left bg-gray-100 dark:bg-gray-800">
-                <th className="p-2 border-b">Avatar</th>
-                <th className="p-2 border-b">Name</th>
-                <th className="p-2 border-b">Nickname</th>
-                <th className="p-2 border-b">E-Mail</th>
-                <th className="p-2 border-b">Status</th>
-                <th className="p-2 border-b">Rolle</th>
-                <th className="p-2 border-b">Aktion</th>
-              </tr>
-            </thead>
-            <tbody>
-              {filtered.map((m) => {
-                const status = getStatus(m);
-                const isAdmin = session?.user?.role === 'admin';
-                return (
-                  <tr key={m.id} className="hover:bg-gray-50 dark:hover:bg-gray-900">
-                    <td className="p-2 border-b">
-                      <div className="w-8 h-8 bg-blue-600 text-white rounded-full flex items-center justify-center font-bold text-xs">
-                        {getInitials(m)}
-                      </div>
-                    </td>
-                    <td className="p-2 border-b">
-                      {m.showName ? (
-                        m.name || '—'
-                      ) : (
-                        <i className="italic text-gray-400">Inhalte privat</i>
-                      )}
-                    </td>
-                    <td className="p-2 border-b">
-                      {m.showNickname ? (
-                        m.nickname || '—'
-                      ) : (
-                        <i className="italic text-gray-400">Inhalte privat</i>
-                      )}
-                    </td>
-                    <td className="p-2 border-b">
-                      {m.showEmail ? (
-                        m.email
-                      ) : (
-                        <i className="italic text-gray-400">Inhalte privat</i>
-                      )}
-                    </td>
-                    <td className={`p-2 border-b ${status.color}`}>{status.text}</td>
-                    <td className="p-2 border-b">
-                      {isAdmin ? (
-                        <select
-                          value={m.role ?? 'viewer'}
-                          onChange={(e) => handleRoleChange(m.id, e.target.value)}
-                          className="text-sm border rounded px-2 py-1 bg-white dark:bg-gray-800 appearance-none relative"
-                          style={{ paddingRight: '1.8rem' }}
-                        >
-                          <option value="admin">Admin</option>
-                          <option value="editor">Editor</option>
-                          <option value="viewer">Viewer</option>
-                        </select>
-                      ) : (
-                        <span className="text-xs text-gray-500 italic">{m.role || 'viewer'}</span>
-                      )}
-                    </td>
-                    <td className="p-2 border-b">
-                      {isAdmin ? (
-                        <button
-                          onClick={() => setShowConfirmId(m.id)}
-                          className="text-red-600 hover:underline text-xs"
-                        >
-                          Entfernen
-                        </button>
-                      ) : (
-                        <span className="text-xs text-gray-400 italic">Keine Berechtigung</span>
-                      )}
-                    </td>
-                  </tr>
-                );
-              })}
-            </tbody>
-          </table>
+          <div className="grid gap-4 sm:grid-cols-2 md:grid-cols-3">
+            {filtered.map((m) => {
+              const status = getStatus(m);
+
+              return (
+                <div
+                  key={m.id}
+                  className="bg-white dark:bg-gray-800 border border-gray-200 dark:border-gray-700 rounded-lg p-4 space-y-2 shadow-sm"
+                >
+                  <div>
+                    <strong>Name:</strong>{' '}
+                    {m.showName ? m.name || '—' : <i className="text-gray-400">privat</i>}
+                  </div>
+                  <div>
+                    <strong>Nickname:</strong>{' '}
+                    {m.showNickname ? m.nickname || '—' : <i className="text-gray-400">privat</i>}
+                  </div>
+                  <div>
+                    <strong>E-Mail:</strong>{' '}
+                    {m.showEmail ? m.email : <i className="text-gray-400">privat</i>}
+                  </div>
+                  <div>
+                    <strong>Status:</strong>{' '}
+                    <span className={status.color}>{status.text}</span>
+                  </div>
+                  <div>
+                    <strong>Rolle:</strong>{' '}
+                    {isAdmin ? (
+                      <select
+                        value={m.role ?? 'viewer'}
+                        onChange={(e) => handleRoleChange(m.id, e.target.value)}
+                        className="text-sm border rounded px-2 py-1 bg-white dark:bg-gray-800 w-full"
+                      >
+                        <option value="admin">Admin</option>
+                        <option value="editor">Editor</option>
+                        <option value="viewer">Viewer</option>
+                      </select>
+                    ) : (
+                      <span className="text-xs text-gray-500 italic">{m.role || 'viewer'}</span>
+                    )}
+                  </div>
+                  <div>
+                    {isAdmin ? (
+                      <button
+                        onClick={() => setShowConfirmId(m.id)}
+                        className="text-red-600 hover:underline text-sm"
+                      >
+                        Entfernen
+                      </button>
+                    ) : (
+                      <span className="text-xs text-gray-400 italic">Keine Berechtigung</span>
+                    )}
+                  </div>
+                </div>
+              );
+            })}
+          </div>
         )}
       </div>
 
