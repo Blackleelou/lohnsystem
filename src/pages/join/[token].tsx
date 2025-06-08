@@ -72,10 +72,13 @@ export default function JoinTokenPage() {
           session.user.role !== data.role
         ) {
           setStage('error');
-          setMessage(
-            '⚠️ Einladung verweigert: Du würdest dich selbst zurückstufen.'
-          );
-          return;
+setMessage(
+  '⚠️ Einladung verweigert: Du würdest dich selbst zurückstufen. Du wirst zur Teamübersicht weitergeleitet.'
+);
+setTimeout(() => {
+  router.push('/team/members');
+}, 3000);
+return;
         }
 
         // 🟡 Erst jetzt Sichtbarkeitsabfrage anzeigen
