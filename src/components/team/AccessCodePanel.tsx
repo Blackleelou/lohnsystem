@@ -1,4 +1,8 @@
 import { useEffect, useState } from 'react';
+import { Copy, Trash2 } from "lucide-react";
+import { toast } from "react-hot-toast";
+import { Tooltip } from "@radix-ui/react-tooltip";
+
 
 type Invitation = {
   id: string;
@@ -143,26 +147,55 @@ export default function AccessCodePanel() {
             </thead>
             <tbody>
               {invitations.map((inv) => (
-                <tr key={inv.id} className="border-t">
-                  <td className="px-3 py-2">{inv.type}</td>
-                  <td className="px-3 py-2">{inv.role}</td>
-                  <td className="px-3 py-2">{inv.createdBy}</td>
-                  <td className="px-3 py-2">{new Date(inv.expiresAt).toLocaleDateString()}</td>
-                  <td className="px-3 py-2 space-x-2">
-                    <button
-                      onClick={() => navigator.clipboard.writeText(`${window.location.origin}/join/${inv.token}`)}
-                      className="text-blue-600 hover:underline"
-                    >
-                      Link kopieren
-                    </button>
-                    <button
-                      onClick={() => deleteInvitation(inv.id)}
-                      className="text-red-600 hover:underline"
-                    >
-                      Löschen
-                    </button>
-                  </td>
-                </tr>
+             <tr key={inv.id} className="border-t">
+  <td className="px-3 py-2">
+    {inv.type === 'qr_simple' && (
+      <span className="inline-block bg-green-100 text-green-800 text-xs px-2 py-1 rounded">
+        QR (einfach)
+      </span>
+    )}
+    {inv.type === 'qr_protected' && (
+      <span className="inline-block bg-yellow-100 text-yellow-800 text-xs px-2 py-1 rounded">
+        QR (mit Passwort)
+      </span>
+    )}
+    {inv.type === 'single_use' && (
+      <span className="inline-block bg-red-100 text-red-800 text-xs px-2 py-1 rounded">
+        Einmal-Link
+      </span>
+    )}
+  </td>
+
+  <td className="px-3 py-2">{inv.role}</td>
+  <td className="px-3 py-2">{inv.createdBy}</td>
+  <td className="px-3 py-2">
+    {new Date(inv.expiresAt).toLocaleDateString('de-DE')}
+  </td>
+
+  <td className="px-3 py-2">
+    <div className="flex items-center gap-3">
+      <button
+        onClick={() => {
+          navigator.clipboard.writeText(`${window.location.origin}/join/${inv.token}`);
+          toast.success("Link wurde kopiert!");
+        }}
+        title="Link kopieren"
+        className="text-blue-600 hover:text-blue-800 transition"
+      >
+        <Copy size={18} />
+      </button>
+
+      <button
+        onClick={() => deleteInvitation(inv.id)}
+        title="Einladung löschen"
+        className="text-red-600 hover:text-red-800 transition"
+      >
+        <Trash2 size={18} />
+      </button>
+    </div>
+  </td>
+</tr>
+
               ))}
               {invitations.length === 0 && (
                 <tr>
