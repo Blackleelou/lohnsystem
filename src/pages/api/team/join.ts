@@ -9,9 +9,18 @@ export default async function handler(req: NextApiRequest, res: NextApiResponse)
   const session = await getServerSession(req, res, authOptions);
   if (!session?.user?.id) return res.status(401).end();
 
-  const { token } = req.body;
+  const { token, nickname, showName, showNickname, showEmail } = req.body;
+
   if (!token || typeof token !== 'string') {
     return res.status(400).json({ error: 'Kein gültiger Token übergeben.' });
+  }
+
+  if (
+    typeof showName !== 'boolean' ||
+    typeof showNickname !== 'boolean' ||
+    typeof showEmail !== 'boolean'
+  ) {
+    return res.status(400).json({ error: 'Ungültige Sichtbarkeitsdaten.' });
   }
 
   const invitation = await prisma.invitation.findUnique({ where: { token } });
@@ -25,6 +34,10 @@ export default async function handler(req: NextApiRequest, res: NextApiResponse)
       companyId: invitation.companyId,
       role: invitation.role,
       invited: true,
+      nickname,
+      showName,
+      showNickname,
+      showEmail,
     },
   });
 
