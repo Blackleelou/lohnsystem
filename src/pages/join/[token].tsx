@@ -1,5 +1,3 @@
-// src/pages/join/[token].tsx
-
 import { useEffect, useState } from 'react';
 import { useRouter } from 'next/router';
 import { useSession } from 'next-auth/react';
@@ -15,6 +13,7 @@ export default function JoinTokenPage() {
   const [hasConsent, setHasConsent] = useState(false);
   const [joined, setJoined] = useState(false); // ✅ verhindert doppelte Verarbeitung
   const [consentData, setConsentData] = useState<{
+    nickname: string;
     showName: boolean;
     showEmail: boolean;
     showNickname: boolean;
@@ -66,7 +65,7 @@ export default function JoinTokenPage() {
         const data = await res.json();
         setCompanyName(data.companyName || null);
 
-        if (!hasConsent) {
+        if (!hasConsent || !consentData) {
           setStage('waitingConsent');
           return;
         }
@@ -115,6 +114,7 @@ export default function JoinTokenPage() {
   }, [session, token, router]);
 
   function handleConsentSubmit(data: {
+    nickname: string;
     showName: boolean;
     showEmail: boolean;
     showNickname: boolean;
