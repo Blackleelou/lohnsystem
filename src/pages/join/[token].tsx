@@ -169,27 +169,22 @@ export default function JoinTokenPage() {
     );
   }
 
-  if (stage === 'success') {
-    return (
-      <div className="min-h-screen flex items-center justify-center bg-gray-50 p-6 text-center">
-        <div className="max-w-md bg-white p-6 rounded shadow">
-          <h1 className="text-green-600 font-bold text-xl mb-2">Beitritt erfolgreich</h1>
-          <p>{message}</p>
-        </div>
-      </div>
-    );
-  }
-
   if (stage === 'error') {
-    return (
-      <div className="min-h-screen flex items-center justify-center bg-gray-50 p-6 text-center">
-        <div className="max-w-md bg-white p-6 rounded shadow">
-          <h1 className="text-red-600 font-bold text-xl mb-2">Fehler</h1>
-          <p>{message}</p>
-        </div>
-      </div>
-    );
-  }
+  return (
+    <div className="min-h-screen flex items-center justify-center bg-gray-50 p-6 text-center">
+      <div className="max-w-md bg-white p-6 rounded shadow">
+        <h1 className="text-red-600 font-bold text-xl mb-2">Fehler</h1>
+        <p>{message}</p>
 
-  return null;
+        {message.includes('zurückstufen') && (
+          <button
+            onClick={() => router.push('/team/members')}
+            className="mt-6 bg-blue-600 text-white px-4 py-2 rounded hover:bg-blue-700 transition"
+          >
+            Zur Teamübersicht
+          </button>
+        )}
+      </div>
+    </div>
+  );
 }
