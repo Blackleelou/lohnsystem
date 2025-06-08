@@ -74,7 +74,11 @@ export default async function handler(req: NextApiRequest, res: NextApiResponse)
     },
   });
 
-  await prisma.invitation.delete({ where: { token } });
+  // Einladung nur löschen, wenn es ein Einmal-Link ist
+  if (invitation.type === 'single_use') {
+    await prisma.invitation.delete({ where: { token } });
+  }
+
 
   res.status(200).json({ success: true });
 }
