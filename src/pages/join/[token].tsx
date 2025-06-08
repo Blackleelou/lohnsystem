@@ -75,30 +75,37 @@ export default function JoinTokenPage() {
 
       // Einlösung der Einladung mit Token und Consent
       setStage("checking");
-if (!joinRes.ok) {
-  setStage("error");
-  setMessage("Fehler beim Beitritt. Bitte versuche es erneut.");
-  return;
-}
 
-const joinData = await joinRes.json();
+      const joinRes = await fetch("/api/team/join", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ token, ...consentData }),
+      });
 
-if (joinData?.success) {
+      if (!joinRes.ok) {
+        setStage("error");
+        setMessage("Fehler beim Beitritt. Bitte versuche es erneut.");
+        return;
+     }
+
+     const joinData = await joinRes.json();
+
+     if (joinData?.success) {
   setStage("success");
   setMessage("Du wurdest erfolgreich zum Team hinzugefügt. Weiterleitung…");
   update();
   setTimeout(() => router.push("/dashboard"), 2500);
-} else {
-  setStage("error");
-  setMessage(joinData?.error || "Einladung fehlgeschlagen oder bereits verwendet.");
-}
-
-    } catch (err) {
-      console.error("Fehler beim Validieren oder Beitreten:", err);
+     } else {
       setStage("error");
-      setMessage("Ein unerwarteter Fehler ist aufgetreten.");
-    }
-  };
+      setMessage(joinData?.error || "Einladung fehlgeschlagen oder bereits verwendet.");
+     }
+
+     } catch (err) {
+       console.error("Fehler beim Validieren oder Beitreten:", err);
+       setStage("error");
+       setMessage("Ein unerwarteter Fehler ist aufgetreten.");
+     }
+   };
 
   validateAndContinue();
 }, [token, session, sessionStatus, hasConsent, consentData, router, update]);
