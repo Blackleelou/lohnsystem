@@ -21,7 +21,8 @@ export default function JoinTokenPage() {
     showEmail: boolean;
     showNickname: boolean;
   } | null>(null);
-
+  
+  const [passwordVerified, setPasswordVerified] = useState(false); // ✅ NEU
   const [stage, setStage] = useState<'checking' | 'waitingPassword' | 'waitingConsent' | 'success' | 'error'>('checking');
   const [message, setMessage] = useState('');
 
@@ -73,7 +74,7 @@ export default function JoinTokenPage() {
           return;
         }
 
-        if (data.requirePassword) {
+        if (data.requirePassword && !passwordVerified) {
           setStage('waitingPassword');
         } else {
           setInvitationValid(true);
@@ -102,7 +103,8 @@ export default function JoinTokenPage() {
         setMessage(data?.error || 'Passwort falsch oder abgelaufen');
         return;
       }
-
+      
+      setPasswordVerified(true); 
       setInvitationValid(true);
       setStage('waitingConsent');
     } catch (err) {
