@@ -1,5 +1,3 @@
-// src/pages/join/[token].tsx
-
 import { useEffect, useState } from 'react';
 import { useRouter } from 'next/router';
 import { useSession } from 'next-auth/react';
@@ -75,6 +73,10 @@ export default function JoinTokenPage() {
         }
 
         setInvitationValid(true); // ✅ Einladung ist gültig
+        if (!consentData) {
+          setStage('waitingConsent');
+        }
+
       } catch (error) {
         console.error('Fehler bei Einladung:', error);
         setStage('error');
