@@ -21,6 +21,23 @@ function PromotedToAdminToast() {
   return null;
 }
 
+// 🔁 NEU: Session regelmäßig aktualisieren (z. B. bei Rollenänderung)
+function SessionRefresher() {
+  const { update, status } = useSession();
+
+  useEffect(() => {
+    if (status !== 'authenticated') return;
+
+    const interval = setInterval(() => {
+      update(); // holt z. B. neue Rolle
+    }, 30000); // alle 30 Sekunden
+
+    return () => clearInterval(interval);
+  }, [status, update]);
+
+  return null;
+}
+
 export default function App({ Component, pageProps: { session, ...pageProps } }: AppProps) {
   const getLayout = (Component as any).getLayout || ((page: React.ReactNode) => page);
 
@@ -28,6 +45,7 @@ export default function App({ Component, pageProps: { session, ...pageProps } }:
     <SessionProvider session={session}>
       <Toaster position="top-center" />
       <PromotedToAdminToast />
+      <SessionRefresher /> {/* <-- NEU eingefügt */}
       {getLayout(<Component {...pageProps} />)}
       <CookieBanner />
     </SessionProvider>
