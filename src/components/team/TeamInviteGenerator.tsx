@@ -10,7 +10,7 @@ export default function TeamInviteGenerator() {
   const [qrUrl, setQrUrl] = useState("");
   const [qrSecureUrl, setQrSecureUrl] = useState("");
   const [lastLink, setLastLink] = useState(""); // für Kopierfunktion
-  const [loadingType, setLoadingType] = useState<"qr" | "secure" | "link-whatsapp" | "link-email" | null>(null);
+  const [loadingType, setLoadingType] = useState<"qr" | "secure" | "link-whatsapp" | "link-email" | "link-copy" | null  >(null);
 
   const createInvite = async (type: string, expiresInHours?: number) => {
     const res = await fetch("/api/team/create-invite", {
