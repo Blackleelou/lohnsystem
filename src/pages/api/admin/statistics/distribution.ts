@@ -1,8 +1,6 @@
-// /src/pages/api/admin/statistics/distribution.ts
-
 import type { NextApiRequest, NextApiResponse } from "next";
 import { prisma } from "@/lib/prisma";
-import { normalizeShifts } from "@/utils/normalizeShifts";
+import { normalizeShifts } from "@/lib/utils"; // falls du diese Funktion selbst hast
 
 export default async function handler(req: NextApiRequest, res: NextApiResponse) {
   if (req.method !== "GET") {
@@ -17,11 +15,16 @@ export default async function handler(req: NextApiRequest, res: NextApiResponse)
       },
     });
 
-    const normalized = normalizeShifts(shifts);
+    // Zeitangaben in Strings umwandeln
+    const formattedShifts = shifts.map(s => ({
+      startTime: s.startTime.toISOString(),
+      endTime: s.endTime.toISOString(),
+    }));
 
+    const normalized = normalizeShifts(formattedShifts);
     res.status(200).json(normalized);
   } catch (error) {
-    console.error("Fehler beim Abrufen der Schichten:", error);
-    res.status(500).json({ error: "Interner Serverfehler" });
+    console.error("Fehler bei /distribution:", error);
+    res.status(500).json({ error: "Internal server error" });
   }
 }
