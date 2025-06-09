@@ -1,103 +1,101 @@
+// components/common/CookieBanner.tsx
 import { useEffect, useState } from "react";
 
-const COOKIE_NAME = "cookie_consent";
-
 const defaultConsent = {
-  essential: true,
-  statistics: false,
+  essenziell: true,
+  statistik: false,
   marketing: false,
 };
 
 export default function CookieBanner() {
   const [visible, setVisible] = useState(false);
   const [consent, setConsent] = useState(defaultConsent);
+  const [modalOpen, setModalOpen] = useState(false);
 
   useEffect(() => {
-    const saved = localStorage.getItem(COOKIE_NAME);
-    if (!saved) setVisible(true);
+    const stored = localStorage.getItem("cookieConsent");
+    if (!stored) {
+      setVisible(true);
+    }
   }, []);
 
-  const handleAcceptAll = () => {
-    const allConsent = {
-      essential: true,
-      statistics: true,
-      marketing: true,
-    };
-    localStorage.setItem(COOKIE_NAME, JSON.stringify(allConsent));
-    setConsent(allConsent);
+  function saveConsent(newConsent: typeof defaultConsent) {
+    localStorage.setItem("cookieConsent", JSON.stringify(newConsent));
     setVisible(false);
-  };
+    setModalOpen(false);
+    location.reload();
+  }
 
-  const handleSave = () => {
-    localStorage.setItem(COOKIE_NAME, JSON.stringify(consent));
-    setVisible(false);
-  };
+  function handleAcceptAll() {
+    saveConsent({ essenziell: true, statistik: true, marketing: true });
+  }
+
+  function handleDeclineAll() {
+    saveConsent({ essenziell: true, statistik: false, marketing: false });
+  }
+
+  function handleSaveSelection() {
+    saveConsent(consent);
+  }
 
   if (!visible) return null;
 
   return (
-    <div className="fixed bottom-0 left-0 w-full bg-white shadow-xl z-50 p-4 border-t border-gray-200">
-      <div className="max-w-4xl mx-auto text-sm text-gray-800">
-        <p className="mb-2">
-          Wir verwenden Cookies, um unsere Website zu verbessern. Du kannst selbst
-          entscheiden, welche Kategorien du zulässt. Essenzielle Cookies sind immer aktiv.
-        </p>
+    <div className="fixed bottom-0 left-0 w-full bg-white border-t p-4 shadow-md z-50 text-sm">
+      {!modalOpen && (
+        <div className="flex flex-col md:flex-row justify-between items-center gap-4">
+          <p>
+            Wir verwenden Cookies, um unsere Website zu verbessern. Einige sind notwendig,
+            andere helfen uns, das Nutzungserlebnis zu optimieren.
+          </p>
+          <div className="flex gap-2">
+            <button className="px-4 py-2 rounded bg-gray-200" onClick={() => setModalOpen(true)}>
+              Auswahl ansehen
+            </button>
+            <button className="px-4 py-2 rounded bg-gray-100" onClick={handleDeclineAll}>
+              Nur essenzielle
+            </button>
+            <button className="px-4 py-2 rounded bg-blue-600 text-white" onClick={handleAcceptAll}>
+              Alle akzeptieren
+            </button>
+          </div>
+        </div>
+      )}
 
-        <div className="flex flex-col md:flex-row gap-4 mb-4">
-          <label className="flex items-center gap-2">
-            <input type="checkbox" checked disabled className="accent-black" /> Essenziell
+      {modalOpen && (
+        <div className="bg-white border p-4 mt-4 rounded">
+          <h2 className="font-semibold mb-2">Cookie-Einstellungen</h2>
+          <label className="block mb-2">
+            <input type="checkbox" checked disabled /> Essenziell (immer aktiv)
           </label>
-          <label className="flex items-center gap-2">
+          <label className="block mb-2">
             <input
               type="checkbox"
-              checked={consent.statistics}
-              onChange={(e) =>
-                setConsent({ ...consent, statistics: e.target.checked })
-              }
-              className="accent-blue-500"
+              checked={consent.statistik}
+              onChange={(e) => setConsent({ ...consent, statistik: e.target.checked })}
             />
-            Statistik
+            Statistik (z. B. Google Analytics)
           </label>
-          <label className="flex items-center gap-2">
+          <label className="block mb-4">
             <input
               type="checkbox"
               checked={consent.marketing}
-              onChange={(e) =>
-                setConsent({ ...consent, marketing: e.target.checked })
-              }
-              className="accent-red-500"
+              onChange={(e) => setConsent({ ...consent, marketing: e.target.checked })}
             />
-            Marketing
+            Marketing (z. B. Werbung, Retargeting)
           </label>
+          <div className="flex gap-2">
+            <button className="px-4 py-2 rounded bg-gray-200" onClick={() => setModalOpen(false)}>
+              Zurück
+            </button>
+            <button className="px-4 py-2 rounded bg-blue-600 text-white" onClick={handleSaveSelection}>
+              Auswahl speichern
+            </button>
+          </div>
         </div>
-
-        <div className="flex flex-col md:flex-row gap-2 justify-end">
-          <button
-            onClick={handleSave}
-            className="bg-gray-200 text-sm px-4 py-2 rounded-md hover:bg-gray-300"
-          >
-            Auswahl speichern
-          </button>
-          <button
-            onClick={handleAcceptAll}
-            className="bg-black text-white text-sm px-4 py-2 rounded-md hover:bg-gray-800"
-          >
-            Alle akzeptieren
-          </button>
-        </div>
-      </div>
+      )}
     </div>
   );
 }
 
-export function hasConsent(category: keyof typeof defaultConsent): boolean {
-  if (typeof window === "undefined") return false;
-  try {
-    const stored = localStorage.getItem(COOKIE_NAME);
-    if (!stored) return false;
-    const parsed = JSON.parse(stored);
-    return parsed[category] === true;
-  } catch {
-    return false;
-  }
-}
+// ➕ In /_app.tsx ist CookieBanner schon korrekt eingebunden
