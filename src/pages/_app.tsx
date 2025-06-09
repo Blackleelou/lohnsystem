@@ -5,6 +5,7 @@ import CookieBanner from '@/components/common/CookieBanner';
 import '@/styles/globals.css';
 import { useEffect, useState } from 'react';
 import { Toaster, toast } from 'react-hot-toast';
+import Script from 'next/script';
 
 function PromotedToAdminToast() {
   const { data: session, update } = useSession();
@@ -38,6 +39,33 @@ function SessionRefresher() {
   return null;
 }
 
+// 📊 Google Analytics nur bei Zustimmung laden
+function AnalyticsScript() {
+  const [enabled, setEnabled] = useState(false);
+
+  useEffect(() => {
+    if (typeof window === 'undefined') return;
+    const accepted = localStorage.getItem('cookie-statistics-consent');
+    if (accepted === 'true') setEnabled(true);
+  }, []);
+
+  if (!enabled) return null;
+
+  return (
+    <>
+      <Script src="https://www.googletagmanager.com/gtag/js?id=G-XXXXXXX" strategy="afterInteractive" />
+      <Script id="ga-init" strategy="afterInteractive">
+        {`
+          window.dataLayer = window.dataLayer || [];
+          function gtag(){dataLayer.push(arguments);}
+          gtag('js', new Date());
+          gtag('config', 'G-XXXXXXX');
+        `}
+      </Script>
+    </>
+  );
+}
+
 export default function App({ Component, pageProps: { session, ...pageProps } }: AppProps) {
   const getLayout = (Component as any).getLayout || ((page: React.ReactNode) => page);
 
@@ -45,7 +73,8 @@ export default function App({ Component, pageProps: { session, ...pageProps } }:
     <SessionProvider session={session}>
       <Toaster position="top-center" />
       <PromotedToAdminToast />
-      <SessionRefresher /> {/* <-- NEU eingefügt */}
+      <SessionRefresher />
+      <AnalyticsScript />
       {getLayout(<Component {...pageProps} />)}
       <CookieBanner />
     </SessionProvider>
