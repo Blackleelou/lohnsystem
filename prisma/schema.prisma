@@ -191,5 +191,5 @@ model AccessCode {
 
   company         Company  @relation(fields: [companyId], references: [id], onDelete: Cascade)
 
-  @@unique([code, companyId])  // ✅ erlaubt pro Firma einen „code“
+  @@unique([code, companyId], name: "code_companyId")  // ✅ erlaubt pro Firma einen „code“
 }
