@@ -1,3 +1,5 @@
+// src/pages/api/team/rotate-all-access-passwords.ts
+
 import { NextApiRequest, NextApiResponse } from 'next';
 import { prisma } from '@/lib/prisma';
 
@@ -19,25 +21,44 @@ export default async function handler(req: NextApiRequest, res: NextApiResponse)
   const now = new Date();
   const validUntil = new Date(now.getTime() + 24 * 60 * 60 * 1000);
 
+  let updatedCount = 0;
+
   for (const company of companies) {
     // alten Zugangscode (geschützt) löschen
     await prisma.accessCode.deleteMany({
       where: { companyId: company.id, requirePassword: true },
     });
 
-    // neuen Code einfügen
+    // Passwort erzeugen mit Kollisionsprüfung
+    let newPassword: string;
+    let exists: boolean;
+
+    do {
+      newPassword = generatePassword();
+      exists = !!(await prisma.accessCode.findFirst({
+        where: {
+          password: newPassword,
+          requirePassword: true,
+          validUntil: { gte: now },
+        },
+      }));
+    } while (exists);
+
+    // neuen Zugangscode speichern
     await prisma.accessCode.create({
       data: {
         code: 'QR_PROTECTED_MAIN',
         companyId: company.id,
-        password: generatePassword(),
+        password: newPassword,
         validFrom: now,
         validUntil,
         role: 'viewer',
         requirePassword: true,
       },
     });
+
+    updatedCount++;
   }
 
-  return res.status(200).json({ success: true, updatedCompanies: companies.length });
+  return res.status(200).json({ success: true, updatedCompanies: updatedCount });
 }
