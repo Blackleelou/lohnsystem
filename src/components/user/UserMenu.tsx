@@ -1,6 +1,6 @@
 // src/components/user/UserMenu.tsx
 
-import { useState } from 'react';
+import { useEffect, useState } from 'react'; // 👈 useEffect importieren
 import { signOut, useSession } from 'next-auth/react';
 import LanguageSwitcher from '@/components/common/LanguageSwitcher';
 import ThemeSwitch from '@/components/common/ThemeSwitch';
@@ -9,12 +9,19 @@ import { LogOut, Settings, User, Shield, Palette, Building2 } from 'lucide-react
 
 export default function UserMenu() {
   const [isOpen, setIsOpen] = useState(false);
-  const { data: session } = useSession();
+  const { data: session, update } = useSession(); // 👈 update holen
 
   const isSuperadmin = session?.user?.email === 'jantzen.chris@gmail.com';
   const companyId = session?.user?.companyId;
   const role = session?.user?.role; // hier erwarten wir "admin" | "editor" | "viewer" etc.
 
+    // Session-Update wenn Menü geöffnet wird
+  useEffect(() => {
+    if (isOpen) {
+      update(); // 👈 aktuelles session.user.role laden
+    }
+  }, [isOpen, update]);
+  
   return (
     <div className="relative">
       <button
