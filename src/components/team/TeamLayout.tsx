@@ -31,7 +31,9 @@ export default function TeamLayout({ children }: { children: React.ReactNode }) 
     { href: '/team/files', label: 'Dokumente', icon: <Folder /> },
     { href: '/team/delete', label: 'Team löschen', icon: <Trash />, danger: true },
   ];
-  
+
+  const router = useRouter(); // oberhalb von visibleLinks
+
   // Links je nach Rolle filtern
   const visibleLinks = links.filter((link) => {
     if (role === 'admin') return true;
