@@ -4,6 +4,7 @@ import Link from 'next/link';
 import { useRouter } from 'next/router';
 import { useState, useEffect } from 'react';
 import UserMenu from '@/components/user/UserMenu';
+import { useSession } from 'next-auth/react';
 import {
   Users,
   QrCode,
@@ -18,8 +19,26 @@ import {
 import { motion, AnimatePresence } from 'framer-motion';
 
 export default function TeamLayout({ children }: { children: React.ReactNode }) {
-  const router = useRouter();
+  const { data: session } = useSession();
+  const role = session?.user?.role;
 
+  const links = [
+    { href: '/team/members', label: 'Mitglieder', icon: <Users /> },
+    { href: '/team/invites', label: 'Einladungen', icon: <QrCode /> },
+    { href: '/team/security', label: 'Zugangs-Code', icon: <KeyRound /> },
+    { href: '/team/payrules', label: 'Zuschläge', icon: <BarChart2 /> },
+    { href: '/team/shifts', label: 'Schichten', icon: <List /> },
+    { href: '/team/files', label: 'Dokumente', icon: <Folder /> },
+    { href: '/team/delete', label: 'Team löschen', icon: <Trash />, danger: true },
+  ];
+  
+  // Links je nach Rolle filtern
+  const visibleLinks = links.filter((link) => {
+    if (role === 'admin') return true;
+    if (role === 'editor') return ['/team/payrules', '/team/shifts'].includes(link.href);
+    return false; // viewer oder unbekannt: nichts anzeigen
+  });
+  
   const [collapsed, setCollapsed] = useState(() => {
     if (typeof window !== 'undefined') {
       return localStorage.getItem('team-sidebar-collapsed') === 'true';
@@ -31,16 +50,7 @@ export default function TeamLayout({ children }: { children: React.ReactNode }) 
     localStorage.setItem('team-sidebar-collapsed', String(collapsed));
   }, [collapsed]);
 
-  const links = [
-    { href: '/team/members', label: 'Mitglieder', icon: <Users /> },
-    { href: '/team/invites', label: 'Einladungen', icon: <QrCode /> },
-    { href: '/team/security', label: 'Zugangs-Code', icon: <KeyRound /> },
-    { href: '/team/payrules', label: 'Zuschläge', icon: <BarChart2 /> },
-    { href: '/team/shifts', label: 'Schichten', icon: <List /> },
-    { href: '/team/files', label: 'Dokumente', icon: <Folder /> },
-    { href: '/team/delete', label: 'Team löschen', icon: <Trash />, danger: true },
-  ];
-
+  
   return (
     <div className="min-h-screen flex bg-gray-50 dark:bg-gray-950">
       <motion.aside
@@ -68,9 +78,9 @@ export default function TeamLayout({ children }: { children: React.ReactNode }) 
         )}
 
         <nav className="flex-1 flex flex-col gap-2 px-2 py-6">
-          {links.map((link) => {
+          {visibleLinks.map((link) => {
             const isActive = router.pathname === link.href;
-            return (
+              return (
               <Link
                 key={link.href}
                 href={link.href}
