@@ -11,7 +11,7 @@ export default async function handler(req: NextApiRequest, res: NextApiResponse)
 
   const { code, password } = req.body;
 
-  const access = await prisma.accessCode.findUnique({ where: { code } });
+  const access = await prisma.accessCode.findFirst({ where: { code } });
   if (!access || access.validUntil < new Date()) {
     return res.status(410).json({ error: 'Ungültiger oder abgelaufener Code.' });
   }
