@@ -1,0 +1,1 @@
+export default function LohnStats() { return <div>LohnStats (Dummy)</div>; }

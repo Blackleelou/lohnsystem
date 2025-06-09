@@ -1,0 +1,1 @@
+export default function PerformanceStats() { return <div>PerformanceStats (Dummy)</div>; }

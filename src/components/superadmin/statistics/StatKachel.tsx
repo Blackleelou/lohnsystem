@@ -1,0 +1,1 @@
+export default function StatKachel() { return <div>StatKachel (Dummy)</div>; }

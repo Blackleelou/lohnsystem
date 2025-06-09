@@ -21,6 +21,7 @@ model User {
   resetTokens   PasswordResetToken[]
   hasChosenMode Boolean @default(false)
   promotedToAdmin Boolean @default(false)
+  lastLogin     DateTime?
 
   // Modus- und Firmenlogik
   companyId   String?

@@ -1,0 +1,1 @@
+export default function CompanyStats() { return <div>CompanyStats (Dummy)</div>; }

@@ -37,6 +37,7 @@
     "nodemailer": "^6.9.13",
     "prisma": "^6.8.2",
     "ra-data-simple-rest": "^5.8.3",
+    "recharts": "^2.9.0",
     "react": "18.2.0",
     "react-admin": "^5.8.3",
     "react-device-detect": "^2.2.2",
@@ -45,7 +46,8 @@
     "react-i18next": "^13.2.2",
     "react-icons": "^4.10.1",
     "react-qr-code": "^2.0.7",
-    "react-toastify": "^9.1.3"
+    "react-toastify": "^9.1.3",
+    "recharts": "^2.15.3"
   },
   "devDependencies": {
     "@eslint/js": "^9.28.0",
