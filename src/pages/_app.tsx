@@ -1,20 +1,21 @@
 // src/pages/_app.tsx
-import type { AppProps } from 'next/app';
-import { SessionProvider, useSession } from 'next-auth/react';
-import CookieBanner from '@/components/common/CookieBanner';
-import '@/styles/globals.css';
-import { useEffect, useState } from 'react';
-import { Toaster, toast } from 'react-hot-toast';
-import Script from 'next/script';
+import type { AppProps } from "next/app";
+import { SessionProvider, useSession } from "next-auth/react";
+import CookieBanner from "@/components/common/CookieBanner";
+import "@/styles/globals.css";
+import { useEffect, useState } from "react";
+import { Toaster, toast } from "react-hot-toast";
+import Script from "next/script";
 
+// ✅ Erfolgsmeldung bei Admin-Beförderung
 function PromotedToAdminToast() {
   const { data: session, update } = useSession();
   const [shown, setShown] = useState(false);
 
   useEffect(() => {
     if (session?.user?.promotedToAdmin && !shown) {
-      toast.success('Du wurdest zum neuen Admin befördert! 🎉', { id: 'promotion-toast' });
-      fetch('/api/user/reset-promotion', { method: 'POST' });
+      toast.success("Du wurdest zum neuen Admin befördert! 🎉", { id: "promotion-toast" });
+      fetch("/api/user/reset-promotion", { method: "POST" });
       setShown(true);
     }
   }, [session, shown]);
@@ -22,31 +23,36 @@ function PromotedToAdminToast() {
   return null;
 }
 
-// 🔁 NEU: Session regelmäßig aktualisieren (z. B. bei Rollenänderung)
+// 🔁 Session-Update alle 30 Sekunden (z. B. Rollenwechsel)
 function SessionRefresher() {
   const { update, status } = useSession();
 
   useEffect(() => {
-    if (status !== 'authenticated') return;
-
+    if (status !== "authenticated") return;
     const interval = setInterval(() => {
-      update(); // holt z. B. neue Rolle
-    }, 30000); // alle 30 Sekunden
-
+      update(); // prüft z. B. neue Rolle
+    }, 30000);
     return () => clearInterval(interval);
   }, [status, update]);
 
   return null;
 }
 
-// 📊 Google Analytics nur bei Zustimmung laden
+// 📊 Analytics nur bei Zustimmung (aus Cookie-Einstellung)
 function AnalyticsScript() {
   const [enabled, setEnabled] = useState(false);
 
   useEffect(() => {
-    if (typeof window === 'undefined') return;
-    const accepted = localStorage.getItem('cookie-statistics-consent');
-    if (accepted === 'true') setEnabled(true);
+    if (typeof window === "undefined") return;
+
+    try {
+      const consent = JSON.parse(localStorage.getItem("cookie-consent") || "{}");
+      if (consent.statistik === true) {
+        setEnabled(true);
+      }
+    } catch {
+      // JSON ungültig – kein Tracking
+    }
   }, []);
 
   if (!enabled) return null;
