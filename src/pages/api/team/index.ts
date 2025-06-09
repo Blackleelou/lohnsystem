@@ -5,6 +5,11 @@ import { prisma } from '@/lib/prisma';
 import { getServerSession } from 'next-auth/next';
 import { authOptions } from '@/lib/authOptions';
 
+function generatePassword(length = 5) {
+  const chars = 'ABCDEFGHJKLMNPQRSTUVWXYZ23456789';
+  return Array.from({ length }, () => chars[Math.floor(Math.random() * chars.length)]).join('');
+}
+
 export default async function handler(req: NextApiRequest, res: NextApiResponse) {
   // === TEAM ERSTELLEN ===
   if (req.method === 'POST') {
@@ -37,6 +42,23 @@ export default async function handler(req: NextApiRequest, res: NextApiResponse)
       },
     });
 
+    // Direkt beim Erstellen: QR-Protected-Code hinzufügen
+    const now = new Date();
+    const validUntil = new Date(now.getTime() + 24 * 60 * 60 * 1000); // 24h gültig
+    const password = generatePassword();
+
+    await prisma.accessCode.create({
+      data: {
+        code: 'QR_PROTECTED_MAIN',
+        companyId: company.id,
+        password,
+        validFrom: now,
+        validUntil,
+        role: 'viewer',
+        requirePassword: true,
+      },
+    });
+
     // User updaten: Team-Zuweisung und Sichtbarkeit/Nickname
     await prisma.user.update({
       where: { email: session.user.email },
@@ -61,7 +83,6 @@ export default async function handler(req: NextApiRequest, res: NextApiResponse)
     }
 
     try {
-      // Hole aktuellen Nutzer aus DB (nicht Session!)
       const user = await prisma.user.findUnique({
         where: { email: session.user.email },
       });
