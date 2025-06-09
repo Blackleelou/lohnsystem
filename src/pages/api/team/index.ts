@@ -47,17 +47,29 @@ export default async function handler(req: NextApiRequest, res: NextApiResponse)
     const validUntil = new Date(now.getTime() + 24 * 60 * 60 * 1000); // 24h gültig
     const password = generatePassword();
 
-    await prisma.accessCode.create({
-      data: {
-        code: 'QR_PROTECTED_MAIN',
-        companyId: company.id,
-        password,
-        validFrom: now,
-        validUntil,
-        role: 'viewer',
-        requirePassword: true,
+    // Sicherstellen, dass kein doppelter Code erzeugt wird
+    const existingCode = await prisma.accessCode.findUnique({
+      where: {
+        code_companyId: {
+          code: 'QR_PROTECTED_MAIN',
+          companyId: company.id,
+        },
       },
     });
+
+    if (!existingCode) {
+      await prisma.accessCode.create({
+        data: {
+          code: 'QR_PROTECTED_MAIN',
+          companyId: company.id,
+          password,
+          validFrom: now,
+          validUntil,
+          role: 'viewer',
+          requirePassword: true,
+        },
+      });
+    }
 
     // User updaten: Team-Zuweisung und Sichtbarkeit/Nickname
     await prisma.user.update({
