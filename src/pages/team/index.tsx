@@ -1,7 +1,6 @@
-// src/pages/team/index.tsx
-
 import Layout from '@/components/common/Layout';
 import { useState, useEffect } from 'react';
+import { useSession } from 'next-auth/react';
 
 type Team = {
   id: string;
@@ -11,10 +10,19 @@ type Team = {
 };
 
 export default function TeamDashboardPage() {
+  const { data: session, update } = useSession(); // 👈 Session holen
   const [team, setTeam] = useState<Team | null>(null);
   const [loading, setLoading] = useState(true);
 
   useEffect(() => {
+    if (!session) return;
+
+    // wenn kein Team mehr -> raus
+    if (!session.user?.companyId) {
+      window.location.href = '/dashboard';
+      return;
+    }
+
     fetch('/api/team/me')
       .then((res) => res.json())
       .then((data) => {
@@ -26,7 +34,7 @@ export default function TeamDashboardPage() {
         }
       })
       .catch(() => setLoading(false));
-  }, []);
+  }, [session]); // 👈 auf session reagieren
 
   return (
     <Layout>
