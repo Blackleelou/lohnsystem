@@ -46,7 +46,7 @@ export default function CookieBanner() {
           <p>
             Wir verwenden Cookies, um unsere Website zu verbessern. Einige sind essenziell, andere helfen uns,
             z. B. bei Statistik oder Marketing.{" "}
-            <a href="/datenschutz" className="underline text-blue-600" target="_blank" rel="noopener noreferrer">
+            <a href="/legal" className="underline text-blue-600" target="_blank" rel="noopener noreferrer">
               Mehr erfahren
             </a>
           </p>
