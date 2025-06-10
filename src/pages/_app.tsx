@@ -59,13 +59,18 @@ function AnalyticsScript() {
 
   return (
     <>
-      <Script src="https://www.googletagmanager.com/gtag/js?id=G-XXXXXXX" strategy="afterInteractive" />
+      <Script
+        src="https://www.googletagmanager.com/gtag/js?id=G-BHB7SNG99H"
+        strategy="afterInteractive"
+      />
       <Script id="ga-init" strategy="afterInteractive">
         {`
           window.dataLayer = window.dataLayer || [];
           function gtag(){dataLayer.push(arguments);}
           gtag('js', new Date());
-          gtag('config', 'G-XXXXXXX');
+          gtag('config', 'G-BHB7SNG99H', {
+            anonymize_ip: true
+          });
         `}
       </Script>
     </>
