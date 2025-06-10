@@ -148,6 +148,16 @@ export default function UserMenu() {
             </Link>
           )}
 
+          {/* Rechtliches: Impressum & Datenschutz */}
+<Link
+  href="/legal"
+  className="flex items-center gap-2 px-3 py-2 rounded-lg text-gray-700 dark:text-gray-100 hover:bg-blue-50 dark:hover:bg-gray-800 transition"
+  onClick={() => setIsOpen(false)}
+>
+  <Shield className="w-5 h-5" />
+  Rechtliches
+</Link>
+          
           {/* Logout */}
           <button
             type="button"
