@@ -3,7 +3,16 @@ import { prisma } from '@/lib/prisma';
 import nodemailer from 'nodemailer';
 
 export default async function handler(req: NextApiRequest, res: NextApiResponse) {
-  // DB-Check
+  // 👉 Optionale Consent-Infos aus Request-Body extrahieren
+  const { consent } = req.body || {};
+  if (consent) {
+    console.log('[Health Consent Debug]', {
+      statistik: consent.statistik,
+      marketing: consent.marketing,
+    });
+  }
+
+  // ✅ DB-Check
   let db: 'ok' | 'warn' | 'error' = 'ok';
   try {
     await prisma.user.findFirst();
@@ -11,7 +20,7 @@ export default async function handler(req: NextApiRequest, res: NextApiResponse)
     db = 'error';
   }
 
-  // Mail-Service-Check
+  // ✅ Mail-Service-Check
   let mail: 'ok' | 'warn' | 'error' = 'ok';
   try {
     const transporter = nodemailer.createTransport({
@@ -22,6 +31,7 @@ export default async function handler(req: NextApiRequest, res: NextApiResponse)
         pass: process.env.MAIL_PASS,
       },
     });
+
     await transporter.sendMail({
       from: `"Health-Check" <${process.env.MAIL_USER}>`,
       to: process.env.MAIL_USER,
@@ -30,8 +40,7 @@ export default async function handler(req: NextApiRequest, res: NextApiResponse)
     });
     mail = 'ok';
   } catch (e) {
-    // <- HIER kommt das Logging rein:
-    console.error('MAIL-CHECK-ERROR', e); // <<<---- HIER!
+    console.error('MAIL-CHECK-ERROR', e);
     mail = 'error';
   }
 
