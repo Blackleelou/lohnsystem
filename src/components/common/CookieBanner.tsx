@@ -1,4 +1,3 @@
-// components/common/CookieBanner.tsx
 import { useEffect, useState } from "react";
 
 const defaultConsent = {
@@ -13,17 +12,17 @@ export default function CookieBanner() {
   const [modalOpen, setModalOpen] = useState(false);
 
   useEffect(() => {
-    const stored = localStorage.getItem("cookieConsent");
+    const stored = localStorage.getItem("cookie-consent");
     if (!stored) {
       setVisible(true);
     }
   }, []);
 
   function saveConsent(newConsent: typeof defaultConsent) {
-    localStorage.setItem("cookieConsent", JSON.stringify(newConsent));
+    localStorage.setItem("cookie-consent", JSON.stringify(newConsent));
     setVisible(false);
     setModalOpen(false);
-    location.reload();
+    location.reload(); // Reload, um Tracking-Skripte ggf. zu aktivieren
   }
 
   function handleAcceptAll() {
@@ -42,11 +41,14 @@ export default function CookieBanner() {
 
   return (
     <div className="fixed bottom-0 left-0 w-full bg-white border-t p-4 shadow-md z-50 text-sm">
-      {!modalOpen && (
+      {!modalOpen ? (
         <div className="flex flex-col md:flex-row justify-between items-center gap-4">
           <p>
-            Wir verwenden Cookies, um unsere Website zu verbessern. Einige sind notwendig,
-            andere helfen uns, das Nutzungserlebnis zu optimieren.
+            Wir verwenden Cookies, um unsere Website zu verbessern. Einige sind essenziell, andere helfen uns,
+            z. B. bei Statistik oder Marketing.{" "}
+            <a href="/datenschutz" className="underline text-blue-600" target="_blank" rel="noopener noreferrer">
+              Mehr erfahren
+            </a>
           </p>
           <div className="flex gap-2">
             <button className="px-4 py-2 rounded bg-gray-200" onClick={() => setModalOpen(true)}>
@@ -60,9 +62,7 @@ export default function CookieBanner() {
             </button>
           </div>
         </div>
-      )}
-
-      {modalOpen && (
+      ) : (
         <div className="bg-white border p-4 mt-4 rounded">
           <h2 className="font-semibold mb-2">Cookie-Einstellungen</h2>
           <label className="block mb-2">
@@ -73,7 +73,7 @@ export default function CookieBanner() {
               type="checkbox"
               checked={consent.statistik}
               onChange={(e) => setConsent({ ...consent, statistik: e.target.checked })}
-            />
+            />{" "}
             Statistik (z. B. Google Analytics)
           </label>
           <label className="block mb-4">
@@ -81,7 +81,7 @@ export default function CookieBanner() {
               type="checkbox"
               checked={consent.marketing}
               onChange={(e) => setConsent({ ...consent, marketing: e.target.checked })}
-            />
+            />{" "}
             Marketing (z. B. Werbung, Retargeting)
           </label>
           <div className="flex gap-2">
@@ -97,5 +97,3 @@ export default function CookieBanner() {
     </div>
   );
 }
-
-// ➕ In /_app.tsx ist CookieBanner schon korrekt eingebunden
