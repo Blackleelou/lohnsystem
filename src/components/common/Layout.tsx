@@ -16,6 +16,17 @@ export default function Layout({ children }: { children: React.ReactNode }) {
       <main className="flex-1 px-4 py-6">
         <div className="max-w-2xl w-full mx-auto">{children}</div>
       </main>
+
+      <footer className="text-center text-xs text-gray-500 dark:text-gray-400 py-4">
+        <a
+          href="/legal"
+          target="_blank"
+          rel="noopener noreferrer"
+          className="underline hover:text-blue-600 dark:hover:text-blue-300"
+        >
+          Impressum & Datenschutz
+        </a>
+      </footer>
     </div>
   );
 }
