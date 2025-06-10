@@ -77,17 +77,54 @@ function AnalyticsScript() {
   );
 }
 
+function AnalyticsDebugStatus() {
+  const [status, setStatus] = useState<"enabled" | "disabled" | "unknown">("unknown");
+
+  useEffect(() => {
+    if (typeof window === "undefined") return;
+
+    try {
+      const consent = JSON.parse(localStorage.getItem("cookie-consent") || "{}");
+      if (consent.statistik === true) {
+        setStatus("enabled");
+      } else {
+        setStatus("disabled");
+      }
+    } catch {
+      setStatus("unknown");
+    }
+  }, []);
+
+  if (process.env.NODE_ENV !== "development") return null;
+
+  const color =
+    status === "enabled" ? "bg-green-500" :
+    status === "disabled" ? "bg-red-500" :
+    "bg-gray-500";
+
+  const text =
+    status === "enabled" ? "Google Analytics AKTIV" :
+    status === "disabled" ? "Google Analytics BLOCKIERT" :
+    "Unbekannter Status";
+
+  return (
+    <div className={`fixed bottom-4 right-4 px-4 py-2 text-xs text-white rounded shadow-lg z-[9999] ${color}`}>
+      {text}
+    </div>
+  );
+}
+
 export default function App({ Component, pageProps: { session, ...pageProps } }: AppProps) {
   const getLayout = (Component as any).getLayout || ((page: React.ReactNode) => page);
 
   return (
-    <SessionProvider session={session}>
-      <Toaster position="top-center" />
-      <PromotedToAdminToast />
-      <SessionRefresher />
-      <AnalyticsScript />
-      {getLayout(<Component {...pageProps} />)}
-      <CookieBanner />
-    </SessionProvider>
-  );
-}
+  <SessionProvider session={session}>
+    <Toaster position="top-center" />
+    <PromotedToAdminToast />
+    <SessionRefresher />
+    <AnalyticsScript />
+    {getLayout(<Component {...pageProps} />)}
+    <AnalyticsDebugStatus />  {/* ⬅️ NEU eingefügt */}
+    <CookieBanner />
+  </SessionProvider>
+);
