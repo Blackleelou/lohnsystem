@@ -21,14 +21,7 @@ export default async function handler(req: NextApiRequest, res: NextApiResponse)
         type: true,
         role: true,
         expiresAt: true,
-        createdBy: true,
-        createdByUser: {
-          select: {
-            name: true,
-            nickname: true,
-            email: true,
-          },
-        },
+        createdBy: true, // 👈 reicht aus, createdByUser ist nicht nötig
       },
       orderBy: {
         expiresAt: 'asc',
