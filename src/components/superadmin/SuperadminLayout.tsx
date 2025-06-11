@@ -128,6 +128,6 @@ export default function SuperadminLayout({ children }: { children: React.ReactNo
     <a href="/legal" className="underline hover:text-blue-600">Impressum & Datenschutz</a>
   </footer>
 </div>
-    
+    </div> // 👈 fehlt aktuell – das ist der Wrapper für das ganze Layout
   );
 }
