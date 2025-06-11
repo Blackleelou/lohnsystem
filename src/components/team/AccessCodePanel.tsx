@@ -173,27 +173,37 @@ export default function AccessCodePanel() {
   </td>
 
   <td className="px-3 py-2">
-    <div className="flex items-center gap-3">
-      <button
-        onClick={() => {
-          navigator.clipboard.writeText(`${window.location.origin}/join/${inv.token}`);
-          toast.success("Link wurde kopiert!");
-        }}
-        title="Link kopieren"
-        className="text-blue-600 hover:text-blue-800 transition"
-      >
-        <Copy size={18} />
-      </button>
+  <div className="flex items-center gap-3">
+    <button
+      onClick={() => {
+        navigator.clipboard.writeText(`${window.location.origin}/join/${inv.token}`);
+        toast.success("Link wurde kopiert!");
+      }}
+      title="Link kopieren"
+      className="text-blue-600 hover:text-blue-800 transition"
+    >
+      <Copy size={18} />
+    </button>
 
-      <button
-        onClick={() => deleteInvitation(inv.id)}
-        title="Einladung löschen"
-        className="text-red-600 hover:text-red-800 transition"
+    {(inv.type === 'qr_simple' || inv.type === 'qr_protected') && (
+      <a
+        href={`/team/print/${inv.token}?edit=1`}
+        title="Einladung bearbeiten oder drucken"
+        className="text-gray-600 hover:text-black transition"
       >
-        <Trash2 size={18} />
-      </button>
-    </div>
-  </td>
+        ✏️
+      </a>
+    )}
+
+    <button
+      onClick={() => deleteInvitation(inv.id)}
+      title="Einladung löschen"
+      className="text-red-600 hover:text-red-800 transition"
+    >
+      <Trash2 size={18} />
+    </button>
+  </div>
+</td>
 </tr>
 
               ))}
