@@ -10,6 +10,11 @@ type Invitation = {
   role: string;
   createdBy: string;
   expiresAt: string;
+  createdByUser?: {
+    name?: string;
+    nickname?: string;
+    email?: string;
+  };
 };
 
 export default function AccessCodePanel() {
@@ -88,23 +93,23 @@ export default function AccessCodePanel() {
             {validUntil && (
               <div className="text-sm text-gray-500 flex flex-wrap gap-4 mb-4">
                 <span>
-                  Gültig bis:{" "}
+                  Gültig bis:{' '}
                   <strong>
-                    {new Date(validUntil).toLocaleString("de-DE", {
-                      day: "2-digit",
-                      month: "2-digit",
-                      year: "numeric",
-                      hour: "2-digit",
-                      minute: "2-digit",
+                    {new Date(validUntil).toLocaleString('de-DE', {
+                      day: '2-digit',
+                      month: '2-digit',
+                      year: 'numeric',
+                      hour: '2-digit',
+                      minute: '2-digit',
                     })}
                   </strong>
                 </span>
                 <span className="text-gray-400 text-sm">
-                  Noch gültig für:{" "}
+                  Noch gültig für:{' '}
                   <strong>
                     {(() => {
                       const diff = new Date(validUntil).getTime() - new Date().getTime();
-                      if (diff <= 0) return "abgelaufen";
+                      if (diff <= 0) return 'abgelaufen';
                       const hours = Math.floor(diff / (1000 * 60 * 60));
                       const minutes = Math.floor((diff % (1000 * 60 * 60)) / (1000 * 60));
                       return `${hours}h ${minutes}min`;
@@ -113,7 +118,6 @@ export default function AccessCodePanel() {
                 </span>
               </div>
             )}
-
             <button
               onClick={regeneratePassword}
               disabled={regenerating}
@@ -162,7 +166,9 @@ export default function AccessCodePanel() {
                     )}
                   </td>
                   <td className="px-3 py-2">{inv.role}</td>
-                  <td className="px-3 py-2">{inv.createdBy}</td>
+                  <td className="px-3 py-2">
+                    {inv.createdByUser?.name || inv.createdByUser?.nickname || inv.createdBy || '–'}
+                  </td>
                   <td className="px-3 py-2">
                     {new Date(inv.expiresAt).toLocaleDateString('de-DE')}
                   </td>
@@ -172,7 +178,7 @@ export default function AccessCodePanel() {
                       <button
                         onClick={() => {
                           navigator.clipboard.writeText(`${window.location.origin}/join/${inv.token}`);
-                          toast.success("Link wurde kopiert!");
+                          toast.success('Link wurde kopiert!');
                         }}
                         title="Link kopieren"
                         className="text-blue-600 hover:text-blue-800 transition"
@@ -180,7 +186,7 @@ export default function AccessCodePanel() {
                         <Copy size={18} />
                       </button>
 
-                      {/* Bearbeiten (mit Tooltip) */}
+                      {/* Bearbeiten */}
                       {(inv.type === 'qr_simple' || inv.type === 'qr_protected') && (
                         <Tooltip.Root>
                           <Tooltip.Trigger asChild>
