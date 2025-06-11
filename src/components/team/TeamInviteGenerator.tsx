@@ -1,11 +1,11 @@
 // src/components/team/TeamInviteGenerator.tsx
+
 import { useState } from 'react';
 import QRCode from 'react-qr-code';
-import { Mail, Lock } from 'lucide-react';
-import { FaWhatsapp } from 'react-icons/fa';
+import { Mail, Lock, Loader2 } from 'lucide-react';
+import { FaWhatsapp, FaQrcode } from 'react-icons/fa';
 import { isMobile } from 'react-device-detect';
 import { toast } from 'react-hot-toast';
-import Link from 'next/link';
 
 export default function TeamInviteGenerator() {
   const [qrUrl, setQrUrl] = useState('');
@@ -58,16 +58,13 @@ export default function TeamInviteGenerator() {
     setLoadingType(null);
 
     if (mode === 'whatsapp') {
-      const whatsappUrl = `https://wa.me/?text=${encodedUrl}`;
-      window.open(whatsappUrl, '_blank');
+      window.open(`https://wa.me/?text=${encodedUrl}`, '_blank');
     } else {
+      window.location.href = `mailto:?subject=Team Einladung&body=${encodedUrl}`;
       if (!isMobile) {
-        window.location.href = `mailto:?subject=Team Einladung&body=${encodedUrl}`;
         setTimeout(() => {
-          toast('Es scheint kein E-Mail-Programm eingerichtet zu sein. Link wurde bereitgestellt.');
+          toast('Es scheint kein E-Mail-Programm eingerichtet zu sein.');
         }, 1500);
-      } else {
-        window.location.href = `mailto:?subject=Team Einladung&body=${encodedUrl}`;
       }
     }
   };
@@ -75,18 +72,18 @@ export default function TeamInviteGenerator() {
   const Card = ({
     title,
     description,
-    buttonArea,
+    action,
     content,
   }: {
     title: string;
     description: string | JSX.Element;
-    buttonArea: JSX.Element;
+    action: JSX.Element;
     content?: JSX.Element | null;
   }) => (
     <section className="bg-white rounded-xl border border-gray-200 shadow-sm p-6">
       <h2 className="text-base font-semibold text-gray-800 mb-1">{title}</h2>
       <p className="text-sm text-gray-500 mb-4">{description}</p>
-      {buttonArea}
+      <div>{action}</div>
       {content && <div className="mt-4 flex justify-center">{content}</div>}
     </section>
   );
@@ -95,92 +92,83 @@ export default function TeamInviteGenerator() {
     <div className="max-w-3xl mx-auto px-4 py-8 space-y-8">
       <h1 className="text-2xl font-bold text-center text-gray-800">Einladungen verwalten</h1>
 
-      {/* Option 1 */}
+      {/* Option 1: QR ohne Passwort */}
       <Card
         title="QR-Code ohne Passwort"
         description="30 Tage gültig, ideal für Aushänge oder interne Weitergabe."
-        buttonArea={
+        action={
           <button
             onClick={handleQr}
-            className="w-full md:w-auto bg-violet-600 text-white px-4 py-2 rounded hover:bg-violet-700 transition"
+            className="inline-flex items-center gap-2 text-violet-700 hover:underline text-sm"
             disabled={loadingType === 'qr'}
           >
-            {loadingType === 'qr' ? 'Erzeuge QR-Code …' : 'QR-Code generieren'}
+            {loadingType === 'qr' ? <Loader2 className="w-4 h-4 animate-spin" /> : <FaQrcode />}
+            QR-Code generieren
           </button>
         }
         content={
           qrUrl ? (
-            <div className="flex flex-col items-center gap-2">
-              <QRCode value={qrUrl} level="H" size={128} />
-            </div>
+            <QRCode value={qrUrl} level="H" size={128} />
           ) : null
         }
       />
 
-      {/* Option 2 */}
+      {/* Option 2: QR mit Passwort */}
       <Card
         title="QR-Code mit Passwort"
         description={
           <span className="flex items-center gap-1 text-gray-500">
-            Passwort wechselt täglich.{' '}
+            Passwort wechselt täglich. 
             <Lock className="w-4 h-4 text-gray-400" />
-            <Link
-              href="/team/security"
-              className="underline hover:text-blue-600 transition"
-              title="Zur Passwortseite"
-            >
-              Hier einsehen
-            </Link>
+            <a href="/team/security" className="text-violet-600 hover:underline ml-1">Anzeigen</a>
           </span>
         }
-        buttonArea={
+        action={
           <button
             onClick={handleSecureQr}
-            className="w-full md:w-auto bg-violet-600 text-white px-4 py-2 rounded hover:bg-violet-700 transition"
+            className="inline-flex items-center gap-2 text-violet-700 hover:underline text-sm"
             disabled={loadingType === 'secure'}
           >
-            {loadingType === 'secure'
-              ? 'Erzeuge geschützten Code …'
-              : 'QR-Code mit Passwort generieren'}
+            {loadingType === 'secure' ? <Loader2 className="w-4 h-4 animate-spin" /> : <FaQrcode />}
+            QR-Code mit Passwort generieren
           </button>
         }
         content={
           qrSecureUrl ? (
-            <div className="flex flex-col items-center gap-2">
-              <QRCode value={qrSecureUrl} level="H" size={128} />
-            </div>
+            <QRCode value={qrSecureUrl} level="H" size={128} />
           ) : null
         }
       />
 
-      {/* Option 3 */}
+      {/* Option 3: Einmal-Link */}
       <Card
         title="Einmal-Link per WhatsApp oder E-Mail"
         description="Nach erstem Klick verfällt der Link. Direkt versenden an neue Teammitglieder."
-        buttonArea={
-          <div className="flex justify-center items-center gap-8">
-            <span
+        action={
+          <div className="flex justify-start items-center gap-6 text-gray-600">
+            {/* WhatsApp */}
+            <button
               onClick={() => generateAndSendLink('whatsapp')}
-              className={`cursor-pointer ${
-                loadingType === 'link-whatsapp' ? 'opacity-50' : 'hover:opacity-80'
-              }`}
+              disabled={loadingType === 'link-whatsapp'}
               title="Per WhatsApp senden"
+              className="hover:text-green-600"
             >
-              <FaWhatsapp className="w-8 h-8 text-green-500" />
-            </span>
+              <FaWhatsapp className="w-6 h-6" />
+            </button>
 
-            <span
+            {/* E-Mail */}
+            <button
               onClick={() => generateAndSendLink('email')}
-              className={`cursor-pointer ${
-                loadingType === 'link-email' ? 'opacity-50' : 'hover:opacity-80'
-              }`}
+              disabled={loadingType === 'link-email'}
               title="Per E-Mail senden"
+              className="hover:text-blue-600"
             >
-              <Mail className="w-8 h-8 text-blue-500" />
-            </span>
+              <Mail className="w-6 h-6" />
+            </button>
 
+            {/* Link kopieren */}
             {!isMobile && (
-              <span
+              <button
                 onClick={async () => {
                   setLoadingType('link-copy');
                   try {
@@ -194,25 +182,18 @@ export default function TeamInviteGenerator() {
 
                     await navigator.clipboard.writeText(url);
                     setLastLink(url);
-                    toast.success('Einladungslink wurde in die Zwischenablage kopiert!');
+                    toast.success('Einladungslink kopiert!');
                   } catch (err) {
                     toast.error('Konnte keinen Link generieren.');
                   } finally {
                     setLoadingType(null);
                   }
                 }}
-                className={`cursor-pointer ${
-                  loadingType === 'link-copy' ? 'opacity-50' : 'hover:opacity-80'
-                }`}
+                disabled={loadingType === 'link-copy'}
                 title="Link kopieren"
+                className="hover:text-gray-800"
               >
-                <svg
-                  xmlns="http://www.w3.org/2000/svg"
-                  className="w-8 h-8 text-gray-500"
-                  fill="none"
-                  viewBox="0 0 24 24"
-                  stroke="currentColor"
-                >
+                <svg xmlns="http://www.w3.org/2000/svg" className="w-6 h-6" fill="none" viewBox="0 0 24 24" stroke="currentColor">
                   <path
                     strokeLinecap="round"
                     strokeLinejoin="round"
@@ -220,7 +201,7 @@ export default function TeamInviteGenerator() {
                     d="M8 16h8m-4-4h4m-4-4h4M7 8h.01M7 16h.01M3 4a1 1 0 011-1h13.586a1 1 0 01.707.293l2.414 2.414a1 1 0 01.293.707V20a1 1 0 01-1 1H4a1 1 0 01-1-1V4z"
                   />
                 </svg>
-              </span>
+              </button>
             )}
           </div>
         }
