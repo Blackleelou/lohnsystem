@@ -1,3 +1,5 @@
+// src/pages/api/team/invitations.ts
+
 import { NextApiRequest, NextApiResponse } from 'next';
 import { getServerSession } from 'next-auth';
 import { authOptions } from '@/lib/authOptions';
@@ -11,29 +13,29 @@ export default async function handler(req: NextApiRequest, res: NextApiResponse)
 
   try {
     const invitations = await prisma.invitation.findMany({
-  where: {
-    companyId: session.user.companyId,
-    expiresAt: { gt: new Date() },
-  },
-  select: {
-    id: true,
-    token: true,
-    type: true,
-    role: true,
-    expiresAt: true,
-    createdBy: true,
-    createdByUser: {
-      select: {
-        name: true,
-        nickname: true,
-        email: true,
+      where: {
+        companyId: session.user.companyId,
+        expiresAt: { gt: new Date() },
       },
-    },
-  },
-  orderBy: {
-    expiresAt: 'asc',
-  },
-});
+      select: {
+        id: true,
+        token: true,
+        type: true,
+        role: true,
+        expiresAt: true,
+        createdBy: true,
+        createdByUser: {
+          select: {
+            name: true,
+            nickname: true,
+            email: true,
+          },
+        },
+      },
+      orderBy: {
+        expiresAt: 'asc',
+      },
+    });
 
     res.status(200).json({ invitations });
   } catch (error) {
