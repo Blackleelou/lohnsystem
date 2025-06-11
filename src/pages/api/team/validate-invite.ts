@@ -25,11 +25,17 @@ export default async function handler(req: NextApiRequest, res: NextApiResponse)
     return res.status(410).json({ error: 'Einladung ungültig oder abgelaufen' });
   }
 
+  // 🔐 Fix für Passwortprüfung
+  const passwordRequired =
+    invite.type === 'qr_protected' &&
+    typeof invite.password === 'string' &&
+    invite.password.trim().length > 0;
+
   return res.status(200).json({
     ok: true,
     companyName: invite.company?.name || null,
     role: invite.role,
     type: invite.type,
-    requirePassword: invite.type === 'qr_protected' && typeof invite.password === 'string' && invite.password.trim().length > 0,
+    requirePassword: passwordRequired,
   });
 }
