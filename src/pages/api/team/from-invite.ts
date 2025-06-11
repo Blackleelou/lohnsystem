@@ -1,7 +1,7 @@
 // src/pages/api/team/from-invite.ts
 
 import { NextApiRequest, NextApiResponse } from 'next';
-import { prisma } from '@/lib/prisma'; // Passe den Pfad ggf. an
+import { prisma } from '@/lib/prisma'; // ggf. Pfad anpassen
 
 export default async function handler(req: NextApiRequest, res: NextApiResponse) {
   const { token } = req.query;
@@ -24,12 +24,12 @@ export default async function handler(req: NextApiRequest, res: NextApiResponse)
 
     return res.status(200).json({
       team: {
-        name: invitation.company.name,
+        name: invitation.company?.name || 'Unbekanntes Team',
       },
       invitation: {
-        printTitle: invitation.printTitle,
-        printText: invitation.printText,
-        printLogo: invitation.printLogo,
+        printTitle: invitation.printTitle || '',
+        printText: invitation.printText || '',
+        printLogo: invitation.printLogo || null,
       },
     });
   } catch (err) {
