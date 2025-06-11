@@ -77,8 +77,6 @@ export default function PrintableQRPage() {
         </div>
       </div>
 
-            </div>
-
       {/* Nur sichtbar außerhalb von Druckansicht */}
       <div className="mt-6 print:hidden flex justify-center">
         <button
