@@ -1,8 +1,7 @@
 import { useEffect, useState } from 'react';
 import { Copy, Trash2 } from "lucide-react";
 import { toast } from "react-hot-toast";
-import { Tooltip } from "@radix-ui/react-tooltip";
-
+import * as Tooltip from "@radix-ui/react-tooltip";
 
 type Invitation = {
   id: string;
@@ -67,7 +66,7 @@ export default function AccessCodePanel() {
   const deleteInvitation = async (id: string) => {
     if (!confirm('Einladung wirklich löschen?')) return;
     await fetch(`/api/team/delete-invite?id=${id}`, { method: 'DELETE' });
-    fetchInvitations(); // neu laden
+    fetchInvitations();
   };
 
   useEffect(() => {
@@ -77,47 +76,43 @@ export default function AccessCodePanel() {
 
   return (
     <div className="space-y-12 max-w-4xl mx-auto p-4 bg-white border rounded shadow">
+      {/* Passwortbereich */}
       <div>
         <h2 className="text-xl font-bold mb-4">QR-Passwort (geschützte Einladung)</h2>
-
         {loading ? (
           <p>Lade…</p>
         ) : (
           <>
             <p className="text-gray-700 mb-2">Aktuelles Passwort:</p>
             <p className="text-2xl font-mono mb-4">{password || '–'}</p>
-
-{validUntil && (
-  <div className="text-sm text-gray-500 flex flex-wrap gap-4 mb-4">
-    <span>
-      Gültig bis:{" "}
-      <strong>
-        {new Date(validUntil).toLocaleString("de-DE", {
-          day: "2-digit",
-          month: "2-digit",
-          year: "numeric",
-          hour: "2-digit",
-          minute: "2-digit",
-        })}
-      </strong>
-    </span>
-    <span className="text-gray-400 text-sm">
-      Noch gültig für:{" "}
-      <strong>
-        {(() => {
-          const diff = new Date(validUntil).getTime() - new Date().getTime();
-          if (diff <= 0) return "abgelaufen";
-          const hours = Math.floor(diff / (1000 * 60 * 60));
-          const minutes = Math.floor((diff % (1000 * 60 * 60)) / (1000 * 60));
-          return `${hours}h ${minutes}min`;
-        })()}
-      </strong>
-    </span>
-  </div>
-)}
-
-
-
+            {validUntil && (
+              <div className="text-sm text-gray-500 flex flex-wrap gap-4 mb-4">
+                <span>
+                  Gültig bis:{" "}
+                  <strong>
+                    {new Date(validUntil).toLocaleString("de-DE", {
+                      day: "2-digit",
+                      month: "2-digit",
+                      year: "numeric",
+                      hour: "2-digit",
+                      minute: "2-digit",
+                    })}
+                  </strong>
+                </span>
+                <span className="text-gray-400 text-sm">
+                  Noch gültig für:{" "}
+                  <strong>
+                    {(() => {
+                      const diff = new Date(validUntil).getTime() - new Date().getTime();
+                      if (diff <= 0) return "abgelaufen";
+                      const hours = Math.floor(diff / (1000 * 60 * 60));
+                      const minutes = Math.floor((diff % (1000 * 60 * 60)) / (1000 * 60));
+                      return `${hours}h ${minutes}min`;
+                    })()}
+                  </strong>
+                </span>
+              </div>
+            )}
 
             <button
               onClick={regeneratePassword}
@@ -130,6 +125,7 @@ export default function AccessCodePanel() {
         )}
       </div>
 
+      {/* Einladungstabelle */}
       <div>
         <h2 className="text-xl font-bold mb-4">Aktive Einladungen</h2>
         <p className="text-sm text-gray-500 mb-2">Einladungen verfallen automatisch 90 Tage nach Erstellung.</p>
@@ -147,66 +143,73 @@ export default function AccessCodePanel() {
             </thead>
             <tbody>
               {invitations.map((inv) => (
-             <tr key={inv.id} className="border-t">
-  <td className="px-3 py-2">
-    {inv.type === 'qr_simple' && (
-      <span className="inline-block bg-green-100 text-green-800 text-xs px-2 py-1 rounded">
-        QR (einfach)
-      </span>
-    )}
-    {inv.type === 'qr_protected' && (
-      <span className="inline-block bg-yellow-100 text-yellow-800 text-xs px-2 py-1 rounded">
-        QR (mit Passwort)
-      </span>
-    )}
-    {inv.type === 'single_use' && (
-      <span className="inline-block bg-red-100 text-red-800 text-xs px-2 py-1 rounded">
-        Einmal-Link
-      </span>
-    )}
-  </td>
+                <tr key={inv.id} className="border-t">
+                  <td className="px-3 py-2">
+                    {inv.type === 'qr_simple' && (
+                      <span className="inline-block bg-green-100 text-green-800 text-xs px-2 py-1 rounded">
+                        QR (einfach)
+                      </span>
+                    )}
+                    {inv.type === 'qr_protected' && (
+                      <span className="inline-block bg-yellow-100 text-yellow-800 text-xs px-2 py-1 rounded">
+                        QR (mit Passwort)
+                      </span>
+                    )}
+                    {inv.type === 'single_use' && (
+                      <span className="inline-block bg-red-100 text-red-800 text-xs px-2 py-1 rounded">
+                        Einmal-Link
+                      </span>
+                    )}
+                  </td>
+                  <td className="px-3 py-2">{inv.role}</td>
+                  <td className="px-3 py-2">{inv.createdBy}</td>
+                  <td className="px-3 py-2">
+                    {new Date(inv.expiresAt).toLocaleDateString('de-DE')}
+                  </td>
+                  <td className="px-3 py-2">
+                    <div className="flex items-center gap-3">
+                      {/* Link kopieren */}
+                      <button
+                        onClick={() => {
+                          navigator.clipboard.writeText(`${window.location.origin}/join/${inv.token}`);
+                          toast.success("Link wurde kopiert!");
+                        }}
+                        title="Link kopieren"
+                        className="text-blue-600 hover:text-blue-800 transition"
+                      >
+                        <Copy size={18} />
+                      </button>
 
-  <td className="px-3 py-2">{inv.role}</td>
-  <td className="px-3 py-2">{inv.createdBy}</td>
-  <td className="px-3 py-2">
-    {new Date(inv.expiresAt).toLocaleDateString('de-DE')}
-  </td>
+                      {/* Bearbeiten (mit Tooltip) */}
+                      {(inv.type === 'qr_simple' || inv.type === 'qr_protected') && (
+                        <Tooltip.Root>
+                          <Tooltip.Trigger asChild>
+                            <a
+                              href={`/team/print/${inv.token}?edit=1`}
+                              className="text-gray-600 hover:text-black transition"
+                            >
+                              ✏️
+                            </a>
+                          </Tooltip.Trigger>
+                          <Tooltip.Content className="bg-black text-white px-2 py-1 rounded text-xs shadow">
+                            Einladung bearbeiten oder drucken
+                          </Tooltip.Content>
+                        </Tooltip.Root>
+                      )}
 
-  <td className="px-3 py-2">
-  <div className="flex items-center gap-3">
-    <button
-      onClick={() => {
-        navigator.clipboard.writeText(`${window.location.origin}/join/${inv.token}`);
-        toast.success("Link wurde kopiert!");
-      }}
-      title="Link kopieren"
-      className="text-blue-600 hover:text-blue-800 transition"
-    >
-      <Copy size={18} />
-    </button>
-
-    {(inv.type === 'qr_simple' || inv.type === 'qr_protected') && (
-      <a
-        href={`/team/print/${inv.token}?edit=1`}
-        title="Einladung bearbeiten oder drucken"
-        className="text-gray-600 hover:text-black transition"
-      >
-        ✏️
-      </a>
-    )}
-
-    <button
-      onClick={() => deleteInvitation(inv.id)}
-      title="Einladung löschen"
-      className="text-red-600 hover:text-red-800 transition"
-    >
-      <Trash2 size={18} />
-    </button>
-  </div>
-</td>
-</tr>
-
+                      {/* Löschen */}
+                      <button
+                        onClick={() => deleteInvitation(inv.id)}
+                        title="Einladung löschen"
+                        className="text-red-600 hover:text-red-800 transition"
+                      >
+                        <Trash2 size={18} />
+                      </button>
+                    </div>
+                  </td>
+                </tr>
               ))}
+
               {invitations.length === 0 && (
                 <tr>
                   <td colSpan={5} className="text-center py-4 text-gray-400">
