@@ -1,5 +1,3 @@
-// src/components/team/TeamLayout.tsx
-
 import Link from 'next/link';
 import { useRouter } from 'next/router';
 import { useState, useEffect } from 'react';
@@ -21,6 +19,7 @@ import { motion, AnimatePresence } from 'framer-motion';
 export default function TeamLayout({ children }: { children: React.ReactNode }) {
   const { data: session } = useSession();
   const role = session?.user?.role;
+  const router = useRouter();
 
   const links = [
     { href: '/team/members', label: 'Mitglieder', icon: <Users /> },
@@ -32,15 +31,12 @@ export default function TeamLayout({ children }: { children: React.ReactNode }) 
     { href: '/team/delete', label: 'Team löschen', icon: <Trash />, danger: true },
   ];
 
-  const router = useRouter(); // oberhalb von visibleLinks
-
-  // Links je nach Rolle filtern
   const visibleLinks = links.filter((link) => {
     if (role === 'admin') return true;
     if (role === 'editor') return ['/team/payrules', '/team/shifts'].includes(link.href);
-    return false; // viewer oder unbekannt: nichts anzeigen
+    return false;
   });
-  
+
   const [collapsed, setCollapsed] = useState(() => {
     if (typeof window !== 'undefined') {
       return localStorage.getItem('team-sidebar-collapsed') === 'true';
@@ -52,9 +48,9 @@ export default function TeamLayout({ children }: { children: React.ReactNode }) 
     localStorage.setItem('team-sidebar-collapsed', String(collapsed));
   }, [collapsed]);
 
-  
   return (
     <div className="min-h-screen flex bg-gray-50 dark:bg-gray-950">
+      {/* Sidebar */}
       <motion.aside
         className="bg-white dark:bg-gray-900 shadow-md flex flex-col min-h-screen sticky top-0 z-40"
         animate={{ width: collapsed ? 64 : 256 }}
@@ -82,7 +78,7 @@ export default function TeamLayout({ children }: { children: React.ReactNode }) 
         <nav className="flex-1 flex flex-col gap-2 px-2 py-6">
           {visibleLinks.map((link) => {
             const isActive = router.pathname === link.href;
-              return (
+            return (
               <Link
                 key={link.href}
                 href={link.href}
@@ -125,11 +121,19 @@ export default function TeamLayout({ children }: { children: React.ReactNode }) 
         </nav>
       </motion.aside>
 
+      {/* Hauptbereich mit Header, Content, Footer */}
       <div className="flex-1 flex flex-col">
         <header className="bg-white dark:bg-gray-900 shadow px-6 py-3 flex justify-end items-center sticky top-0 z-50">
           <UserMenu />
         </header>
+
         <main className="flex-1 p-6">{children}</main>
+
+        <footer className="text-xs text-center text-gray-400 dark:text-gray-500 py-6">
+          <a href="/legal" className="underline hover:text-blue-600 dark:hover:text-blue-400">
+            Impressum & Datenschutz
+          </a>
+        </footer>
       </div>
     </div>
   );
