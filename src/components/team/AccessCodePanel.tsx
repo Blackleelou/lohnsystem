@@ -180,6 +180,46 @@ export default function AccessCodePanel() {
                       <Trash2 size={18} />
                     </button>
                   </td>
+                  <td className="px-3 py-2">
+  <div className="flex items-center gap-3">
+
+    {/* ✅ 1. Nur Kopieren testen – mit try/catch */}
+    <button
+      onClick={async () => {
+        try {
+          await navigator.clipboard.writeText(`${window.location.origin}/join/${inv.token}`);
+          toast.success('Link wurde kopiert!');
+        } catch (err) {
+          console.error('Fehler beim Kopieren:', err);
+          toast.error('Kopieren fehlgeschlagen');
+        }
+      }}
+      title="Link kopieren"
+      className="text-blue-600 hover:text-blue-800 transition"
+    >
+      <Copy size={18} />
+    </button>
+
+    {/* ✅ 2. Bearbeiten-Link OHNE Tooltip testen */}
+    {(inv.type === 'qr_simple' || inv.type === 'qr_protected') && (
+      <a
+        href={`/team/print/${inv.token}?edit=1`}
+        className="text-gray-600 hover:text-black transition"
+      >
+        ✏️
+      </a>
+    )}
+
+    {/* ✅ 3. Löschen */}
+    <button
+      onClick={() => deleteInvitation(inv.token)}
+      title="Einladung löschen"
+      className="text-red-600 hover:text-red-800 transition"
+    >
+      <Trash2 size={18} />
+    </button>
+  </div>
+</td>
                 </tr>
               ))}
               {invitations.length === 0 && (
