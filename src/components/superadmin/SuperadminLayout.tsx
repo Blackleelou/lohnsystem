@@ -117,11 +117,17 @@ export default function SuperadminLayout({ children }: { children: React.ReactNo
       </motion.aside>
 
       <div className="flex-1 flex flex-col">
-        <header className="bg-white shadow px-6 py-3 flex justify-end items-center sticky top-0 z-50">
-          <UserMenu />
-        </header>
-        <main className="flex-1 p-6">{children}</main>
-      </div>
-    </div>
+  <header className="bg-white shadow px-6 py-3 flex justify-end items-center sticky top-0 z-50">
+    <UserMenu />
+  </header>
+
+  <main className="flex-1 p-6">{children}</main>
+
+  {/* Footer mit Impressum */}
+  <footer className="text-xs text-center text-gray-400 py-6">
+    <a href="/legal" className="underline hover:text-blue-600">Impressum & Datenschutz</a>
+  </footer>
+</div>
+    
   );
 }
