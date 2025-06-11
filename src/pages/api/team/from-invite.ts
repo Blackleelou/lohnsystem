@@ -1,7 +1,7 @@
 // src/pages/api/team/from-invite.ts
 
 import { NextApiRequest, NextApiResponse } from 'next';
-import { prisma } from '@/lib/prisma'; // ggf. Pfad anpassen
+import { prisma } from '@/lib/prisma';
 
 export default async function handler(req: NextApiRequest, res: NextApiResponse) {
   const { token } = req.query;
