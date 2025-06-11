@@ -19,16 +19,22 @@ export default function PrintableQRPage() {
 
   // Teamnamen dynamisch abrufen (basiert auf Invite)
   useEffect(() => {
-    if (!token || typeof token !== 'string') return;
+  if (!token || typeof token !== 'string') return;
 
-    fetch(`/api/team/from-invite?token=${token}`)
-      .then(res => res.json())
-      .then(data => {
-        if (data?.team?.name) {
-          setTeamName(data.team.name);
-        }
-      });
-  }, [token]);
+  fetch(`/api/team/from-invite?token=${token}`)
+    .then(res => res.json())
+    .then(data => {
+      if (data?.team?.name) {
+        setTeamName(data.team.name);
+      }
+
+      if (data?.invitation) {
+        if (data.invitation.printTitle) setHeadline(data.invitation.printTitle);
+        if (data.invitation.printText) setCustomText(data.invitation.printText);
+        if (data.invitation.printLogo) setLogo(data.invitation.printLogo);
+      }
+    });
+}, [token]);
 
   const handleLogoUpload = (e: React.ChangeEvent<HTMLInputElement>) => {
     const file = e.target.files?.[0];
