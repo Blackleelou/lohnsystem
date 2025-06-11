@@ -13,7 +13,7 @@ import {
   ChevronLeft,
   ChevronRight,
 } from 'lucide-react';
-import { motion, AnimatePresence } from 'framer-
+import { motion, AnimatePresence } from 'framer-motion';
   
 export default function UserSettingsLayout({ children }: { children: React.ReactNode }) {
   const router = useRouter();
