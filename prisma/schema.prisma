@@ -174,7 +174,9 @@ model Invitation {
   note         String?               
   type         String                
   password     String?               
-  createdById  String                
+  createdById  String      
+
+  createdByUser User? @relation(fields: [createdById], references: [id])
 
   printTitle   String?
   printText    String?
