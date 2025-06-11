@@ -171,10 +171,14 @@ model Invitation {
   expiresAt    DateTime
   used         Boolean  @default(false)
   createdBy    String?
-  note         String?               // Persönliche Nachricht
-  type         String                // z. B. 'qr_simple', 'qr_protected', 'single_use'
-  password     String?               // Passwort nur bei geschützten QR-Codes
-  createdById  String                // Wer hat den Link erstellt
+  note         String?               
+  type         String                
+  password     String?               
+  createdById  String                
+
+  printTitle   String?
+  printText    String?
+  printLogo    String?
 
   company      Company  @relation(fields: [companyId], references: [id], onDelete: Cascade)
 }
