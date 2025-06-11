@@ -2,15 +2,17 @@
 
 import { useState } from 'react';
 import QRCode from 'react-qr-code';
-import { Mail, Lock, Loader2 } from 'lucide-react';
+import { Mail, Lock, Loader2, Printer } from 'lucide-react';
 import { FaWhatsapp, FaQrcode } from 'react-icons/fa';
 import { isMobile } from 'react-device-detect';
 import { toast } from 'react-hot-toast';
+import Link from 'next/link';
 
 export default function TeamInviteGenerator() {
   const [qrUrl, setQrUrl] = useState('');
   const [qrSecureUrl, setQrSecureUrl] = useState('');
   const [lastLink, setLastLink] = useState('');
+  const [lastToken, setLastToken] = useState('');
   const [loadingType, setLoadingType] = useState<
     'qr' | 'secure' | 'link-whatsapp' | 'link-email' | 'link-copy' | null
   >(null);
@@ -24,12 +26,19 @@ export default function TeamInviteGenerator() {
     return await res.json();
   };
 
+  const extractToken = (url: string) => {
+    const parts = url.split('/');
+    return parts[parts.length - 1];
+  };
+
   const handleQr = async () => {
     setLoadingType('qr');
     const data = await createInvite('qr_simple', 720);
     const url = data.invitation?.joinUrl || '';
+    const token = extractToken(url);
     setQrUrl(url);
     setLastLink(url);
+    setLastToken(token);
     setLoadingType(null);
   };
 
@@ -37,8 +46,10 @@ export default function TeamInviteGenerator() {
     setLoadingType('secure');
     const data = await createInvite('qr_protected', 168);
     const url = data.invitation?.joinUrl || '';
+    const token = extractToken(url);
     setQrSecureUrl(url);
     setLastLink(url);
+    setLastToken(token);
     setLoadingType(null);
   };
 
@@ -74,16 +85,29 @@ export default function TeamInviteGenerator() {
     description,
     action,
     content,
+    showPrint,
   }: {
     title: string;
     description: string | JSX.Element;
     action: JSX.Element;
     content?: JSX.Element | null;
+    showPrint?: boolean;
   }) => (
     <section className="bg-white rounded-xl border border-gray-200 shadow-sm p-6">
       <h2 className="text-base font-semibold text-gray-800 mb-1">{title}</h2>
       <p className="text-sm text-gray-500 mb-4">{description}</p>
-      <div>{action}</div>
+      <div className="flex items-center gap-4">
+        {action}
+        {showPrint && lastToken && (
+          <Link
+            href={`/team/print/${lastToken}`}
+            className="inline-flex items-center gap-1 text-sm text-gray-600 hover:text-black hover:underline"
+          >
+            <Printer className="w-4 h-4" />
+            Drucken
+          </Link>
+        )}
+      </div>
       {content && <div className="mt-4 flex justify-center">{content}</div>}
     </section>
   );
@@ -92,7 +116,7 @@ export default function TeamInviteGenerator() {
     <div className="max-w-3xl mx-auto px-4 py-8 space-y-8">
       <h1 className="text-2xl font-bold text-center text-gray-800">Einladungen verwalten</h1>
 
-      {/* Option 1: QR ohne Passwort */}
+      {/* Option 1 */}
       <Card
         title="QR-Code ohne Passwort"
         description="30 Tage gültig, ideal für Aushänge oder interne Weitergabe."
@@ -106,14 +130,11 @@ export default function TeamInviteGenerator() {
             QR-Code generieren
           </button>
         }
-        content={
-          qrUrl ? (
-            <QRCode value={qrUrl} level="H" size={128} />
-          ) : null
-        }
+        content={qrUrl ? <QRCode value={qrUrl} level="H" size={128} /> : null}
+        showPrint={!!qrUrl}
       />
 
-      {/* Option 2: QR mit Passwort */}
+      {/* Option 2 */}
       <Card
         title="QR-Code mit Passwort"
         description={
@@ -133,40 +154,32 @@ export default function TeamInviteGenerator() {
             QR-Code mit Passwort generieren
           </button>
         }
-        content={
-          qrSecureUrl ? (
-            <QRCode value={qrSecureUrl} level="H" size={128} />
-          ) : null
-        }
+        content={qrSecureUrl ? <QRCode value={qrSecureUrl} level="H" size={128} /> : null}
+        showPrint={!!qrSecureUrl}
       />
 
-      {/* Option 3: Einmal-Link */}
+      {/* Option 3 */}
       <Card
         title="Einmal-Link per WhatsApp oder E-Mail"
         description="Nach erstem Klick verfällt der Link. Direkt versenden an neue Teammitglieder."
         action={
           <div className="flex justify-start items-center gap-6 text-gray-600">
-            {/* WhatsApp */}
             <button
               onClick={() => generateAndSendLink('whatsapp')}
               disabled={loadingType === 'link-whatsapp'}
               title="Per WhatsApp senden"
               className="hover:text-green-600"
             >
-              <FaWhatsapp className="w-6 h-6" />
+              <FaWhatsapp className="w-6 h-6 text-green-500" />
             </button>
-
-            {/* E-Mail */}
             <button
               onClick={() => generateAndSendLink('email')}
               disabled={loadingType === 'link-email'}
               title="Per E-Mail senden"
               className="hover:text-blue-600"
             >
-              <Mail className="w-6 h-6" />
+              <Mail className="w-6 h-6 text-blue-500" />
             </button>
-
-            {/* Link kopieren */}
             {!isMobile && (
               <button
                 onClick={async () => {
@@ -193,7 +206,7 @@ export default function TeamInviteGenerator() {
                 title="Link kopieren"
                 className="hover:text-gray-800"
               >
-                <svg xmlns="http://www.w3.org/2000/svg" className="w-6 h-6" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                <svg xmlns="http://www.w3.org/2000/svg" className="w-6 h-6 text-gray-500" fill="none" viewBox="0 0 24 24" stroke="currentColor">
                   <path
                     strokeLinecap="round"
                     strokeLinejoin="round"
