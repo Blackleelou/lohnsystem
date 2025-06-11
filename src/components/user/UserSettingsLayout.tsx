@@ -1,5 +1,3 @@
-// src/components/user/UserSettingsLayout.tsx
-
 import Link from 'next/link';
 import { useRouter } from 'next/router';
 import { useState, useEffect } from 'react';
@@ -14,11 +12,12 @@ import {
   ChevronRight,
 } from 'lucide-react';
 import { motion, AnimatePresence } from 'framer-motion';
-  
+
 export default function UserSettingsLayout({ children }: { children: React.ReactNode }) {
   const router = useRouter();
   const { data: session } = useSession();
   const companyId = session?.user?.companyId;
+
   const [collapsed, setCollapsed] = useState(() => {
     if (typeof window !== 'undefined') {
       return localStorage.getItem('user-sidebar-collapsed') === 'true';
@@ -43,8 +42,10 @@ export default function UserSettingsLayout({ children }: { children: React.React
   const links = [...baseLinks, ...teamLink];
 
   return (
-    <div className="min-h-screen flex flex-col bg-gray-50 dark:bg-gray-950">
+    <div className="flex flex-col min-h-screen bg-gray-50 dark:bg-gray-950">
+      {/* Header + Sidebar + Content */}
       <div className="flex flex-1">
+        {/* Sidebar */}
         <motion.aside
           className="bg-white dark:bg-gray-900 shadow-md flex flex-col min-h-screen sticky top-0 z-40"
           animate={{ width: collapsed ? 64 : 256 }}
@@ -115,10 +116,12 @@ export default function UserSettingsLayout({ children }: { children: React.React
           </nav>
         </motion.aside>
 
+        {/* Content */}
         <div className="flex-1 flex flex-col">
           <header className="bg-white dark:bg-gray-900 shadow px-6 py-3 flex justify-end items-center sticky top-0 z-50">
             <UserMenu />
           </header>
+
           <motion.main
             className="flex-1 p-6"
             initial={{ opacity: 0 }}
@@ -130,7 +133,7 @@ export default function UserSettingsLayout({ children }: { children: React.React
         </div>
       </div>
 
-      {/* Footer mit Impressum */}
+      {/* Footer immer unten sichtbar */}
       <footer className="text-xs text-center text-gray-400 dark:text-gray-500 py-6">
         <a href="/legal" className="underline hover:text-blue-600 dark:hover:text-blue-400">
           Impressum & Datenschutz
