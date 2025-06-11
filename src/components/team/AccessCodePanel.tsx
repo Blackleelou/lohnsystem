@@ -68,10 +68,25 @@ export default function AccessCodePanel() {
     }
   };
 
-  const deleteInvitation = async (id: string) => {
+  const deleteInvitation = async (token: string) => {
     if (!confirm('Einladung wirklich löschen?')) return;
-    await fetch(`/api/team/delete-invite?id=${id}`, { method: 'DELETE' });
-    fetchInvitations();
+
+    try {
+      const res = await fetch('/api/team/delete-invite', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ token }),
+      });
+
+      if (res.ok) {
+        toast.success('Einladung gelöscht');
+        fetchInvitations();
+      } else {
+        toast.error('Löschen fehlgeschlagen');
+      }
+    } catch (err) {
+      toast.error('Serverfehler beim Löschen');
+    }
   };
 
   useEffect(() => {
@@ -174,7 +189,6 @@ export default function AccessCodePanel() {
                   </td>
                   <td className="px-3 py-2">
                     <div className="flex items-center gap-3">
-                      {/* Link kopieren */}
                       <button
                         onClick={() => {
                           navigator.clipboard.writeText(`${window.location.origin}/join/${inv.token}`);
@@ -186,7 +200,6 @@ export default function AccessCodePanel() {
                         <Copy size={18} />
                       </button>
 
-                      {/* Bearbeiten */}
                       {(inv.type === 'qr_simple' || inv.type === 'qr_protected') && (
                         <Tooltip.Root>
                           <Tooltip.Trigger asChild>
@@ -203,9 +216,8 @@ export default function AccessCodePanel() {
                         </Tooltip.Root>
                       )}
 
-                      {/* Löschen */}
                       <button
-                        onClick={() => deleteInvitation(inv.id)}
+                        onClick={() => deleteInvitation(inv.token)}
                         title="Einladung löschen"
                         className="text-red-600 hover:text-red-800 transition"
                       >
