@@ -172,7 +172,6 @@ export default function AccessCodePanel() {
                   <td className="px-3 py-2">{inv.createdByUser?.name || inv.createdByUser?.nickname || inv.createdBy || '–'}</td>
                   <td className="px-3 py-2">{new Date(inv.expiresAt).toLocaleDateString('de-DE')}</td>
                   <td className="px-3 py-2">
-                 <td className="px-3 py-2">
   <div className="flex items-center gap-3">
 
     {/* ✅ 1. Nur Kopieren testen – mit try/catch */}
