@@ -17,20 +17,8 @@ export default async function handler(req: NextApiRequest, res: NextApiResponse)
         companyId: session.user.companyId,
         expiresAt: { gt: new Date() },
       },
-      select: {
-        id: true,
-        token: true,
-        type: true,
-        role: true,
-        expiresAt: true,
-        createdBy: true,
-        createdByUser: {
-          select: {
-            name: true,
-            nickname: true,
-            email: true,
-          },
-        },
+      include: {
+        createdByUser: true, // 🔁 automatisch sicher, auch wenn NULL
       },
       orderBy: {
         expiresAt: 'asc',
@@ -38,8 +26,8 @@ export default async function handler(req: NextApiRequest, res: NextApiResponse)
     });
 
     res.status(200).json({ invitations });
-  } catch (error) {
-    console.error('Fehler beim Laden der Einladungen:', error);
+  } catch (error: any) {
+    console.error('Fehler beim Laden der Einladungen:', error.message, error.stack);
     res.status(500).json({ error: 'Einladungen konnten nicht geladen werden.' });
   }
 }
