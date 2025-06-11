@@ -5,6 +5,7 @@ import { Mail } from 'lucide-react';
 import { FaWhatsapp } from 'react-icons/fa';
 import { isMobile } from 'react-device-detect';
 import { toast } from 'react-hot-toast';
+import { Lock } from 'lucide-react'; // am Anfang der Datei, falls noch nicht vorhanden
 
 export default function TeamInviteGenerator() {
   const [qrUrl, setQrUrl] = useState('');
@@ -119,7 +120,18 @@ export default function TeamInviteGenerator() {
       {/* Option 2 */}
       <Card
         title="QR-Code mit Passwort"
-        description="Passwort wechselt alle 24 Stunden, QR bleibt gültig. Passwort auf /team/security."
+        description={
+  <span className="flex items-center gap-1 text-gray-500">
+    Passwort wechselt täglich.
+    <Lock className="w-4 h-4 text-gray-400" />
+    <a
+      href="/team/security"
+      className="underline text-blue-600 hover:text-blue-800"
+    >
+      Zugangscode einsehen
+    </a>
+  </span>
+}
         buttonArea={
           <button
             onClick={handleSecureQr}
