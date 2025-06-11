@@ -10,6 +10,7 @@ type Company = {
 export default function CompaniesPage() {
   const [companies, setCompanies] = useState<Company[]>([]);
   const [loading, setLoading] = useState(true);
+  const [deleting, setDeleting] = useState(false);
 
   // Firmen abrufen
   const fetchCompanies = () => {
@@ -36,10 +37,31 @@ export default function CompaniesPage() {
     }
   };
 
+  // Alle QR-Codes (global) löschen
+  const deleteAllQrCodes = async () => {
+    if (!window.confirm('Willst du wirklich ALLE QR-Codes im System löschen?')) return;
+    setDeleting(true);
+
+    const res = await fetch('/api/superadmin/delete-all-invitations', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+    });
+
+    setDeleting(false);
+
+    if (res.ok) {
+      const data = await res.json();
+      alert(`✅ ${data.deletedCount} Einladungen gelöscht.`);
+    } else {
+      alert('❌ Fehler beim Löschen.');
+    }
+  };
+
   return (
     <SuperadminLayout>
       <div className="max-w-3xl mx-auto p-6">
         <h1 className="text-2xl font-bold text-blue-700 mb-6">Firmenübersicht</h1>
+
         <div className="bg-white rounded-xl shadow p-4">
           {loading ? (
             <div className="text-gray-400 text-center">Lade Firmen...</div>
@@ -74,6 +96,17 @@ export default function CompaniesPage() {
               </tbody>
             </table>
           )}
+        </div>
+
+        {/* QR-Code-Löschfunktion */}
+        <div className="mt-8 text-center">
+          <button
+            onClick={deleteAllQrCodes}
+            disabled={deleting}
+            className="bg-red-700 hover:bg-red-800 text-white px-4 py-2 rounded text-sm"
+          >
+            {deleting ? 'Lösche...' : '🔥 Alle QR-Codes systemweit löschen'}
+          </button>
         </div>
       </div>
     </SuperadminLayout>
