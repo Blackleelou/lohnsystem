@@ -1,4 +1,3 @@
-
 import { useEffect, useState } from 'react';
 import { Copy, Trash2 } from "lucide-react";
 import { toast } from "react-hot-toast";
@@ -24,7 +23,7 @@ export default function AccessCodePanel() {
   const [loading, setLoading] = useState(false);
   const [regenerating, setRegenerating] = useState(false);
   const [invitations, setInvitations] = useState<Invitation[]>([]);
-  const [debugError, setDebugError] = useState<string | null>(null); // Fehleranzeige
+  const [debugError, setDebugError] = useState<string | null>(null);
 
   const fetchPassword = async () => {
     setLoading(true);
@@ -64,7 +63,7 @@ export default function AccessCodePanel() {
       const data = await res.json();
       if (res.ok && Array.isArray(data.invitations)) {
         setInvitations(data.invitations);
-        setDebugError(null); // Fehleranzeige zurücksetzen
+        setDebugError(null);
       } else {
         setDebugError(`Fehler vom Server: ${data?.error || 'Unbekannter Fehler'}`);
       }
@@ -172,50 +171,61 @@ export default function AccessCodePanel() {
                   <td className="px-3 py-2">{inv.createdByUser?.name || inv.createdByUser?.nickname || inv.createdBy || '–'}</td>
                   <td className="px-3 py-2">{new Date(inv.expiresAt).toLocaleDateString('de-DE')}</td>
                   <td className="px-3 py-2">
-  <div className="flex items-center gap-3">
+                    <div className="flex items-center gap-3">
+                      <button
+                        onClick={async () => {
+                          try {
+                            await navigator.clipboard.writeText(`${window.location.origin}/join/${inv.token}`);
+                            toast.success('Link wurde kopiert!');
+                          } catch (err) {
+                            console.error('Fehler beim Kopieren:', err);
+                            toast.error('Kopieren fehlgeschlagen');
+                          }
+                        }}
+                        title="Link kopieren"
+                        className="text-blue-600 hover:text-blue-800 transition"
+                      >
+                        <Copy size={18} />
+                      </button>
 
-    {/* ✅ 1. Nur Kopieren testen – mit try/catch */}
-    <button
-      onClick={async () => {
-        try {
-          await navigator.clipboard.writeText(`${window.location.origin}/join/${inv.token}`);
-          toast.success('Link wurde kopiert!');
-        } catch (err) {
-          console.error('Fehler beim Kopieren:', err);
-          toast.error('Kopieren fehlgeschlagen');
-        }
-      }}
-      title="Link kopieren"
-      className="text-blue-600 hover:text-blue-800 transition"
-    >
-      <Copy size={18} />
-    </button>
+                      {(inv.type === 'qr_simple' || inv.type === 'qr_protected') && (
+                        <Tooltip.Root>
+                          <Tooltip.Trigger asChild>
+                            <a
+                              href={`/team/print/${inv.token}?edit=1`}
+                              className="text-gray-600 hover:text-black transition"
+                            >
+                              ✏️
+                            </a>
+                          </Tooltip.Trigger>
+                          <Tooltip.Portal>
+                            <Tooltip.Content
+                              className="bg-black text-white px-2 py-1 rounded text-xs shadow"
+                              sideOffset={5}
+                            >
+                              Einladung bearbeiten oder drucken
+                              <Tooltip.Arrow className="fill-black" />
+                            </Tooltip.Content>
+                          </Tooltip.Portal>
+                        </Tooltip.Root>
+                      )}
 
-    {/* ✅ 2. Bearbeiten-Link OHNE Tooltip testen */}
-    {(inv.type === 'qr_simple' || inv.type === 'qr_protected') && (
-      <a
-        href={`/team/print/${inv.token}?edit=1`}
-        className="text-gray-600 hover:text-black transition"
-      >
-        ✏️
-      </a>
-    )}
-
-    {/* ✅ 3. Löschen */}
-    <button
-      onClick={() => deleteInvitation(inv.token)}
-      title="Einladung löschen"
-      className="text-red-600 hover:text-red-800 transition"
-    >
-      <Trash2 size={18} />
-    </button>
-  </div>
-</td>
+                      <button
+                        onClick={() => deleteInvitation(inv.token)}
+                        title="Einladung löschen"
+                        className="text-red-600 hover:text-red-800 transition"
+                      >
+                        <Trash2 size={18} />
+                      </button>
+                    </div>
+                  </td>
                 </tr>
               ))}
               {invitations.length === 0 && (
                 <tr>
-                  <td colSpan={5} className="text-center py-4 text-gray-400">Keine aktiven Einladungen vorhanden.</td>
+                  <td colSpan={5} className="text-center py-4 text-gray-400">
+                    Keine aktiven Einladungen vorhanden.
+                  </td>
                 </tr>
               )}
             </tbody>
