@@ -5,6 +5,7 @@ import QRCode from 'react-qr-code';
 import Head from 'next/head';
 import { useEffect, useState } from 'react';
 import Image from 'next/image';
+import { toast } from 'react-hot-toast';
 
 export default function PrintableQRPage() {
   const router = useRouter();
@@ -17,24 +18,24 @@ export default function PrintableQRPage() {
 
   const joinUrl = `${process.env.NEXT_PUBLIC_APP_URL || ''}/team/join/${token}`;
 
-  // Teamnamen dynamisch abrufen (basiert auf Invite)
+  // Teamnamen & gespeicherte Druckdaten laden
   useEffect(() => {
-  if (!token || typeof token !== 'string') return;
+    if (!token || typeof token !== 'string') return;
 
-  fetch(`/api/team/from-invite?token=${token}`)
-    .then(res => res.json())
-    .then(data => {
-      if (data?.team?.name) {
-        setTeamName(data.team.name);
-      }
+    fetch(`/api/team/from-invite?token=${token}`)
+      .then(res => res.json())
+      .then(data => {
+        if (data?.team?.name) {
+          setTeamName(data.team.name);
+        }
 
-      if (data?.invitation) {
-        if (data.invitation.printTitle) setHeadline(data.invitation.printTitle);
-        if (data.invitation.printText) setCustomText(data.invitation.printText);
-        if (data.invitation.printLogo) setLogo(data.invitation.printLogo);
-      }
-    });
-}, [token]);
+        if (data?.invitation) {
+          if (data.invitation.printTitle) setHeadline(data.invitation.printTitle);
+          if (data.invitation.printText) setCustomText(data.invitation.printText);
+          if (data.invitation.printLogo) setLogo(data.invitation.printLogo);
+        }
+      });
+  }, [token]);
 
   const handleLogoUpload = (e: React.ChangeEvent<HTMLInputElement>) => {
     const file = e.target.files?.[0];
@@ -57,8 +58,8 @@ export default function PrintableQRPage() {
       </Head>
 
       <div className="flex flex-col min-h-screen bg-white text-black px-6 py-8 print:p-0">
-        {/* Vorschaubereich */}
-        <div className="max-w-xl mx-auto w-full border border-gray-300 rounded-lg p-8 shadow print:shadow-none print:border-0 print:p-0 text-center">
+        {/* Vorschau-Block */}
+        <div className="max-w-xl mx-auto w-full border border-gray-300 rounded-lg p-8 shadow print:shadow-none print:border-0 print:p-0 text-center relative">
           <h1 className="text-2xl font-bold mb-2">{headline} {teamName}</h1>
 
           {customText && (
@@ -66,7 +67,7 @@ export default function PrintableQRPage() {
           )}
 
           {logo && (
-            <div className="mb-6 flex justify-center">
+            <div className="mb-6 relative flex justify-center">
               <Image
                 src={logo}
                 alt="Logo"
@@ -74,10 +75,17 @@ export default function PrintableQRPage() {
                 height={100}
                 className="object-contain max-h-[100px]"
               />
+              <button
+                onClick={() => setLogo(null)}
+                className="absolute -top-2 -right-2 bg-white border border-gray-300 text-gray-500 rounded-full w-6 h-6 flex items-center justify-center text-sm shadow hover:text-black"
+                title="Logo entfernen"
+              >
+                ×
+              </button>
             </div>
           )}
 
-          {/* QR-Code – max. 25 % der Höhe (bei A4 ca. 210px) */}
+          {/* QR-Code */}
           <div className="flex justify-center items-center my-6">
             <QRCode value={joinUrl} size={210} level="H" />
           </div>
@@ -120,34 +128,42 @@ export default function PrintableQRPage() {
             >
               Zurück
             </button>
+
             <button
-  onClick={async () => {
-    if (!token || typeof token !== 'string') return;
+              onClick={printPage}
+              className="px-4 py-2 text-sm bg-violet-600 text-white rounded hover:bg-violet-700"
+            >
+              Drucken
+            </button>
 
-    const res = await fetch('/api/team/update-invite-print', {
-      method: 'POST',
-      headers: {
-        'Content-Type': 'application/json',
-      },
-      body: JSON.stringify({
-        token,
-        title: headline,
-        text: customText,
-        logo,
-      }),
-    });
+            <button
+              onClick={async () => {
+                if (!token || typeof token !== 'string') return;
 
-    if (res.ok) {
-      alert('Entwurf gespeichert!');
-    } else {
-      const data = await res.json();
-      alert(`Fehler beim Speichern: ${data.error || 'Unbekannter Fehler'}`);
-    }
-  }}
-  className="px-4 py-2 text-sm border border-gray-300 rounded hover:bg-gray-100"
->
-  Speichern
-</button>
+                const res = await fetch('/api/team/update-invite-print', {
+                  method: 'POST',
+                  headers: {
+                    'Content-Type': 'application/json',
+                  },
+                  body: JSON.stringify({
+                    token,
+                    title: headline,
+                    text: customText,
+                    logo,
+                  }),
+                });
+
+                if (res.ok) {
+                  toast.success('Entwurf gespeichert!');
+                } else {
+                  const data = await res.json();
+                  toast.error(`Fehler: ${data.error || 'Unbekannter Fehler'}`);
+                }
+              }}
+              className="px-4 py-2 text-sm border border-gray-300 rounded hover:bg-gray-100"
+            >
+              Speichern
+            </button>
           </div>
         </div>
       </div>
