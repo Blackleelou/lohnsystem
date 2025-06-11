@@ -1,41 +1,80 @@
-// src/pages/api/team/delete-invite.ts
+import { useEffect, useState } from 'react';
+import { useSession } from 'next-auth/react';
+import { useRouter } from 'next/router';
 
-import type { NextApiRequest, NextApiResponse } from 'next';
-import { prisma } from '@/lib/prisma';
-import { getServerSession } from 'next-auth';
-import { authOptions } from '@/lib/authOptions';
+type Invitation = {
+  id: string;
+  token: string;
+  type: string;
+  password: string | null;
+  createdAt: string;
+  expiresAt: string;
+};
 
-export default async function handler(req: NextApiRequest, res: NextApiResponse) {
-  if (req.method !== 'POST') {
-    return res.status(405).json({ error: 'Nur POST erlaubt' });
-  }
+export default function QRCleanupPage() {
+  const { data: session, status } = useSession();
+  const router = useRouter();
+  const [invitations, setInvitations] = useState<Invitation[]>([]);
+  const [loading, setLoading] = useState(true);
 
-  const session = await getServerSession(req, res, authOptions);
-  if (!session?.user?.companyId) {
-    return res.status(401).json({ error: 'Nicht authentifiziert oder kein Team' });
-  }
+  useEffect(() => {
+    if (status !== 'authenticated') return;
 
-  const { token } = req.body;
+    fetch('/api/team/invitations')
+      .then(res => res.json())
+      .then(data => {
+        const broken = data.invitations.filter(
+          (inv: Invitation) =>
+            inv.type === 'qr_protected' &&
+            (inv.password === null || inv.password.trim() === '')
+        );
+        setInvitations(broken);
+        setLoading(false);
+      });
+  }, [status]);
 
-  if (!token || typeof token !== 'string') {
-    return res.status(400).json({ error: 'Ungültiger Token' });
-  }
+  const deleteInvite = async (token: string) => {
+    if (!confirm('Einladung wirklich löschen?')) return;
 
-  try {
-    const deleted = await prisma.invitation.deleteMany({
-      where: {
-        token,
-        companyId: session.user.companyId,
-      },
+    const res = await fetch('/api/team/delete-invite', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({ token }), // ✅ sendet token
     });
 
-    if (deleted.count === 0) {
-      return res.status(404).json({ error: 'Einladung nicht gefunden oder nicht erlaubt' });
+    if (res.ok) {
+      setInvitations(prev => prev.filter(inv => inv.token !== token)); // ✅ filtert nach token
+    } else {
+      alert('Fehler beim Löschen.');
     }
+  };
 
-    return res.status(200).json({ success: true });
-  } catch (error) {
-    console.error('Fehler beim Löschen:', error);
-    return res.status(500).json({ error: 'Interner Serverfehler' });
-  }
+  if (status === 'loading' || loading) return <div className="p-6">Lade...</div>;
+  if (!session) return <div className="p-6">Nicht eingeloggt.</div>;
+
+  return (
+    <div className="max-w-2xl mx-auto py-12 px-4">
+      <h1 className="text-xl font-bold mb-4">Fehlerhafte QR-Einladungen (qr_protected ohne Passwort)</h1>
+
+      {invitations.length === 0 ? (
+        <p className="text-gray-600">Keine fehlerhaften Einladungen gefunden.</p>
+      ) : (
+        <ul className="space-y-4">
+          {invitations.map(inv => (
+            <li key={inv.token} className="border border-gray-300 p-4 rounded">
+              <p className="text-sm mb-2">Token: <code>{inv.token}</code></p>
+              <p className="text-sm">Erstellt: {new Date(inv.createdAt).toLocaleString()}</p>
+              <p className="text-sm">Ablauf: {new Date(inv.expiresAt).toLocaleString()}</p>
+              <button
+                onClick={() => deleteInvite(inv.token)} // ✅ token statt id
+                className="mt-2 px-3 py-1 text-sm bg-red-500 text-white rounded hover:bg-red-600"
+              >
+                Löschen
+              </button>
+            </li>
+          ))}
+        </ul>
+      )}
+    </div>
+  );
 }
