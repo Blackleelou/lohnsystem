@@ -1,3 +1,5 @@
+// src/pages/api/team/validate-invite.ts
+
 import type { NextApiRequest, NextApiResponse } from 'next';
 import { prisma } from '@/lib/prisma';
 
@@ -24,11 +26,10 @@ export default async function handler(req: NextApiRequest, res: NextApiResponse)
   }
 
   return res.status(200).json({
-  ok: true,
-  companyName: invite.company?.name || null,
-  role: invite.role,
-  type: invite.type,
-  requirePassword: invite.type === 'qr_protected',
-});
-
+    ok: true,
+    companyName: invite.company?.name || null,
+    role: invite.role,
+    type: invite.type,
+    requirePassword: invite.type === 'qr_protected' && typeof invite.password === 'string' && invite.password.trim().length > 0,
+  });
 }
