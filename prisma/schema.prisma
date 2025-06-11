@@ -23,14 +23,12 @@ model User {
   promotedToAdmin Boolean @default(false)
   lastLogin     DateTime?
 
-  // Modus- und Firmenlogik
   companyId   String?
   company     Company?   @relation(fields: [companyId], references: [id])
-  role        String?    // "admin", "editor", "viewer"
+  role        String?    
   invited     Boolean    @default(false)
   accepted    Boolean    @default(true)
 
-  // Sichtbarkeitsoptionen für jedes Teammitglied individuell:
   showName     Boolean  @default(true)
   showNickname Boolean  @default(false)
   showEmail    Boolean  @default(false)
@@ -38,6 +36,8 @@ model User {
   accounts    Account[]
   sessions    Session[]
   shifts      Shift[]
+
+  createdInvitations Invitation[] @relation("UserToInvitations")
 }
 
 model Company {
@@ -50,9 +50,8 @@ model Company {
   settings    CompanySettings?
   payRules    PayRule[]
   shifts      Shift[]
-
-  invitations Invitation[]     // ⬅️ Rückverweis für Invitation
-  accessCodes AccessCode[]     // ⬅️ Rückverweis für AccessCode
+  invitations Invitation[]
+  accessCodes AccessCode[]
 }
 
 model VerificationCode {
@@ -88,8 +87,6 @@ model SuperadminBoardEntry {
   completedAt      DateTime?
   updatedByImport  Boolean   @default(false)
 }
-
-// NextAuth-kompatible Modelle:
 
 model Account {
   id                 String   @id @default(cuid())
@@ -171,18 +168,17 @@ model Invitation {
   expiresAt    DateTime
   used         Boolean  @default(false)
   createdBy    String?
-  note         String?               
-  type         String                
-  password     String?               
-  createdById  String      
-
-  createdByUser User? @relation(fields: [createdById], references: [id])
+  note         String?
+  type         String
+  password     String?
+  createdById  String?
 
   printTitle   String?
   printText    String?
   printLogo    String?
 
-  company      Company  @relation(fields: [companyId], references: [id], onDelete: Cascade)
+  company         Company  @relation(fields: [companyId], references: [id], onDelete: Cascade)
+  createdByUser   User?    @relation("UserToInvitations", fields: [createdById], references: [id])
 }
 
 model AccessCode {
@@ -198,5 +194,5 @@ model AccessCode {
 
   company         Company  @relation(fields: [companyId], references: [id], onDelete: Cascade)
 
-  @@unique([code, companyId], name: "code_companyId")  // ✅ erlaubt pro Firma einen „code“
+  @@unique([code, companyId], name: "code_companyId")
 }
