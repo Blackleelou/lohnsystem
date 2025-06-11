@@ -1,16 +1,16 @@
 // src/components/team/TeamInviteGenerator.tsx
 import { useState } from 'react';
 import QRCode from 'react-qr-code';
-import { Mail } from 'lucide-react';
+import { Mail, Lock } from 'lucide-react';
 import { FaWhatsapp } from 'react-icons/fa';
 import { isMobile } from 'react-device-detect';
 import { toast } from 'react-hot-toast';
-import { Lock } from 'lucide-react'; // am Anfang der Datei, falls noch nicht vorhanden
+import Link from 'next/link';
 
 export default function TeamInviteGenerator() {
   const [qrUrl, setQrUrl] = useState('');
   const [qrSecureUrl, setQrSecureUrl] = useState('');
-  const [lastLink, setLastLink] = useState(''); // für Kopierfunktion
+  const [lastLink, setLastLink] = useState('');
   const [loadingType, setLoadingType] = useState<
     'qr' | 'secure' | 'link-whatsapp' | 'link-email' | 'link-copy' | null
   >(null);
@@ -79,7 +79,7 @@ export default function TeamInviteGenerator() {
     content,
   }: {
     title: string;
-    description: string;
+    description: string | JSX.Element;
     buttonArea: JSX.Element;
     content?: JSX.Element | null;
   }) => (
@@ -121,17 +121,18 @@ export default function TeamInviteGenerator() {
       <Card
         title="QR-Code mit Passwort"
         description={
-  <span className="flex items-center gap-1 text-gray-500">
-    Passwort wechselt täglich.
-    <Lock className="w-4 h-4 text-gray-400" />
-    <a
-      href="/team/security"
-      className="underline text-blue-600 hover:text-blue-800"
-    >
-      Zugangscode einsehen
-    </a>
-  </span>
-}
+          <span className="flex items-center gap-1 text-gray-500">
+            Passwort wechselt täglich.{' '}
+            <Lock className="w-4 h-4 text-gray-400" />
+            <Link
+              href="/team/security"
+              className="underline hover:text-blue-600 transition"
+              title="Zur Passwortseite"
+            >
+              Hier einsehen
+            </Link>
+          </span>
+        }
         buttonArea={
           <button
             onClick={handleSecureQr}
@@ -158,7 +159,6 @@ export default function TeamInviteGenerator() {
         description="Nach erstem Klick verfällt der Link. Direkt versenden an neue Teammitglieder."
         buttonArea={
           <div className="flex justify-center items-center gap-8">
-            {/* WhatsApp */}
             <span
               onClick={() => generateAndSendLink('whatsapp')}
               className={`cursor-pointer ${
@@ -169,7 +169,6 @@ export default function TeamInviteGenerator() {
               <FaWhatsapp className="w-8 h-8 text-green-500" />
             </span>
 
-            {/* E-Mail */}
             <span
               onClick={() => generateAndSendLink('email')}
               className={`cursor-pointer ${
@@ -180,7 +179,6 @@ export default function TeamInviteGenerator() {
               <Mail className="w-8 h-8 text-blue-500" />
             </span>
 
-            {/* Link kopieren Icon (erzeugt neuen Token) */}
             {!isMobile && (
               <span
                 onClick={async () => {
@@ -203,7 +201,9 @@ export default function TeamInviteGenerator() {
                     setLoadingType(null);
                   }
                 }}
-                className={`cursor-pointer ${loadingType === 'link-copy' ? 'opacity-50' : 'hover:opacity-80'}`}
+                className={`cursor-pointer ${
+                  loadingType === 'link-copy' ? 'opacity-50' : 'hover:opacity-80'
+                }`}
                 title="Link kopieren"
               >
                 <svg
