@@ -1,5 +1,3 @@
-// pages/test/qr-cleanup.tsx
-
 import { useEffect, useState } from 'react';
 import { useSession } from 'next-auth/react';
 import { useRouter } from 'next/router';
@@ -35,24 +33,23 @@ export default function QRCleanupPage() {
       });
   }, [status]);
 
-  const deleteInvite = async (id: string) => {
+  const deleteInvite = async (token: string) => {
     if (!confirm('Einladung wirklich löschen?')) return;
 
     const res = await fetch('/api/team/delete-invite', {
       method: 'POST',
       headers: { 'Content-Type': 'application/json' },
-      body: JSON.stringify({ id }),
+      body: JSON.stringify({ token }), // ✅ sendet token
     });
 
     if (res.ok) {
-      setInvitations(prev => prev.filter(inv => inv.id !== id));
+      setInvitations(prev => prev.filter(inv => inv.token !== token)); // ✅ filtert nach token
     } else {
       alert('Fehler beim Löschen.');
     }
   };
 
   if (status === 'loading' || loading) return <div className="p-6">Lade...</div>;
-
   if (!session) return <div className="p-6">Nicht eingeloggt.</div>;
 
   return (
@@ -64,12 +61,12 @@ export default function QRCleanupPage() {
       ) : (
         <ul className="space-y-4">
           {invitations.map(inv => (
-            <li key={inv.id} className="border border-gray-300 p-4 rounded">
+            <li key={inv.token} className="border border-gray-300 p-4 rounded">
               <p className="text-sm mb-2">Token: <code>{inv.token}</code></p>
               <p className="text-sm">Erstellt: {new Date(inv.createdAt).toLocaleString()}</p>
               <p className="text-sm">Ablauf: {new Date(inv.expiresAt).toLocaleString()}</p>
               <button
-                onClick={() => deleteInvite(inv.id)}
+                onClick={() => deleteInvite(inv.token)} // ✅ token statt id
                 className="mt-2 px-3 py-1 text-sm bg-red-500 text-white rounded hover:bg-red-600"
               >
                 Löschen
