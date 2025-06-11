@@ -1,5 +1,3 @@
-// src/pages/api/team/invitations.ts
-
 import { NextApiRequest, NextApiResponse } from 'next';
 import { getServerSession } from 'next-auth';
 import { authOptions } from '@/lib/authOptions';
@@ -22,8 +20,15 @@ export default async function handler(req: NextApiRequest, res: NextApiResponse)
         token: true,
         type: true,
         role: true,
-        createdBy: true,
         expiresAt: true,
+        createdBy: true,
+        createdByUser: {
+          select: {
+            name: true,
+            nickname: true,
+            email: true,
+          },
+        },
       },
       orderBy: {
         expiresAt: 'asc',
