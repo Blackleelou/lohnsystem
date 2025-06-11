@@ -115,17 +115,33 @@ export default function PrintableQRPage() {
               Zurück
             </button>
             <button
-              onClick={printPage}
-              className="px-4 py-2 text-sm bg-violet-600 text-white rounded hover:bg-violet-700"
-            >
-              Drucken
-            </button>
-            <button
-              onClick={() => alert('Später: Entwurf speichern')}
-              className="px-4 py-2 text-sm border border-gray-300 rounded hover:bg-gray-100"
-            >
-              Speichern
-            </button>
+  onClick={async () => {
+    if (!token || typeof token !== 'string') return;
+
+    const res = await fetch('/api/team/update-invite-print', {
+      method: 'POST',
+      headers: {
+        'Content-Type': 'application/json',
+      },
+      body: JSON.stringify({
+        token,
+        title: headline,
+        text: customText,
+        logo,
+      }),
+    });
+
+    if (res.ok) {
+      alert('Entwurf gespeichert!');
+    } else {
+      const data = await res.json();
+      alert(`Fehler beim Speichern: ${data.error || 'Unbekannter Fehler'}`);
+    }
+  }}
+  className="px-4 py-2 text-sm border border-gray-300 rounded hover:bg-gray-100"
+>
+  Speichern
+</button>
           </div>
         </div>
       </div>
