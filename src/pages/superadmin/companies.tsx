@@ -7,10 +7,22 @@ type Company = {
   createdAt: string;
 };
 
+type Invitation = {
+  id: string;
+  token: string;
+  type: string;
+  password: string | null;
+  createdAt: string;
+  expiresAt: string;
+  companyId: string;
+};
+
 export default function CompaniesPage() {
   const [companies, setCompanies] = useState<Company[]>([]);
+  const [invitations, setInvitations] = useState<Invitation[]>([]);
   const [loading, setLoading] = useState(true);
   const [deleting, setDeleting] = useState(false);
+  const [loadingInvites, setLoadingInvites] = useState(true);
 
   // Firmen abrufen
   const fetchCompanies = () => {
@@ -22,8 +34,19 @@ export default function CompaniesPage() {
       });
   };
 
+  // QR-Einladungen abrufen
+  const fetchInvitations = () => {
+    fetch('/api/superadmin/all-qr-invitations')
+      .then((res) => res.json())
+      .then((data) => {
+        setInvitations(data.invitations);
+        setLoadingInvites(false);
+      });
+  };
+
   useEffect(() => {
     fetchCompanies();
+    fetchInvitations();
   }, []);
 
   // Firma löschen
@@ -37,9 +60,9 @@ export default function CompaniesPage() {
     }
   };
 
-  // Alle QR-Codes (global) löschen
-  const deleteAllQrCodes = async () => {
-    if (!window.confirm('Willst du wirklich ALLE QR-Codes im System löschen?')) return;
+  // Alle Einladungen löschen
+  const deleteAllInvites = async () => {
+    if (!window.confirm('Willst du wirklich ALLE Einladungen im System löschen?')) return;
     setDeleting(true);
 
     const res = await fetch('/api/superadmin/delete-all-invitations', {
@@ -52,6 +75,7 @@ export default function CompaniesPage() {
     if (res.ok) {
       const data = await res.json();
       alert(`✅ ${data.deletedCount} Einladungen gelöscht.`);
+      fetchInvitations(); // Liste aktualisieren
     } else {
       alert('❌ Fehler beim Löschen.');
     }
@@ -59,10 +83,10 @@ export default function CompaniesPage() {
 
   return (
     <SuperadminLayout>
-      <div className="max-w-3xl mx-auto p-6">
+      <div className="max-w-5xl mx-auto p-6">
         <h1 className="text-2xl font-bold text-blue-700 mb-6">Firmenübersicht</h1>
 
-        <div className="bg-white rounded-xl shadow p-4">
+        <div className="bg-white rounded-xl shadow p-4 mb-10">
           {loading ? (
             <div className="text-gray-400 text-center">Lade Firmen...</div>
           ) : companies.length === 0 ? (
@@ -98,15 +122,50 @@ export default function CompaniesPage() {
           )}
         </div>
 
-        {/* QR-Code-Löschfunktion */}
-        <div className="mt-8 text-center">
+        {/* Alle Einladungen löschen */}
+        <div className="text-center mb-10">
           <button
-            onClick={deleteAllQrCodes}
+            onClick={deleteAllInvites}
             disabled={deleting}
             className="bg-red-700 hover:bg-red-800 text-white px-4 py-2 rounded text-sm"
           >
-            {deleting ? 'Lösche...' : '🔥 Alle QR-Codes systemweit löschen'}
+            {deleting ? 'Lösche...' : '🔥 Alle Einladungen systemweit löschen'}
           </button>
+        </div>
+
+        {/* QR-Codes Übersicht */}
+        <div className="bg-white rounded-xl shadow p-4">
+          <h2 className="text-lg font-semibold mb-3">Vorhandene QR-Codes</h2>
+          {loadingInvites ? (
+            <p className="text-gray-400">Lade QR-Codes...</p>
+          ) : invitations.length === 0 ? (
+            <p className="text-sm text-gray-500">Keine QR-Einladungen vorhanden</p>
+          ) : (
+            <div className="overflow-x-auto">
+              <table className="min-w-full text-sm">
+                <thead>
+                  <tr className="bg-gray-100">
+                    <th className="px-3 py-2 text-left">Typ</th>
+                    <th className="px-3 py-2 text-left">Token</th>
+                    <th className="px-3 py-2 text-left">Firma</th>
+                    <th className="px-3 py-2 text-left">Erstellt</th>
+                    <th className="px-3 py-2 text-left">Ablauf</th>
+                  </tr>
+                </thead>
+                <tbody>
+                  {invitations.map((inv) => (
+                    <tr key={inv.id} className="border-t hover:bg-blue-50">
+                      <td className="px-3 py-1">{inv.type}</td>
+                      <td className="px-3 py-1 font-mono text-xs break-all">{inv.token}</td>
+                      <td className="px-3 py-1">{inv.companyId}</td>
+                      <td className="px-3 py-1">{new Date(inv.createdAt).toLocaleDateString()}</td>
+                      <td className="px-3 py-1">{new Date(inv.expiresAt).toLocaleDateString()}</td>
+                    </tr>
+                  ))}
+                </tbody>
+              </table>
+            </div>
+          )}
         </div>
       </div>
     </SuperadminLayout>
