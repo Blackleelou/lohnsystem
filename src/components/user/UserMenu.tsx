@@ -79,29 +79,6 @@ export default function UserMenu() {
             Mein Konto
           </Link>
 
-          {/* Trennlinie, falls noch kein Team */}
-          {!companyId && (
-            <>
-              <Link
-                href="/team/create"
-                className="flex items-center gap-2 px-3 py-2 rounded-lg text-violet-700 dark:text-violet-400 font-semibold hover:bg-violet-50 dark:hover:bg-gray-800 transition"
-                onClick={() => setIsOpen(false)}
-              >
-                <Building2 className="w-5 h-5" />
-                Team erstellen
-              </Link>
-              <Link
-                href="/invite/join"
-                className="flex items-center gap-2 px-3 py-2 rounded-lg text-green-700 dark:text-green-400 font-semibold hover:bg-green-50 dark:hover:bg-gray-800 transition"
-                onClick={() => setIsOpen(false)}
-              >
-                <User className="w-5 h-5" />
-                Mit Einladung beitreten
-              </Link>
-              <hr className="my-2 border-gray-200 dark:border-gray-700" />
-            </>
-          )}
-
           {/* Firmeneinstellungen nur anzeigen, wenn ein Team existiert UND role != "viewer" */}
           {companyId && role !== 'viewer' && (
             <Link
