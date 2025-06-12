@@ -1,4 +1,6 @@
-import { useEffect, useRef, useState } from 'react';
+// src/pages/join/[token].tsx
+
+import { useEffect, useState } from 'react';
 import { useRouter } from 'next/router';
 import { useSession } from 'next-auth/react';
 import VisibilityConsentForm from '@/components/VisibilityConsentForm';
@@ -15,17 +17,17 @@ export default function JoinTokenPage() {
   const [invitationValid, setInvitationValid] = useState(false);
   const [requirePassword, setRequirePassword] = useState(false);
   const [enteredPassword, setEnteredPassword] = useState('');
+  const [passwordVerified, setPasswordVerified] = useState(false);
   const [consentData, setConsentData] = useState<{
     nickname: string;
     showName: boolean;
     showEmail: boolean;
     showNickname: boolean;
   } | null>(null);
-  const [passwordVerified, setPasswordVerified] = useState(false);
+
   const [stage, setStage] = useState<'checking' | 'waitingPassword' | 'waitingConsent' | 'success' | 'error'>('checking');
   const [message, setMessage] = useState('');
 
-  const passwordInputRef = useRef<HTMLInputElement>(null);
   const { data: session, status: sessionStatus, update } = useSession({ required: false });
 
   useEffect(() => {
@@ -33,6 +35,7 @@ export default function JoinTokenPage() {
     return () => clearInterval(handle);
   }, [update]);
 
+  // 🧠 Einladung zwischenspeichern (vor Login)
   useEffect(() => {
     if (!token || token.length < 10) return;
     if (sessionStatus === 'loading') return;
@@ -45,6 +48,21 @@ export default function JoinTokenPage() {
     }
   }, [token, session, sessionStatus, router]);
 
+  // 🔁 Einladung aus SessionStorage wiederherstellen
+  useEffect(() => {
+    const storedToken = sessionStorage.getItem('joinToken');
+    const currentPath = typeof window !== 'undefined' ? window.location.pathname : '';
+
+    if (
+      session &&
+      (!token || token.length < 10 || currentPath.includes('/join/undefined')) &&
+      storedToken
+    ) {
+      router.replace(`/join/${storedToken}`);
+    }
+  }, [session, token, router]);
+
+  // ✅ Einladung prüfen
   useEffect(() => {
     if (!session || !token || sessionStatus !== 'authenticated' || joined) return;
 
@@ -76,7 +94,6 @@ export default function JoinTokenPage() {
 
         if (data.requirePassword && !passwordVerified) {
           setStage('waitingPassword');
-          setTimeout(() => passwordInputRef.current?.focus(), 100); // Auto-Fokus nach Stage-Wechsel
         } else {
           setInvitationValid(true);
           setStage('waitingConsent');
@@ -91,6 +108,7 @@ export default function JoinTokenPage() {
     runValidation();
   }, [session, token, sessionStatus, joined]);
 
+  // 🔒 Passwort prüfen
   const verifyPassword = async () => {
     try {
       const res = await fetch('/api/team/verify-access-password', {
@@ -114,6 +132,7 @@ export default function JoinTokenPage() {
     }
   };
 
+  // ✅ Teambeitritt durchführen
   useEffect(() => {
     if (!invitationValid || !consentData || joined) return;
 
@@ -138,6 +157,7 @@ export default function JoinTokenPage() {
 
         const data = await res.json();
         if (data?.success) {
+          sessionStorage.removeItem('joinToken'); // 🧹 Token löschen
           setJoined(true);
           setStage('success');
           setMessage('Du wurdest erfolgreich zum Team hinzugefügt. Weiterleitung…');
@@ -157,15 +177,6 @@ export default function JoinTokenPage() {
     joinTeam();
   }, [invitationValid, consentData, joined, token, router, update]);
 
-  useEffect(() => {
-    if (session && !token && typeof window !== 'undefined') {
-      const storedToken = sessionStorage.getItem('joinToken');
-      if (storedToken) {
-        router.replace(`/join/${storedToken}`);
-      }
-    }
-  }, [session, token, router]);
-
   function handleConsentSubmit(data: {
     nickname: string;
     showName: boolean;
@@ -176,6 +187,16 @@ export default function JoinTokenPage() {
     setHasConsent(true);
   }
 
+  if (stage === 'checking') {
+    return (
+      <div className="min-h-screen flex items-center justify-center bg-gray-50 p-6 text-center">
+        <div className="max-w-md bg-white p-6 rounded shadow">
+          <p>Einladung wird geprüft…</p>
+        </div>
+      </div>
+    );
+  }
+
   if (stage === 'waitingPassword') {
     return (
       <div className="min-h-screen flex items-center justify-center bg-gray-50 p-6 text-center">
@@ -183,34 +204,21 @@ export default function JoinTokenPage() {
           <h1 className="text-lg font-bold">Passwort erforderlich</h1>
           <p className="text-sm text-gray-600">Diese Einladung erfordert ein temporäres Passwort.</p>
           <input
-            ref={passwordInputRef}
             type="text"
             placeholder="Passwort eingeben"
             value={enteredPassword}
             onChange={(e) => setEnteredPassword(e.target.value)}
             className="w-full px-3 py-2 border rounded"
+            autoFocus
           />
           <button
             onClick={verifyPassword}
+            className="w-full bg-blue-600 text-white py-2 rounded hover:bg-blue-700 transition"
             disabled={enteredPassword.trim().length === 0}
-            className="w-full bg-blue-600 text-white py-2 rounded hover:bg-blue-700 transition disabled:opacity-50"
           >
             Prüfen
           </button>
-          {enteredPassword.trim().length === 0 && (
-            <p className="text-sm text-gray-400">Bitte Passwort eingeben, um fortzufahren.</p>
-          )}
           {message && <p className="text-sm text-red-500">{message}</p>}
-        </div>
-      </div>
-    );
-  }
-
-  if (stage === 'checking') {
-    return (
-      <div className="min-h-screen flex items-center justify-center bg-gray-50 p-6 text-center">
-        <div className="max-w-md bg-white p-6 rounded shadow">
-          <p>Einladung wird geprüft…</p>
         </div>
       </div>
     );
