@@ -1,6 +1,6 @@
-/* src/pages/login.tsx */
+// src/pages/login.tsx
 
-import { useState } from 'react';
+import { useState, useEffect } from 'react';
 import { signIn } from 'next-auth/react';
 import { useRouter } from 'next/router';
 import { Eye, EyeOff, Mail, Lock, UserPlus, LogIn, ChevronRight } from 'lucide-react';
@@ -15,11 +15,13 @@ export default function LoginPage() {
   const handleLogin = async (e: React.FormEvent) => {
     e.preventDefault();
     setError('');
+
     const res = await signIn('credentials', {
       email,
       password,
       redirect: false,
     });
+
     if (res?.ok) {
       const joinToken = sessionStorage.getItem('joinToken');
       if (joinToken) {
@@ -34,6 +36,15 @@ export default function LoginPage() {
       } else {
         setError('Benutzername oder Passwort ist ungültig.');
       }
+    }
+  };
+
+  const handleGoogleLogin = () => {
+    const joinToken = sessionStorage.getItem('joinToken');
+    if (joinToken) {
+      signIn('google', { callbackUrl: `/join/${joinToken}` });
+    } else {
+      signIn('google', { callbackUrl: '/dashboard' });
     }
   };
 
@@ -103,7 +114,7 @@ export default function LoginPage() {
 
         <button
           type="button"
-          onClick={() => signIn('google', { callbackUrl: '/dashboard' })}
+          onClick={handleGoogleLogin}
           className="google-btn"
         >
           <img
