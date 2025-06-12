@@ -10,8 +10,8 @@ export default function VerifyPage() {
   const [success, setSuccess] = useState('');
   const router = useRouter();
   const email = (router.query.email as string) || '';
+  const redirect = (router.query.redirect as string) || '/dashboard';
 
-  // Automatische Überprüfung, wenn alle Felder ausgefüllt sind
   const checkAndSubmit = async (vals: string[]) => {
     if (vals.every((v) => v !== '')) {
       setLoading(true);
@@ -29,20 +29,16 @@ export default function VerifyPage() {
           setError(data.message || 'Fehler bei der Verifizierung.');
         } else {
           setSuccess('Verifizierung erfolgreich! Du wirst weitergeleitet ...');
-          // Automatischer Login (nach erfolgreicher Verifizierung)
           setTimeout(async () => {
-            // Optional: Passwort aus sessionStorage holen (wie bei Registrierung)
             const password = sessionStorage.getItem('initialPassword') || '';
-            // Automatisch anmelden
             const loginResult = await signIn('credentials', {
               email,
               password,
               redirect: false,
-              callbackUrl: '/dashboard',
+              callbackUrl: redirect,
             });
-            // Wenn Login klappt, weiterleiten, sonst zur Login-Seite
             if (loginResult?.ok) {
-              router.push('/dashboard');
+              router.push(redirect);
             } else {
               router.push('/login');
             }
@@ -56,21 +52,18 @@ export default function VerifyPage() {
     }
   };
 
-  // Beim Einfügen (Paste) alle Felder befüllen
   const handlePaste = (e: React.ClipboardEvent<HTMLInputElement>, idx: number) => {
     const pasted = e.clipboardData.getData('Text').replace(/\D/g, '');
     if (pasted.length === 6) {
       const arr = pasted.split('');
       setValues(arr);
-      // Sofort prüfen:
       checkAndSubmit(arr);
       e.preventDefault();
     }
   };
 
-  // Bei Eingabe einzelne Felder ausfüllen
   const handleChange = (idx: number, val: string) => {
-    if (!/^[0-9]?$/.test(val)) return; // Nur Ziffern
+    if (!/^[0-9]?$/.test(val)) return;
     const newVals = [...values];
     newVals[idx] = val;
     setValues(newVals);
@@ -82,7 +75,6 @@ export default function VerifyPage() {
       inputs.current[idx - 1]?.focus();
     }
 
-    // Sofort prüfen, wenn alle Felder befüllt sind
     setTimeout(() => checkAndSubmit(newVals), 100);
   };
 
@@ -130,7 +122,7 @@ export default function VerifyPage() {
           type="submit"
           className={`w-full py-2 rounded-md text-white font-semibold transition flex items-center justify-center ${loading ? 'bg-blue-400 cursor-not-allowed' : 'bg-blue-600 hover:bg-blue-700'}`}
           disabled={loading || values.some((v) => v === '')}
-          style={{ display: 'none' }} // Der Button ist für Accessibility, aber nicht sichtbar
+          style={{ display: 'none' }}
         >
           {loading ? (
             <span className="inline-block w-6 h-6 border-2 border-white border-t-blue-400 rounded-full animate-spin"></span>
