@@ -1,4 +1,4 @@
-import { useEffect, useState } from 'react';
+import { useEffect, useRef, useState } from 'react';
 import { useRouter } from 'next/router';
 import { useSession } from 'next-auth/react';
 import VisibilityConsentForm from '@/components/VisibilityConsentForm';
@@ -21,11 +21,11 @@ export default function JoinTokenPage() {
     showEmail: boolean;
     showNickname: boolean;
   } | null>(null);
-  
-  const [passwordVerified, setPasswordVerified] = useState(false); // ✅ NEU
+  const [passwordVerified, setPasswordVerified] = useState(false);
   const [stage, setStage] = useState<'checking' | 'waitingPassword' | 'waitingConsent' | 'success' | 'error'>('checking');
   const [message, setMessage] = useState('');
 
+  const passwordInputRef = useRef<HTMLInputElement>(null);
   const { data: session, status: sessionStatus, update } = useSession({ required: false });
 
   useEffect(() => {
@@ -76,6 +76,7 @@ export default function JoinTokenPage() {
 
         if (data.requirePassword && !passwordVerified) {
           setStage('waitingPassword');
+          setTimeout(() => passwordInputRef.current?.focus(), 100); // Auto-Fokus nach Stage-Wechsel
         } else {
           setInvitationValid(true);
           setStage('waitingConsent');
@@ -103,8 +104,8 @@ export default function JoinTokenPage() {
         setMessage(data?.error || 'Passwort falsch oder abgelaufen');
         return;
       }
-      
-      setPasswordVerified(true); 
+
+      setPasswordVerified(true);
       setInvitationValid(true);
       setStage('waitingConsent');
     } catch (err) {
@@ -117,17 +118,16 @@ export default function JoinTokenPage() {
     if (!invitationValid || !consentData || joined) return;
 
     const joinTeam = async () => {
-  try {
-    const res = await fetch('/api/team/join', {
-      method: 'POST',
-      headers: { 'Content-Type': 'application/json' },
-      body: JSON.stringify({
-        token,
-        ...consentData,
-        password: requirePassword ? enteredPassword : undefined, // 🔑
-      }),
-    });
-
+      try {
+        const res = await fetch('/api/team/join', {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({
+            token,
+            ...consentData,
+            password: requirePassword ? enteredPassword : undefined,
+          }),
+        });
 
         if (!res.ok) {
           const err = await res.json();
@@ -176,16 +176,6 @@ export default function JoinTokenPage() {
     setHasConsent(true);
   }
 
-  if (stage === 'checking') {
-    return (
-      <div className="min-h-screen flex items-center justify-center bg-gray-50 p-6 text-center">
-        <div className="max-w-md bg-white p-6 rounded shadow">
-          <p>Einladung wird geprüft…</p>
-        </div>
-      </div>
-    );
-  }
-
   if (stage === 'waitingPassword') {
     return (
       <div className="min-h-screen flex items-center justify-center bg-gray-50 p-6 text-center">
@@ -193,6 +183,7 @@ export default function JoinTokenPage() {
           <h1 className="text-lg font-bold">Passwort erforderlich</h1>
           <p className="text-sm text-gray-600">Diese Einladung erfordert ein temporäres Passwort.</p>
           <input
+            ref={passwordInputRef}
             type="text"
             placeholder="Passwort eingeben"
             value={enteredPassword}
@@ -201,11 +192,25 @@ export default function JoinTokenPage() {
           />
           <button
             onClick={verifyPassword}
-            className="w-full bg-blue-600 text-white py-2 rounded hover:bg-blue-700 transition"
+            disabled={enteredPassword.trim().length === 0}
+            className="w-full bg-blue-600 text-white py-2 rounded hover:bg-blue-700 transition disabled:opacity-50"
           >
             Prüfen
           </button>
+          {enteredPassword.trim().length === 0 && (
+            <p className="text-sm text-gray-400">Bitte Passwort eingeben, um fortzufahren.</p>
+          )}
           {message && <p className="text-sm text-red-500">{message}</p>}
+        </div>
+      </div>
+    );
+  }
+
+  if (stage === 'checking') {
+    return (
+      <div className="min-h-screen flex items-center justify-center bg-gray-50 p-6 text-center">
+        <div className="max-w-md bg-white p-6 rounded shadow">
+          <p>Einladung wird geprüft…</p>
         </div>
       </div>
     );
