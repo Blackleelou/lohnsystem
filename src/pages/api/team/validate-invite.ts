@@ -15,6 +15,7 @@ export default async function handler(req: NextApiRequest, res: NextApiResponse)
     include: {
       company: {
         select: {
+          id: true,
           name: true,
         },
       },
@@ -25,11 +26,22 @@ export default async function handler(req: NextApiRequest, res: NextApiResponse)
     return res.status(410).json({ error: 'Einladung ungültig oder abgelaufen' });
   }
 
-  // 🔐 Fix für Passwortprüfung
-  const passwordRequired =
-    invite.type === 'qr_protected' &&
-    typeof invite.password === 'string' &&
-    invite.password.trim().length > 0;
+  let passwordRequired = false;
+
+  // 🔐 Prüfe ob für qr_protected ein aktiver AccessCode existiert
+  if (invite.type === 'qr_protected') {
+    const now = new Date();
+    const accessCode = await prisma.accessCode.findFirst({
+      where: {
+        companyId: invite.company?.id,
+        validFrom: { lte: now },
+        validUntil: { gte: now },
+        password: { not: null },
+      },
+    });
+
+    passwordRequired = !!accessCode?.password?.trim();
+  }
 
   return res.status(200).json({
     ok: true,
