@@ -43,22 +43,23 @@ export default function VisibilityConsentForm({ onSubmit }: VisibilityConsentFor
       className="max-w-xl mx-auto bg-white p-6 rounded shadow space-y-6"
     >
       {shouldAskRealname && (
-        <div>
-          <label className="block text-sm font-semibold mb-1">
-            Dein Name <span className="text-gray-400">(optional)</span>
-          </label>
-          <input
-            className="w-full px-3 py-2 border rounded"
-            placeholder="z.B. Max Mustermann"
-            value={realname}
-            onChange={(e) => setRealname(e.target.value)}
-            maxLength={50}
-          />
-          <span className="block mt-1 text-xs text-gray-500">
-            Nur sichtbar, wenn du es unten erlaubst.
-          </span>
-        </div>
-      )}
+  <div>
+    <label className="block text-sm font-semibold mb-1">
+      Dein Name <span className="text-gray-400">(optional)</span>
+    </label>
+    <input
+      className="w-full px-3 py-2 border rounded"
+      placeholder="z.B. Max Mustermann"
+      value={realname}
+      onChange={(e) => setRealname(e.target.value)}
+      maxLength={50}
+    />
+    <span className="block mt-1 text-xs text-gray-500">
+      Optional: Wenn du deinen echten Namen angibst, können andere Teammitglieder dich leichter erkennen.
+      Du kannst später entscheiden, ob dein Name im Team sichtbar sein soll.
+    </span>
+  </div>
+)}
 
       <div>
         <label className="block text-sm font-semibold mb-1">
