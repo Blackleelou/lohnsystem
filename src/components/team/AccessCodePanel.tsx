@@ -1,7 +1,6 @@
 import { useEffect, useState } from 'react';
-import { Copy, Trash2 } from "lucide-react";
+import { Copy, Trash2, Info } from "lucide-react";
 import { toast } from "react-hot-toast";
-import * as Tooltip from "@radix-ui/react-tooltip";
 
 type Invitation = {
   id: string;
@@ -17,6 +16,17 @@ type Invitation = {
   };
 };
 
+function SimpleTooltip({ text }: { text: string }) {
+  return (
+    <span className="group relative cursor-pointer text-gray-600">
+      <Info className="w-4 h-4" />
+      <span className="absolute z-50 hidden group-hover:block bg-black text-white px-2 py-1 text-xs rounded shadow-lg w-56 top-6 left-1/2 -translate-x-1/2">
+        {text}
+      </span>
+    </span>
+  );
+}
+
 export default function AccessCodePanel() {
   const [password, setPassword] = useState('');
   const [validUntil, setValidUntil] = useState('');
@@ -24,9 +34,11 @@ export default function AccessCodePanel() {
   const [regenerating, setRegenerating] = useState(false);
   const [invitations, setInvitations] = useState<Invitation[]>([]);
   const [debugError, setDebugError] = useState<string | null>(null);
-  const [mounted, setMounted] = useState(false); // wichtig für Tooltip
 
-  useEffect(() => setMounted(true), []);
+  useEffect(() => {
+    fetchPassword();
+    fetchInvitations();
+  }, []);
 
   const fetchPassword = async () => {
     setLoading(true);
@@ -94,11 +106,6 @@ export default function AccessCodePanel() {
       toast.error('Serverfehler beim Löschen');
     }
   };
-
-  useEffect(() => {
-    fetchPassword();
-    fetchInvitations();
-  }, []);
 
   return (
     <div className="space-y-12 max-w-4xl mx-auto p-4 bg-white border rounded shadow">
@@ -174,7 +181,6 @@ export default function AccessCodePanel() {
                   <td className="px-3 py-2">
                     <div className="flex items-center gap-3">
 
-                      {/* Kopieren */}
                       <button
                         onClick={async () => {
                           try {
@@ -191,30 +197,18 @@ export default function AccessCodePanel() {
                         <Copy size={18} />
                       </button>
 
-                      {/* Tooltip-basiertes Bearbeiten */}
-                      {(inv.type === 'qr_simple' || inv.type === 'qr_protected') && mounted && (
-                        <Tooltip.Root>
-                          <Tooltip.Trigger asChild>
-                            <a
-                              href={`/team/print/${inv.token}?edit=1`}
-                              className="text-gray-600 hover:text-black transition"
-                            >
-                              ✏️
-                            </a>
-                          </Tooltip.Trigger>
-                          <Tooltip.Portal>
-                            <Tooltip.Content
-                              className="bg-black text-white px-2 py-1 rounded text-xs shadow"
-                              sideOffset={5}
-                            >
-                              Einladung bearbeiten oder drucken
-                              <Tooltip.Arrow className="fill-black" />
-                            </Tooltip.Content>
-                          </Tooltip.Portal>
-                        </Tooltip.Root>
+                      {(inv.type === 'qr_simple' || inv.type === 'qr_protected') && (
+                        <a
+                          href={`/team/print/${inv.token}?edit=1`}
+                          className="group relative text-gray-600 hover:text-black transition"
+                        >
+                          ✏️
+                          <span className="absolute z-50 hidden group-hover:block bg-black text-white px-2 py-1 text-xs rounded shadow-lg w-56 top-6 left-1/2 -translate-x-1/2">
+                            Einladung bearbeiten oder drucken
+                          </span>
+                        </a>
                       )}
 
-                      {/* Löschen */}
                       <button
                         onClick={() => deleteInvitation(inv.token)}
                         title="Einladung löschen"
