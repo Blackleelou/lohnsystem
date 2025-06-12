@@ -54,6 +54,9 @@ export const authOptions: NextAuthOptions = {
             isAdmin: true,
             nickname: true,
             name: true,
+            showName: true,
+            showNickname: true,
+            showEmail: true,
           },
         });
         if (dbUser) {
@@ -64,6 +67,9 @@ export const authOptions: NextAuthOptions = {
           token.isAdmin = dbUser.isAdmin;
           token.nickname = dbUser.nickname;
           token.name = dbUser.name;
+          token.showName = dbUser.showName;
+          token.showNickname = dbUser.showNickname;
+          token.showEmail = dbUser.showEmail;
         }
       }
 
@@ -76,6 +82,9 @@ export const authOptions: NextAuthOptions = {
             isAdmin: true,
             nickname: true,
             name: true,
+            showName: true,
+            showNickname: true,
+            showEmail: true,
           },
         });
         if (dbUser) {
@@ -84,6 +93,9 @@ export const authOptions: NextAuthOptions = {
           token.isAdmin = dbUser.isAdmin;
           token.nickname = dbUser.nickname;
           token.name = dbUser.name;
+          token.showName = dbUser.showName;
+          token.showNickname = dbUser.showNickname;
+          token.showEmail = dbUser.showEmail;
         }
       }
 
@@ -99,6 +111,9 @@ export const authOptions: NextAuthOptions = {
         session.user.isAdmin = token.isAdmin as boolean;
         session.user.nickname = (token.nickname as string | null) ?? undefined;
         session.user.name = token.name as string | undefined;
+        session.user.showName = token.showName as boolean;
+        session.user.showNickname = token.showNickname as boolean;
+        session.user.showEmail = token.showEmail as boolean;
       }
       return session;
     },
