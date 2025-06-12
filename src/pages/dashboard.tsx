@@ -71,23 +71,6 @@ export default function Dashboard() {
             onClick={() => handleSelect('/team/create')}
           />
           <DashboardCard
-            icon={<Link2 className="w-10 h-10 text-green-500 dark:text-green-300" />}
-            title="Mit Einladungslink beitreten"
-            text={
-              <>
-                Wurdest du eingeladen? Einfach Link eingeben oder scannen{' '}
-                <span className="hidden sm:inline">–</span>
-                <span className="sm:hidden">
-                  <br />
-                </span>
-                und sofort mitmachen!
-              </>
-            }
-            buttonText="Beitreten"
-            color="text-green-500"
-            onClick={() => handleSelect('/invite/join')}
-          />
-          <DashboardCard
             icon={<User className="w-10 h-10 text-blue-500 dark:text-blue-300" />}
             title="Allein loslegen"
             text={
