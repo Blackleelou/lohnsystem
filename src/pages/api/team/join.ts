@@ -50,16 +50,18 @@ export default async function handler(req: NextApiRequest, res: NextApiResponse)
   const currentRole = session.user.role;
   const targetRole = invitation.role;
 
-  if (
-    currentRole &&
-    targetRole &&
-    currentRole !== targetRole &&
-    (currentRole === 'admin' || currentRole === 'editor')
-  ) {
-    return res.status(403).json({
-      error: '⚠️ Einladung verweigert: Du würdest dich selbst zurückstufen.',
-    });
-  }
+  // ✅ Selbst-Degradierung nur verhindern, wenn man sich selbst eingeladen hat
+if (
+  currentRole &&
+  targetRole &&
+  currentRole !== targetRole &&
+  (currentRole === 'admin' || currentRole === 'editor') &&
+  invitation.createdById === session.user.id
+) {
+  return res.status(403).json({
+    error: '⚠️ Einladung verweigert: Du kannst dich nicht selbst in eine niedrigere Rolle einladen.',
+  });
+}
 
   await prisma.user.update({
     where: { id: session.user.id },
