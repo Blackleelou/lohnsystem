@@ -16,7 +16,8 @@ export default function PrintableQRPage() {
   const [customText, setCustomText] = useState('');
   const [logo, setLogo] = useState<string | null>(null); // base64 oder URL
 
-  const joinUrl = `${process.env.NEXT_PUBLIC_APP_URL || ''}/team/join/${token}`;
+  const baseUrl = (process.env.NEXT_PUBLIC_APP_URL || '').replace(/\/$/, '');
+  const joinUrl = `${baseUrl}/join/${token}`;
 
   // Teamnamen & gespeicherte Druckdaten laden
   useEffect(() => {
