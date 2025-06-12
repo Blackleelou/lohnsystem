@@ -1,3 +1,5 @@
+// src/pages/register.tsx
+
 import { useState } from 'react';
 import { useRouter } from 'next/router';
 import {
@@ -38,6 +40,7 @@ export default function RegisterPage() {
     e.preventDefault();
     setError('');
     setLoading(true);
+
     if (honeypot.trim() !== '') {
       setError('Ungültige Eingabe.');
       setLoading(false);
@@ -53,6 +56,7 @@ export default function RegisterPage() {
       setLoading(false);
       return;
     }
+
     try {
       const res = await fetch('/api/register', {
         method: 'POST',
@@ -69,7 +73,13 @@ export default function RegisterPage() {
           headers: { 'Content-Type': 'application/json' },
           body: JSON.stringify({ email }),
         });
-        router.push(`/verify?email=${encodeURIComponent(email)}`);
+
+        const joinToken = sessionStorage.getItem('joinToken');
+        if (joinToken) {
+          router.push(`/verify?email=${encodeURIComponent(email)}&redirect=/join/${joinToken}`);
+        } else {
+          router.push(`/verify?email=${encodeURIComponent(email)}`);
+        }
       }
     } catch (err) {
       setError('Serverfehler. Bitte später erneut versuchen.');
@@ -100,6 +110,7 @@ export default function RegisterPage() {
           tabIndex={-1}
         />
 
+        {/* E-Mail */}
         <div>
           <label className="block text-xs font-semibold text-gray-500 mb-1" htmlFor="email">
             E-Mail
@@ -119,7 +130,7 @@ export default function RegisterPage() {
           </div>
         </div>
 
-        {/* Passwortfeld */}
+        {/* Passwort */}
         <div>
           <label className="block text-xs font-semibold text-gray-500 mb-1" htmlFor="password">
             Passwort
@@ -159,7 +170,7 @@ export default function RegisterPage() {
           </div>
         </div>
 
-        {/* Passwort-Stärke-Anzeige */}
+        {/* Stärke-Anzeige */}
         <div className="h-2 w-full rounded bg-gray-200 dark:bg-gray-800 mb-2">
           <div
             className={`h-2 rounded transition-all duration-300 ${strength <= 2 ? 'bg-red-500' : strength <= 4 ? 'bg-yellow-500' : 'bg-green-500'}`}
@@ -176,12 +187,9 @@ export default function RegisterPage() {
           </ul>
         )}
 
-        {/* Passwort bestätigen */}
+        {/* Passwort wiederholen */}
         <div>
-          <label
-            className="block text-xs font-semibold text-gray-500 mb-1"
-            htmlFor="confirm-password"
-          >
+          <label className="block text-xs font-semibold text-gray-500 mb-1" htmlFor="confirm-password">
             Passwort wiederholen
           </label>
           <div className="flex items-center rounded-lg bg-blue-50 dark:bg-gray-800 px-3 py-2">
@@ -215,11 +223,7 @@ export default function RegisterPage() {
           disabled={loading}
           className="flex items-center justify-center gap-2 py-2 rounded-xl bg-blue-600 hover:bg-blue-700 transition text-white font-bold shadow-md mt-2"
         >
-          {loading ? (
-            <Loader2 className="w-5 h-5 animate-spin" />
-          ) : (
-            <UserPlus className="w-5 h-5" />
-          )}
+          {loading ? <Loader2 className="w-5 h-5 animate-spin" /> : <UserPlus className="w-5 h-5" />}
           {loading ? 'Wird verarbeitet...' : 'Registrieren'}
         </button>
 
