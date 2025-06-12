@@ -20,6 +20,7 @@ export default function JoinTokenPage() {
   const [passwordVerified, setPasswordVerified] = useState(false);
   const [consentData, setConsentData] = useState<{
     nickname: string;
+    realname?: string;
     showName: boolean;
     showEmail: boolean;
     showNickname: boolean;
@@ -179,6 +180,7 @@ export default function JoinTokenPage() {
 
   function handleConsentSubmit(data: {
     nickname: string;
+    realname?: string;
     showName: boolean;
     showEmail: boolean;
     showNickname: boolean;
