@@ -20,7 +20,31 @@ const QUESTIONS = [
   },
   {
     q: 'Was kostet das?',
-    a: 'Die Grundfunktionen sind dauerhaft kostenlos nutzbar. Für erweiterte Tools und Support gibt es später optionale Zusatzpakete – aber der Grundgedanke bleibt: Fairness für alle!',
+    a: (
+      <>
+        Die Grundfunktionen von <strong>meinLohn</strong> sind dauerhaft kostenlos. Dieses Projekt wird als privates Herzensprojekt betrieben – komplett ohne Werbung, Abo-Modell oder versteckte Kosten.
+        <br className="my-1" />
+        Wenn du möchtest, kannst du die Entwicklung freiwillig unterstützen über{' '}
+        <a
+          href="https://coff.ee/meinLohn.app"
+          target="_blank"
+          rel="noopener noreferrer"
+          className="underline text-blue-600 dark:text-blue-400"
+        >
+          Ko-fi
+        </a>{' '}
+        oder{' '}
+        <a
+          href="https://paypal.me/meinLohnapp"
+          target="_blank"
+          rel="noopener noreferrer"
+          className="underline text-blue-600 dark:text-blue-400"
+        >
+          PayPal
+        </a>
+        .
+      </>
+    ),
   },
 ];
 
