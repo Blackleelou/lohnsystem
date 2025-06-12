@@ -1,8 +1,10 @@
-import { useState } from 'react';
+import { useState, useEffect } from 'react';
+import { useSession } from 'next-auth/react';
 
 interface VisibilityConsentFormProps {
   onSubmit: (consent: {
     nickname: string;
+    realname?: string;
     showName: boolean;
     showEmail: boolean;
     showNickname: boolean;
@@ -10,19 +12,29 @@ interface VisibilityConsentFormProps {
 }
 
 export default function VisibilityConsentForm({ onSubmit }: VisibilityConsentFormProps) {
+  const { data: session } = useSession();
   const [nickname, setNickname] = useState('');
+  const [realname, setRealname] = useState('');
   const [showName, setShowName] = useState(true);
   const [showEmail, setShowEmail] = useState(false);
   const [showNickname, setShowNickname] = useState(false);
+  const [shouldAskRealname, setShouldAskRealname] = useState(false);
+
+  // Prüfen, ob der Nutzer einen Namen hat
+  useEffect(() => {
+    if (!session?.user?.name || session.user.name.trim() === '') {
+      setShouldAskRealname(true);
+    }
+  }, [session]);
 
   const handleNicknameChange = (val: string) => {
     setNickname(val);
-    setShowNickname(!!val); // Automatisch aktivieren, wenn Nickname vorhanden
+    setShowNickname(!!val);
   };
 
   const handleSubmit = (e: React.FormEvent) => {
     e.preventDefault();
-    onSubmit({ nickname, showName, showEmail, showNickname });
+    onSubmit({ nickname, realname, showName, showEmail, showNickname });
   };
 
   return (
@@ -30,6 +42,24 @@ export default function VisibilityConsentForm({ onSubmit }: VisibilityConsentFor
       onSubmit={handleSubmit}
       className="max-w-xl mx-auto bg-white p-6 rounded shadow space-y-6"
     >
+      {shouldAskRealname && (
+        <div>
+          <label className="block text-sm font-semibold mb-1">
+            Dein Name <span className="text-gray-400">(optional)</span>
+          </label>
+          <input
+            className="w-full px-3 py-2 border rounded"
+            placeholder="z.B. Max Mustermann"
+            value={realname}
+            onChange={(e) => setRealname(e.target.value)}
+            maxLength={50}
+          />
+          <span className="block mt-1 text-xs text-gray-500">
+            Nur sichtbar, wenn du es unten erlaubst.
+          </span>
+        </div>
+      )}
+
       <div>
         <label className="block text-sm font-semibold mb-1">
           Nickname <span className="text-gray-400">(optional)</span>
