@@ -9,12 +9,18 @@ declare module 'next-auth' {
       role?: 'admin' | 'editor' | 'viewer';
       isAdmin?: boolean;
       nickname?: string;
-      promotedToAdmin?: boolean; // 👈 HIER ERGÄNZT
+      promotedToAdmin?: boolean;
       name?: string;
+      showName?: boolean;
+      showNickname?: boolean;
+      showEmail?: boolean;
     };
   }
 
   interface User {
-    promotedToAdmin?: boolean; // Optional, falls du später auch User erweiterst
+    promotedToAdmin?: boolean;
+    showName?: boolean;
+    showNickname?: boolean;
+    showEmail?: boolean;
   }
 }
