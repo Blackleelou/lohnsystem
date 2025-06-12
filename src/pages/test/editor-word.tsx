@@ -1,5 +1,12 @@
-import EditorCanvas from "@/components/konva-editor/EditorCanvas";
-import Toolbar from "@/components/konva-editor/Toolbar";
+import dynamic from "next/dynamic";
+
+const EditorCanvas = dynamic(() => import("@/components/konva-editor/EditorCanvas"), {
+  ssr: false, // verhindert Server-Rendering
+});
+
+const Toolbar = dynamic(() => import("@/components/konva-editor/Toolbar"), {
+  ssr: false,
+});
 
 export default function WordEditorTestPage() {
   return (
