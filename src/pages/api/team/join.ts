@@ -1,5 +1,3 @@
-// src/pages/api/team/join.ts
-
 import { NextApiRequest, NextApiResponse } from 'next';
 import { prisma } from '@/lib/prisma';
 import { getServerSession } from 'next-auth';
@@ -11,7 +9,15 @@ export default async function handler(req: NextApiRequest, res: NextApiResponse)
   const session = await getServerSession(req, res, authOptions);
   if (!session?.user?.id) return res.status(401).end();
 
-  const { token, nickname, showName, showNickname, showEmail, password } = req.body;
+  const {
+    token,
+    nickname,
+    showName,
+    showNickname,
+    showEmail,
+    password,
+    realname,
+  } = req.body;
 
   if (!token || typeof token !== 'string') {
     return res.status(400).json({ error: 'Kein gültiger Token übergeben.' });
@@ -32,55 +38,60 @@ export default async function handler(req: NextApiRequest, res: NextApiResponse)
   }
 
   if (invitation.type === 'qr_protected') {
-  const accessCode = await prisma.accessCode.findFirst({
-    where: {
-      companyId: invitation.companyId,
-      validFrom: { lte: new Date() },
-      validUntil: { gte: new Date() },
-    },
-  });
+    const accessCode = await prisma.accessCode.findFirst({
+      where: {
+        companyId: invitation.companyId,
+        validFrom: { lte: new Date() },
+        validUntil: { gte: new Date() },
+      },
+    });
 
-  if (!accessCode || accessCode.password !== password) {
-    return res.status(403).json({ error: 'Falsches oder fehlendes QR-Passwort.' });
+    if (!accessCode || accessCode.password !== password) {
+      return res.status(403).json({ error: 'Falsches oder fehlendes QR-Passwort.' });
+    }
   }
-}
-
 
   // ✅ Selbst-Degradierung verhindern
   const currentRole = session.user.role;
   const targetRole = invitation.role;
 
-  // ✅ Selbst-Degradierung nur verhindern, wenn man sich selbst eingeladen hat
-if (
-  currentRole &&
-  targetRole &&
-  currentRole !== targetRole &&
-  (currentRole === 'admin' || currentRole === 'editor') &&
-  invitation.createdById === session.user.id
-) {
-  return res.status(403).json({
-    error: '⚠️ Einladung verweigert: Du kannst dich nicht selbst in eine niedrigere Rolle einladen.',
-  });
-}
+  if (
+    currentRole &&
+    targetRole &&
+    currentRole !== targetRole &&
+    (currentRole === 'admin' || currentRole === 'editor') &&
+    invitation.createdById === session.user.id
+  ) {
+    return res.status(403).json({
+      error:
+        '⚠️ Einladung verweigert: Du kannst dich nicht selbst in eine niedrigere Rolle einladen.',
+    });
+  }
+
+  // Daten vorbereiten
+  const updateData: any = {
+    companyId: invitation.companyId,
+    role: invitation.role,
+    invited: true,
+    nickname,
+    showName,
+    showNickname,
+    showEmail,
+  };
+
+  // ✅ Falls realname übergeben und aktueller Name leer ist → Name setzen
+  if (!session.user.name && typeof realname === 'string' && realname.trim() !== '') {
+    updateData.name = realname.trim();
+  }
 
   await prisma.user.update({
     where: { id: session.user.id },
-    data: {
-      companyId: invitation.companyId,
-      role: invitation.role,
-      invited: true,
-      nickname,
-      showName,
-      showNickname,
-      showEmail,
-    },
+    data: updateData,
   });
 
-  // Einladung nur löschen, wenn es ein Einmal-Link ist
   if (invitation.type === 'single_use') {
     await prisma.invitation.delete({ where: { token } });
   }
-
 
   res.status(200).json({ success: true });
 }
