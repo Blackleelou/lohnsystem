@@ -10,20 +10,23 @@ export default function EditorCanvas() {
   const [editText, setEditText] = useState("");
   const inputRef = useRef<HTMLInputElement>(null);
 
-  // Hole das aktuelle Element, das bearbeitet wird
   const editingElement = elements.find((el) => el.id === editingId);
 
-  // Positioniere das Eingabefeld
   useEffect(() => {
     if (editingElement && inputRef.current) {
       const input = inputRef.current;
       input.style.position = "absolute";
-      input.style.top = `${editingElement.y + 100}px`; // Korrektur wegen Layout
+      input.style.top = `${editingElement.y + 100}px`; // ggf. anpassen je nach Layout
       input.style.left = `${editingElement.x + 16}px`;
       input.style.fontSize = "18px";
       input.focus();
     }
   }, [editingElement]);
+
+  const handleEditStart = (elId: string, currentText: string) => {
+    setEditingId(elId);
+    setEditText(currentText);
+  };
 
   return (
     <div className="relative border border-gray-300 rounded shadow">
@@ -44,17 +47,15 @@ export default function EditorCanvas() {
                     y: e.target.y(),
                   })
                 }
-                onDblClick={() => {
-                  setEditingId(el.id);
-                  setEditText(el.text || "");
-                }}
+                onDblClick={() => handleEditStart(el.id, el.text || "")} // Desktop
+                onTap={() => handleEditStart(el.id, el.text || "")}      // Handy
               />
             ) : null
           )}
         </Layer>
       </Stage>
 
-      {/* Eingabefeld zum Editieren */}
+      {/* Eingabefeld */}
       {editingElement && (
         <input
           ref={inputRef}
