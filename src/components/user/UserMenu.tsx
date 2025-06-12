@@ -92,7 +92,7 @@ export default function UserMenu() {
     </Link>
     <hr className="my-2 border-gray-200 dark:border-gray-700" />
   </>
-)
+)}
           {/* Firmeneinstellungen nur anzeigen, wenn ein Team existiert UND role != "viewer" */}
           {companyId && role !== 'viewer' && (
             <Link
