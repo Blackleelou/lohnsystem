@@ -22,8 +22,6 @@ export default function LegalPage() {
             >
               jantzen.chris@gmail.com
             </a>
-            <br />
-            Telefon: 01520&nbsp;6086949
           </p>
         </section>
 
@@ -81,7 +79,7 @@ export default function LegalPage() {
             Dir gefällt das Projekt und du möchtest die laufenden Kosten ein wenig mittragen?
             Dann kannst du das gerne freiwillig tun – zum Beispiel über{" "}
             <a
-              href="https://ko-fi.com/deinname"
+              href="https://coff.ee/meinLohn.app"
               target="_blank"
               rel="noopener noreferrer"
               className="text-blue-600 underline"
@@ -90,7 +88,7 @@ export default function LegalPage() {
             </a>{" "}
             oder{" "}
             <a
-              href="https://paypal.me/deinlink"
+              href="https://paypal.me/meinLohnapp"
               target="_blank"
               rel="noopener noreferrer"
               className="text-blue-600 underline"
@@ -100,7 +98,7 @@ export default function LegalPage() {
             .
           </p>
           <p className="mt-2 text-sm text-gray-500">
-            Hinweis: Es handelt sich nicht um eine Spende im steuerlichen Sinne, sondern um eine freiwillige Unterstützung ohne Gegenleistung.
+            Hinweis: Es handelt sich nicht um eine Spende im steuerrechtlichen Sinne, sondern um eine freiwillige Zuwendung ohne Gegenleistung.
           </p>
         </section>
 
