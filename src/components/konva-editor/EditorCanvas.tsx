@@ -1,4 +1,4 @@
-import { Stage, Layer, Text } from "react-konva";
+import { Stage, Layer, Text, Transformer } from "react-konva";
 import { useEditorStore } from "./useEditorStore";
 import { useState, useRef, useEffect } from "react";
 
@@ -9,6 +9,8 @@ export default function EditorCanvas() {
   const [editingId, setEditingId] = useState<string | null>(null);
   const [editText, setEditText] = useState("");
   const inputRef = useRef<HTMLInputElement>(null);
+  const transformerRef = useRef<any>(null);
+  const selectedShapeRef = useRef<any>(null);
 
   const editingElement = elements.find((el) => el.id === editingId);
 
@@ -16,12 +18,19 @@ export default function EditorCanvas() {
     if (editingElement && inputRef.current) {
       const input = inputRef.current;
       input.style.position = "absolute";
-      input.style.top = `${editingElement.y + 100}px`; // ggf. anpassen je nach Layout
+      input.style.top = `${editingElement.y + 100}px`;
       input.style.left = `${editingElement.x + 16}px`;
       input.style.fontSize = "18px";
       input.focus();
     }
   }, [editingElement]);
+
+  useEffect(() => {
+    if (transformerRef.current && selectedShapeRef.current) {
+      transformerRef.current.nodes([selectedShapeRef.current]);
+      transformerRef.current.getLayer().batchDraw();
+    }
+  }, [editingId]);
 
   const handleEditStart = (elId: string, currentText: string) => {
     setEditingId(elId);
@@ -47,15 +56,28 @@ export default function EditorCanvas() {
                     y: e.target.y(),
                   })
                 }
-                onDblClick={() => handleEditStart(el.id, el.text || "")} // Desktop
-                onTap={() => handleEditStart(el.id, el.text || "")}      // Handy
+                onDblClick={() => handleEditStart(el.id, el.text || "")}
+                onTap={() => handleEditStart(el.id, el.text || "")}
+                ref={el.id === editingId ? selectedShapeRef : undefined}
+                onTransformEnd={(e) => {
+                  const node = e.target;
+                  const scaleX = node.scaleX();
+                  const newFontSize = node.fontSize() * scaleX;
+
+                  node.scaleX(1);
+                  node.scaleY(1);
+
+                  updateElement(el.id, {
+                    fontSize: newFontSize,
+                  });
+                }}
               />
             ) : null
           )}
+          <Transformer ref={transformerRef} />
         </Layer>
       </Stage>
 
-      {/* Eingabefeld */}
       {editingElement && (
         <input
           ref={inputRef}
