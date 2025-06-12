@@ -3,6 +3,9 @@ import { useEditorStore } from "./useEditorStore";
 import { useEffect, useRef } from "react";
 
 export default function EditorCanvas() {
+  // 🛡️ Schutz: Nur im Browser rendern
+  if (typeof window === "undefined") return null;
+
   const { elements, updateElement } = useEditorStore();
 
   return (
