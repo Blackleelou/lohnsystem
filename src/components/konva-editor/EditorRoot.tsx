@@ -1,11 +1,11 @@
 import EditorCanvas from "./EditorCanvas";
-import EditorToolbar from "./EditorToolbar";
 
 export default function EditorRoot() {
   return (
-    <div className="p-4 border border-gray-300 rounded shadow">
-      <EditorToolbar />
-      <EditorCanvas />
+    <div className="flex justify-center items-center min-h-screen bg-gray-100 p-4">
+      <div className="bg-white shadow-xl border border-gray-300" style={{ width: 794, height: 1123 }}>
+        <EditorCanvas />
+      </div>
     </div>
   );
 }
