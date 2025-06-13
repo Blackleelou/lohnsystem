@@ -1,14 +1,17 @@
-import { useEffect } from "react";
+import { useEffect, useRef, useState } from "react";
 import EditorCanvas from "./EditorCanvas";
 import { useCanvasSize } from "./useCanvasSize";
 import { useEditorFormatStore } from "./useEditorFormat";
 
 export default function EditorCanvasWrapper() {
+  const containerRef = useRef<HTMLDivElement | null>(null);
+  const [scale, setScale] = useState(1);
+
   const { width, height } = useCanvasSize();
   const format = useEditorFormatStore((s) => s.format);
   const setFormat = useEditorFormatStore((s) => s.setFormat);
 
-  // 🧠 Format aus localStorage merken (bei Reload)
+  // 🧠 Format aus localStorage merken
   useEffect(() => {
     const saved = localStorage.getItem("editor-format");
     if (saved === "a4" || saved === "a5" || saved === "a6") {
@@ -16,17 +19,21 @@ export default function EditorCanvasWrapper() {
     }
   }, [setFormat]);
 
-  // 💾 Format im localStorage speichern
+  // 💾 Speichern im localStorage
   useEffect(() => {
     localStorage.setItem("editor-format", format);
   }, [format]);
 
-  // 📏 Skalierung berechnen: passt Canvas an Bildschirmbreite an (mit etwas Padding)
-  const maxWidth = typeof window !== "undefined" ? window.innerWidth : 375;
-  const scale = maxWidth < width + 40 ? maxWidth / (width + 40) : 1;
+  // 📏 Dynamische Skalierung anhand Containergröße
+  useEffect(() => {
+    if (!containerRef.current) return;
+    const containerWidth = containerRef.current.offsetWidth;
+    const newScale = containerWidth < width + 40 ? containerWidth / (width + 40) : 1;
+    setScale(newScale);
+  }, [width]);
 
   return (
-    <div className="w-full flex justify-center overflow-auto px-2">
+    <div ref={containerRef} className="w-full flex justify-center overflow-auto px-2">
       <div
         className="relative bg-white shadow-xl border rounded"
         style={{
@@ -34,7 +41,7 @@ export default function EditorCanvasWrapper() {
           height: `${height}px`,
           transform: `scale(${scale})`,
           transformOrigin: "top center",
-          transition: "transform 0.3s ease-in-out", // 🎬 Smooth animation
+          transition: "transform 0.3s ease-in-out",
           margin: "2rem 0",
         }}
       >
