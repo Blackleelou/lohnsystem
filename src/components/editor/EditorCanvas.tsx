@@ -1,4 +1,4 @@
-import { Stage, Layer, Text } from "react-konva";
+import { Stage, Layer, Text, Rect, Group } from "react-konva";
 import { useEditorStore } from "./useEditorStore";
 import { useState, useRef } from "react";
 import EditorToolbar from "./EditorToolbar";
@@ -24,15 +24,14 @@ export default function EditorCanvas({ width, height }: Props) {
   };
 
   return (
-    <div className="relative bg-gray-100 flex justify-center items-center overflow-auto p-4">
+    <div className="relative bg-gray-200 flex justify-center items-start overflow-auto px-4 py-8 w-full h-full">
       <div
         style={{
           width,
           height,
           background: "white",
-          border: "1px solid #ddd",
           borderRadius: "4px",
-          boxShadow: "0 0 8px rgba(0,0,0,0.1)",
+          boxShadow: "0 0 8px rgba(0,0,0,0.2)",
         }}
       >
         <Stage
@@ -46,6 +45,19 @@ export default function EditorCanvas({ width, height }: Props) {
           }}
         >
           <Layer clip={{ x: 0, y: 0, width, height }}>
+            {/* 🟡 Druckbereich-Markierung */}
+            <Group>
+              <Rect
+                x={40}
+                y={40}
+                width={width - 80}
+                height={height - 80}
+                stroke="rgba(0,0,0,0.1)"
+                dash={[4, 4]}
+              />
+            </Group>
+
+            {/* 🔤 Text-Elemente */}
             {elements.map((el) =>
               el.type === "text" ? (
                 <Text
