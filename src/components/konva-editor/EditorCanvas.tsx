@@ -22,7 +22,7 @@ export default function EditorCanvas() {
       input.style.position = "absolute";
       input.style.top = `${editingElement.y + 100}px`;
       input.style.left = `${editingElement.x + 16}px`;
-      input.style.fontSize = `${editingElement.fontSize || 18}px`; // ✅ korrigiert
+      input.style.fontSize = `${editingElement.fontSize || 18}px`;
       input.focus();
     }
   }, [editingElement]);
@@ -36,28 +36,33 @@ export default function EditorCanvas() {
 
   const handleEditStart = (elId: string, currentText: string) => {
     setEditingId(elId);
+    setSelectedId(elId); // ✅ wichtig: Auswahl setzen, damit Leiste sichtbar bleibt
     setEditText(currentText);
   };
 
+  const currentElement = editingElement || selectedElement;
+
   return (
     <div className="relative border border-gray-300 rounded shadow p-4">
-      {selectedElement && (
+      {currentElement && (
         <div className="flex flex-wrap items-center gap-2 mb-2 text-sm">
           <label>Größe:</label>
           <input
             type="number"
-            value={selectedElement.fontSize || 18}
+            value={currentElement.fontSize || 18}
             onChange={(e) =>
-              updateElement(selectedElement.id, { fontSize: parseInt(e.target.value) })
+              updateElement(currentElement.id, {
+                fontSize: parseInt(e.target.value),
+              })
             }
             className="border rounded px-2 py-1 w-16"
           />
 
           <label>Schrift:</label>
           <select
-            value={selectedElement.fontFamily || "Arial"}
+            value={currentElement.fontFamily || "Arial"}
             onChange={(e) =>
-              updateElement(selectedElement.id, { fontFamily: e.target.value })
+              updateElement(currentElement.id, { fontFamily: e.target.value })
             }
             className="border rounded px-2 py-1"
           >
@@ -71,16 +76,17 @@ export default function EditorCanvas() {
           <label>Farbe:</label>
           <input
             type="color"
-            value={selectedElement.fill || "#000000"}
+            value={currentElement.fill || "#000000"}
             onChange={(e) =>
-              updateElement(selectedElement.id, { fill: e.target.value })
+              updateElement(currentElement.id, { fill: e.target.value })
             }
           />
 
           <button
             onClick={() =>
-              updateElement(selectedElement.id, {
-                fontWeight: selectedElement.fontWeight === "bold" ? "normal" : "bold",
+              updateElement(currentElement.id, {
+                fontWeight:
+                  currentElement.fontWeight === "bold" ? "normal" : "bold",
               })
             }
             className="border px-2 py-1 rounded font-bold"
@@ -90,8 +96,9 @@ export default function EditorCanvas() {
 
           <button
             onClick={() =>
-              updateElement(selectedElement.id, {
-                fontStyle: selectedElement.fontStyle === "italic" ? "normal" : "italic",
+              updateElement(currentElement.id, {
+                fontStyle:
+                  currentElement.fontStyle === "italic" ? "normal" : "italic",
               })
             }
             className="border px-2 py-1 rounded italic"
@@ -101,9 +108,11 @@ export default function EditorCanvas() {
 
           <label>Ausrichtung:</label>
           <select
-            value={selectedElement.align || "left"}
+            value={currentElement.align || "left"}
             onChange={(e) =>
-              updateElement(selectedElement.id, { align: e.target.value as any })
+              updateElement(currentElement.id, {
+                align: e.target.value as any,
+              })
             }
             className="border rounded px-2 py-1"
           >
@@ -130,9 +139,17 @@ export default function EditorCanvas() {
                 fill={el.fill || "#000000"}
                 align={el.align || "left"}
                 draggable
-                onClick={() => setSelectedId(el.id)}
-                onDblClick={() => handleEditStart(el.id, el.text || "")}
-                onTap={() => handleEditStart(el.id, el.text || "")}
+                onClick={() => {
+                  setSelectedId(el.id);
+                }}
+                onDblClick={() => {
+                  setSelectedId(el.id);
+                  handleEditStart(el.id, el.text || "");
+                }}
+                onTap={() => {
+                  setSelectedId(el.id);
+                  handleEditStart(el.id, el.text || "");
+                }}
                 onDragEnd={(e) =>
                   updateElement(el.id, {
                     x: e.target.x(),
@@ -155,13 +172,11 @@ export default function EditorCanvas() {
           onBlur={() => {
             updateElement(editingElement.id, { text: editText });
             setEditingId(null);
-            setSelectedId(null); // ✅ optional, aber logisch
           }}
           onKeyDown={(e) => {
             if (e.key === "Enter") {
               updateElement(editingElement.id, { text: editText });
               setEditingId(null);
-              setSelectedId(null); // ✅ optional, aber logisch
             }
           }}
           className="absolute border border-gray-300 rounded px-1 py-0.5 bg-white"
