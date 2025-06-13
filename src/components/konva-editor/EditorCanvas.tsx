@@ -1,4 +1,3 @@
-
 import { Stage, Layer, Text, Transformer } from "react-konva";
 import { useEditorStore } from "./useEditorStore";
 import { useState, useRef, useEffect } from "react";
@@ -23,7 +22,7 @@ export default function EditorCanvas() {
       input.style.position = "absolute";
       input.style.top = `${editingElement.y + 100}px`;
       input.style.left = `${editingElement.x + 16}px`;
-      input.style.fontSize = \`\${editingElement.fontSize || 18}px\`;
+      input.style.fontSize = `${editingElement.fontSize || 18}px`; // ✅ korrigiert
       input.focus();
     }
   }, [editingElement]);
@@ -131,17 +130,9 @@ export default function EditorCanvas() {
                 fill={el.fill || "#000000"}
                 align={el.align || "left"}
                 draggable
-                onClick={() => {
-                  setSelectedId(el.id);
-                }}
-                onDblClick={() => {
-                  setSelectedId(el.id);
-                  handleEditStart(el.id, el.text || "");
-                }}
-                onTap={() => {
-                  setSelectedId(el.id);
-                  handleEditStart(el.id, el.text || "");
-                }}
+                onClick={() => setSelectedId(el.id)}
+                onDblClick={() => handleEditStart(el.id, el.text || "")}
+                onTap={() => handleEditStart(el.id, el.text || "")}
                 onDragEnd={(e) =>
                   updateElement(el.id, {
                     x: e.target.x(),
@@ -164,11 +155,13 @@ export default function EditorCanvas() {
           onBlur={() => {
             updateElement(editingElement.id, { text: editText });
             setEditingId(null);
+            setSelectedId(null); // ✅ optional, aber logisch
           }}
           onKeyDown={(e) => {
             if (e.key === "Enter") {
               updateElement(editingElement.id, { text: editText });
               setEditingId(null);
+              setSelectedId(null); // ✅ optional, aber logisch
             }
           }}
           className="absolute border border-gray-300 rounded px-1 py-0.5 bg-white"
