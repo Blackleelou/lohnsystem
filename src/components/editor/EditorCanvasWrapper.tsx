@@ -37,9 +37,19 @@ export default function EditorCanvasWrapper() {
       <EditorHeader />
 
       {/* 🖼 Zeichenfläche */}
-      <div className="w-full flex justify-center overflow-auto px-2 py-6">
-        <EditorCanvas width={width} height={height} />
-      </div>
+      <div className="w-full flex justify-center px-2 py-6 overflow-auto">
+  <div
+    className="border border-gray-300 rounded shadow bg-white"
+    style={{
+      width: `${width}px`,
+      height: `${height}px`,
+      transform: `scale(${Math.min(1, window.innerWidth / (width + 40))})`,
+      transformOrigin: "top center",
+    }}
+  >
+    <EditorCanvas width={width} height={height} />
+  </div>
+</div>
 
       {/* 🧹 Zurücksetzen */}
       <button
