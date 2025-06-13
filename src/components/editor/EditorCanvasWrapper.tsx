@@ -4,7 +4,7 @@ import { useCanvasSize } from "./useCanvasSize";
 import { useEditorFormatStore } from "./useEditorFormat";
 
 export default function EditorCanvasWrapper() {
-  const containerRef = useRef<HTMLDivElement | null>(null);
+  const wrapperRef = useRef<HTMLDivElement | null>(null);
   const [scale, setScale] = useState(1);
 
   const { width, height } = useCanvasSize();
@@ -24,16 +24,26 @@ export default function EditorCanvasWrapper() {
     localStorage.setItem("editor-format", format);
   }, [format]);
 
-  // 📏 Dynamische Skalierung anhand Containergröße
+  // 📏 ResizeObserver zur dynamischen Skalierung
   useEffect(() => {
-    if (!containerRef.current) return;
-    const containerWidth = containerRef.current.offsetWidth;
-    const newScale = containerWidth < width + 40 ? containerWidth / (width + 40) : 1;
-    setScale(newScale);
+    const container = wrapperRef.current;
+    if (!container) return;
+
+    const observer = new ResizeObserver((entries) => {
+      for (const entry of entries) {
+        const containerWidth = entry.contentRect.width;
+        const newScale = containerWidth < width + 40 ? containerWidth / (width + 40) : 1;
+        setScale(newScale);
+      }
+    });
+
+    observer.observe(container);
+
+    return () => observer.disconnect();
   }, [width]);
 
   return (
-    <div ref={containerRef} className="w-full flex justify-center overflow-auto px-2">
+    <div ref={wrapperRef} className="w-full flex justify-center overflow-auto px-2">
       <div
         className="relative bg-white shadow-xl border rounded"
         style={{
