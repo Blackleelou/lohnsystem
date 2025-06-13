@@ -1,9 +1,7 @@
-// src/components/editor/EditorCanvasWrapper.tsx
-
+import { useEffect } from "react";
 import EditorCanvas from "./EditorCanvas";
 import { useCanvasSize } from "./useCanvasSize";
 import { useEditorFormatStore } from "./useEditorFormat";
-import { useEffect } from "react";
 
 export default function EditorCanvasWrapper() {
   const { width, height } = useCanvasSize();
@@ -18,23 +16,25 @@ export default function EditorCanvasWrapper() {
     }
   }, [setFormat]);
 
+  // 💾 Format im localStorage speichern
   useEffect(() => {
     localStorage.setItem("editor-format", format);
   }, [format]);
 
-  // 🔍 Bildschirmbreite prüfen für dynamische Skalierung
+  // 📏 Skalierung berechnen: passt Canvas an Bildschirmbreite an (mit etwas Padding)
   const maxWidth = typeof window !== "undefined" ? window.innerWidth : 375;
   const scale = maxWidth < width + 40 ? maxWidth / (width + 40) : 1;
 
   return (
-    <div className="overflow-auto w-full flex justify-center">
+    <div className="w-full flex justify-center overflow-auto px-2">
       <div
-        className="bg-white shadow-xl border rounded relative"
+        className="relative bg-white shadow-xl border rounded"
         style={{
           width: `${width}px`,
           height: `${height}px`,
           transform: `scale(${scale})`,
           transformOrigin: "top center",
+          transition: "transform 0.3s ease-in-out", // 🎬 Smooth animation
           margin: "2rem 0",
         }}
       >
