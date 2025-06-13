@@ -1,19 +1,19 @@
 // src/components/editor/EditorCanvasWrapper.tsx
 
-import { useCanvasSize } from "./useCanvasSize";
 import EditorCanvas from "./EditorCanvas";
+import { useCanvasSize } from "./useCanvasSize";
 
 export default function EditorCanvasWrapper() {
   const { width, height } = useCanvasSize();
 
   return (
-    <div className="flex justify-center overflow-auto">
+    <div className="overflow-auto w-full flex justify-center">
       <div
+        className="bg-white shadow-xl border rounded relative"
         style={{
-          width,
-          height,
-          background: "white",
-          boxShadow: "0 0 4px rgba(0,0,0,0.2)",
+          width: `${width}px`,
+          height: `${height}px`,
+          margin: "2rem 0",
         }}
       >
         <EditorCanvas width={width} height={height} />
