@@ -7,12 +7,6 @@ export type EditorElement = {
   x: number;
   y: number;
   src?: string; // ← NUR für Bildtyp
-  id: string;
-  type: "text" | "image"; // ← HIER erweitert
-  text?: string; // ← optional, weil image keinen Text hat
-  x: number;
-  y: number;
-  src?: string; // ← NUR für Bildtyp
   width?: number;
   height?: number;
   ...
