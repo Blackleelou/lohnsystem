@@ -24,7 +24,7 @@ export default function EditorToolbarFormat() {
             <button
               key={opt}
               onClick={() => {
-                setFormat(opt);
+                setFormat(opt as "a4" | "a5" | "a6");
                 setOpen(false);
               }}
               className={`w-full text-left px-3 py-1 hover:bg-gray-100 ${
