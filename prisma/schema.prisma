@@ -211,8 +211,6 @@ model EditorDocument {
   owner        User?      @relation(fields: [ownerId], references: [id])
   company      Company?   @relation(fields: [companyId], references: [id])
   shares       EditorShare[]
-
-  @@check(ownerId != null || companyId != null) // Muss entweder Solo oder Team gehören
 }
 
 model EditorShare {
@@ -226,8 +224,6 @@ model EditorShare {
   document             EditorDocument @relation(fields: [documentId], references: [id])
   sharedWithUser       User?          @relation(fields: [sharedWithUserId], references: [id])
   sharedWithCompany    Company?       @relation(fields: [sharedWithCompanyId], references: [id])
-
-  @@check(sharedWithUserId != null || sharedWithCompanyId != null)
 }
 
 enum Visibility {
