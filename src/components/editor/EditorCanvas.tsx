@@ -8,8 +8,8 @@ type Props = {
   height: number;
 };
 
-
-  export default function EditorCanvas({ width, height }: Props) {
+export default function EditorCanvas({ width, height }: Props) {
+  const { elements, updateElement } = useEditorStore(); // ✅ HIER
   const [selectedId, setSelectedId] = useState<string | null>(null);
   const stageRef = useRef<any>(null);
 
