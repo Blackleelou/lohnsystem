@@ -9,10 +9,10 @@ export default function ToolbarGroupText() {
   if (!selected) return null;
 
   return (
-    <div className="flex items-center gap-2">
+    <div className="flex items-center gap-2 flex-wrap">
       <span className="text-sm font-semibold text-gray-600">Text:</span>
 
-      {/* Größe */}
+      {/* Schriftgröße */}
       <select
         className="border rounded px-1 py-0.5 text-sm"
         value={selected.fontSize || 18}
@@ -20,7 +20,7 @@ export default function ToolbarGroupText() {
           updateElement(selected.id, { fontSize: parseInt(e.target.value) })
         }
       >
-        {[12, 14, 16, 18, 20, 24, 28, 32].map((size) => (
+        {[12, 14, 16, 18, 20, 24, 28, 32, 40, 48].map((size) => (
           <option key={size} value={size}>
             {size}px
           </option>
@@ -37,7 +37,9 @@ export default function ToolbarGroupText() {
 
       {/* Fett */}
       <button
-        className="px-2 py-1 border rounded text-sm font-bold hover:bg-gray-100"
+        className={`px-2 py-1 border rounded text-sm font-bold ${
+          selected.fontWeight === "bold" ? "bg-gray-200" : ""
+        }`}
         onClick={() =>
           updateElement(selected.id, {
             fontWeight: selected.fontWeight === "bold" ? "normal" : "bold",
@@ -49,7 +51,9 @@ export default function ToolbarGroupText() {
 
       {/* Kursiv */}
       <button
-        className="px-2 py-1 border rounded text-sm italic hover:bg-gray-100"
+        className={`px-2 py-1 border rounded text-sm italic ${
+          selected.fontStyle === "italic" ? "bg-gray-200" : ""
+        }`}
         onClick={() =>
           updateElement(selected.id, {
             fontStyle: selected.fontStyle === "italic" ? "normal" : "italic",
