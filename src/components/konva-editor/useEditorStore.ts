@@ -47,4 +47,23 @@ export const useEditorStore = create<State>((set) => ({
         el.id === id ? { ...el, ...newProps } : el
       ),
     })),
+  addText: () =>
+    set((state) => {
+      const newId = (state.elements.length + 1).toString();
+      const newText: EditorElement = {
+        id: newId,
+        type: "text",
+        text: "Neuer Text",
+        x: 100,
+        y: 100,
+        fontSize: 18,
+        fontFamily: "Arial",
+        fontStyle: "normal",
+        fontWeight: "normal",
+        fill: "#000000",
+        align: "left",
+        selected: false,
+      };
+      return { elements: [...state.elements, newText] };
+    }),
 }));
