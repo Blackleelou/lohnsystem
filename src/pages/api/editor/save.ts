@@ -1,3 +1,5 @@
+// src/pages/api/editor/save.ts
+
 import { getServerSession } from "next-auth";
 import { authOptions } from "@/lib/authOptions";
 import { prisma } from "@/lib/prisma";
@@ -13,11 +15,16 @@ export default async function handler(req: NextApiRequest, res: NextApiResponse)
     return res.status(405).json({ error: "Methode nicht erlaubt" });
   }
 
-  const { title, content, format, teamId } = req.body;
+  const { title, content, format, companyId } = req.body;
+
+  // Grundlegende Validierung
+  if (!title || !content || !format) {
+    return res.status(400).json({ error: "Fehlende Felder: title, content oder format" });
+  }
 
   try {
-    // Check: Solo oder Team-Dokument?
-    if (!teamId) {
+    if (!companyId) {
+      // Solo-Dokument (privat)
       const doc = await prisma.editorDocument.create({
         data: {
           title,
@@ -27,13 +34,13 @@ export default async function handler(req: NextApiRequest, res: NextApiResponse)
           visibility: "PRIVATE",
         },
       });
-      return res.status(200).json({ success: true, document: doc });
+      return res.json({ success: true, document: doc });
     } else {
-      // Team-Mitglied prüfen (kann erweitert werden)
+      // Team-Zugehörigkeit prüfen
       const member = await prisma.user.findFirst({
         where: {
           id: session.user.id,
-          companyId: teamId,
+          companyId: companyId,
         },
       });
 
@@ -41,17 +48,18 @@ export default async function handler(req: NextApiRequest, res: NextApiResponse)
         return res.status(403).json({ error: "Kein Zugriff auf dieses Team" });
       }
 
+      // Team-Dokument
       const doc = await prisma.editorDocument.create({
         data: {
           title,
           content,
           format,
-          teamId,
+          companyId,
           visibility: "TEAM",
         },
       });
 
-      return res.status(200).json({ success: true, document: doc });
+      return res.json({ success: true, document: doc });
     }
   } catch (error) {
     console.error("Fehler beim Speichern:", error);
