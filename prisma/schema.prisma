@@ -38,6 +38,9 @@ model User {
   shifts      Shift[]
 
   createdInvitations Invitation[] @relation("UserToInvitations")
+  
+editorDocuments       EditorDocument[] @relation("UserDocuments")
+  sharedEditorDocuments EditorShare[]    @relation("UserSharedDocuments")
 }
 
 model Company {
@@ -52,6 +55,9 @@ model Company {
   shifts      Shift[]
   invitations Invitation[]
   accessCodes AccessCode[]
+
+  editorDocuments       EditorDocument[] @relation("CompanyDocuments")
+  sharedEditorDocuments EditorShare[]    @relation("CompanySharedDocuments")
 }
 
 model VerificationCode {
@@ -200,30 +206,32 @@ model AccessCode {
 model EditorDocument {
   id           String     @id @default(cuid())
   title        String
-  content      Json       // Editor-Daten (Text, Bilder, Position etc.)
-  format       String     @default("a4") // z. B. a4, a5, a6
-  ownerId      String?    // falls privat genutzt
-  companyId    String?    // falls einem Team gehört
-  visibility   Visibility @default(PRIVATE) // PRIVATE | TEAM | SHARED
+  content      Json
+  format       String     @default("a4")
+  ownerId      String?
+  companyId    String?
+  visibility   Visibility @default(PRIVATE)
   createdAt    DateTime   @default(now())
   updatedAt    DateTime   @updatedAt
 
-  owner        User?      @relation(fields: [ownerId], references: [id])
-  company      Company?   @relation(fields: [companyId], references: [id])
+  owner        User?      @relation("UserDocuments", fields: [ownerId], references: [id])
+  company      Company?   @relation("CompanyDocuments", fields: [companyId], references: [id])
   shares       EditorShare[]
+
+  // Optional: ohne Prisma-Fehler, kann später per Code geprüft werden
 }
 
 model EditorShare {
   id                   String   @id @default(cuid())
   documentId           String
-  sharedWithUserId     String? // genau ein Empfänger…
-  sharedWithCompanyId  String? // … entweder User oder Firma
-  canEdit              Boolean @default(false)
+  sharedWithUserId     String?
+  sharedWithCompanyId  String?
+  canEdit              Boolean  @default(false)
   createdAt            DateTime @default(now())
 
   document             EditorDocument @relation(fields: [documentId], references: [id])
-  sharedWithUser       User?          @relation(fields: [sharedWithUserId], references: [id])
-  sharedWithCompany    Company?       @relation(fields: [sharedWithCompanyId], references: [id])
+  sharedWithUser       User?          @relation("UserSharedDocuments", fields: [sharedWithUserId], references: [id])
+  sharedWithCompany    Company?       @relation("CompanySharedDocuments", fields: [sharedWithCompanyId], references: [id])
 }
 
 enum Visibility {
