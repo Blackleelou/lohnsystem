@@ -1,4 +1,4 @@
-import { useEditorFormatStore } from "./useEditorFormat";
+import { useEditorFormatStore } from "../useEditorFormat";
 import { useState } from "react";
 
 export default function EditorToolbarFormat() {
