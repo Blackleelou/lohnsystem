@@ -1,4 +1,4 @@
-src/components/editor/EditorCanvasWrapper.tsx
+// src/components/editor/EditorCanvasWrapper.tsx
 
 import { useCanvasSize } from "./useCanvasSize";
 import EditorCanvas from "./EditorCanvas";
