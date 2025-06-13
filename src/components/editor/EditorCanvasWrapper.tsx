@@ -32,7 +32,7 @@ export default function EditorCanvasWrapper() {
   };
 
   return (
-    <div className="flex flex-col items-center w-full min-h-screen bg-gray-50">
+    <div className="flex flex-col items-center min-h-screen bg-gray-50 overflow-hidden">
       {/* 🔝 Moderne Toolbar mit Dropdown-Auswahl */}
       <EditorHeader />
 
