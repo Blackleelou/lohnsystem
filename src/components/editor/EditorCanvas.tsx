@@ -1,7 +1,8 @@
-import { Stage, Layer, Text, Transformer } from "react-konva";
+import { Stage, Layer, Text, Transformer, Image as KonvaImage } from "react-konva";
 import { useEditorStore } from "./useEditorStore";
 import { useEffect, useRef, useState } from "react";
 import EditorToolbar from "./EditorToolbar";
+import useImage from "use-image";
 
 type Props = {
   width: number;
@@ -99,10 +100,18 @@ export default function EditorCanvas({ width, height }: Props) {
                     })
                   }
                 />
+              ) : el.type === "image" ? (
+                <URLImage
+                  key={el.id}
+                  id={el.id}
+                  src={el.src}
+                  x={el.x}
+                  y={el.y}
+                  width={el.width}
+                  height={el.height}
+                />
               ) : null
             )}
-
-            {/* optionaler Transformer für Resize etc. */}
             <Transformer ref={transformerRef} />
           </Layer>
         </Stage>
@@ -129,5 +138,42 @@ export default function EditorCanvas({ width, height }: Props) {
         />
       )}
     </div>
+  );
+}
+
+// 🖼 Bild-Komponente (außerhalb!)
+function URLImage({
+  id,
+  src,
+  x,
+  y,
+  width = 200,
+  height = 150,
+}: {
+  id: string;
+  src?: string;
+  x: number;
+  y: number;
+  width?: number;
+  height?: number;
+}) {
+  const [image] = useImage(src || "");
+  const updateElement = useEditorStore((s) => s.updateElement);
+
+  return (
+    <KonvaImage
+      image={image}
+      x={x}
+      y={y}
+      width={width}
+      height={height}
+      draggable
+      onDragEnd={(e) =>
+        updateElement(id, {
+          x: e.target.x(),
+          y: e.target.y(),
+        })
+      }
+    />
   );
 }
