@@ -1,34 +1,49 @@
+import dynamic from "next/dynamic";
 import { useState } from "react";
+import EditorToolbar from "./EditorToolbar";
 import EditorCanvas from "./EditorCanvas";
 
-const pageSizes = {
-  A4: { width: 794, height: 1123 }, // 210 × 297 mm @ 96 DPI
-  A5: { width: 559, height: 794 },
-  A6: { width: 397, height: 559 },
-};
-
 export default function EditorRoot() {
-  const [format, setFormat] = useState<"A4" | "A5" | "A6">("A4");
+  const [paperSize, setPaperSize] = useState<"A4" | "A5" | "A6">("A4");
+
+  const getDimensions = () => {
+    switch (paperSize) {
+      case "A5":
+        return { width: 420, height: 595 }; // halbes A4
+      case "A6":
+        return { width: 298, height: 420 }; // halbes A5
+      case "A4":
+      default:
+        return { width: 595, height: 842 }; // A4 in pt (72dpi)
+    }
+  };
+
+  const { width, height } = getDimensions();
 
   return (
-    <div className="p-4 border border-gray-300 rounded shadow">
-      <div className="mb-4 flex gap-2 text-sm items-center">
-        <label className="font-medium">Format:</label>
-        <select
-          value={format}
-          onChange={(e) => setFormat(e.target.value as "A4" | "A5" | "A6")}
-          className="border px-2 py-1 rounded"
-        >
-          <option value="A4">A4 (Standard)</option>
-          <option value="A5">A5</option>
-          <option value="A6">A6</option>
-        </select>
+    <div className="w-full min-h-screen bg-gray-100 p-4 flex flex-col items-center">
+      {/* Auswahl Papiergröße */}
+      <div className="mb-4 flex gap-2">
+        {["A4", "A5", "A6"].map((size) => (
+          <button
+            key={size}
+            className={`px-3 py-1 rounded border ${
+              paperSize === size ? "bg-blue-600 text-white" : "bg-white text-black"
+            }`}
+            onClick={() => setPaperSize(size as "A4" | "A5" | "A6")}
+          >
+            {size}
+          </button>
+        ))}
       </div>
 
-      <EditorCanvas
-        width={pageSizes[format].width}
-        height={pageSizes[format].height}
-      />
+      {/* Werkzeugleiste */}
+      <EditorToolbar />
+
+      {/* Zeichenfläche */}
+      <div className="mt-4 shadow-lg border bg-white">
+        <EditorCanvas width={width} height={height} />
+      </div>
     </div>
   );
 }
