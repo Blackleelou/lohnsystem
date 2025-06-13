@@ -1,15 +1,11 @@
-// src/components/editor/EditorHeader.tsx
-
-import ToolbarGroupFile from "./toolbar/ToolbarGroupFile";
-import ToolbarGroupText from "./toolbar/ToolbarGroupText";
-import ToolbarGroupInsert from "./toolbar/ToolbarGroupInsert";
+import EditorToolbarFormat from "./EditorToolbarFormat";
+import EditorToolbarText from "./EditorToolbarText";
 
 export default function EditorHeader() {
   return (
-    <div className="flex flex-wrap items-center gap-4 mb-4 p-2 border border-gray-200 rounded shadow-sm bg-white">
-      <ToolbarGroupFile />
-      <ToolbarGroupText />
-      <ToolbarGroupInsert />
+    <div className="sticky top-0 z-30 w-full bg-white border-b shadow-sm px-4 py-2 flex flex-wrap items-center justify-between gap-4">
+      <EditorToolbarFormat />
+      <EditorToolbarText />
     </div>
   );
 }
