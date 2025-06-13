@@ -2,10 +2,21 @@ import { create } from "zustand";
 
 export type EditorElement = {
   id: string;
-  type: "text";
-  text: string;
+  type: "text" | "image"; // ← HIER erweitert
+  text?: string; // ← optional, weil image keinen Text hat
   x: number;
   y: number;
+  src?: string; // ← NUR für Bildtyp
+  id: string;
+  type: "text" | "image"; // ← HIER erweitert
+  text?: string; // ← optional, weil image keinen Text hat
+  x: number;
+  y: number;
+  src?: string; // ← NUR für Bildtyp
+  width?: number;
+  height?: number;
+  ...
+};
   fontSize?: number;
   fontFamily?: string;
   fontStyle?: "normal" | "italic";
