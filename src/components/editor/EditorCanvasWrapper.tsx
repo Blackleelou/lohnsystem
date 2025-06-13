@@ -2,11 +2,27 @@
 
 import EditorCanvas from "./EditorCanvas";
 import { useCanvasSize } from "./useCanvasSize";
+import { useEditorFormatStore } from "./useEditorFormat";
+import { useEffect } from "react";
 
 export default function EditorCanvasWrapper() {
   const { width, height } = useCanvasSize();
+  const format = useEditorFormatStore((s) => s.format);
+  const setFormat = useEditorFormatStore((s) => s.setFormat);
 
-  // Automatische Skalierung bei kleinen Bildschirmen
+  // 🧠 Format aus localStorage merken (bei Reload)
+  useEffect(() => {
+    const saved = localStorage.getItem("editor-format");
+    if (saved === "A4" || saved === "A5" || saved === "A6") {
+      setFormat(saved);
+    }
+  }, [setFormat]);
+
+  useEffect(() => {
+    localStorage.setItem("editor-format", format);
+  }, [format]);
+
+  // 🔍 Bildschirmbreite prüfen für dynamische Skalierung
   const maxWidth = typeof window !== "undefined" ? window.innerWidth : 375;
   const scale = maxWidth < width + 40 ? maxWidth / (width + 40) : 1;
 
