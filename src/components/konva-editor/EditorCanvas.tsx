@@ -1,3 +1,4 @@
+import Konva from "konva";
 import { Stage, Layer, Text, Transformer } from "react-konva";
 import { useEditorStore } from "./useEditorStore";
 import { useState, useRef, useEffect } from "react";
@@ -20,7 +21,7 @@ export default function EditorCanvas() {
       input.style.position = "absolute";
       input.style.top = `${editingElement.y + 100}px`;
       input.style.left = `${editingElement.x + 16}px`;
-      input.style.fontSize = "18px";
+      input.style.fontSize = `${editingElement.fontSize || 18}px`;
       input.focus();
     }
   }, [editingElement]);
@@ -48,7 +49,7 @@ export default function EditorCanvas() {
                 x={el.x}
                 y={el.y}
                 text={el.text}
-                fontSize={18}
+                fontSize={el.fontSize || 18}
                 draggable
                 onDragEnd={(e) =>
                   updateElement(el.id, {
@@ -60,7 +61,7 @@ export default function EditorCanvas() {
                 onTap={() => handleEditStart(el.id, el.text || "")}
                 ref={el.id === editingId ? selectedShapeRef : undefined}
                 onTransformEnd={(e) => {
-                  const node = e.target;
+                  const node = e.target as Konva.Text;
                   const scaleX = node.scaleX();
                   const newFontSize = node.fontSize() * scaleX;
 
