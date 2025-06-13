@@ -20,6 +20,7 @@ type State = {
   addElement: (el: EditorElement) => void;
   updateElement: (id: string, newProps: Partial<EditorElement>) => void;
   addText: () => void;
+  clearElements: () => void; // ✅ neu
 };
 
 export const useEditorStore = create<State>((set) => ({
@@ -66,4 +67,5 @@ export const useEditorStore = create<State>((set) => ({
       };
       return { elements: [...state.elements, newText] };
     }),
+  clearElements: () => set({ elements: [] }), // ✅ neu
 }));
