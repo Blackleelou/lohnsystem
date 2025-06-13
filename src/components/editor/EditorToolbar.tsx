@@ -1,97 +1,80 @@
+// src/components/editor/EditorToolbar.tsx
 import { useEditorStore } from "./useEditorStore";
 
 export default function EditorToolbar() {
-  const { elements, updateElement } = useEditorStore();
-  const selectedElement = elements.find((el) => el.selected);
+  const { elements, updateElement, addText } = useEditorStore();
+  const selected = elements.find(el => el.selected);
 
-  if (!selectedElement) return null;
+  const handleChange = (prop: string, value: any) => {
+    if (!selected) return;
+    updateElement(selected.id, { [prop]: value });
+  };
 
   return (
-    <div className="flex flex-wrap items-center gap-2 mb-4 text-sm">
-      <label>Größe:</label>
-      <input
-        type="number"
-        value={selectedElement.fontSize || 18}
-        onChange={(e) =>
-          updateElement(selectedElement.id, {
-            fontSize: parseInt(e.target.value),
-          })
-        }
-        className="border rounded px-2 py-1 w-16"
-      />
-
-      <label>Schrift:</label>
-      <select
-        value={selectedElement.fontFamily || "Arial"}
-        onChange={(e) =>
-          updateElement(selectedElement.id, {
-            fontFamily: e.target.value,
-          })
-        }
-        className="border rounded px-2 py-1"
-      >
-        <option value="Arial">Arial</option>
-        <option value="Verdana">Verdana</option>
-        <option value="Georgia">Georgia</option>
-        <option value="Times New Roman">Times New Roman</option>
-        <option value="Courier New">Courier New</option>
-      </select>
-
-      <label>Farbe:</label>
-      <input
-        type="color"
-        value={selectedElement.fill || "#000000"}
-        onChange={(e) =>
-          updateElement(selectedElement.id, { fill: e.target.value })
-        }
-      />
-
+    <div className="flex flex-wrap gap-2 mb-4">
       <button
-        onClick={() =>
-          updateElement(selectedElement.id, {
-            fontWeight:
-              selectedElement.fontWeight === "bold" ? "normal" : "bold",
-          })
-        }
-        className={`border px-2 py-1 rounded font-bold ${
-          selectedElement.fontWeight === "bold"
-            ? "bg-gray-200"
-            : "bg-white"
-        }`}
+        className="px-2 py-1 border rounded text-sm"
+        onClick={() => addText()}
       >
-        B
+        ➕ Neuer Text
       </button>
 
-      <button
-        onClick={() =>
-          updateElement(selectedElement.id, {
-            fontStyle:
-              selectedElement.fontStyle === "italic" ? "normal" : "italic",
-          })
-        }
-        className={`border px-2 py-1 rounded italic ${
-          selectedElement.fontStyle === "italic"
-            ? "bg-gray-200"
-            : "bg-white"
-        }`}
-      >
-        I
-      </button>
+      {selected && (
+        <>
+          <select
+            value={selected.fontSize || 18}
+            onChange={e => handleChange("fontSize", parseInt(e.target.value))}
+            className="px-2 py-1 border rounded text-sm"
+          >
+            {[12, 14, 16, 18, 24, 32, 48].map(size => (
+              <option key={size} value={size}>
+                {size}px
+              </option>
+            ))}
+          </select>
 
-      <label>Ausrichtung:</label>
-      <select
-        value={selectedElement.align || "left"}
-        onChange={(e) =>
-          updateElement(selectedElement.id, {
-            align: e.target.value as any,
-          })
-        }
-        className="border rounded px-2 py-1"
-      >
-        <option value="left">Links</option>
-        <option value="center">Zentriert</option>
-        <option value="right">Rechts</option>
-      </select>
+          <input
+            type="color"
+            value={selected.fill || "#000000"}
+            onChange={e => handleChange("fill", e.target.value)}
+            className="w-8 h-8 p-0 border"
+          />
+
+          <button
+            className="px-2 py-1 border rounded text-sm"
+            onClick={() =>
+              handleChange(
+                "fontWeight",
+                selected.fontWeight === "bold" ? "normal" : "bold"
+              )
+            }
+          >
+            <strong>B</strong>
+          </button>
+
+          <button
+            className="px-2 py-1 border rounded text-sm italic"
+            onClick={() =>
+              handleChange(
+                "fontStyle",
+                selected.fontStyle === "italic" ? "normal" : "italic"
+              )
+            }
+          >
+            i
+          </button>
+
+          <select
+            value={selected.align || "left"}
+            onChange={e => handleChange("align", e.target.value)}
+            className="px-2 py-1 border rounded text-sm"
+          >
+            <option value="left">Links</option>
+            <option value="center">Zentriert</option>
+            <option value="right">Rechts</option>
+          </select>
+        </>
+      )}
     </div>
   );
 }
