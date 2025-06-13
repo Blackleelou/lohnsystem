@@ -212,7 +212,6 @@ model EditorDocument {
   team         Team?    @relation(fields: [teamId], references: [id])
   shares       EditorShare[]        // 🔁 Freigaben
 
-  @@check(ownerId != null || teamId != null) // Muss entweder Solo oder Team gehören
 }
 
 model EditorShare {
@@ -227,7 +226,6 @@ model EditorShare {
   sharedWithUser   User?          @relation(fields: [sharedWithUserId], references: [id])
   sharedWithTeam   Team?          @relation(fields: [sharedWithTeamId], references: [id])
 
-  @@check(sharedWithUserId != null || sharedWithTeamId != null)
 }
 
 enum Visibility {
