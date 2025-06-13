@@ -20,7 +20,7 @@ export default function EditorCanvas() {
       input.style.position = "absolute";
       input.style.top = `${editingElement.y + 100}px`;
       input.style.left = `${editingElement.x + 16}px`;
-      input.style.fontSize = \`\${editingElement.fontSize || 18}px\`;
+      input.style.fontSize = `${editingElement.fontSize || 18}px`;
       input.focus();
     }
   }, [editingElement]);
