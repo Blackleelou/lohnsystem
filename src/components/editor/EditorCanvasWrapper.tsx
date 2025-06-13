@@ -13,7 +13,7 @@ export default function EditorCanvasWrapper() {
   // 🧠 Format aus localStorage merken (bei Reload)
   useEffect(() => {
     const saved = localStorage.getItem("editor-format");
-    if (saved === "A4" || saved === "A5" || saved === "A6") {
+    if (saved === "a4" || saved === "a5" || saved === "a6") {
       setFormat(saved);
     }
   }, [setFormat]);
