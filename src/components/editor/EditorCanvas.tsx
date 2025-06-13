@@ -1,6 +1,8 @@
+// src/components/editor/EditorCanvas.tsx
+
 import { Stage, Layer, Text, Transformer } from "react-konva";
 import { useEditorStore } from "./useEditorStore";
-import { useState, useRef, useEffect } from "react";
+import { useEffect, useRef, useState } from "react";
 import EditorToolbar from "./EditorToolbar";
 
 type Props = {
@@ -9,8 +11,6 @@ type Props = {
 };
 
 export default function EditorCanvas({ width, height }: Props) {
-  if (typeof window === "undefined") return null;
-
   const { elements, updateElement } = useEditorStore();
   const [editingId, setEditingId] = useState<string | null>(null);
   const [editText, setEditText] = useState("");
@@ -21,16 +21,21 @@ export default function EditorCanvas({ width, height }: Props) {
   const editingElement = elements.find((el) => el.id === editingId);
   const selectedElement = elements.find((el) => el.selected);
 
+  // automatische Skalierung für Mobil
+  const scale = Math.min(1, window.innerWidth / (width + 40));
+
   useEffect(() => {
     if (editingElement && inputRef.current) {
       const input = inputRef.current;
       input.style.position = "absolute";
-      input.style.top = `${editingElement.y + 100}px`;
-      input.style.left = `${editingElement.x + 16}px`;
-      input.style.fontSize = `${editingElement.fontSize || 18}px`;
+      input.style.top = `${editingElement.y * scale + 100}px`;
+      input.style.left = `${editingElement.x * scale + 16}px`;
+      input.style.fontSize = `${(editingElement.fontSize || 18) * scale}px`;
+      input.style.transform = `scale(${1 / scale})`;
+      input.style.transformOrigin = "top left";
       input.focus();
     }
-  }, [editingElement]);
+  }, [editingElement, scale]);
 
   useEffect(() => {
     if (transformerRef.current && selectedShapeRef.current) {
@@ -51,10 +56,17 @@ export default function EditorCanvas({ width, height }: Props) {
   };
 
   return (
-    <div className="relative border border-gray-300 rounded shadow p-4">
+    <div className="relative overflow-auto border border-gray-300 rounded shadow p-2 w-full flex justify-center">
       {selectedElement && <EditorToolbar />}
 
-      <div className="overflow-auto border bg-white shadow-inner mx-auto" style={{ width, height }}>
+      <div
+        style={{
+          transform: `scale(${scale})`,
+          transformOrigin: "top left",
+          width,
+          height,
+        }}
+      >
         <Stage width={width} height={height}>
           <Layer>
             {elements.map((el) =>
@@ -71,9 +83,7 @@ export default function EditorCanvas({ width, height }: Props) {
                   fill={el.fill || "#000000"}
                   align={el.align || "left"}
                   draggable
-                  onClick={() => {
-                    handleSelect(el.id);
-                  }}
+                  onClick={() => handleSelect(el.id)}
                   onDblClick={() => {
                     handleSelect(el.id);
                     handleEditStart(el.id, el.text || "");
