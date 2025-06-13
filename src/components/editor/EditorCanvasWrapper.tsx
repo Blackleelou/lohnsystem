@@ -1,13 +1,10 @@
-import { useEffect, useRef, useState } from "react";
+import { useEffect } from "react";
 import EditorCanvas from "./EditorCanvas";
 import { useCanvasSize } from "./useCanvasSize";
 import { useEditorFormatStore } from "./useEditorFormat";
 import { useEditorStore } from "./useEditorStore";
 
 export default function EditorCanvasWrapper() {
-  const containerRef = useRef<HTMLDivElement | null>(null);
-  const [scale, setScale] = useState(1);
-
   const { width, height } = useCanvasSize();
   const format = useEditorFormatStore((s) => s.format);
   const setFormat = useEditorFormatStore((s) => s.setFormat);
@@ -26,26 +23,6 @@ export default function EditorCanvasWrapper() {
     localStorage.setItem("editor-format", format);
   }, [format]);
 
-  // 📏 Dynamisches Scaling
-  useEffect(() => {
-    const resize = () => {
-      if (!containerRef.current) return;
-      const containerWidth = containerRef.current.offsetWidth;
-      const padding = 32;
-      const newScale = containerWidth < width + padding
-        ? containerWidth / (width + padding)
-        : 1;
-      setScale(newScale);
-    };
-
-    resize();
-
-    const observer = new ResizeObserver(resize);
-    if (containerRef.current) observer.observe(containerRef.current);
-
-    return () => observer.disconnect();
-  }, [width]);
-
   const handleReset = () => {
     localStorage.removeItem("editor-format");
     setFormat("a4");
@@ -62,21 +39,8 @@ export default function EditorCanvasWrapper() {
         Editor zurücksetzen
       </button>
 
-      <div
-        ref={containerRef}
-        className="w-full max-w-full flex justify-center overflow-x-auto px-2"
-      >
-        <div
-          style={{
-            transform: `scale(${scale})`,
-            transformOrigin: "top center",
-            width: `${width}px`,
-            height: `${height}px`,
-            margin: "2rem 0",
-          }}
-        >
-          <EditorCanvas width={width} height={height} />
-        </div>
+      <div className="w-full flex justify-center overflow-auto px-2">
+        <EditorCanvas width={width} height={height} />
       </div>
     </div>
   );
