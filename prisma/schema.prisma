@@ -198,34 +198,36 @@ model AccessCode {
 }
 
 model EditorDocument {
-  id           String   @id @default(cuid())
+  id           String     @id @default(cuid())
   title        String
-  content      Json     // Editor-Daten (Text, Bilder, Position etc.)
-  format       String   @default("a4") // z. B. a4, a5, a6
-  ownerId      String?  // falls privat genutzt
-  teamId       String?  // falls einem Team gehört
+  content      Json       // Editor-Daten (Text, Bilder, Position etc.)
+  format       String     @default("a4") // z. B. a4, a5, a6
+  ownerId      String?    // falls privat genutzt
+  companyId    String?    // falls einem Team gehört
   visibility   Visibility @default(PRIVATE) // PRIVATE | TEAM | SHARED
-  createdAt    DateTime @default(now())
-  updatedAt    DateTime @updatedAt
+  createdAt    DateTime   @default(now())
+  updatedAt    DateTime   @updatedAt
 
-  owner        User?    @relation(fields: [ownerId], references: [id])
-  team         Team?    @relation(fields: [teamId], references: [id])
-  shares       EditorShare[]        // 🔁 Freigaben
+  owner        User?      @relation(fields: [ownerId], references: [id])
+  company      Company?   @relation(fields: [companyId], references: [id])
+  shares       EditorShare[]
 
+  @@check(ownerId != null || companyId != null) // Muss entweder Solo oder Team gehören
 }
 
 model EditorShare {
-  id               String   @id @default(cuid())
-  documentId       String
-  sharedWithUserId String? // genau ein Empfänger…
-  sharedWithTeamId String? // … entweder User oder Team
-  canEdit          Boolean @default(false)
-  createdAt        DateTime @default(now())
+  id                   String   @id @default(cuid())
+  documentId           String
+  sharedWithUserId     String? // genau ein Empfänger…
+  sharedWithCompanyId  String? // … entweder User oder Firma
+  canEdit              Boolean @default(false)
+  createdAt            DateTime @default(now())
 
-  document         EditorDocument @relation(fields: [documentId], references: [id])
-  sharedWithUser   User?          @relation(fields: [sharedWithUserId], references: [id])
-  sharedWithTeam   Team?          @relation(fields: [sharedWithTeamId], references: [id])
+  document             EditorDocument @relation(fields: [documentId], references: [id])
+  sharedWithUser       User?          @relation(fields: [sharedWithUserId], references: [id])
+  sharedWithCompany    Company?       @relation(fields: [sharedWithCompanyId], references: [id])
 
+  @@check(sharedWithUserId != null || sharedWithCompanyId != null)
 }
 
 enum Visibility {
