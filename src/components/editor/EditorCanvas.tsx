@@ -2,7 +2,7 @@ import { Stage, Layer, Text, Transformer, Image as KonvaImage } from "react-konv
 import { useEditorStore } from "./useEditorStore";
 import { useEffect, useRef, useState } from "react";
 import EditorToolbar from "./EditorToolbar";
-import useImage from "react-konva-utils/useImage"; // ✅ richtig
+import useImage from "react-konva-utils/useImage";
 
 type Props = {
   width: number;
