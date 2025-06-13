@@ -12,6 +12,7 @@ export type EditorElement = {
   fontWeight?: "normal" | "bold";
   fill?: string;
   align?: "left" | "center" | "right";
+  selected?: boolean;
 };
 
 type State = {
@@ -35,6 +36,7 @@ export const useEditorStore = create<State>((set) => ({
       fontWeight: "normal",
       fill: "#000000",
       align: "left",
+      selected: false,
     },
   ],
   addElement: (el) =>
@@ -44,24 +46,5 @@ export const useEditorStore = create<State>((set) => ({
       elements: state.elements.map((el) =>
         el.id === id ? { ...el, ...newProps } : el
       ),
-    })),
-  addText: () =>
-    set((state) => ({
-      elements: [
-        ...state.elements,
-        {
-          id: crypto.randomUUID(),
-          type: "text",
-          text: "Neuer Text",
-          x: 100,
-          y: 100,
-          fontSize: 18,
-          fontFamily: "Arial",
-          fontStyle: "normal",
-          fontWeight: "normal",
-          fill: "#000000",
-          align: "left",
-        },
-      ],
     })),
 }));
