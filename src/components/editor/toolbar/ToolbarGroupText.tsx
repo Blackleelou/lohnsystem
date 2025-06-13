@@ -12,6 +12,21 @@ export default function ToolbarGroupText() {
     <div className="flex items-center gap-2 flex-wrap">
       <span className="text-sm font-semibold text-gray-600">Text:</span>
 
+      {/* Schriftart */}
+<select
+  className="border rounded px-1 py-0.5 text-sm"
+  value={selected.fontFamily || "Arial"}
+  onChange={(e) =>
+    updateElement(selected.id, { fontFamily: e.target.value })
+  }
+>
+  {["Arial", "Georgia", "Times New Roman", "Verdana", "Courier New", "Tahoma"].map((font) => (
+    <option key={font} value={font}>
+      {font}
+    </option>
+  ))}
+</select>
+      
       {/* Schriftgröße */}
       <select
         className="border rounded px-1 py-0.5 text-sm"
