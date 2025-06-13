@@ -2,7 +2,7 @@
 
 import { create } from "zustand";
 
-type EditorFormat = "a4" | "letter";
+type EditorFormat = "a4" | "a5" | "a6" | "letter";
 
 type EditorFormatStore = {
   format: EditorFormat;
