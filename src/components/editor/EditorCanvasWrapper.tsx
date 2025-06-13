@@ -5,7 +5,7 @@ import { useEditorFormatStore } from "./useEditorFormat";
 import { useEditorStore } from "./useEditorStore";
 
 export default function EditorCanvasWrapper() {
-  const wrapperRef = useRef<HTMLDivElement | null>(null);
+  const containerRef = useRef<HTMLDivElement | null>(null);
   const [scale, setScale] = useState(1);
 
   const { width, height } = useCanvasSize();
@@ -13,7 +13,7 @@ export default function EditorCanvasWrapper() {
   const setFormat = useEditorFormatStore((s) => s.setFormat);
   const clearElements = useEditorStore((s) => s.clearElements);
 
-  // 1. Format aus localStorage holen
+  // Format aus localStorage laden
   useEffect(() => {
     const saved = localStorage.getItem("editor-format");
     if (saved === "a4" || saved === "a5" || saved === "a6") {
@@ -21,29 +21,28 @@ export default function EditorCanvasWrapper() {
     }
   }, [setFormat]);
 
-  // 2. Format speichern
+  // Format speichern
   useEffect(() => {
     localStorage.setItem("editor-format", format);
   }, [format]);
 
-  // 3. Skalierung berechnen mit ResizeObserver
+  // 📏 Dynamisches Scaling
   useEffect(() => {
-    const container = wrapperRef.current;
-    if (!container) return;
+    const resize = () => {
+      if (!containerRef.current) return;
+      const containerWidth = containerRef.current.offsetWidth;
+      const padding = 32;
+      const newScale = containerWidth < width + padding
+        ? containerWidth / (width + padding)
+        : 1;
+      setScale(newScale);
+    };
 
-    const observer = new ResizeObserver((entries) => {
-      for (const entry of entries) {
-        const containerWidth = entry.contentRect.width;
-        const padding = 32; // z. B. px-4 links/rechts
-        const newScale =
-          containerWidth < width + padding
-            ? containerWidth / (width + padding)
-            : 1;
-        setScale(newScale);
-      }
-    });
+    resize();
 
-    observer.observe(container);
+    const observer = new ResizeObserver(resize);
+    if (containerRef.current) observer.observe(containerRef.current);
+
     return () => observer.disconnect();
   }, [width]);
 
@@ -56,7 +55,6 @@ export default function EditorCanvasWrapper() {
 
   return (
     <div className="flex flex-col items-center w-full">
-      {/* Reset-Button */}
       <button
         onClick={handleReset}
         className="text-xs text-gray-500 underline mt-4 mb-2"
@@ -64,19 +62,16 @@ export default function EditorCanvasWrapper() {
         Editor zurücksetzen
       </button>
 
-      {/* Canvas-Container mit Skalierung */}
       <div
-        ref={wrapperRef}
-        className="w-full max-w-full flex justify-center overflow-x-auto px-4"
+        ref={containerRef}
+        className="w-full max-w-full flex justify-center overflow-x-auto px-2"
       >
         <div
-          className="bg-white shadow-xl border rounded relative"
           style={{
-            width: `${width}px`,
-            height: `${height}px`,
             transform: `scale(${scale})`,
             transformOrigin: "top center",
-            transition: "transform 0.3s ease-in-out",
+            width: `${width}px`,
+            height: `${height}px`,
             margin: "2rem 0",
           }}
         >
