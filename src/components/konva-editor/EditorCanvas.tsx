@@ -1,3 +1,4 @@
+
 import { Stage, Layer, Text, Transformer } from "react-konva";
 import { useEditorStore } from "./useEditorStore";
 import { useState, useRef, useEffect } from "react";
@@ -7,12 +8,14 @@ export default function EditorCanvas() {
 
   const { elements, updateElement } = useEditorStore();
   const [editingId, setEditingId] = useState<string | null>(null);
+  const [selectedId, setSelectedId] = useState<string | null>(null);
   const [editText, setEditText] = useState("");
   const inputRef = useRef<HTMLInputElement>(null);
   const transformerRef = useRef<any>(null);
   const selectedShapeRef = useRef<any>(null);
 
   const editingElement = elements.find((el) => el.id === editingId);
+  const selectedElement = elements.find((el) => el.id === selectedId);
 
   useEffect(() => {
     if (editingElement && inputRef.current) {
@@ -20,7 +23,7 @@ export default function EditorCanvas() {
       input.style.position = "absolute";
       input.style.top = `${editingElement.y + 100}px`;
       input.style.left = `${editingElement.x + 16}px`;
-      input.style.fontSize = `${editingElement.fontSize || 18}px`;
+      input.style.fontSize = \`\${editingElement.fontSize || 18}px\`;
       input.focus();
     }
   }, [editingElement]);
@@ -30,7 +33,7 @@ export default function EditorCanvas() {
       transformerRef.current.nodes([selectedShapeRef.current]);
       transformerRef.current.getLayer().batchDraw();
     }
-  }, [editingId]);
+  }, [selectedId]);
 
   const handleEditStart = (elId: string, currentText: string) => {
     setEditingId(elId);
@@ -39,23 +42,23 @@ export default function EditorCanvas() {
 
   return (
     <div className="relative border border-gray-300 rounded shadow p-4">
-      {editingElement && (
+      {selectedElement && (
         <div className="flex flex-wrap items-center gap-2 mb-2 text-sm">
           <label>Größe:</label>
           <input
             type="number"
-            value={editingElement.fontSize || 18}
+            value={selectedElement.fontSize || 18}
             onChange={(e) =>
-              updateElement(editingElement.id, { fontSize: parseInt(e.target.value) })
+              updateElement(selectedElement.id, { fontSize: parseInt(e.target.value) })
             }
             className="border rounded px-2 py-1 w-16"
           />
 
           <label>Schrift:</label>
           <select
-            value={editingElement.fontFamily || "Arial"}
+            value={selectedElement.fontFamily || "Arial"}
             onChange={(e) =>
-              updateElement(editingElement.id, { fontFamily: e.target.value })
+              updateElement(selectedElement.id, { fontFamily: e.target.value })
             }
             className="border rounded px-2 py-1"
           >
@@ -69,16 +72,16 @@ export default function EditorCanvas() {
           <label>Farbe:</label>
           <input
             type="color"
-            value={editingElement.fill || "#000000"}
+            value={selectedElement.fill || "#000000"}
             onChange={(e) =>
-              updateElement(editingElement.id, { fill: e.target.value })
+              updateElement(selectedElement.id, { fill: e.target.value })
             }
           />
 
           <button
             onClick={() =>
-              updateElement(editingElement.id, {
-                fontWeight: editingElement.fontWeight === "bold" ? "normal" : "bold",
+              updateElement(selectedElement.id, {
+                fontWeight: selectedElement.fontWeight === "bold" ? "normal" : "bold",
               })
             }
             className="border px-2 py-1 rounded font-bold"
@@ -88,8 +91,8 @@ export default function EditorCanvas() {
 
           <button
             onClick={() =>
-              updateElement(editingElement.id, {
-                fontStyle: editingElement.fontStyle === "italic" ? "normal" : "italic",
+              updateElement(selectedElement.id, {
+                fontStyle: selectedElement.fontStyle === "italic" ? "normal" : "italic",
               })
             }
             className="border px-2 py-1 rounded italic"
@@ -99,9 +102,9 @@ export default function EditorCanvas() {
 
           <label>Ausrichtung:</label>
           <select
-            value={editingElement.align || "left"}
+            value={selectedElement.align || "left"}
             onChange={(e) =>
-              updateElement(editingElement.id, { align: e.target.value as any })
+              updateElement(selectedElement.id, { align: e.target.value as any })
             }
             className="border rounded px-2 py-1"
           >
@@ -128,15 +131,24 @@ export default function EditorCanvas() {
                 fill={el.fill || "#000000"}
                 align={el.align || "left"}
                 draggable
+                onClick={() => {
+                  setSelectedId(el.id);
+                }}
+                onDblClick={() => {
+                  setSelectedId(el.id);
+                  handleEditStart(el.id, el.text || "");
+                }}
+                onTap={() => {
+                  setSelectedId(el.id);
+                  handleEditStart(el.id, el.text || "");
+                }}
                 onDragEnd={(e) =>
                   updateElement(el.id, {
                     x: e.target.x(),
                     y: e.target.y(),
                   })
                 }
-                onDblClick={() => handleEditStart(el.id, el.text || "")}
-                onTap={() => handleEditStart(el.id, el.text || "")}
-                ref={el.id === editingId ? selectedShapeRef : undefined}
+                ref={el.id === selectedId ? selectedShapeRef : undefined}
               />
             ) : null
           )}
