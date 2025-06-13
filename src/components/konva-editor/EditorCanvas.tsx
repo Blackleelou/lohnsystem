@@ -1,20 +1,20 @@
 import { Stage, Layer, Text, Transformer } from "react-konva";
 import { useEditorStore } from "./useEditorStore";
 import { useState, useRef, useEffect } from "react";
+import EditorToolbar from "./EditorToolbar";
 
 export default function EditorCanvas() {
   if (typeof window === "undefined") return null;
 
   const { elements, updateElement } = useEditorStore();
   const [editingId, setEditingId] = useState<string | null>(null);
-  const [selectedId, setSelectedId] = useState<string | null>(null);
   const [editText, setEditText] = useState("");
   const inputRef = useRef<HTMLInputElement>(null);
   const transformerRef = useRef<any>(null);
   const selectedShapeRef = useRef<any>(null);
 
   const editingElement = elements.find((el) => el.id === editingId);
-  const selectedElement = elements.find((el) => el.id === selectedId);
+  const selectedElement = elements.find((el) => el.selected);
 
   useEffect(() => {
     if (editingElement && inputRef.current) {
@@ -32,96 +32,23 @@ export default function EditorCanvas() {
       transformerRef.current.nodes([selectedShapeRef.current]);
       transformerRef.current.getLayer().batchDraw();
     }
-  }, [selectedId]);
+  }, [selectedElement]);
+
+  const handleSelect = (id: string) => {
+    elements.forEach((el) => {
+      updateElement(el.id, { selected: el.id === id });
+    });
+  };
 
   const handleEditStart = (elId: string, currentText: string) => {
     setEditingId(elId);
-    setSelectedId(elId); // ✅ wichtig: Auswahl setzen, damit Leiste sichtbar bleibt
     setEditText(currentText);
   };
 
-  const currentElement = editingElement || selectedElement;
-
   return (
     <div className="relative border border-gray-300 rounded shadow p-4">
-      {currentElement && (
-        <div className="flex flex-wrap items-center gap-2 mb-2 text-sm">
-          <label>Größe:</label>
-          <input
-            type="number"
-            value={currentElement.fontSize || 18}
-            onChange={(e) =>
-              updateElement(currentElement.id, {
-                fontSize: parseInt(e.target.value),
-              })
-            }
-            className="border rounded px-2 py-1 w-16"
-          />
-
-          <label>Schrift:</label>
-          <select
-            value={currentElement.fontFamily || "Arial"}
-            onChange={(e) =>
-              updateElement(currentElement.id, { fontFamily: e.target.value })
-            }
-            className="border rounded px-2 py-1"
-          >
-            <option value="Arial">Arial</option>
-            <option value="Verdana">Verdana</option>
-            <option value="Georgia">Georgia</option>
-            <option value="Times New Roman">Times New Roman</option>
-            <option value="Courier New">Courier New</option>
-          </select>
-
-          <label>Farbe:</label>
-          <input
-            type="color"
-            value={currentElement.fill || "#000000"}
-            onChange={(e) =>
-              updateElement(currentElement.id, { fill: e.target.value })
-            }
-          />
-
-          <button
-            onClick={() =>
-              updateElement(currentElement.id, {
-                fontWeight:
-                  currentElement.fontWeight === "bold" ? "normal" : "bold",
-              })
-            }
-            className="border px-2 py-1 rounded font-bold"
-          >
-            B
-          </button>
-
-          <button
-            onClick={() =>
-              updateElement(currentElement.id, {
-                fontStyle:
-                  currentElement.fontStyle === "italic" ? "normal" : "italic",
-              })
-            }
-            className="border px-2 py-1 rounded italic"
-          >
-            I
-          </button>
-
-          <label>Ausrichtung:</label>
-          <select
-            value={currentElement.align || "left"}
-            onChange={(e) =>
-              updateElement(currentElement.id, {
-                align: e.target.value as any,
-              })
-            }
-            className="border rounded px-2 py-1"
-          >
-            <option value="left">Links</option>
-            <option value="center">Zentriert</option>
-            <option value="right">Rechts</option>
-          </select>
-        </div>
-      )}
+      {/* Toolbar wird nur angezeigt wenn etwas ausgewählt ist */}
+      {selectedElement && <EditorToolbar />}
 
       <Stage width={600} height={400}>
         <Layer>
@@ -140,14 +67,14 @@ export default function EditorCanvas() {
                 align={el.align || "left"}
                 draggable
                 onClick={() => {
-                  setSelectedId(el.id);
+                  handleSelect(el.id);
                 }}
                 onDblClick={() => {
-                  setSelectedId(el.id);
+                  handleSelect(el.id);
                   handleEditStart(el.id, el.text || "");
                 }}
                 onTap={() => {
-                  setSelectedId(el.id);
+                  handleSelect(el.id);
                   handleEditStart(el.id, el.text || "");
                 }}
                 onDragEnd={(e) =>
@@ -156,7 +83,7 @@ export default function EditorCanvas() {
                     y: e.target.y(),
                   })
                 }
-                ref={el.id === selectedId ? selectedShapeRef : undefined}
+                ref={el.selected ? selectedShapeRef : undefined}
               />
             ) : null
           )}
