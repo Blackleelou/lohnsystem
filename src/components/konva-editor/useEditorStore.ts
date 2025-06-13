@@ -14,31 +14,11 @@ export type EditorElement = {
   align?: "left" | "center" | "right";
 };
 
-addText: () =>
-  set((state) => ({
-    elements: [
-      ...state.elements,
-      {
-        id: crypto.randomUUID(),
-        type: "text",
-        text: "Neuer Text",
-        x: 100,
-        y: 100,
-        fontSize: 18,
-        fontFamily: "Arial",
-        fontStyle: "normal",
-        fontWeight: "normal",
-        fill: "#000000",
-        align: "left",
-      },
-    ],
-  })),
-  
 type State = {
   elements: EditorElement[];
   addElement: (el: EditorElement) => void;
   updateElement: (id: string, newProps: Partial<EditorElement>) => void;
-  addText: () => void; // ✅ hinzufügen
+  addText: () => void;
 };
 
 export const useEditorStore = create<State>((set) => ({
@@ -64,5 +44,24 @@ export const useEditorStore = create<State>((set) => ({
       elements: state.elements.map((el) =>
         el.id === id ? { ...el, ...newProps } : el
       ),
+    })),
+  addText: () =>
+    set((state) => ({
+      elements: [
+        ...state.elements,
+        {
+          id: crypto.randomUUID(),
+          type: "text",
+          text: "Neuer Text",
+          x: 100,
+          y: 100,
+          fontSize: 18,
+          fontFamily: "Arial",
+          fontStyle: "normal",
+          fontWeight: "normal",
+          fill: "#000000",
+          align: "left",
+        },
+      ],
     })),
 }));
