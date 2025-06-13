@@ -14,6 +14,26 @@ export type EditorElement = {
   align?: "left" | "center" | "right";
 };
 
+addText: () =>
+  set((state) => ({
+    elements: [
+      ...state.elements,
+      {
+        id: crypto.randomUUID(),
+        type: "text",
+        text: "Neuer Text",
+        x: 100,
+        y: 100,
+        fontSize: 18,
+        fontFamily: "Arial",
+        fontStyle: "normal",
+        fontWeight: "normal",
+        fill: "#000000",
+        align: "left",
+      },
+    ],
+  })),
+  
 type State = {
   elements: EditorElement[];
   addElement: (el: EditorElement) => void;
