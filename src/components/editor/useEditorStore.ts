@@ -2,15 +2,13 @@ import { create } from "zustand";
 
 export type EditorElement = {
   id: string;
-  type: "text" | "image"; // ← HIER erweitert
-  text?: string; // ← optional, weil image keinen Text hat
+  type: "text" | "image"; // ← erweitert
+  text?: string;          // ← optional für Text
   x: number;
   y: number;
-  src?: string; // ← NUR für Bildtyp
+  src?: string;           // ← optional für Bild
   width?: number;
   height?: number;
-  ...
-};
   fontSize?: number;
   fontFamily?: string;
   fontStyle?: "normal" | "italic";
@@ -25,7 +23,7 @@ type State = {
   addElement: (el: EditorElement) => void;
   updateElement: (id: string, newProps: Partial<EditorElement>) => void;
   addText: () => void;
-  clearElements: () => void; // ✅ neu
+  clearElements: () => void;
 };
 
 export const useEditorStore = create<State>((set) => ({
@@ -72,5 +70,5 @@ export const useEditorStore = create<State>((set) => ({
       };
       return { elements: [...state.elements, newText] };
     }),
-  clearElements: () => set({ elements: [] }), // ✅ neu
+  clearElements: () => set({ elements: [] }),
 }));
