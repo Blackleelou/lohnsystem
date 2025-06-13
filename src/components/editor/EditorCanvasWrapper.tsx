@@ -16,7 +16,7 @@ export default function EditorCanvasWrapper() {
           boxShadow: "0 0 4px rgba(0,0,0,0.2)",
         }}
       >
-        <EditorCanvas />
+        <EditorCanvas width={width} height={height} />
       </div>
     </div>
   );
