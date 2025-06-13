@@ -18,6 +18,7 @@ type State = {
   elements: EditorElement[];
   addElement: (el: EditorElement) => void;
   updateElement: (id: string, newProps: Partial<EditorElement>) => void;
+  addText: () => void; // ✅ hinzufügen
 };
 
 export const useEditorStore = create<State>((set) => ({
