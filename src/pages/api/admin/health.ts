@@ -1,26 +1,21 @@
 import type { NextApiRequest, NextApiResponse } from 'next';
-import { prisma } from '@/lib/prisma';
-import nodemailer from 'nodemailer';
 
 export default async function handler(req: NextApiRequest, res: NextApiResponse) {
-  const { consent } = req.body || {};
-  if (consent) {
-    console.log('[Health Consent Debug]', {
-      statistik: consent.statistik,
-      marketing: consent.marketing,
-    });
-  }
-
-  // ✅ DB-Check
-  let db: 'ok' | 'warn' | 'error' = 'ok';
+  // Initialisiere Default-Werte
+  let db: 'ok' | 'warn' | 'error' = 'warn';
   let dbSize: string | null = null;
   let dbSizeRaw: number | null = null;
   let dbSizePercent: number | null = null;
 
+  let mail: 'ok' | 'warn' | 'error' = 'warn';
+  let dbError: string | null = null;
+  let mailError: string | null = null;
+
+  // ✅ Teste Datenbankverbindung
   try {
+    const { prisma } = await import('@/lib/prisma');
     await prisma.user.findFirst();
 
-    // 🔍 Speichergröße der aktuellen DB abfragen
     const result: any = await prisma.$queryRawUnsafe(`
       SELECT 
         pg_size_pretty(pg_database_size(current_database())) AS size_pretty,
@@ -30,19 +25,21 @@ export default async function handler(req: NextApiRequest, res: NextApiResponse)
     dbSize = result?.[0]?.size_pretty || null;
     dbSizeRaw = result?.[0]?.size_bytes || null;
 
-    // 📏 Prozent berechnen (ausgehend von 10 GB Limit)
     if (dbSizeRaw !== null) {
       dbSizePercent = Math.round((dbSizeRaw / 10_000_000_000) * 100);
     }
 
-  } catch (e) {
-    console.error('DB-CHECK-ERROR', e);
+    db = 'ok';
+  } catch (e: any) {
     db = 'error';
+    dbError = e.message || 'Unbekannter Fehler';
+    console.error('[DB ERROR]', e);
   }
 
-  // ✅ Mail-Service-Check
-  let mail: 'ok' | 'warn' | 'error' = 'ok';
+  // ✅ Teste Mail-Transport
   try {
+    const nodemailer = await import('nodemailer');
+
     const transporter = nodemailer.createTransport({
       host: process.env.MAIL_HOST,
       port: Number(process.env.MAIL_PORT),
@@ -58,25 +55,28 @@ export default async function handler(req: NextApiRequest, res: NextApiResponse)
       subject: 'Health Check',
       text: 'Test',
     });
+
     mail = 'ok';
-  } catch (e) {
-    console.error('MAIL-CHECK-ERROR', e);
+  } catch (e: any) {
     mail = 'error';
+    mailError = e.message || 'Unbekannter Fehler';
+    console.error('[MAIL ERROR]', e);
   }
 
-  const api: 'ok' = 'ok';
-  const build: 'ok' | 'warn' | 'error' = process.env.VERCEL ? 'ok' : 'warn';
-
+  // Abschlussantwort
   res.status(200).json({
-    db,
-    mail,
-    api,
-    build,
+    status: '✅ Health Check ausgeführt',
     serverTime: new Date().toISOString(),
+    api: 'ok',
+    build: process.env.VERCEL ? 'ok' : 'warn',
 
-    // 📊 Zusätzliche DB-Infos
-    dbSize,         // z. B. "1.4 GB"
-    dbSizeRaw,      // z. B. 1450000000
-    dbSizePercent,  // z. B. 14
+    db,
+    dbSize,
+    dbSizeRaw,
+    dbSizePercent,
+    dbError,
+
+    mail,
+    mailError,
   });
 }
