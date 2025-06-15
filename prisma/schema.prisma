@@ -238,4 +238,5 @@ enum Visibility {
   PRIVATE   // Nur Besitzer
   TEAM      // Ganzes Team (abhängig von Rolle)
   SHARED    // explizit freigegeben
+  PUBLIC    // pulic halt
 }
