@@ -1,18 +1,34 @@
-// src/pages/api/admin/healthcheck.ts
 import type { NextApiRequest, NextApiResponse } from 'next';
-import { prisma } from '@/lib/prisma';
+import nodemailer from 'nodemailer';
 
 export default async function handler(req: NextApiRequest, res: NextApiResponse) {
-  try {
-    const user = await prisma.user.findFirst(); // Testabfrage
+  let mail: 'ok' | 'error' = 'ok';
 
-    res.status(200).json({
-      status: 'prisma OK ✅',
-      firstUser: user ?? null,
-      time: new Date().toISOString(),
+  try {
+    const transporter = nodemailer.createTransport({
+      host: process.env.MAIL_HOST,
+      port: Number(process.env.MAIL_PORT),
+      auth: {
+        user: process.env.MAIL_USER,
+        pass: process.env.MAIL_PASS,
+      },
     });
+
+    await transporter.sendMail({
+      from: `"HealthCheck Test" <${process.env.MAIL_USER}>`,
+      to: process.env.MAIL_USER,
+      subject: 'Mail-Test ✔️',
+      text: 'Das ist ein Test.',
+    });
+
+    mail = 'ok';
   } catch (error) {
-    console.error('❌ PRISMA FEHLER:', error);
-    res.status(500).json({ error: 'Prisma nicht erreichbar', details: String(error) });
+    console.error('MAIL-TEST-ERROR', error);
+    mail = 'error';
   }
+
+  res.status(200).json({
+    mail,
+    time: new Date().toISOString(),
+  });
 }
