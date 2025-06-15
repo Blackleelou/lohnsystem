@@ -107,8 +107,8 @@ export default function SystemStatusPage() {
             {Object.entries(LABELS).map(([key, label]) => {
               const isDb = key === 'db';
               const value = isDb
-                ? (status.db.status as 'ok' | 'warn' | 'error')
-                : (status?.[key as keyof HealthStatus] as 'ok' | 'warn' | 'error' | undefined);
+                ? status.db.status
+                : status?.[key as keyof HealthStatus] as 'ok' | 'warn' | 'error' | undefined;
               const Icon = ICONS[key];
               const safeValue = value ?? 'error';
 
@@ -143,33 +143,31 @@ export default function SystemStatusPage() {
                   </div>
 
                   {/* DB-Details */}
-                  {isDb && (
-                    <>
-                      {status.db.sizePretty && (
-                        <div className="text-xs text-gray-500 ml-12">
-                          Speicherverbrauch: <span className="font-medium">{status.db.sizePretty}</span>
-                          {typeof status.db.sizePercent === 'number' && (
-                            <> ({status.db.sizePercent}% von 10 GB)</>
-                          )}
-                        </div>
+                  {isDb && status.db.sizePretty && (
+                    <div className="text-xs text-gray-500 ml-12">
+                      Speicherverbrauch: <span className="font-medium">{status.db.sizePretty}</span>
+                      {typeof status.db.sizePercent === 'number' && (
+                        <> ({status.db.sizePercent}% von 10 GB)</>
                       )}
-                      {Array.isArray(status.warnings) && status.warnings.length > 0 && (
-  <div className="text-xs text-yellow-600 mt-1 ml-12">
-    ⚠️ {status.warnings.join(', ')}
-  </div>
-)}
-                      {status.db.topTables?.length > 0 && (
-                        <div className="text-xs text-gray-500 mt-2 ml-12 space-y-1">
-                          <div className="font-medium text-gray-600">Größte Tabellen:</div>
-                          {status.db.topTables.map((t, i) => (
-                            <div key={i} className="flex justify-between pr-2">
-                              <span>{t.name}</span>
-                              <span className="tabular-nums">{(t.sizeBytes / 1024).toFixed(1)} kB</span>
-                            </div>
-                          ))}
+                    </div>
+                  )}
+
+                  {isDb && Array.isArray(status.warnings) && status.warnings.length > 0 && (
+                    <div className="text-xs text-yellow-600 mt-1 ml-12">
+                      ⚠️ {status.warnings.join(', ')}
+                    </div>
+                  )}
+
+                  {isDb && Array.isArray(status.db.topTables) && status.db.topTables.length > 0 && (
+                    <div className="text-xs text-gray-500 mt-2 ml-12 space-y-1">
+                      <div className="font-medium text-gray-600">Größte Tabellen:</div>
+                      {status.db.topTables.map((t, i) => (
+                        <div key={i} className="flex justify-between pr-2">
+                          <span>{t.name}</span>
+                          <span className="tabular-nums">{(t.sizeBytes / 1024).toFixed(1)} kB</span>
                         </div>
-                      )}
-                    </>
+                      ))}
+                    </div>
                   )}
                 </div>
               );
