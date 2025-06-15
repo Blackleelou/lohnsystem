@@ -12,6 +12,7 @@ export default async function handler(req: NextApiRequest, res: NextApiResponse)
     api: 'ok',
     consentDebug: null,
     errors: [],
+    warnings: [],
   };
 
   try {
@@ -41,7 +42,6 @@ export default async function handler(req: NextApiRequest, res: NextApiResponse)
       const sizePretty = raw?.[0]?.size_pretty || null;
       const sizeBytes = raw?.[0]?.size_bytes ?? null;
       const sizeBytesNumber = sizeBytes ? Number(sizeBytes) : null;
-
       const sizePercent = sizeBytesNumber
         ? Math.round((sizeBytesNumber / 10_000_000_000) * 100)
         : null;
@@ -49,6 +49,26 @@ export default async function handler(req: NextApiRequest, res: NextApiResponse)
       result.db.sizePretty = sizePretty;
       result.db.sizeBytes = sizeBytesNumber;
       result.db.sizePercent = sizePercent;
+
+      if (sizePercent !== null && sizePercent >= 80) {
+        result.warnings.push('Datenbank belegt über 80 % des Speicherlimits!');
+      }
+
+      // Speicherfresser-Report
+      const tableSizes: any = await prisma.$queryRawUnsafe(`
+        SELECT
+          table_name,
+          pg_total_relation_size(quote_ident(table_name)) AS size
+        FROM information_schema.tables
+        WHERE table_schema = 'public'
+        ORDER BY size DESC
+        LIMIT 5;
+      `);
+
+      result.db.topTables = tableSizes.map((t: any) => ({
+        name: t.table_name,
+        sizeBytes: Number(t.size),
+      }));
 
     } catch (err: any) {
       result.db.sizeError = 'Fehler beim Lesen der DB-Größe: ' + String(err);
