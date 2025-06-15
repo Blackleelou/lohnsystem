@@ -1,6 +1,7 @@
 import { useEditorStore } from "../useEditorStore";
 import { useEditorFormatStore } from "../useEditorFormat";
 import { toast } from "react-hot-toast";
+import ToolbarSaveAsButton from "./ToolbarSaveAsButton";
 
 export default function ToolbarGroupFile() {
   const elements = useEditorStore((s) => s.elements);
@@ -15,7 +16,7 @@ export default function ToolbarGroupFile() {
           title: "Neues Dokument",
           content: elements,
           format,
-          teamId: null, // später dynamisch
+          visibility: "PRIVATE",
         }),
       });
 
@@ -30,7 +31,7 @@ export default function ToolbarGroupFile() {
   };
 
   return (
-    <div className="flex items-center gap-2">
+    <div className="flex items-center gap-3 flex-wrap">
       <span className="text-sm font-semibold text-gray-600">Datei:</span>
 
       <button
@@ -39,6 +40,8 @@ export default function ToolbarGroupFile() {
       >
         Speichern
       </button>
+
+      <ToolbarSaveAsButton />
 
       <button
         className="px-2 py-1 border rounded text-sm hover:bg-gray-100"
