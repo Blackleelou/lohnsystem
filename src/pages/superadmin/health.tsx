@@ -109,9 +109,12 @@ export default function SystemStatusPage() {
           <div className="grid grid-cols-1 gap-4 md:grid-cols-2">
             {Object.entries(LABELS).map(([key, label]) => {
               const isDb = key === 'db';
-              const value = isDb
-                ? status.db.status
-                : status?.[key as keyof HealthStatus] as 'ok' | 'warn' | 'error' | undefined;
+              const value =
+                key === 'db'
+                  ? status.db.status
+                  : key === 'mail'
+                  ? status.mail.status
+                  : status[key as keyof HealthStatus] as 'ok' | 'warn' | 'error' | undefined;
               const Icon = ICONS[key];
               const safeValue = value ?? 'error';
 
