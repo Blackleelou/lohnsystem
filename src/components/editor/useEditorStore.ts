@@ -2,11 +2,11 @@ import { create } from "zustand";
 
 export type EditorElement = {
   id: string;
-  type: "text" | "image"; // ← erweitert
-  text?: string;          // ← optional für Text
+  type: "text" | "image"; // Elementtyp
+  text?: string;          // optional für Text
   x: number;
   y: number;
-  src?: string;           // ← optional für Bild
+  src?: string;           // optional für Bild
   width?: number;
   height?: number;
   fontSize?: number;
@@ -24,6 +24,7 @@ type State = {
   updateElement: (id: string, newProps: Partial<EditorElement>) => void;
   addText: () => void;
   clearElements: () => void;
+  setElements: (elements: EditorElement[]) => void; // ✅ NEU
 };
 
 export const useEditorStore = create<State>((set) => ({
@@ -71,4 +72,5 @@ export const useEditorStore = create<State>((set) => ({
       return { elements: [...state.elements, newText] };
     }),
   clearElements: () => set({ elements: [] }),
+  setElements: (elements) => set({ elements }), // ✅ NEU
 }));
