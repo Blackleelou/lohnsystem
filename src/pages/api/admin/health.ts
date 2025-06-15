@@ -6,8 +6,12 @@ export default async function handler(req: NextApiRequest, res: NextApiResponse)
   const result: any = {
     status: 'Healthcheck gestartet',
     time: new Date().toISOString(),
-    db: { status: 'pending' },
-    mail: { status: 'pending' },
+    db: {
+      status: 'pending',
+    },
+    mail: {
+      status: 'pending',
+    },
     build: process.env.VERCEL ? 'ok' : 'warn',
     api: 'ok',
     consentDebug: null,
@@ -24,15 +28,17 @@ export default async function handler(req: NextApiRequest, res: NextApiResponse)
       };
     }
 
+    // DB-Test
     try {
       await prisma.user.findFirst();
       result.db.status = 'ok';
     } catch (err: any) {
       result.db.status = 'error';
       result.db.error = 'Fehler bei Prisma: ' + String(err);
-      result.errors.push('DB-Zugriff fehlgeschlagen: ' + String(err));
+      result.errors.push(result.db.error);
     }
 
+    // DB-Größe + Speicherfresser
     try {
       const raw: any = await prisma.$queryRawUnsafe(`
         SELECT 
@@ -42,6 +48,7 @@ export default async function handler(req: NextApiRequest, res: NextApiResponse)
       const sizePretty = raw?.[0]?.size_pretty || null;
       const sizeBytes = raw?.[0]?.size_bytes ?? null;
       const sizeBytesNumber = sizeBytes ? Number(sizeBytes) : null;
+
       const sizePercent = sizeBytesNumber
         ? Math.round((sizeBytesNumber / 10_000_000_000) * 100)
         : null;
@@ -54,7 +61,6 @@ export default async function handler(req: NextApiRequest, res: NextApiResponse)
         result.warnings.push('Datenbank belegt über 80 % des Speicherlimits!');
       }
 
-      // Speicherfresser-Report
       const tableSizes: any = await prisma.$queryRawUnsafe(`
         SELECT
           table_name,
@@ -72,9 +78,10 @@ export default async function handler(req: NextApiRequest, res: NextApiResponse)
 
     } catch (err: any) {
       result.db.sizeError = 'Fehler beim Lesen der DB-Größe: ' + String(err);
-      result.errors.push('DB-Größenabfrage fehlgeschlagen: ' + String(err));
+      result.errors.push(result.db.sizeError);
     }
 
+    // Mail-Test
     try {
       if (
         !process.env.MAIL_HOST ||
@@ -106,7 +113,7 @@ export default async function handler(req: NextApiRequest, res: NextApiResponse)
     } catch (err: any) {
       result.mail.status = 'error';
       result.mail.error = 'Fehler beim Mailversand: ' + String(err);
-      result.errors.push('Mailversand fehlgeschlagen: ' + String(err));
+      result.errors.push(result.mail.error);
     }
 
     result.status = result.errors.length > 0 ? 'Warnungen oder Fehler' : 'Alles OK';
