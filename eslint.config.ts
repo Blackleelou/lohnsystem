@@ -1,20 +1,24 @@
-// eslint.config.js
+// eslint.config.ts
 import js from '@eslint/js';
-import tseslint from 'typescript-eslint';
+import parser from '@typescript-eslint/parser';
+import plugin from '@typescript-eslint/eslint-plugin';
 
 export default [
-  js.configs.recommended,
-  ...tseslint.configs.recommended,
   {
     files: ['**/*.ts', '**/*.tsx'],
     languageOptions: {
+      parser,
       parserOptions: {
+        ecmaVersion: 'latest',
         project: './tsconfig.json',
         sourceType: 'module',
       },
     },
+    plugins: {
+      '@typescript-eslint': plugin,
+    },
     rules: {
-      // Deaktiviere strenge oder nervige Regeln
+      ...plugin.configs.recommended.rules,
       'no-console': 'off',
       'no-unused-vars': 'off',
       'no-undef': 'off',
@@ -30,7 +34,6 @@ export default [
       '@typescript-eslint/no-unused-expressions': 'off',
     },
   },
-  // Tailwind-Config erlauben
   {
     files: ['tailwind.config.js'],
     languageOptions: {
@@ -39,6 +42,11 @@ export default [
     rules: {
       'no-undef': 'off',
       '@typescript-eslint/no-require-imports': 'off',
+    },
+  },
+  {
+    rules: {
+      ...js.configs.recommended.rules,
     },
   },
 ];
