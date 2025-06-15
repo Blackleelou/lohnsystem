@@ -22,6 +22,8 @@ type HealthStatus = {
   dbSize?: string;
   dbSizeRaw?: number;
   dbSizePercent?: number;
+  warnings?: string[];
+  db?: any; // Für topTables etc.
 };
 
 const ICONS: Record<string, any> = {
@@ -31,7 +33,7 @@ const ICONS: Record<string, any> = {
   build: Cpu,
 };
 
-const LABELS: Record<keyof Omit<HealthStatus, 'serverTime' | 'dbSize' | 'dbSizeRaw' | 'dbSizePercent'>, string> = {
+const LABELS: Record<keyof Omit<HealthStatus, 'serverTime' | 'dbSize' | 'dbSizeRaw' | 'dbSizePercent' | 'warnings' | 'db'>, string> = {
   db: 'Datenbank',
   mail: 'Mail-Service',
   api: 'API',
@@ -148,7 +150,6 @@ export default function SystemStatusPage() {
                     </span>
                   </div>
 
-                  {/* ➕ Speicherverbrauch anzeigen (nur bei Datenbank) */}
                   {key === 'db' && status?.dbSize && (
                     <div className="text-xs text-gray-500 ml-12">
                       Speicherverbrauch: <span className="font-medium">{status.dbSize}</span>
@@ -157,22 +158,37 @@ export default function SystemStatusPage() {
                       )}
                     </div>
                   )}
+
+                  {key === 'db' && status?.warnings?.length > 0 && (
+                    <div className="text-xs text-yellow-600 mt-1 ml-12">
+                      ⚠️ {status.warnings.join(', ')}
+                    </div>
+                  )}
+
+                  {key === 'db' && Array.isArray(status?.db?.topTables) && (
+                    <div className="text-xs text-gray-500 mt-2 ml-12 space-y-1">
+                      <div className="font-medium text-gray-600">Größte Tabellen:</div>
+                      {status.db.topTables.map((table: any, index: number) => (
+                        <div key={index} className="flex justify-between pr-2">
+                          <span>{table.name}</span>
+                          <span className="tabular-nums">{(table.sizeBytes / 1024).toFixed(1)} kB</span>
+                        </div>
+                      ))}
+                    </div>
+                  )}
                 </div>
               );
             })}
 
             {/* Google Analytics */}
-            <div
-              className={`relative flex items-start gap-3 bg-white rounded-2xl shadow-md p-4 border
-                ${
-                  gaStatus === 'ok'
-                    ? 'border-green-100'
-                    : gaStatus === 'warn'
-                    ? 'border-yellow-100'
-                    : 'border-red-200'
-                }
-              `}
-            >
+            <div className={`relative flex items-start gap-3 bg-white rounded-2xl shadow-md p-4 border
+              ${
+                gaStatus === 'ok'
+                  ? 'border-green-100'
+                  : gaStatus === 'warn'
+                  ? 'border-yellow-100'
+                  : 'border-red-200'
+              }`}>
               <span className="bg-blue-50 rounded-full p-2 flex items-center justify-center mt-1">
                 <BarChart2 className="w-5 h-5 text-blue-600" />
               </span>
@@ -190,32 +206,27 @@ export default function SystemStatusPage() {
               </div>
               <div className="flex flex-col items-end justify-between h-full">
                 <StatusSymbol status={gaStatus} />
-                <span
-                  className={`mt-2 text-xs ${
-                    gaStatus === 'ok'
-                      ? 'text-green-600'
-                      : gaStatus === 'warn'
-                      ? 'text-yellow-600'
-                      : 'text-red-600'
-                  } font-medium`}
-                >
+                <span className={`mt-2 text-xs ${
+                  gaStatus === 'ok'
+                    ? 'text-green-600'
+                    : gaStatus === 'warn'
+                    ? 'text-yellow-600'
+                    : 'text-red-600'
+                } font-medium`}>
                   {gaStatus === 'ok' ? 'Aktiv' : gaStatus === 'warn' ? 'Blockiert' : 'Fehler'}
                 </span>
               </div>
             </div>
 
             {/* Marketing Consent */}
-            <div
-              className={`relative flex items-center gap-3 bg-white rounded-2xl shadow-md p-4 border
-                ${
-                  marketingStatus === 'ok'
-                    ? 'border-green-100'
-                    : marketingStatus === 'warn'
-                    ? 'border-yellow-100'
-                    : 'border-red-200'
-                }
-              `}
-            >
+            <div className={`relative flex items-center gap-3 bg-white rounded-2xl shadow-md p-4 border
+              ${
+                marketingStatus === 'ok'
+                  ? 'border-green-100'
+                  : marketingStatus === 'warn'
+                  ? 'border-yellow-100'
+                  : 'border-red-200'
+              }`}>
               <span className="bg-blue-50 rounded-full p-2 flex items-center justify-center">
                 <Megaphone className="w-5 h-5 text-blue-600" />
               </span>
@@ -228,15 +239,13 @@ export default function SystemStatusPage() {
                 </div>
               </div>
               <StatusSymbol status={marketingStatus} />
-              <span
-                className={`text-xs ${
-                  marketingStatus === 'ok'
-                    ? 'text-green-600'
-                    : marketingStatus === 'warn'
-                    ? 'text-yellow-600'
-                    : 'text-red-600'
-                } font-medium`}
-              >
+              <span className={`text-xs ${
+                marketingStatus === 'ok'
+                  ? 'text-green-600'
+                  : marketingStatus === 'warn'
+                  ? 'text-yellow-600'
+                  : 'text-red-600'
+              } font-medium`}>
                 {marketingStatus === 'ok' ? 'Aktiv' : marketingStatus === 'warn' ? 'Blockiert' : 'Fehler'}
               </span>
             </div>
