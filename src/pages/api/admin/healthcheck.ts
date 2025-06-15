@@ -11,35 +11,43 @@ export default async function handler(req: NextApiRequest, res: NextApiResponse)
     });
   }
 
-  // ✅ DB-Check
   let db: 'ok' | 'warn' | 'error' = 'ok';
   let dbSize: string | null = null;
   let dbSizeRaw: number | null = null;
   let dbSizePercent: number | null = null;
+  let errorDbMessage: string | null = null;
 
   try {
     await prisma.user.findFirst();
 
-    const result: any = await prisma.$queryRawUnsafe(`
-      SELECT 
-        pg_size_pretty(pg_database_size(current_database())) AS size_pretty,
-        pg_database_size(current_database()) AS size_bytes;
-    `);
+    try {
+      const result: any = await prisma.$queryRawUnsafe(`
+        SELECT 
+          pg_size_pretty(pg_database_size(current_database())) AS size_pretty,
+          pg_database_size(current_database()) AS size_bytes;
+      `);
 
-    dbSize = result?.[0]?.size_pretty || null;
-    dbSizeRaw = result?.[0]?.size_bytes || null;
+      dbSize = result?.[0]?.size_pretty || null;
+      dbSizeRaw = result?.[0]?.size_bytes || null;
 
-    if (dbSizeRaw !== null) {
-      dbSizePercent = Math.round((dbSizeRaw / 10_000_000_000) * 100);
+      if (dbSizeRaw !== null) {
+        dbSizePercent = Math.round((dbSizeRaw / 10_000_000_000) * 100);
+      }
+
+    } catch (inner) {
+      errorDbMessage = `Fehler bei DB-Größe: ${String(inner)}`;
+      console.error('[DB-SIZE-CHECK-ERROR]', inner);
     }
 
   } catch (e) {
-    console.error('DB-CHECK-ERROR', e);
     db = 'error';
+    errorDbMessage = `Fehler beim Zugriff auf Datenbank: ${String(e)}`;
+    console.error('[DB-CHECK-ERROR]', e);
   }
 
-  // ✅ Mail-Check
   let mail: 'ok' | 'warn' | 'error' = 'ok';
+  let errorMailMessage: string | null = null;
+
   try {
     const transporter = nodemailer.createTransport({
       host: process.env.MAIL_HOST,
@@ -56,16 +64,18 @@ export default async function handler(req: NextApiRequest, res: NextApiResponse)
       subject: 'Health Check',
       text: 'Test',
     });
+
   } catch (e) {
-    console.error('MAIL-CHECK-ERROR', e);
     mail = 'error';
+    errorMailMessage = `Fehler beim Mailversand: ${String(e)}`;
+    console.error('[MAIL-CHECK-ERROR]', e);
   }
 
-  // Systeminfos
   const api: 'ok' = 'ok';
   const build: 'ok' | 'warn' | 'error' = process.env.VERCEL ? 'ok' : 'warn';
 
   res.status(200).json({
+    status: 'Health-Check abgeschlossen',
     db,
     mail,
     api,
@@ -74,5 +84,7 @@ export default async function handler(req: NextApiRequest, res: NextApiResponse)
     dbSize,
     dbSizeRaw,
     dbSizePercent,
+    errorDbMessage,
+    errorMailMessage,
   });
 }
