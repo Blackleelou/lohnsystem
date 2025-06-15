@@ -153,11 +153,11 @@ export default function SystemStatusPage() {
                           )}
                         </div>
                       )}
-                      {status.warnings?.length > 0 && (
-                        <div className="text-xs text-yellow-600 mt-1 ml-12">
-                          ⚠️ {status.warnings.join(', ')}
-                        </div>
-                      )}
+                      {Array.isArray(status.warnings) && status.warnings.length > 0 && (
+  <div className="text-xs text-yellow-600 mt-1 ml-12">
+    ⚠️ {status.warnings.join(', ')}
+  </div>
+)}
                       {status.db.topTables?.length > 0 && (
                         <div className="text-xs text-gray-500 mt-2 ml-12 space-y-1">
                           <div className="font-medium text-gray-600">Größte Tabellen:</div>
