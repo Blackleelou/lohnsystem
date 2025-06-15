@@ -2,6 +2,7 @@ import { useEditorStore } from "../useEditorStore";
 import { useEditorFormatStore } from "../useEditorFormat";
 import { toast } from "react-hot-toast";
 import ToolbarSaveAsButton from "./ToolbarSaveAsButton";
+import ToolbarOpenButton from "./ToolbarOpenButton";
 
 export default function ToolbarGroupFile() {
   const elements = useEditorStore((s) => s.elements);
@@ -41,6 +42,7 @@ export default function ToolbarGroupFile() {
         Speichern
       </button>
 
+      <ToolbarOpenButton />
       <ToolbarSaveAsButton />
 
       <button
