@@ -3,88 +3,102 @@ import { prisma } from '@/lib/prisma';
 import nodemailer from 'nodemailer';
 
 export default async function handler(req: NextApiRequest, res: NextApiResponse) {
-  const { consent } = req.body || {};
-  if (consent) {
-    console.log('[Health Consent Debug]', {
-      statistik: consent.statistik,
-      marketing: consent.marketing,
-    });
-  }
-
-  let db: 'ok' | 'warn' | 'error' = 'ok';
-  let dbSize: string | null = null;
-  let dbSizeRaw: number | null = null;
-  let dbSizePercent: number | null = null;
-  let errorDbMessage: string | null = null;
+  const result: any = {
+    status: 'Healthcheck gestartet',
+    time: new Date().toISOString(),
+    db: { status: 'pending' },
+    mail: { status: 'pending' },
+    build: process.env.VERCEL ? 'ok' : 'warn',
+    api: 'ok',
+    consentDebug: null,
+    errors: [],
+  };
 
   try {
-    await prisma.user.findFirst();
+    // Consent-Log
+    const { consent } = req.body || {};
+    if (consent) {
+      result.consentDebug = {
+        statistik: consent.statistik,
+        marketing: consent.marketing,
+      };
+    }
 
+    // --- DB-Zugriff prüfen ---
     try {
-      const result: any = await prisma.$queryRawUnsafe(`
+      await prisma.user.findFirst(); // nur lesend
+      result.db.status = 'ok';
+    } catch (err: any) {
+      result.db.status = 'error';
+      result.db.error = 'Fehler bei Prisma: ' + String(err);
+      result.errors.push('DB-Zugriff fehlgeschlagen: ' + String(err));
+    }
+
+    // --- DB-Größe ---
+    try {
+      const raw: any = await prisma.$queryRawUnsafe(`
         SELECT 
           pg_size_pretty(pg_database_size(current_database())) AS size_pretty,
           pg_database_size(current_database()) AS size_bytes;
       `);
+      const sizePretty = raw?.[0]?.size_pretty || null;
+      const sizeBytes = raw?.[0]?.size_bytes || null;
+      const sizePercent = sizeBytes ? Math.round((sizeBytes / 10_000_000_000) * 100) : null;
 
-      dbSize = result?.[0]?.size_pretty || null;
-      dbSizeRaw = result?.[0]?.size_bytes || null;
+      result.db.sizePretty = sizePretty;
+      result.db.sizeBytes = sizeBytes;
+      result.db.sizePercent = sizePercent;
 
-      if (dbSizeRaw !== null) {
-        dbSizePercent = Math.round((dbSizeRaw / 10_000_000_000) * 100);
-      }
-
-    } catch (inner) {
-      errorDbMessage = `Fehler bei DB-Größe: ${String(inner)}`;
-      console.error('[DB-SIZE-CHECK-ERROR]', inner);
+    } catch (err: any) {
+      result.db.sizeError = 'Fehler beim Lesen der DB-Größe: ' + String(err);
+      result.errors.push('DB-Größenabfrage fehlgeschlagen: ' + String(err));
     }
 
-  } catch (e) {
-    db = 'error';
-    errorDbMessage = `Fehler beim Zugriff auf Datenbank: ${String(e)}`;
-    console.error('[DB-CHECK-ERROR]', e);
-  }
+    // --- Mail-Check ---
+    try {
+      if (
+        !process.env.MAIL_HOST ||
+        !process.env.MAIL_USER ||
+        !process.env.MAIL_PASS ||
+        !process.env.MAIL_PORT
+      ) {
+        throw new Error('Eine oder mehrere MAIL_... Umgebungsvariablen fehlen');
+      }
 
-  let mail: 'ok' | 'warn' | 'error' = 'ok';
-  let errorMailMessage: string | null = null;
+      const transporter = nodemailer.createTransport({
+        host: process.env.MAIL_HOST,
+        port: Number(process.env.MAIL_PORT),
+        auth: {
+          user: process.env.MAIL_USER,
+          pass: process.env.MAIL_PASS,
+        },
+      });
 
-  try {
-    const transporter = nodemailer.createTransport({
-      host: process.env.MAIL_HOST,
-      port: Number(process.env.MAIL_PORT),
-      auth: {
-        user: process.env.MAIL_USER,
-        pass: process.env.MAIL_PASS,
-      },
+      await transporter.sendMail({
+        from: `"Health-Check" <${process.env.MAIL_USER}>`,
+        to: process.env.MAIL_USER,
+        subject: 'Health Check',
+        text: 'Test',
+      });
+
+      result.mail.status = 'ok';
+
+    } catch (err: any) {
+      result.mail.status = 'error';
+      result.mail.error = 'Fehler beim Mailversand: ' + String(err);
+      result.errors.push('Mailversand fehlgeschlagen: ' + String(err));
+    }
+
+    result.status = result.errors.length > 0 ? 'Warnungen oder Fehler' : 'Alles OK';
+
+    res.status(200).json(result);
+
+  } catch (err: any) {
+    // Fallback für alles andere
+    console.error('[API HEALTHCHECK FAILED]', err);
+    res.status(500).json({
+      status: 'Fataler Fehler in der API',
+      error: String(err),
     });
-
-    await transporter.sendMail({
-      from: `"Health-Check" <${process.env.MAIL_USER}>`,
-      to: process.env.MAIL_USER,
-      subject: 'Health Check',
-      text: 'Test',
-    });
-
-  } catch (e) {
-    mail = 'error';
-    errorMailMessage = `Fehler beim Mailversand: ${String(e)}`;
-    console.error('[MAIL-CHECK-ERROR]', e);
   }
-
-  const api: 'ok' = 'ok';
-  const build: 'ok' | 'warn' | 'error' = process.env.VERCEL ? 'ok' : 'warn';
-
-  res.status(200).json({
-    status: 'Health-Check abgeschlossen',
-    db,
-    mail,
-    api,
-    build,
-    serverTime: new Date().toISOString(),
-    dbSize,
-    dbSizeRaw,
-    dbSizePercent,
-    errorDbMessage,
-    errorMailMessage,
-  });
 }
