@@ -19,9 +19,6 @@ type HealthStatus = {
   api: 'ok' | 'warn' | 'error';
   build: 'ok' | 'warn' | 'error';
   serverTime?: string;
-  dbSize?: string;
-  dbSizeRaw?: number;
-  dbSizePercent?: number;
 };
 
 const ICONS: Record<string, any> = {
@@ -31,7 +28,7 @@ const ICONS: Record<string, any> = {
   build: Cpu,
 };
 
-const LABELS: Record<keyof Omit<HealthStatus, 'serverTime' | 'dbSize' | 'dbSizeRaw' | 'dbSizePercent'>, string> = {
+const LABELS: Record<keyof Omit<HealthStatus, 'serverTime'>, string> = {
   db: 'Datenbank',
   mail: 'Mail-Service',
   api: 'API',
@@ -112,14 +109,17 @@ export default function SystemStatusPage() {
         ) : status ? (
           <div className="grid grid-cols-1 gap-4 md:grid-cols-2">
             {Object.entries(LABELS).map(([key, label]) => {
-              const value = status?.[key as keyof HealthStatus] as 'ok' | 'warn' | 'error' | undefined;
+              const value = status?.[key as keyof HealthStatus] as
+                | 'ok'
+                | 'warn'
+                | 'error'
+                | undefined;
               const safeValue = value ?? 'error';
               const Icon = ICONS[key];
-
               return (
                 <div
                   key={key}
-                  className={`flex flex-col items-start gap-1 bg-white rounded-2xl shadow-md p-4 border
+                  className={`flex items-center gap-3 bg-white rounded-2xl shadow-md p-4 border
                     ${
                       safeValue === 'ok'
                         ? 'border-green-100'
@@ -129,34 +129,22 @@ export default function SystemStatusPage() {
                     }
                   `}
                 >
-                  <div className="flex items-center gap-3 w-full">
-                    <span className="bg-blue-50 rounded-full p-2 flex items-center justify-center">
-                      <Icon className="w-5 h-5 text-blue-600" />
-                    </span>
-                    <span className="flex-1 font-semibold">{label}</span>
-                    <StatusSymbol status={safeValue} />
-                    <span
-                      className={
-                        safeValue === 'ok'
-                          ? 'text-green-600 font-medium'
-                          : safeValue === 'warn'
-                          ? 'text-yellow-600 font-medium'
-                          : 'text-red-600 font-medium'
-                      }
-                    >
-                      {safeValue === 'ok' ? 'OK' : safeValue === 'warn' ? 'Warnung' : 'Fehler'}
-                    </span>
-                  </div>
-
-                  {/* ➕ Speicherverbrauch anzeigen (nur bei Datenbank) */}
-                  {key === 'db' && status?.dbSize && (
-                    <div className="text-xs text-gray-500 ml-12">
-                      Speicherverbrauch: <span className="font-medium">{status.dbSize}</span>
-                      {typeof status.dbSizePercent === 'number' && (
-                        <> ({status.dbSizePercent}% von 10 GB)</>
-                      )}
-                    </div>
-                  )}
+                  <span className="bg-blue-50 rounded-full p-2 flex items-center justify-center">
+                    <Icon className="w-5 h-5 text-blue-600" />
+                  </span>
+                  <span className="flex-1 font-semibold">{label}</span>
+                  <StatusSymbol status={safeValue} />
+                  <span
+                    className={
+                      safeValue === 'ok'
+                        ? 'text-green-600 font-medium'
+                        : safeValue === 'warn'
+                        ? 'text-yellow-600 font-medium'
+                        : 'text-red-600 font-medium'
+                    }
+                  >
+                    {safeValue === 'ok' ? 'OK' : safeValue === 'warn' ? 'Warnung' : 'Fehler'}
+                  </span>
                 </div>
               );
             })}
