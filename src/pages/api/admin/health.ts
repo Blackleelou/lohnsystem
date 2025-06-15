@@ -3,7 +3,6 @@ import { prisma } from '@/lib/prisma';
 import nodemailer from 'nodemailer';
 
 export default async function handler(req: NextApiRequest, res: NextApiResponse) {
-  // 👉 Optionale Consent-Infos aus Request-Body extrahieren
   const { consent } = req.body || {};
   if (consent) {
     console.log('[Health Consent Debug]', {
@@ -14,9 +13,30 @@ export default async function handler(req: NextApiRequest, res: NextApiResponse)
 
   // ✅ DB-Check
   let db: 'ok' | 'warn' | 'error' = 'ok';
+  let dbSize: string | null = null;
+  let dbSizeRaw: number | null = null;
+  let dbSizePercent: number | null = null;
+
   try {
     await prisma.user.findFirst();
+
+    // 🔍 Speichergröße der aktuellen DB abfragen
+    const result: any = await prisma.$queryRawUnsafe(`
+      SELECT 
+        pg_size_pretty(pg_database_size(current_database())) AS size_pretty,
+        pg_database_size(current_database()) AS size_bytes;
+    `);
+
+    dbSize = result?.[0]?.size_pretty || null;
+    dbSizeRaw = result?.[0]?.size_bytes || null;
+
+    // 📏 Prozent berechnen (ausgehend von 10 GB Limit)
+    if (dbSizeRaw !== null) {
+      dbSizePercent = Math.round((dbSizeRaw / 10_000_000_000) * 100);
+    }
+
   } catch (e) {
+    console.error('DB-CHECK-ERROR', e);
     db = 'error';
   }
 
@@ -53,5 +73,10 @@ export default async function handler(req: NextApiRequest, res: NextApiResponse)
     api,
     build,
     serverTime: new Date().toISOString(),
+
+    // 📊 Zusätzliche DB-Infos
+    dbSize,         // z. B. "1.4 GB"
+    dbSizeRaw,      // z. B. 1450000000
+    dbSizePercent,  // z. B. 14
   });
 }
