@@ -1,9 +1,45 @@
 import type { NextApiRequest, NextApiResponse } from 'next';
+import { prisma } from '@/lib/prisma';
 import nodemailer from 'nodemailer';
 
 export default async function handler(req: NextApiRequest, res: NextApiResponse) {
-  let mail: 'ok' | 'error' = 'ok';
+  const { consent } = req.body || {};
+  if (consent) {
+    console.log('[Health Consent Debug]', {
+      statistik: consent.statistik,
+      marketing: consent.marketing,
+    });
+  }
 
+  // ✅ DB-Check
+  let db: 'ok' | 'warn' | 'error' = 'ok';
+  let dbSize: string | null = null;
+  let dbSizeRaw: number | null = null;
+  let dbSizePercent: number | null = null;
+
+  try {
+    await prisma.user.findFirst();
+
+    const result: any = await prisma.$queryRawUnsafe(`
+      SELECT 
+        pg_size_pretty(pg_database_size(current_database())) AS size_pretty,
+        pg_database_size(current_database()) AS size_bytes;
+    `);
+
+    dbSize = result?.[0]?.size_pretty || null;
+    dbSizeRaw = result?.[0]?.size_bytes || null;
+
+    if (dbSizeRaw !== null) {
+      dbSizePercent = Math.round((dbSizeRaw / 10_000_000_000) * 100);
+    }
+
+  } catch (e) {
+    console.error('DB-CHECK-ERROR', e);
+    db = 'error';
+  }
+
+  // ✅ Mail-Check
+  let mail: 'ok' | 'warn' | 'error' = 'ok';
   try {
     const transporter = nodemailer.createTransport({
       host: process.env.MAIL_HOST,
@@ -15,20 +51,28 @@ export default async function handler(req: NextApiRequest, res: NextApiResponse)
     });
 
     await transporter.sendMail({
-      from: `"HealthCheck Test" <${process.env.MAIL_USER}>`,
+      from: `"Health-Check" <${process.env.MAIL_USER}>`,
       to: process.env.MAIL_USER,
-      subject: 'Mail-Test ✔️',
-      text: 'Das ist ein Test.',
+      subject: 'Health Check',
+      text: 'Test',
     });
-
-    mail = 'ok';
-  } catch (error) {
-    console.error('MAIL-TEST-ERROR', error);
+  } catch (e) {
+    console.error('MAIL-CHECK-ERROR', e);
     mail = 'error';
   }
 
+  // Systeminfos
+  const api: 'ok' = 'ok';
+  const build: 'ok' | 'warn' | 'error' = process.env.VERCEL ? 'ok' : 'warn';
+
   res.status(200).json({
+    db,
     mail,
-    time: new Date().toISOString(),
+    api,
+    build,
+    serverTime: new Date().toISOString(),
+    dbSize,
+    dbSizeRaw,
+    dbSizePercent,
   });
 }
