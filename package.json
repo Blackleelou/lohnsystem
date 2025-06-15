@@ -5,8 +5,8 @@
     "dev": "next dev",
     "build": "prisma db push && next build",
     "start": "next start",
-    "lint": "eslint \"src/**/*.{ts,tsx}\"",
-    "lint:fix": "eslint \"src/**/*.{ts,tsx}\" --fix",
+    "lint": "eslint .",
+    "lint:fix": "eslint . --fix",
     "postinstall": "prisma db push && prisma generate",
     "db:push": "prisma db push",
     "seed": "ts-node prisma/seed.ts"
