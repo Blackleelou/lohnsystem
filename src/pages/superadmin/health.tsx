@@ -14,16 +14,18 @@ import {
 } from 'lucide-react';
 
 type HealthStatus = {
-  db: 'ok' | 'warn' | 'error';
+  db: {
+    status: 'ok' | 'warn' | 'error';
+    sizePretty?: string;
+    sizeBytes?: number;
+    sizePercent?: number;
+    topTables?: { name: string; sizeBytes: number }[];
+  };
   mail: 'ok' | 'warn' | 'error';
   api: 'ok' | 'warn' | 'error';
   build: 'ok' | 'warn' | 'error';
   serverTime?: string;
-  dbSize?: string;
-  dbSizeRaw?: number;
-  dbSizePercent?: number;
   warnings?: string[];
-  db?: any; // Für topTables etc.
 };
 
 const ICONS: Record<string, any> = {
@@ -33,7 +35,7 @@ const ICONS: Record<string, any> = {
   build: Cpu,
 };
 
-const LABELS: Record<keyof Omit<HealthStatus, 'serverTime' | 'dbSize' | 'dbSizeRaw' | 'dbSizePercent' | 'warnings' | 'db'>, string> = {
+const LABELS: Record<keyof Omit<HealthStatus, 'serverTime' | 'warnings'>, string> = {
   db: 'Datenbank',
   mail: 'Mail-Service',
   api: 'API',
@@ -49,19 +51,8 @@ function StatusSymbol({ status }: { status: 'ok' | 'warn' | 'error' }) {
 function Tooltip({ children }: { children: React.ReactNode }) {
   return (
     <span className="group relative cursor-pointer text-gray-400">
-      <svg
-        xmlns="http://www.w3.org/2000/svg"
-        className="h-4 w-4"
-        fill="none"
-        viewBox="0 0 24 24"
-        stroke="currentColor"
-      >
-        <path
-          strokeLinecap="round"
-          strokeLinejoin="round"
-          strokeWidth={2}
-          d="M13 16h-1v-4h-1m1-4h.01M12 20a8 8 0 100-16 8 8 0 000 16z"
-        />
+      <svg className="h-4 w-4" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+        <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M13 16h-1v-4h-1m1-4h.01M12 20a8 8 0 100-16 8 8 0 000 16z" />
       </svg>
       <span className="absolute z-50 hidden group-hover:block bg-white border rounded px-3 py-2 text-xs text-gray-700 shadow-lg w-64 top-6 left-1/2 -translate-x-1/2">
         {children}
@@ -114,22 +105,23 @@ export default function SystemStatusPage() {
         ) : status ? (
           <div className="grid grid-cols-1 gap-4 md:grid-cols-2">
             {Object.entries(LABELS).map(([key, label]) => {
-              const value = status?.[key as keyof HealthStatus] as 'ok' | 'warn' | 'error' | undefined;
-              const safeValue = value ?? 'error';
+              const isDb = key === 'db';
+              const value = isDb
+                ? (status.db.status as 'ok' | 'warn' | 'error')
+                : (status?.[key as keyof HealthStatus] as 'ok' | 'warn' | 'error' | undefined);
               const Icon = ICONS[key];
+              const safeValue = value ?? 'error';
 
               return (
                 <div
                   key={key}
-                  className={`flex flex-col items-start gap-1 bg-white rounded-2xl shadow-md p-4 border
-                    ${
-                      safeValue === 'ok'
-                        ? 'border-green-100'
-                        : safeValue === 'warn'
-                        ? 'border-yellow-100'
-                        : 'border-red-200'
-                    }
-                  `}
+                  className={`flex flex-col items-start gap-1 bg-white rounded-2xl shadow-md p-4 border ${
+                    safeValue === 'ok'
+                      ? 'border-green-100'
+                      : safeValue === 'warn'
+                      ? 'border-yellow-100'
+                      : 'border-red-200'
+                  }`}
                 >
                   <div className="flex items-center gap-3 w-full">
                     <span className="bg-blue-50 rounded-full p-2 flex items-center justify-center">
@@ -150,45 +142,47 @@ export default function SystemStatusPage() {
                     </span>
                   </div>
 
-                  {key === 'db' && status?.dbSize && (
-                    <div className="text-xs text-gray-500 ml-12">
-                      Speicherverbrauch: <span className="font-medium">{status.dbSize}</span>
-                      {typeof status.dbSizePercent === 'number' && (
-                        <> ({status.dbSizePercent}% von 10 GB)</>
-                      )}
-                    </div>
-                  )}
-
-                  {key === 'db' && status?.warnings?.length > 0 && (
-                    <div className="text-xs text-yellow-600 mt-1 ml-12">
-                      ⚠️ {status.warnings.join(', ')}
-                    </div>
-                  )}
-
-                  {key === 'db' && Array.isArray(status?.db?.topTables) && (
-                    <div className="text-xs text-gray-500 mt-2 ml-12 space-y-1">
-                      <div className="font-medium text-gray-600">Größte Tabellen:</div>
-                      {status.db.topTables.map((table: any, index: number) => (
-                        <div key={index} className="flex justify-between pr-2">
-                          <span>{table.name}</span>
-                          <span className="tabular-nums">{(table.sizeBytes / 1024).toFixed(1)} kB</span>
+                  {/* DB-Details */}
+                  {isDb && (
+                    <>
+                      {status.db.sizePretty && (
+                        <div className="text-xs text-gray-500 ml-12">
+                          Speicherverbrauch: <span className="font-medium">{status.db.sizePretty}</span>
+                          {typeof status.db.sizePercent === 'number' && (
+                            <> ({status.db.sizePercent}% von 10 GB)</>
+                          )}
                         </div>
-                      ))}
-                    </div>
+                      )}
+                      {status.warnings?.length > 0 && (
+                        <div className="text-xs text-yellow-600 mt-1 ml-12">
+                          ⚠️ {status.warnings.join(', ')}
+                        </div>
+                      )}
+                      {status.db.topTables?.length > 0 && (
+                        <div className="text-xs text-gray-500 mt-2 ml-12 space-y-1">
+                          <div className="font-medium text-gray-600">Größte Tabellen:</div>
+                          {status.db.topTables.map((t, i) => (
+                            <div key={i} className="flex justify-between pr-2">
+                              <span>{t.name}</span>
+                              <span className="tabular-nums">{(t.sizeBytes / 1024).toFixed(1)} kB</span>
+                            </div>
+                          ))}
+                        </div>
+                      )}
+                    </>
                   )}
                 </div>
               );
             })}
 
             {/* Google Analytics */}
-            <div className={`relative flex items-start gap-3 bg-white rounded-2xl shadow-md p-4 border
-              ${
-                gaStatus === 'ok'
-                  ? 'border-green-100'
-                  : gaStatus === 'warn'
-                  ? 'border-yellow-100'
-                  : 'border-red-200'
-              }`}>
+            <div className={`relative flex items-start gap-3 bg-white rounded-2xl shadow-md p-4 border ${
+              gaStatus === 'ok'
+                ? 'border-green-100'
+                : gaStatus === 'warn'
+                ? 'border-yellow-100'
+                : 'border-red-200'
+            }`}>
               <span className="bg-blue-50 rounded-full p-2 flex items-center justify-center mt-1">
                 <BarChart2 className="w-5 h-5 text-blue-600" />
               </span>
@@ -218,15 +212,14 @@ export default function SystemStatusPage() {
               </div>
             </div>
 
-            {/* Marketing Consent */}
-            <div className={`relative flex items-center gap-3 bg-white rounded-2xl shadow-md p-4 border
-              ${
-                marketingStatus === 'ok'
-                  ? 'border-green-100'
-                  : marketingStatus === 'warn'
-                  ? 'border-yellow-100'
-                  : 'border-red-200'
-              }`}>
+            {/* Marketing */}
+            <div className={`relative flex items-center gap-3 bg-white rounded-2xl shadow-md p-4 border ${
+              marketingStatus === 'ok'
+                ? 'border-green-100'
+                : marketingStatus === 'warn'
+                ? 'border-yellow-100'
+                : 'border-red-200'
+            }`}>
               <span className="bg-blue-50 rounded-full p-2 flex items-center justify-center">
                 <Megaphone className="w-5 h-5 text-blue-600" />
               </span>
