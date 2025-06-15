@@ -15,7 +15,6 @@ export default async function handler(req: NextApiRequest, res: NextApiResponse)
   };
 
   try {
-    // Consent-Log
     const { consent } = req.body || {};
     if (consent) {
       result.consentDebug = {
@@ -24,9 +23,8 @@ export default async function handler(req: NextApiRequest, res: NextApiResponse)
       };
     }
 
-    // --- DB-Zugriff prüfen ---
     try {
-      await prisma.user.findFirst(); // nur lesend
+      await prisma.user.findFirst();
       result.db.status = 'ok';
     } catch (err: any) {
       result.db.status = 'error';
@@ -34,7 +32,6 @@ export default async function handler(req: NextApiRequest, res: NextApiResponse)
       result.errors.push('DB-Zugriff fehlgeschlagen: ' + String(err));
     }
 
-    // --- DB-Größe ---
     try {
       const raw: any = await prisma.$queryRawUnsafe(`
         SELECT 
@@ -42,11 +39,15 @@ export default async function handler(req: NextApiRequest, res: NextApiResponse)
           pg_database_size(current_database()) AS size_bytes;
       `);
       const sizePretty = raw?.[0]?.size_pretty || null;
-      const sizeBytes = raw?.[0]?.size_bytes || null;
-      const sizePercent = sizeBytes ? Math.round((sizeBytes / 10_000_000_000) * 100) : null;
+      const sizeBytes = raw?.[0]?.size_bytes ?? null;
+      const sizeBytesNumber = sizeBytes ? Number(sizeBytes) : null;
+
+      const sizePercent = sizeBytesNumber
+        ? Math.round((sizeBytesNumber / 10_000_000_000) * 100)
+        : null;
 
       result.db.sizePretty = sizePretty;
-      result.db.sizeBytes = sizeBytes;
+      result.db.sizeBytes = sizeBytesNumber;
       result.db.sizePercent = sizePercent;
 
     } catch (err: any) {
@@ -54,7 +55,6 @@ export default async function handler(req: NextApiRequest, res: NextApiResponse)
       result.errors.push('DB-Größenabfrage fehlgeschlagen: ' + String(err));
     }
 
-    // --- Mail-Check ---
     try {
       if (
         !process.env.MAIL_HOST ||
@@ -90,11 +90,9 @@ export default async function handler(req: NextApiRequest, res: NextApiResponse)
     }
 
     result.status = result.errors.length > 0 ? 'Warnungen oder Fehler' : 'Alles OK';
-
     res.status(200).json(result);
 
   } catch (err: any) {
-    // Fallback für alles andere
     console.error('[API HEALTHCHECK FAILED]', err);
     res.status(500).json({
       status: 'Fataler Fehler in der API',
