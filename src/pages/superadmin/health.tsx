@@ -21,7 +21,10 @@ type HealthStatus = {
     sizePercent?: number;
     topTables?: { name: string; sizeBytes: number }[];
   };
-  mail: 'ok' | 'warn' | 'error';
+  mail: {
+    status: 'ok' | 'warn' | 'error';
+    error?: string;
+  };
   api: 'ok' | 'warn' | 'error';
   build: 'ok' | 'warn' | 'error';
   serverTime?: string;
