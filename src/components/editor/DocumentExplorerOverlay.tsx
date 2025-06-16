@@ -1,6 +1,6 @@
 import { useEffect, useState } from "react";
 import { Dialog } from "@headlessui/react";
-import { Eye, Users, Lock } from "lucide-react";
+import { Eye, Users, Lock, Globe } from "lucide-react";
 
 type Document = {
   id: string;
@@ -40,7 +40,13 @@ export default function DocumentExplorerOverlay({ isOpen, onClose, onSelect }: P
     v === "PRIVATE" ? <Lock size={16} className="text-gray-500" /> :
     v === "TEAM" ? <Users size={16} className="text-blue-500" /> :
     v === "SHARED" ? <Eye size={16} className="text-green-500" /> :
-    <Eye size={16} className="text-orange-500" />;
+    <Globe size={16} className="text-orange-500" />;
+
+  const labelText = (v: Document["visibility"]) =>
+    v === "PRIVATE" ? "Privat" :
+    v === "TEAM" ? "Team" :
+    v === "SHARED" ? "Geteilt" :
+    "Öffentlich";
 
   return (
     <Dialog open={isOpen} onClose={onClose} className="relative z-50">
@@ -70,7 +76,7 @@ export default function DocumentExplorerOverlay({ isOpen, onClose, onSelect }: P
                     : "bg-white border-gray-300 text-gray-500"
                 }`}
               >
-                {f}
+                {f === "ALL" ? "Alle" : labelText(f as any)}
               </button>
             ))}
           </div>
@@ -92,6 +98,17 @@ export default function DocumentExplorerOverlay({ isOpen, onClose, onSelect }: P
                 <div className="flex items-center gap-2 text-sm">
                   {icon(doc.visibility)}
                   <span>{doc.title}</span>
+                  <span className={`
+                    text-xs font-medium ml-2 px-2 py-0.5 rounded
+                    ${
+                      doc.visibility === "PRIVATE" ? "bg-gray-100 text-gray-600" :
+                      doc.visibility === "TEAM" ? "bg-blue-100 text-blue-700" :
+                      doc.visibility === "SHARED" ? "bg-green-100 text-green-700" :
+                      "bg-orange-100 text-orange-700"
+                    }
+                  `}>
+                    {labelText(doc.visibility)}
+                  </span>
                 </div>
                 <div className="text-xs text-gray-400">
                   {new Date(doc.createdAt).toLocaleDateString()}
