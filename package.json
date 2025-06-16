@@ -3,11 +3,11 @@
   "version": "0.0.50",
   "scripts": {
     "dev": "next dev",
-    "build": "prisma db push && next build",
+    "build": "next build",
     "start": "next start",
     "lint": "eslint .",
     "lint:fix": "eslint . --fix",
-    "postinstall": "prisma db push && prisma generate",
+    "postinstall": "if [ \"$NODE_ENV\" != \"production\" ]; then prisma db push; fi && prisma generate",
     "db:push": "prisma db push",
     "seed": "ts-node prisma/seed.ts"
   },
@@ -22,11 +22,8 @@
     "bcryptjs": "^2.4.3",
     "cookie": "^0.5.0",
     "dotenv": "^16.5.0",
-    "dotenv-cli": "^8.0.0",
-    "form-data": "^4.0.2",
     "formidable": "^2.1.1",
     "framer-motion": "^11.0.0",
-    "use-image": "^1.0.1",
     "i18next": "^23.2.3",
     "i18next-browser-languagedetector": "^8.1.0",
     "i18next-http-backend": "^3.0.2",
@@ -34,24 +31,27 @@
     "lucide-react": "^0.511.0",
     "konva": "^9.3.0",
     "react-konva": "^18.0.5",
-    "mailgun.js": "^5.2.2",
     "next": "13.5.6",
     "next-auth": "^4.24.2",
     "nodemailer": "^6.9.13",
     "prisma": "^6.8.2",
-    "ra-data-simple-rest": "^5.8.3",
-    "recharts": "^2.15.3",
     "react": "18.2.0",
     "react-admin": "^5.8.3",
-    "react-device-detect": "^2.2.2",
     "react-dom": "18.2.0",
     "react-hot-toast": "^2.5.2",
     "react-i18next": "^13.2.2",
-    "react-icons": "^4.10.1",
-    "react-konva-utils": "^1.0.4",
-    "react-qr-code": "^2.0.7",
-    "react-toastify": "^9.1.3",
     "zustand": "^4.4.0"
+
+    // ❌ Entfernt, vermutlich nicht benötigt – ggf. bei Bedarf wieder einfügen:
+    // "mailgun.js": "^5.2.2",             // Wird nicht mehr verwendet (du nutzt Brevo)
+    // "form-data": "^4.0.2",              // Meist nur mit Mailgun benötigt
+    // "dotenv-cli": "^8.0.0",             // Wird durch Next.js/Prisma intern erledigt
+    // "use-image": "^1.0.1",              // Nur nötig, wenn du Bilder in Konva lädst
+    // "ra-data-simple-rest": "^5.8.3",    // Nur relevant bei REST-API in react-admin
+    // "react-icons": "^4.10.1",           // Wenn du ausschließlich lucide-react nutzt
+    // "react-toastify": "^9.1.3",         // Doppelt – du nutzt bereits react-hot-toast
+    // "react-qr-code": "^2.0.7",          // Nur wenn du diesen QR-Renderer nutzt
+    // "react-device-detect": "^2.2.2"     // Nur nötig, wenn du device checks brauchst
   },
   "devDependencies": {
     "@eslint/js": "^9.28.0",
