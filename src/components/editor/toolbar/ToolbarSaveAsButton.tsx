@@ -2,6 +2,7 @@ import { useState } from "react";
 import { useEditorStore } from "../useEditorStore";
 import { useEditorFormatStore } from "../useEditorFormat";
 import { toast } from "react-hot-toast";
+import { useSession } from "next-auth/react"; // ✅ hinzugefügt
 
 export default function ToolbarSaveAsButton() {
   const [title, setTitle] = useState("");
@@ -11,6 +12,7 @@ export default function ToolbarSaveAsButton() {
 
   const elements = useEditorStore((s) => s.elements);
   const format = useEditorFormatStore((s) => s.format);
+  const { data: session } = useSession(); // ✅ hier holen wir companyId
 
   const handleSave = async () => {
     if (!title.trim()) {
@@ -29,7 +31,7 @@ export default function ToolbarSaveAsButton() {
           content: elements,
           format,
           visibility,
-          companyId: session?.user?.companyId ?? null, // 👈 DAS IST ENTSCHEIDEND
+          companyId: session?.user?.companyId ?? null, // ✅ jetzt korrekt verwendet
         }),
       });
 
