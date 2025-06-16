@@ -39,7 +39,7 @@ const handler: NextApiHandler = async (req, res) => {
         format: true,
         updatedAt: true,
         ownerId: true,
-        companyID: true,
+        companyId: true,
       },
     });
 
