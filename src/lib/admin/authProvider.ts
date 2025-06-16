@@ -8,26 +8,38 @@ const authProvider = {
     return Promise.resolve();
   },
   checkAuth: async () => {
-    const res = await fetch('/api/auth/session');
-    const session = await res.json();
-    return session?.user ? Promise.resolve() : Promise.reject();
+    try {
+      const res = await fetch('/api/auth/session');
+      const session = await res.json();
+      return session?.user ? Promise.resolve() : Promise.reject();
+    } catch (error) {
+      return Promise.reject();
+    }
   },
   getPermissions: async () => {
-    const res = await fetch('/api/auth/session');
-    const session = await res.json();
-    return session?.user?.role || 'guest';
+    try {
+      const res = await fetch('/api/auth/session');
+      const session = await res.json();
+      return Promise.resolve(session?.user?.role || 'guest');
+    } catch {
+      return Promise.resolve('guest');
+    }
   },
   getIdentity: async () => {
-    const res = await fetch('/api/auth/session');
-    const session = await res.json();
-    if (session?.user) {
-      return {
-        id: session.user.email,
-        fullName: session.user.name || session.user.email,
-        avatar: session.user.image || undefined,
-      };
+    try {
+      const res = await fetch('/api/auth/session');
+      const session = await res.json();
+      if (session?.user) {
+        return {
+          id: session.user.email,
+          fullName: session.user.name || session.user.email,
+          avatar: session.user.image || undefined,
+        };
+      }
+      return null;
+    } catch {
+      return null;
     }
-    return null;
   },
 };
 
