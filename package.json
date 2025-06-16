@@ -37,6 +37,8 @@
     "prisma": "^6.8.2",
     "react": "18.2.0",
     "react-admin": "^5.8.3",
+    "@react-admin/core": "^5.8.3",
+    "@react-admin/ra-rsc": "^5.8.3",
     "react-dom": "18.2.0",
     "react-hot-toast": "^2.5.2",
     "react-i18next": "^13.2.2",
