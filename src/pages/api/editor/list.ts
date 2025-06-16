@@ -18,19 +18,28 @@ const handler: NextApiHandler = async (req, res) => {
   try {
     const { id: userId, companyId } = session.user;
 
-    // OR-Filter ohne undefined-Einträge
+    // Sichtbare Dokumente zusammenstellen
     const orFilters: Prisma.EditorDocumentWhereInput[] = [
-      { ownerId: userId },                            // eigene Dokumente
-      { visibility: "PUBLIC" },                       // öffentlich
-      companyId && { visibility: "TEAM", teamId: companyId }, // Team
-      {                                               // explizit geteilt
+      { ownerId: userId }, // Eigene Dokumente
+      { visibility: "PUBLIC" },
+      companyId && { visibility: "TEAM", companyId }, // Dokumente im Team
+      {
         visibility: "SHARED",
-        sharedWithUsers: { some: { id: userId } },
+        shares: {
+          some: {
+            OR: [
+              { sharedWithUserId: userId },
+              { sharedWithCompanyId: companyId },
+            ],
+          },
+        },
       },
     ].filter(Boolean) as Prisma.EditorDocumentWhereInput[];
 
     const documents = await prisma.editorDocument.findMany({
-      where: { OR: orFilters },
+      where: {
+        OR: orFilters,
+      },
       orderBy: { updatedAt: "desc" },
       select: {
         id: true,
