@@ -1,6 +1,6 @@
 // src/components/admin/AdminPanel.tsx
 import { Admin, Resource, ListGuesser } from 'react-admin';
-import simpleRestDataProvider from '@react-admin/ra-data-simple-rest';
+import simpleRestDataProvider from 'ra-data-simple-rest';
 import authProvider from '@/lib/admin/authProvider';
 
 const dataProvider = simpleRestDataProvider('/api');
