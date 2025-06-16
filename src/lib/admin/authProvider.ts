@@ -1,34 +1,27 @@
 // src/lib/admin/authProvider.ts
-import { AuthProvider } from 'react-admin';
+import { AuthProvider, UserIdentity } from 'react-admin';
 
 const authProvider: AuthProvider = {
-  login: async () => {
+  login: () => {
     window.location.href = '/api/auth/signin';
     return Promise.resolve();
   },
 
-  logout: async () => {
+  logout: () => {
     window.location.href = '/api/auth/signout';
     return Promise.resolve();
   },
 
   checkAuth: async () => {
-    try {
-      const res = await fetch('/api/auth/session');
-      const session = await res.json();
-      return session?.user ? Promise.resolve() : Promise.reject();
-    } catch {
-      return Promise.reject();
-    }
+    const res = await fetch('/api/auth/session');
+    const session = await res.json();
+    return session?.user ? Promise.resolve() : Promise.reject();
   },
 
-  // <<< fehlte bisher
   checkError: async (error) => {
-    // Bei 401/403 → abmelden, sonst ignorieren
-    if (error?.status === 401 || error?.status === 403) {
-      return Promise.reject();
-    }
-    return Promise.resolve();
+    return error?.status === 401 || error?.status === 403
+      ? Promise.reject()
+      : Promise.resolve();
   },
 
   getPermissions: async () => {
@@ -41,21 +34,19 @@ const authProvider: AuthProvider = {
     }
   },
 
-  getIdentity: async () => {
-    try {
-      const res = await fetch('/api/auth/session');
-      const session = await res.json();
-      if (session?.user) {
-        return {
-          id: session.user.email,
-          fullName: session.user.name ?? session.user.email,
-          avatar: session.user.image ?? undefined,
-        };
-      }
-      return null;
-    } catch {
-      return null;
+  getIdentity: async (): Promise<UserIdentity> => {
+    const res = await fetch('/api/auth/session');
+    const session = await res.json();
+
+    if (session?.user) {
+      return {
+        id: session.user.email,
+        fullName: session.user.name ?? session.user.email,
+        avatar: session.user.image ?? undefined,
+      };
     }
+
+    return Promise.reject();
   },
 };
 
