@@ -1,21 +1,20 @@
 // src/components/admin/AdminPanel.tsx
 
 import React from 'react';
-import { Admin, Resource, ListGuesser } from 'react-admin';
+import { AdminContext, AdminUI, Resource, ListGuesser } from 'react-admin';
 import simpleRestDataProvider from 'ra-data-simple-rest';
-import { authProvider } from '../authProvider'; // falls du eins nutzt
+import { authProvider } from '../authProvider'; // falls du Auth nutzt
 
-const dataProvider = simpleRestDataProvider('/api'); // Deine API-URL anpassen
+const dataProvider = simpleRestDataProvider('/api'); // Deine API-URL
 
-export const AdminPanel: React.FC = () => (
-  <Admin
-    dataProvider={dataProvider}
-    authProvider={authProvider} // falls du Auth nutzt
-  >
-    <Resource name="users" list={ListGuesser} />
-    <Resource name="posts" list={ListGuesser} />
-    {/* Weitere Ressourcen hier */}
-  </Admin>
+const AdminPanel: React.FC = () => (
+  <AdminContext dataProvider={dataProvider} authProvider={authProvider}>
+    <AdminUI>
+      <Resource name="users" list={ListGuesser} />
+      <Resource name="posts" list={ListGuesser} />
+      {/* Weitere Ressourcen hier */}
+    </AdminUI>
+  </AdminContext>
 );
 
 export default AdminPanel;
