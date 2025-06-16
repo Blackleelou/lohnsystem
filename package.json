@@ -2,15 +2,11 @@
   "name": "lohnsystem",
   "version": "0.0.50",
   "scripts": {
-    
-    "preinstall": "rm -rf package-lock.json node_modules",
-
     "dev": "next dev",
-    "build": "next build",
+    "build": "npx prisma generate && next build",
     "start": "next start",
     "lint": "eslint .",
     "lint:fix": "eslint . --fix",
-    "postinstall": "if [ \"$NODE_ENV\" != \"production\" ]; then prisma db push; fi && prisma generate",
     "db:push": "prisma db push",
     "seed": "ts-node prisma/seed.ts"
   },
@@ -39,12 +35,9 @@
     "nodemailer": "^6.9.13",
     "prisma": "^6.8.2",
     "react": "18.2.0",
-
-    
     "react-admin": "5.8.3",
     "ra-core": "5.8.3",
     "ra-data-simple-rest": "5.8.3",
-
     "react-dom": "18.2.0",
     "react-hot-toast": "^2.5.2",
     "react-i18next": "^13.2.2",
