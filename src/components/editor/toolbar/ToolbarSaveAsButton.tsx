@@ -5,6 +5,7 @@ import { toast } from "react-hot-toast";
 
 export default function ToolbarSaveAsButton() {
   const [title, setTitle] = useState("");
+  const [visibility, setVisibility] = useState<"PRIVATE" | "TEAM" | "SHARED" | "PUBLIC">("PRIVATE");
   const [saving, setSaving] = useState(false);
   const [showInput, setShowInput] = useState(false);
 
@@ -27,7 +28,7 @@ export default function ToolbarSaveAsButton() {
           title,
           content: elements,
           format,
-          visibility: "PRIVATE", // Standardwert
+          visibility,
         }),
       });
 
@@ -55,6 +56,18 @@ export default function ToolbarSaveAsButton() {
             placeholder="Dokumenttitel"
             className="border rounded px-2 py-1 text-sm"
           />
+
+          <select
+            value={visibility}
+            onChange={(e) => setVisibility(e.target.value as any)}
+            className="border rounded px-2 py-1 text-sm"
+          >
+            <option value="PRIVATE">🔒 Privat</option>
+            <option value="TEAM">👥 Team</option>
+            <option value="SHARED">🔗 Geteilt</option>
+            <option value="PUBLIC">🌍 Öffentlich</option>
+          </select>
+
           <button
             className="px-2 py-1 border rounded text-sm bg-blue-500 text-white"
             onClick={handleSave}
