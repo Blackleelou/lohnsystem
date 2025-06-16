@@ -2,6 +2,7 @@
   "name": "lohnsystem",
   "version": "0.0.50",
   "scripts": {
+    "preinstall": "rm -f package-lock.json",
     "dev": "next dev",
     "build": "next build",
     "start": "next start",
