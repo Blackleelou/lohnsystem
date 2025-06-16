@@ -2,7 +2,7 @@
   "name": "lohnsystem",
   "version": "0.0.50",
   "scripts": {
-    // Ganz wichtig: löscht vor jeder install alte Lockfile + node_modules
+    
     "preinstall": "rm -rf package-lock.json node_modules",
 
     "dev": "next dev",
@@ -40,7 +40,7 @@
     "prisma": "^6.8.2",
     "react": "18.2.0",
 
-    // Hier die korrekten v5-Pins – keine Tilde, kein Caret
+    
     "react-admin": "5.8.3",
     "ra-core": "5.8.3",
     "ra-data-simple-rest": "5.8.3",
