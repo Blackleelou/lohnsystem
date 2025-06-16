@@ -1,5 +1,6 @@
 // src/components/admin/AdminPanel.tsx
-import { AdminContext, AdminUI, Resource, ListGuesser } from 'react-admin';
+import { Resource, ListGuesser } from 'react-admin';
+import { AdminContext, AdminUI } from '@react-admin/core';
 import simpleRestDataProvider from 'ra-data-simple-rest';
 import authProvider from '@/lib/admin/authProvider';
 
