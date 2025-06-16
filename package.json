@@ -35,6 +35,7 @@
     "nodemailer": "^6.9.13",
     "prisma": "^6.8.2",
     "use-image": "^1.1.2",
+    "recharts": "^2.9.0",
     "react": "18.2.0",
     "react-admin": "4.16.18",
     "ra-data-simple-rest": "4.16.2",
