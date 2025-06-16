@@ -29,6 +29,7 @@ export default function ToolbarSaveAsButton() {
           content: elements,
           format,
           visibility,
+          companyId: session?.user?.companyId ?? null, // 👈 DAS IST ENTSCHEIDEND
         }),
       });
 
