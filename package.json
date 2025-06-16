@@ -2,7 +2,9 @@
   "name": "lohnsystem",
   "version": "0.0.50",
   "scripts": {
-    "preinstall": "rm -f package-lock.json",
+    // Ganz wichtig: löscht vor jeder install alte Lockfile + node_modules
+    "preinstall": "rm -rf package-lock.json node_modules",
+
     "dev": "next dev",
     "build": "next build",
     "start": "next start",
@@ -37,9 +39,12 @@
     "nodemailer": "^6.9.13",
     "prisma": "^6.8.2",
     "react": "18.2.0",
+
+    // Hier die korrekten v5-Pins – keine Tilde, kein Caret
     "react-admin": "5.8.3",
     "ra-core": "5.8.3",
     "ra-data-simple-rest": "5.8.3",
+
     "react-dom": "18.2.0",
     "react-hot-toast": "^2.5.2",
     "react-i18next": "^13.2.2",
