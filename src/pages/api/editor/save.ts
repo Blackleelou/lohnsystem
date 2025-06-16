@@ -14,7 +14,12 @@ export default async function handler(req: NextApiRequest, res: NextApiResponse)
     return res.status(405).json({ error: "Methode nicht erlaubt" });
   }
 
-  const { title, content, format = "a4", companyId } = req.body;
+  const { title, content, format = "a4", companyId, visibility = "PRIVATE" } = req.body;
+
+  // Sichtbarkeit validieren
+  if (!["PRIVATE", "TEAM", "SHARED", "PUBLIC"].includes(visibility)) {
+    return res.status(400).json({ error: "Ungültige Sichtbarkeit" });
+  }
 
   try {
     // Vorschau-Modus: Kein Speichern, nur Rückgabe
@@ -26,6 +31,7 @@ export default async function handler(req: NextApiRequest, res: NextApiResponse)
           title,
           content,
           format,
+          visibility,
           createdAt: new Date(),
         },
       });
@@ -39,9 +45,10 @@ export default async function handler(req: NextApiRequest, res: NextApiResponse)
           content,
           format,
           ownerId: session.user.id,
-          visibility: "PRIVATE",
+          visibility,
         },
       });
+      console.log("🆔 Dokument gespeichert:", doc.id);
       return res.status(200).json({ success: true, document: doc });
     }
 
@@ -64,12 +71,11 @@ export default async function handler(req: NextApiRequest, res: NextApiResponse)
         content,
         format,
         companyId,
-        visibility: "TEAM",
+        visibility,
       },
     });
 
-    // (Optional) hier später: Freigaben hinzufügen
-
+    console.log("🆔 Dokument gespeichert:", doc.id);
     return res.status(200).json({ success: true, document: doc });
 
   } catch (error) {
