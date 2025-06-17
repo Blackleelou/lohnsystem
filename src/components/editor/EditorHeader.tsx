@@ -91,7 +91,7 @@ export default function EditorHeader() {
 
       {/* Overlay für "Öffnen" */}
       <DocumentExplorerOverlay
-        isopen={open}
+        isOpen={open}
         onClose={() => setOpen(false)}
         onSelect={handleSelect}
       />
