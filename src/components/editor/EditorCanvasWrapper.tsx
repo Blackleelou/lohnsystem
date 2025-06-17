@@ -8,12 +8,10 @@ import { useCanvasSize } from "./useCanvasSize";
 import { useEditorFormatStore } from "./useEditorFormat";
 import { useEditorStore } from "./useEditorStore";
 
-// 🧠 Dokument von API laden
+// 🧠 Dokument von API laden (jetzt mit GET statt POST!)
 async function loadEditorDocument(id: string, isShared = false) {
-  const res = await fetch("/api/editor/load", {
-    method: "POST",
-    headers: { "Content-Type": "application/json" },
-    body: JSON.stringify({ id, shared: isShared }),
+  const res = await fetch(`/api/editor/load?id=${id}&shared=${isShared}`, {
+    method: "GET",
   });
 
   if (!res.ok) throw new Error("Fehler beim Laden");
