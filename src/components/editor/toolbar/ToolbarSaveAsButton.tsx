@@ -6,7 +6,7 @@ import { useEditorStore } from "../useEditorStore";
 import { useEditorFormatStore } from "../useEditorFormat";
 import { toast } from "react-hot-toast";
 import { useSession } from "next-auth/react";
-import { HiOutlineDocumentDuplicate } from "react-icons/hi";
+import { HiOutlineDownload } from "react-icons/hi";
 
 export default function ToolbarSaveAsButton() {
   const [title, setTitle] = useState("");
@@ -97,7 +97,7 @@ export default function ToolbarSaveAsButton() {
         title="Speichern unter"
         className="p-2 hover:bg-gray-100 rounded"
       >
-        <HiOutlineDocumentDuplicate size={20} />
+        <HiOutlineDownload size={20} />
       </button>
 
       {showInput &&
