@@ -47,6 +47,7 @@ const handler: NextApiHandler = async (req, res) => {
         visibility: true,
         format: true,
         updatedAt: true,
+        createdAt: true, // ✅ HIER HINZUFÜGEN!
         ownerId: true,
         companyId: true,
       },
