@@ -14,7 +14,7 @@ import ToolbarSaveAsButton from "./toolbar/ToolbarSaveAsButton";
 import ToolbarGroupFormat from "./toolbar/ToolbarGroupFormat";
 import ToolbarGroupText from "./toolbar/ToolbarGroupText";
 import ToolbarGroupInsert from "./toolbar/ToolbarGroupInsert";
-import DocumentPickerOverlay from "./DocumentExplorerOverlay";
+import DocumentExplorerOverlay from "./DocumentExplorerOverlay";
 
 export default function EditorHeader() {
   const router = useRouter();
@@ -25,6 +25,7 @@ export default function EditorHeader() {
   const format = useEditorFormatStore((s) => s.format);
   const setFormat = useEditorFormatStore((s) => s.setFormat);
 
+  // 1) Speichern (Overwrite)
   const handleSave = async () => {
     try {
       const res = await fetch("/api/editor/save", {
@@ -40,13 +41,16 @@ export default function EditorHeader() {
     }
   };
 
-  const handleSelect = (doc: { id: string }) => {
+  // 2) Öffnen (Explorer-Overlay), jetzt passend: onSelect(docId: string)
+  const handleSelect = (docId: string) => {
     setOpen(false);
-    router.push(`/editor?id=${doc.id}`);
+    router.push(`/editor?id=${docId}`);
   };
 
+  // 3) Drucken
   const handlePrint = () => window.print();
 
+  // 4) Reset
   const handleReset = () => {
     localStorage.removeItem("editor-format");
     setFormat("a4");
@@ -86,7 +90,7 @@ export default function EditorHeader() {
       </div>
 
       {/* Overlay für "Öffnen" */}
-      <DocumentPickerOverlay
+      <DocumentExplorerOverlay
         open={open}
         onClose={() => setOpen(false)}
         onSelect={handleSelect}
