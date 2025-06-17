@@ -31,7 +31,7 @@ export default function EditorCanvas({ width, height }: Props) {
       const newTextEl = elements.find((el) => el.type === "text" && el.text === "");
       if (newTextEl) {
         updateElement(newTextEl.id, { selected: true });
-        // setEditingId(newTextEl.id);  // 👈 hier auskommentiert
+        // setEditingId(newTextEl.id);  // 👈 hier noch auskommentiert, wir testen nur diesen Part
         setEditText("");
       }
     }
@@ -153,8 +153,41 @@ export default function EditorCanvas({ width, height }: Props) {
         />
       )}
     </div>
-  );
 }
 
-// Bild-Komponente bleibt unverändert
-function URLImage({ /* … */ }) { /* … */ }
+// Vollständige URLImage-Komponente mit return
+function URLImage({
+  id,
+  src,
+  x,
+  y,
+  width = 200,
+  height = 150,
+}: {
+  id: string;
+  src?: string;
+  x: number;
+  y: number;
+  width?: number;
+  height?: number;
+}): JSX.Element {
+  const [image] = useImage(src || "");
+  const updateElement = useEditorStore((s) => s.updateElement);
+
+  return (
+    <KonvaImage
+      image={image}
+      x={x}
+      y={y}
+      width={width}
+      height={height}
+      draggable
+      onDragEnd={(e) =>
+        updateElement(id, {
+          x: e.target.x(),
+          y: e.target.y(),
+        })
+      }
+    />
+  );
+}
