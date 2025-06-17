@@ -16,20 +16,26 @@ export default async function handler(req: NextApiRequest, res: NextApiResponse)
 
   const { title, content, format = "a4", companyId, visibility = "PRIVATE" } = req.body;
 
-  // Sichtbarkeit validieren
   if (!["PRIVATE", "TEAM", "SHARED", "PUBLIC"].includes(visibility)) {
     return res.status(400).json({ error: "Ungültige Sichtbarkeit" });
   }
 
   try {
-    // Vorschau-Modus: Kein Speichern, nur Rückgabe
+    // 🧹 content bereinigen: null → ""
+    const sanitizedContent = Array.isArray(content)
+      ? content.map((el) => ({
+          ...el,
+          text: el.text ?? "",
+        }))
+      : content;
+
     if (req.query.preview === "true") {
       return res.status(200).json({
         success: true,
         preview: true,
         document: {
           title,
-          content,
+          content: sanitizedContent,
           format,
           visibility,
           createdAt: new Date(),
@@ -37,12 +43,11 @@ export default async function handler(req: NextApiRequest, res: NextApiResponse)
       });
     }
 
-    // Wenn keine Firma: Privat-Dokument
     if (!companyId) {
       const doc = await prisma.editorDocument.create({
         data: {
           title,
-          content,
+          content: sanitizedContent,
           format,
           ownerId: session.user.id,
           visibility,
@@ -52,7 +57,6 @@ export default async function handler(req: NextApiRequest, res: NextApiResponse)
       return res.status(200).json({ success: true, document: doc });
     }
 
-    // Wenn companyId vorhanden: prüfen ob User dazugehört
     const member = await prisma.user.findFirst({
       where: {
         id: session.user.id,
@@ -64,11 +68,10 @@ export default async function handler(req: NextApiRequest, res: NextApiResponse)
       return res.status(403).json({ error: "Kein Zugriff auf dieses Team" });
     }
 
-    // Dokument mit Firmenzuordnung speichern
     const doc = await prisma.editorDocument.create({
       data: {
         title,
-        content,
+        content: sanitizedContent,
         format,
         companyId,
         visibility,
