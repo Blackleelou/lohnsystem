@@ -82,7 +82,19 @@ export default async function handler(req: NextApiRequest, res: NextApiResponse)
     return res.status(200).json({ success: true, document: doc });
 
   } catch (error) {
-    console.error("Fehler beim Speichern:", error);
+    console.error("🛑 Fehler beim Speichern (RAW):", error);
+
+    if (error instanceof Error) {
+      console.error("🛠 Fehlermeldung:", error.message);
+      console.error("📌 Stacktrace:", error.stack);
+    } else {
+      try {
+        console.error("🧾 JSON-Fehlerobjekt:", JSON.stringify(error, null, 2));
+      } catch (e) {
+        console.error("⚠️ Fehler beim Serialisieren:", e);
+      }
+    }
+
     return res.status(500).json({ error: "Fehler beim Speichern" });
   }
 }
