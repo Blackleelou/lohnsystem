@@ -1,9 +1,10 @@
+// src/components/editor/EditorCanvas.tsx
+
 import { Stage, Layer, Text, Transformer, Image as KonvaImage } from "react-konva";
 import { useEditorStore } from "./useEditorStore";
 import { useEffect, useRef, useState } from "react";
 import EditorToolbar from "./EditorToolbar";
 import useImage from "use-image";
-
 
 type Props = {
   width: number;
@@ -21,7 +22,7 @@ export default function EditorCanvas({ width, height }: Props) {
   const editingElement = elements.find((el) => el.id === editingId);
   const selectedElement = elements.find((el) => el.selected);
 
-  // ✅ automatische Skalierung für kleinere Bildschirme (z. B. iPhone)
+  // automatische Skalierung
   const scale = Math.min(1, window.innerWidth / (width + 40));
 
   useEffect(() => {
@@ -118,11 +119,12 @@ export default function EditorCanvas({ width, height }: Props) {
         </Stage>
       </div>
 
-      {/* Editierbares Textfeld */}
+      {/* Editierbares Textfeld mit Platzhalter */}
       {editingElement && (
         <input
           ref={inputRef}
           value={editText}
+          placeholder="Neuen Text eingeben…"
           onChange={(e) => setEditText(e.target.value)}
           onBlur={() => {
             updateElement(editingElement.id, { text: editText });
@@ -142,7 +144,7 @@ export default function EditorCanvas({ width, height }: Props) {
   );
 }
 
-// 🖼 Bild-Komponente (außerhalb!)
+// Bild-Komponente
 function URLImage({
   id,
   src,
