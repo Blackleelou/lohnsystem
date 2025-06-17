@@ -153,6 +153,7 @@ export default function EditorCanvas({ width, height }: Props) {
         />
       )}
     </div>
+  );
 }
 
 // Vollständige URLImage-Komponente mit return
