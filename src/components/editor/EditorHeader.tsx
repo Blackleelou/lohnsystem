@@ -5,8 +5,8 @@ import { useRouter } from "next/router";
 import {
   HiOutlinePrinter,
   HiOutlinePhotograph,
-  HiOutlineDownload,
   HiOutlineDocumentText,
+  HiOutlineRefresh,
 } from "react-icons/hi";
 import { useEditorStore } from "./useEditorStore";
 import { useEditorFormatStore } from "./useEditorFormat";
@@ -17,14 +17,9 @@ import { v4 as uuid } from "uuid";
 
 export default function EditorHeader() {
   const router = useRouter();
-
-  // Editor-Store
   const clearElements = useEditorStore((s) => s.clearElements);
   const addElement = useEditorStore((s) => s.addElement);
-
-  // Format-Store
   const setFormat = useEditorFormatStore((s) => s.setFormat);
-  const format = useEditorFormatStore((s) => s.format);
 
   // Drucken
   const handlePrint = () => window.print();
@@ -125,7 +120,7 @@ export default function EditorHeader() {
         title="Editor zurücksetzen"
         className="ml-auto p-2 hover:bg-gray-100 rounded"
       >
-        <HiOutlineDownload size={20} />
+        <HiOutlineRefresh size={20} />
       </button>
     </div>
   );
