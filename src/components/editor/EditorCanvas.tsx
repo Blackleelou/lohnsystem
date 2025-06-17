@@ -1,6 +1,10 @@
-// src/components/editor/EditorCanvas.tsx
-
-import { Stage, Layer, Text, Transformer, Image as KonvaImage } from "react-konva";
+import {
+  Stage,
+  Layer,
+  Text,
+  Transformer,
+  Image as KonvaImage,
+} from "react-konva";
 import { useEditorStore } from "./useEditorStore";
 import { useEffect, useRef, useState } from "react";
 import EditorToolbar from "./EditorToolbar";
@@ -12,9 +16,11 @@ type Props = {
 };
 
 export default function EditorCanvas({ width, height }: Props) {
+  /* ───────── lokaler & Store-State ───────── */
   const { elements, updateElement } = useEditorStore();
   const [editingId, setEditingId] = useState<string | null>(null);
   const [editText, setEditText] = useState("");
+
   const inputRef = useRef<HTMLInputElement>(null);
   const transformerRef = useRef<any>(null);
   const selectedShapeRef = useRef<any>(null);
@@ -22,22 +28,27 @@ export default function EditorCanvas({ width, height }: Props) {
   const editingElement = elements.find((el) => el.id === editingId);
   const selectedElement = elements.find((el) => el.selected);
 
-  // automatische Skalierung
+  /* ───────── Canvas skalieren ───────── */
   const scale = Math.min(1, window.innerWidth / (width + 40));
 
-  // 🆕 Neu eingefügtes, leeres Textelement auto‐editieren
+  /* ───────── Auto-Edit für leeres Textelement ───────── */
+  const autoOpened = useRef(false);
+
   useEffect(() => {
-    // Nur wenn noch kein Editier-Feld offen ist
-    if (!editingElement) {
-      const newTextEl = elements.find((el) => el.type === "text" && el.text === "");
-      if (newTextEl) {
-        // updateElement(newTextEl.id, { selected: true });  // 👈 hier auskommentiert
-        setEditingId(newTextEl.id);
+    if (!autoOpened.current) {
+      const empty = elements.find(
+        (el) => el.type === "text" && (el.text ?? "") === ""
+      );
+      if (empty) {
+        updateElement(empty.id, { selected: true });
+        setEditingId(empty.id);
         setEditText("");
+        autoOpened.current = true; // verhindert weitere Durchläufe
       }
     }
-  }, [elements, editingElement, updateElement]);
+  }, [elements, updateElement]);
 
+  /* ───────── Input-Feld über Canvas positionieren ───────── */
   useEffect(() => {
     if (editingElement && inputRef.current) {
       const input = inputRef.current;
@@ -51,6 +62,7 @@ export default function EditorCanvas({ width, height }: Props) {
     }
   }, [editingElement, scale]);
 
+  /* ───────── Transformer an selektiertes Element binden ───────── */
   useEffect(() => {
     if (transformerRef.current && selectedShapeRef.current) {
       transformerRef.current.nodes([selectedShapeRef.current]);
@@ -58,10 +70,9 @@ export default function EditorCanvas({ width, height }: Props) {
     }
   }, [selectedElement]);
 
+  /* ───────── Hilfs-Handler ───────── */
   const handleSelect = (id: string) => {
-    elements.forEach((el) => {
-      updateElement(el.id, { selected: el.id === id });
-    });
+    elements.forEach((el) => updateElement(el.id, { selected: el.id === id }));
   };
 
   const handleEditStart = (elId: string, currentText: string) => {
@@ -69,6 +80,7 @@ export default function EditorCanvas({ width, height }: Props) {
     setEditText(currentText);
   };
 
+  /* ───────── JSX ───────── */
   return (
     <div className="relative border border-gray-300 rounded shadow bg-white flex justify-center">
       {selectedElement && <EditorToolbar />}
@@ -132,7 +144,7 @@ export default function EditorCanvas({ width, height }: Props) {
         </Stage>
       </div>
 
-      {/* Editierbares Textfeld mit Platzhalter */}
+      {/* Input-Feld für Textediting */}
       {editingElement && (
         <input
           ref={inputRef}
@@ -157,7 +169,7 @@ export default function EditorCanvas({ width, height }: Props) {
   );
 }
 
-// Bild-Komponente
+/* ───────── Bild-Komponente ───────── */
 function URLImage({
   id,
   src,
@@ -172,7 +184,7 @@ function URLImage({
   y: number;
   width?: number;
   height?: number;
-}) {
+}): JSX.Element {
   const [image] = useImage(src || "");
   const updateElement = useEditorStore((s) => s.updateElement);
 
@@ -185,10 +197,7 @@ function URLImage({
       height={height}
       draggable
       onDragEnd={(e) =>
-        updateElement(id, {
-          x: e.target.x(),
-          y: e.target.y(),
-        })
+        updateElement(id, { x: e.target.x(), y: e.target.y() })
       }
     />
   );
