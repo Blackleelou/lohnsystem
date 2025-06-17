@@ -6,7 +6,7 @@ import {
   HiOutlineSave,
   HiOutlineFolderOpen,
   HiOutlinePrinter,
-  HiOutlineArrowPath,
+  HiOutlineRefresh,
 } from "react-icons/hi";
 import { useEditorStore } from "./useEditorStore";
 import { useEditorFormatStore } from "./useEditorFormat";
@@ -18,15 +18,13 @@ import DocumentPickerOverlay from "./DocumentExplorerOverlay";
 
 export default function EditorHeader() {
   const router = useRouter();
-
-  // State & Hooks
   const [open, setOpen] = useState(false);
+
   const elements = useEditorStore((s) => s.elements);
   const clearElements = useEditorStore((s) => s.clearElements);
   const format = useEditorFormatStore((s) => s.format);
   const setFormat = useEditorFormatStore((s) => s.setFormat);
 
-  // 1) Speichern (Overwrite)
   const handleSave = async () => {
     try {
       const res = await fetch("/api/editor/save", {
@@ -42,16 +40,13 @@ export default function EditorHeader() {
     }
   };
 
-  // 2) Öffnen (Explorer-Overlay)
   const handleSelect = (doc: { id: string }) => {
     setOpen(false);
     router.push(`/editor?id=${doc.id}`);
   };
 
-  // 3) Drucken
   const handlePrint = () => window.print();
 
-  // 4) Reset
   const handleReset = () => {
     localStorage.removeItem("editor-format");
     setFormat("a4");
@@ -112,7 +107,7 @@ export default function EditorHeader() {
         title="Editor zurücksetzen"
         className="ml-auto p-2 hover:bg-gray-100 rounded"
       >
-        <HiOutlineArrowPath size={20} />
+        <HiOutlineRefresh size={20} />
       </button>
     </div>
   );
