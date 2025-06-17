@@ -105,14 +105,6 @@ export default function EditorCanvasWrapper() {
         </div>
       </div>
 
-      {/* 🧹 Zurücksetzen */}
-      <button
-        onClick={handleReset}
-        className="text-xs text-gray-400 underline mt-4 mb-6"
-      >
-        Editor zurücksetzen
-      </button>
-
       {/* 🧭 Explorer-Overlay */}
       <DocumentExplorerOverlay
         isOpen={explorerOpen}
