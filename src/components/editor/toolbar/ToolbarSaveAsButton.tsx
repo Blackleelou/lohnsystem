@@ -6,7 +6,7 @@ import { useEditorStore } from "../useEditorStore";
 import { useEditorFormatStore } from "../useEditorFormat";
 import { toast } from "react-hot-toast";
 import { useSession } from "next-auth/react";
-import { HiOutlineDownload } from "react-icons/hi";
+import { FiSave } from "react-icons/fi";
 
 export default function ToolbarSaveAsButton() {
   const [title, setTitle] = useState("");
@@ -48,7 +48,6 @@ export default function ToolbarSaveAsButton() {
     }
   };
 
-  // Overlay-Content als separate Komponente
   const Modal = () => (
     <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50">
       <div className="bg-white p-6 rounded shadow-lg w-80">
@@ -97,12 +96,10 @@ export default function ToolbarSaveAsButton() {
         title="Speichern unter"
         className="p-2 hover:bg-gray-100 rounded"
       >
-        <HiOutlineDownload size={20} />
+        <FiSave size={20} />
       </button>
 
-      {showInput &&
-        // Portal ans Ende von document.body, damit Overlay über allem liegt
-        createPortal(<Modal />, document.body)}
+      {showInput && createPortal(<Modal />, document.body)}
     </>
   );
 }
