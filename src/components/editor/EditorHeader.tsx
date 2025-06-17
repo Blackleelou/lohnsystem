@@ -5,7 +5,6 @@ import { useRouter } from "next/router";
 import {
   HiOutlineFolderOpen,
   HiOutlinePrinter,
-  HiOutlinePhotograph,
   HiOutlineRefresh,
 } from "react-icons/hi";
 import { useEditorStore } from "./useEditorStore";
@@ -13,42 +12,48 @@ import { useEditorFormatStore } from "./useEditorFormat";
 import ToolbarSaveAsButton from "./toolbar/ToolbarSaveAsButton";
 import ToolbarGroupFormat from "./toolbar/ToolbarGroupFormat";
 import ToolbarGroupText from "./toolbar/ToolbarGroupText";
-import ToolbarGroupInsert from "./toolbar/ToolbarGroupInsert";
 import DocumentExplorerOverlay from "./DocumentExplorerOverlay";
-import ImageInsertOverlay from "./toolbar/ImageInsertOverlay";
+import { v4 as uuid } from "uuid";
 
 export default function EditorHeader() {
   const router = useRouter();
-
-  // State für Overlays
   const [openExplorer, setOpenExplorer] = useState(false);
-  const [openImageInsert, setOpenImageInsert] = useState(false);
 
-  // Editor- und Format-Store
   const elements = useEditorStore((s) => s.elements);
   const clearElements = useEditorStore((s) => s.clearElements);
+  const addElement = useEditorStore((s) => s.addElement);
   const format = useEditorFormatStore((s) => s.format);
   const setFormat = useEditorFormatStore((s) => s.setFormat);
 
-  // Datei öffnen
+  // 1) Dokument öffnen
   const handleSelectDocument = (docId: string) => {
     setOpenExplorer(false);
     router.push(`/editor?id=${docId}`);
   };
 
-  // Drucken
-  const handlePrint = () => {
-    window.print();
+  // 2) Drucken
+  const handlePrint = () => window.print();
+
+  // 3) Bild einfügen (aus alter ToolbarGroupInsert.tsx)
+  const handleImageUpload = (e: React.ChangeEvent<HTMLInputElement>) => {
+    const file = e.target.files?.[0];
+    if (!file) return;
+    const reader = new FileReader();
+    reader.onload = () => {
+      addElement({
+        id: uuid(),
+        type: "image",
+        src: reader.result as string,
+        x: 100,
+        y: 100,
+        width: 200,
+        height: 150,
+      });
+    };
+    reader.readAsDataURL(file);
   };
 
-  // Bild einfügen
-  const handleInsertImage = (file: File) => {
-    // TODO: Hier deine Logik zum Einfügen eines Bildes in den Editor
-    // z.B. editorStore.addImage({ file, ... })
-    setOpenImageInsert(false);
-  };
-
-  // Editor zurücksetzen
+  // 4) Editor zurücksetzen
   const handleReset = () => {
     localStorage.removeItem("editor-format");
     setFormat("a4");
@@ -80,23 +85,27 @@ export default function EditorHeader() {
           </button>
         </div>
 
-        {/* — Bild einfügen */}
-        <button
-          onClick={() => setOpenImageInsert(true)}
+        {/* — Bild einfügen: nutzen wir direkt den versteckten File-Input */}
+        <label
+          htmlFor="header-image-upload"
+          className="cursor-pointer p-2 hover:bg-gray-100 rounded"
           title="Bild einfügen"
-          className="p-2 hover:bg-gray-100 rounded"
         >
-          <HiOutlinePhotograph size={20} />
-        </button>
+          📷
+          <input
+            id="header-image-upload"
+            type="file"
+            accept="image/*"
+            onChange={handleImageUpload}
+            className="hidden"
+          />
+        </label>
 
         {/* — Format-Auswahl (A4/A5/A6) */}
         <ToolbarGroupFormat />
 
         {/* — Text-Werkzeuge (Font-Family, Font-Size, Farbe) */}
         <ToolbarGroupText />
-
-        {/* — Einfüge-Werkzeuge (Formen, Icons etc.) */}
-        <ToolbarGroupInsert />
 
         {/* — Editor zurücksetzen */}
         <button
@@ -108,17 +117,11 @@ export default function EditorHeader() {
         </button>
       </div>
 
-      {/* Overlays */}
+      {/* Overlay für "Öffnen" */}
       <DocumentExplorerOverlay
         isOpen={openExplorer}
         onClose={() => setOpenExplorer(false)}
         onSelect={handleSelectDocument}
-      />
-
-      <ImageInsertOverlay
-        isOpen={openImageInsert}
-        onClose={() => setOpenImageInsert(false)}
-        onSelect={handleInsertImage}
       />
     </>
   );
