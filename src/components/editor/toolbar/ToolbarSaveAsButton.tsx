@@ -1,6 +1,7 @@
 // src/components/editor/toolbar/ToolbarSaveAsButton.tsx
 
 import { useState } from "react";
+import { createPortal } from "react-dom";
 import { useEditorStore } from "../useEditorStore";
 import { useEditorFormatStore } from "../useEditorFormat";
 import { toast } from "react-hot-toast";
@@ -47,50 +48,61 @@ export default function ToolbarSaveAsButton() {
     }
   };
 
-  return (
-    <div className="flex items-center gap-2">
-      {showInput ? (
-        <div className="flex items-center gap-2 bg-white p-2 shadow rounded">
-          <input
-            type="text"
-            value={title}
-            onChange={(e) => setTitle(e.target.value)}
-            placeholder="Dokumenttitel"
-            className="border rounded px-2 py-1 text-sm"
-          />
-          <select
-            value={visibility}
-            onChange={(e) => setVisibility(e.target.value as any)}
-            className="border rounded px-2 py-1 text-sm"
+  // Overlay-Content als separate Komponente
+  const Modal = () => (
+    <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50">
+      <div className="bg-white p-6 rounded shadow-lg w-80">
+        <h2 className="text-lg font-semibold mb-4">Speichern unter</h2>
+        <input
+          type="text"
+          value={title}
+          onChange={(e) => setTitle(e.target.value)}
+          placeholder="Dokumenttitel"
+          className="w-full border rounded px-2 py-1 mb-3 text-sm"
+        />
+        <select
+          value={visibility}
+          onChange={(e) => setVisibility(e.target.value as any)}
+          className="w-full border rounded px-2 py-1 mb-4 text-sm"
+        >
+          <option value="PRIVATE">🔒 Privat</option>
+          <option value="TEAM">👥 Team</option>
+          <option value="SHARED">🔗 Geteilt</option>
+          <option value="PUBLIC">🌍 Öffentlich</option>
+        </select>
+        <div className="flex justify-end gap-2">
+          <button
+            onClick={() => setShowInput(false)}
+            className="px-3 py-1 text-sm text-gray-600 hover:underline"
+            disabled={saving}
           >
-            <option value="PRIVATE">🔒 Privat</option>
-            <option value="TEAM">👥 Team</option>
-            <option value="SHARED">🔗 Geteilt</option>
-            <option value="PUBLIC">🌍 Öffentlich</option>
-          </select>
+            Abbrechen
+          </button>
           <button
             onClick={handleSave}
             disabled={saving}
             className="px-3 py-1 bg-blue-600 text-white text-sm rounded hover:bg-blue-700 disabled:opacity-50"
           >
-            Speichern
-          </button>
-          <button
-            onClick={() => setShowInput(false)}
-            className="text-sm text-gray-500 underline hover:text-gray-700"
-          >
-            Abbrechen
+            {saving ? "Speichere…" : "Speichern"}
           </button>
         </div>
-      ) : (
-        <button
-          onClick={() => setShowInput(true)}
-          title="Speichern unter"
-          className="p-2 hover:bg-gray-100 rounded"
-        >
-          <HiOutlineDocumentDuplicate size={20} />
-        </button>
-      )}
+      </div>
     </div>
+  );
+
+  return (
+    <>
+      <button
+        onClick={() => setShowInput(true)}
+        title="Speichern unter"
+        className="p-2 hover:bg-gray-100 rounded"
+      >
+        <HiOutlineDocumentDuplicate size={20} />
+      </button>
+
+      {showInput &&
+        // Portal ans Ende von document.body, damit Overlay über allem liegt
+        createPortal(<Modal />, document.body)}
+    </>
   );
 }
