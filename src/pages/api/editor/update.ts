@@ -49,11 +49,19 @@ export default async function handler(req: NextApiRequest, res: NextApiResponse)
       return res.status(403).json({ error: "Kein Bearbeitungszugriff" });
     }
 
+    // 🧹 content bereinigen: null → ""
+    const sanitizedContent = Array.isArray(content)
+      ? content.map((el) => ({
+          ...el,
+          text: el.text ?? "",
+        }))
+      : content;
+
     const updated = await prisma.editorDocument.update({
       where: { id },
       data: {
         title,
-        content,
+        content: sanitizedContent,
         format,
       },
     });
