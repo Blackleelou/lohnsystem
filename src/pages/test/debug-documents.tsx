@@ -1,5 +1,3 @@
-// src/pages/test/debug-documents.tsx
-
 import { useEffect, useState } from "react";
 
 type Document = {
@@ -44,6 +42,20 @@ export default function DebugDocumentsPage() {
     }
   };
 
+  const handleDeleteAll = async () => {
+    if (!confirm("Wirklich ALLE Dokumente unwiderruflich löschen?")) return;
+    try {
+      const res = await fetch("/api/editor/delete-all", {
+        method: "DELETE",
+      });
+      if (!res.ok) throw new Error("Löschen aller Dokumente fehlgeschlagen");
+      setDocuments([]);
+    } catch (err) {
+      alert("Fehler beim Löschen aller Dokumente");
+      console.error(err);
+    }
+  };
+
   useEffect(() => {
     loadDocuments();
   }, []);
@@ -51,6 +63,21 @@ export default function DebugDocumentsPage() {
   return (
     <div className="p-6">
       <h1 className="text-xl font-bold mb-4">🧪 Debug: Editor-Dokumente</h1>
+
+      <div className="mb-4 flex gap-4">
+        <button
+          onClick={loadDocuments}
+          className="px-3 py-1 bg-blue-600 text-white text-sm rounded hover:bg-blue-700"
+        >
+          Neu laden
+        </button>
+        <button
+          onClick={handleDeleteAll}
+          className="px-3 py-1 bg-red-600 text-white text-sm rounded hover:bg-red-700"
+        >
+          Alle löschen
+        </button>
+      </div>
 
       {loading ? (
         <p>Lade...</p>
