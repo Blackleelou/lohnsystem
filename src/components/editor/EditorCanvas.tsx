@@ -11,15 +11,10 @@ type Props = {
   height: number;
 };
 
-export default function EditorCanvas({ width, height }: Props): JSX.Element | null {
-  // 🚫 SSR-Guard: Auf dem Server nichts rendern
-  if (typeof window === "undefined") {
-    return null;
-  }
-
+export default function EditorCanvas({ width, height }: Props) {
   const { elements, updateElement } = useEditorStore();
   const [editingId, setEditingId] = useState<string | null>(null);
-  const [editText, setEditText] = useState<string>("");
+  const [editText, setEditText] = useState("");
   const inputRef = useRef<HTMLInputElement>(null);
   const transformerRef = useRef<any>(null);
   const selectedShapeRef = useRef<any>(null);
@@ -27,22 +22,22 @@ export default function EditorCanvas({ width, height }: Props): JSX.Element | nu
   const editingElement = elements.find((el) => el.id === editingId);
   const selectedElement = elements.find((el) => el.selected);
 
-  // Client-Side Skalierung
+  // automatische Skalierung
   const scale = Math.min(1, window.innerWidth / (width + 40));
 
-  // 🆕 Auto-Edit für neues, leeres Textelement
+  // 🆕 Neu eingefügtes, leeres Textelement auto‐editieren
   useEffect(() => {
+    // Nur wenn noch kein Editier-Feld offen ist
     if (!editingElement) {
       const newTextEl = elements.find((el) => el.type === "text" && el.text === "");
       if (newTextEl) {
-        updateElement(newTextEl.id, { selected: true });
+        // updateElement(newTextEl.id, { selected: true });  // 👈 hier auskommentiert
         setEditingId(newTextEl.id);
         setEditText("");
       }
     }
   }, [elements, editingElement, updateElement]);
 
-  // Position & Style für das Input-Feld
   useEffect(() => {
     if (editingElement && inputRef.current) {
       const input = inputRef.current;
@@ -56,7 +51,6 @@ export default function EditorCanvas({ width, height }: Props): JSX.Element | nu
     }
   }, [editingElement, scale]);
 
-  // Transformer auf das selektierte Shape anwenden
   useEffect(() => {
     if (transformerRef.current && selectedShapeRef.current) {
       transformerRef.current.nodes([selectedShapeRef.current]);
@@ -90,60 +84,55 @@ export default function EditorCanvas({ width, height }: Props): JSX.Element | nu
       >
         <Stage width={width} height={height}>
           <Layer clip={{ x: 0, y: 0, width, height }}>
-            {elements.map((el) => {
-              if (el.type === "text") {
-                return (
-                  <Text
-                    key={el.id}
-                    x={el.x}
-                    y={el.y}
-                    text={el.text}
-                    fontSize={el.fontSize || 18}
-                    fontFamily={el.fontFamily || "Arial"}
-                    fontStyle={el.fontStyle || "normal"}
-                    fontWeight={el.fontWeight || "normal"}
-                    fill={el.fill || "#000000"}
-                    align={el.align || "left"}
-                    draggable
-                    ref={el.selected ? selectedShapeRef : undefined}
-                    onClick={() => handleSelect(el.id)}
-                    onDblClick={() => {
-                      handleSelect(el.id);
-                      handleEditStart(el.id, el.text || "");
-                    }}
-                    onTap={() => {
-                      handleSelect(el.id);
-                      handleEditStart(el.id, el.text || "");
-                    }}
-                    onDragEnd={(e) =>
-                      updateElement(el.id, {
-                        x: e.target.x(),
-                        y: e.target.y(),
-                      })
-                    }
-                  />
-                );
-              } else if (el.type === "image") {
-                return (
-                  <URLImage
-                    key={el.id}
-                    id={el.id}
-                    src={el.src}
-                    x={el.x}
-                    y={el.y}
-                    width={el.width}
-                    height={el.height}
-                  />
-                );
-              }
-              return null;
-            })}
+            {elements.map((el) =>
+              el.type === "text" ? (
+                <Text
+                  key={el.id}
+                  x={el.x}
+                  y={el.y}
+                  text={el.text}
+                  fontSize={el.fontSize || 18}
+                  fontFamily={el.fontFamily || "Arial"}
+                  fontStyle={el.fontStyle || "normal"}
+                  fontWeight={el.fontWeight || "normal"}
+                  fill={el.fill || "#000000"}
+                  align={el.align || "left"}
+                  draggable
+                  ref={el.selected ? selectedShapeRef : undefined}
+                  onClick={() => handleSelect(el.id)}
+                  onDblClick={() => {
+                    handleSelect(el.id);
+                    handleEditStart(el.id, el.text || "");
+                  }}
+                  onTap={() => {
+                    handleSelect(el.id);
+                    handleEditStart(el.id, el.text || "");
+                  }}
+                  onDragEnd={(e) =>
+                    updateElement(el.id, {
+                      x: e.target.x(),
+                      y: e.target.y(),
+                    })
+                  }
+                />
+              ) : el.type === "image" ? (
+                <URLImage
+                  key={el.id}
+                  id={el.id}
+                  src={el.src}
+                  x={el.x}
+                  y={el.y}
+                  width={el.width}
+                  height={el.height}
+                />
+              ) : null
+            )}
             <Transformer ref={transformerRef} />
           </Layer>
         </Stage>
       </div>
 
-      {/* Editierbares Textfeld */}
+      {/* Editierbares Textfeld mit Platzhalter */}
       {editingElement && (
         <input
           ref={inputRef}
@@ -168,7 +157,7 @@ export default function EditorCanvas({ width, height }: Props): JSX.Element | nu
   );
 }
 
-// URLImage-Komponente
+// Bild-Komponente
 function URLImage({
   id,
   src,
@@ -183,7 +172,7 @@ function URLImage({
   y: number;
   width?: number;
   height?: number;
-}): JSX.Element {
+}) {
   const [image] = useImage(src || "");
   const updateElement = useEditorStore((s) => s.updateElement);
 
