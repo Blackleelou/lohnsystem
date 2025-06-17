@@ -7,7 +7,7 @@ import {
   HiOutlineFolderOpen,
   HiOutlinePrinter,
   HiOutlineArrowPath,
-} from "react-icons/hi2";
+} from "react-icons/hi";
 import { useEditorStore } from "./useEditorStore";
 import { useEditorFormatStore } from "./useEditorFormat";
 import ToolbarSaveAsButton from "./toolbar/ToolbarSaveAsButton";
@@ -36,7 +36,6 @@ export default function EditorHeader() {
       });
       const data = await res.json();
       if (!res.ok) throw new Error(data.error || "Fehler beim Speichern");
-      // Du kannst hier z. B. toast.success("Gespeichert!") aufrufen
       console.log("Gespeichert:", data.document);
     } catch (err: any) {
       console.error(err);
