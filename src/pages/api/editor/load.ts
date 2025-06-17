@@ -1,3 +1,5 @@
+// src/pages/api/editor/load.ts
+
 import { getServerSession } from "next-auth";
 import { authOptions } from "@/lib/authOptions";
 import { prisma } from "@/lib/prisma";
@@ -42,20 +44,31 @@ export default async function handler(req: NextApiRequest, res: NextApiResponse)
     const isExplicitlyShared =
       document.shares.some(
         (share) =>
-          (share.sharedWithUserId === userId || share.sharedWithCompanyId === companyId)
+          share.sharedWithUserId === userId || share.sharedWithCompanyId === companyId
       );
 
     const canAccess =
       isOwner ||
       (document.visibility === "TEAM" && isSameCompany) ||
       (document.visibility === "SHARED" && isShared && isExplicitlyShared) ||
-      (document.visibility === "PUBLIC");
+      document.visibility === "PUBLIC";
 
     if (!canAccess) {
       return res.status(403).json({ error: "Kein Zugriff auf dieses Dokument" });
     }
 
+    // 🧪 JSON-Test: Ist der Inhalt speicherbar?
+    try {
+      JSON.stringify(document.content);
+    } catch (e) {
+      console.error("❌ Ungültiges JSON im content-Feld:", e);
+      console.error("🔎 Dokumentinhalt war:", document.content);
+      return res.status(500).json({ error: "Dokumentinhalt defekt oder nicht lesbar" });
+    }
+
+    // ✅ Alles in Ordnung
     return res.status(200).json({ success: true, document });
+
   } catch (err) {
     console.error("Fehler beim Laden des Dokuments:", err);
     return res.status(500).json({ error: "Fehler beim Laden" });
