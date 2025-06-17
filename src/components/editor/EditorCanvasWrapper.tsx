@@ -1,10 +1,11 @@
-import { useEffect } from "react";
+import { useEffect, useState } from "react";
 import { useRouter } from "next/router";
 import EditorCanvas from "./EditorCanvas";
 import EditorHeader from "./EditorHeader";
 import { useCanvasSize } from "./useCanvasSize";
 import { useEditorFormatStore } from "./useEditorFormat";
 import { useEditorStore } from "./useEditorStore";
+import DocumentExplorerOverlay from "./DocumentExplorerOverlay"; // ⬅️ WICHTIG
 
 // 🧠 Dokument von API laden
 async function loadEditorDocument(id: string, isShared = false) {
@@ -27,6 +28,11 @@ export default function EditorCanvasWrapper() {
   const clearElements = useEditorStore((s) => s.clearElements);
   const setElements = useEditorStore((s) => s.setElements);
   const router = useRouter();
+
+  const [explorerOpen, setExplorerOpen] = useState(false); // ⬅️ Explorer sichtbar?
+  const handleSelectDocument = (docId: string) => {
+    router.push(`/editor?id=${docId}`);
+  };
 
   // 📦 Laden bei URL ?id=...
   useEffect(() => {
@@ -76,6 +82,14 @@ export default function EditorCanvasWrapper() {
       {/* 🔝 Moderne Toolbar mit Dropdown-Auswahl */}
       <EditorHeader />
 
+      {/* 📂 Dokument öffnen */}
+      <button
+        onClick={() => setExplorerOpen(true)}
+        className="mt-4 px-4 py-2 bg-blue-600 text-white text-sm rounded"
+      >
+        📂 Dokument öffnen
+      </button>
+
       {/* 🖼 Zeichenfläche */}
       <div className="w-full flex justify-center px-2 py-6 overflow-auto">
         <div
@@ -98,6 +112,13 @@ export default function EditorCanvasWrapper() {
       >
         Editor zurücksetzen
       </button>
+
+      {/* 🧭 Explorer-Overlay */}
+      <DocumentExplorerOverlay
+        isOpen={explorerOpen}
+        onClose={() => setExplorerOpen(false)}
+        onSelect={handleSelectDocument}
+      />
     </div>
   );
 }
