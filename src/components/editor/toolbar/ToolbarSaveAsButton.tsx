@@ -1,8 +1,11 @@
+// src/components/editor/toolbar/ToolbarSaveAsButton.tsx
+
 import { useState } from "react";
 import { useEditorStore } from "../useEditorStore";
 import { useEditorFormatStore } from "../useEditorFormat";
 import { toast } from "react-hot-toast";
-import { useSession } from "next-auth/react"; // ✅ Session einbinden
+import { useSession } from "next-auth/react";
+import { HiOutlineDocumentDuplicate } from "react-icons/hi";
 
 export default function ToolbarSaveAsButton() {
   const [title, setTitle] = useState("");
@@ -12,16 +15,14 @@ export default function ToolbarSaveAsButton() {
 
   const elements = useEditorStore((s) => s.elements);
   const format = useEditorFormatStore((s) => s.format);
-  const { data: session } = useSession(); // ✅ Session auslesen
+  const { data: session } = useSession();
 
   const handleSave = async () => {
     if (!title.trim()) {
       toast.error("Bitte gib einen Titel ein");
       return;
     }
-
     setSaving(true);
-
     try {
       const res = await fetch("/api/editor/save", {
         method: "POST",
@@ -31,13 +32,11 @@ export default function ToolbarSaveAsButton() {
           content: elements,
           format,
           visibility,
-          companyId: session?.user?.companyId ?? null, // ✅ jetzt funktioniert es
+          companyId: session?.user?.companyId ?? null,
         }),
       });
-
       const data = await res.json();
       if (!res.ok) throw new Error(data.error || "Fehler beim Speichern");
-
       toast.success("Dokument gespeichert!");
       setShowInput(false);
       setTitle("");
@@ -51,7 +50,7 @@ export default function ToolbarSaveAsButton() {
   return (
     <div className="flex items-center gap-2">
       {showInput ? (
-        <div className="flex items-center gap-2">
+        <div className="flex items-center gap-2 bg-white p-2 shadow rounded">
           <input
             type="text"
             value={title}
@@ -59,7 +58,6 @@ export default function ToolbarSaveAsButton() {
             placeholder="Dokumenttitel"
             className="border rounded px-2 py-1 text-sm"
           />
-
           <select
             value={visibility}
             onChange={(e) => setVisibility(e.target.value as any)}
@@ -70,27 +68,27 @@ export default function ToolbarSaveAsButton() {
             <option value="SHARED">🔗 Geteilt</option>
             <option value="PUBLIC">🌍 Öffentlich</option>
           </select>
-
           <button
-            className="px-2 py-1 border rounded text-sm bg-blue-500 text-white"
             onClick={handleSave}
             disabled={saving}
+            className="px-3 py-1 bg-blue-600 text-white text-sm rounded hover:bg-blue-700 disabled:opacity-50"
           >
             Speichern
           </button>
           <button
-            className="text-sm text-gray-500 underline"
             onClick={() => setShowInput(false)}
+            className="text-sm text-gray-500 underline hover:text-gray-700"
           >
             Abbrechen
           </button>
         </div>
       ) : (
         <button
-          className="px-2 py-1 border rounded text-sm hover:bg-gray-100"
           onClick={() => setShowInput(true)}
+          title="Speichern unter"
+          className="p-2 hover:bg-gray-100 rounded"
         >
-          Speichern unter …
+          <HiOutlineDocumentDuplicate size={20} />
         </button>
       )}
     </div>
