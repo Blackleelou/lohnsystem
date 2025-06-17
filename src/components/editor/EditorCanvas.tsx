@@ -25,6 +25,20 @@ export default function EditorCanvas({ width, height }: Props) {
   // automatische Skalierung
   const scale = Math.min(1, window.innerWidth / (width + 40));
 
+  // 🆕 Neu eingefügtes, leeres Textelement auto‐editieren
+  useEffect(() => {
+    // Nur wenn noch kein Editier-Feld offen ist
+    if (!editingElement) {
+      const newTextEl = elements.find((el) => el.type === "text" && el.text === "");
+      if (newTextEl) {
+        // Markiere es als ausgewählt und öffne das Input
+        updateElement(newTextEl.id, { selected: true });
+        setEditingId(newTextEl.id);
+        setEditText("");
+      }
+    }
+  }, [elements, editingElement, updateElement]);
+
   useEffect(() => {
     if (editingElement && inputRef.current) {
       const input = inputRef.current;
