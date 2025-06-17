@@ -12,6 +12,7 @@ export default function ToolbarGroupText() {
 
   return (
     <div className="flex items-center gap-2">
+      {/* Schriftart */}
       <select
         value={fontFamily}
         onChange={(e) => setFontFamily(e.target.value)}
@@ -23,6 +24,7 @@ export default function ToolbarGroupText() {
         <option value="Verdana">Verdana</option>
       </select>
 
+      {/* Schriftgröße */}
       <select
         value={fontSize}
         onChange={(e) => setFontSize(Number(e.target.value))}
@@ -35,6 +37,7 @@ export default function ToolbarGroupText() {
         ))}
       </select>
 
+      {/* Schriftfarbe */}
       <input
         type="color"
         value={fontColor}
