@@ -19,35 +19,17 @@ export default function EditorCanvas({ width, height }: Props) {
   const transformerRef = useRef<any>(null);
   const selectedShapeRef = useRef<any>(null);
 
-  const editingElement = elements.find(
-    (el) =>
-      el.id === editingId &&
-      typeof el.x === "number" &&
-      typeof el.y === "number"
-  );
-
+  const editingElement = elements.find((el) => el.id === editingId);
   const selectedElement = elements.find((el) => el.selected);
 
   // automatische Skalierung
   const scale = Math.min(1, window.innerWidth / (width + 40));
 
-  // 🆕 Neu eingefügtes, leeres Textelement auto‐editieren (nur mit Koordinaten)
-  useEffect(() => {
-    if (!editingElement) {
-      const newTextEl = elements.find(
-        (el) =>
-          el.type === "text" &&
-          el.text === "" &&
-          typeof el.x === "number" &&
-          typeof el.y === "number"
-      );
-      if (newTextEl) {
-        updateElement(newTextEl.id, { selected: true });
-        setEditingId(newTextEl.id);
-        setEditText("");
-      }
-    }
-  }, [elements, editingElement, updateElement]);
+  // ─────────────────────────────────────────────────────────────
+  // ERSTE ÄNDERUNG ENTFERNT:
+  // Der `useEffect`, der automatisch ein leeres Textelement zum Editieren öffnet,
+  // ist hier komplett rausgenommen worden.
+  // ─────────────────────────────────────────────────────────────
 
   useEffect(() => {
     if (editingElement && inputRef.current) {
@@ -55,7 +37,7 @@ export default function EditorCanvas({ width, height }: Props) {
       input.style.position = "absolute";
       input.style.top = `${editingElement.y * scale + 100}px`;
       input.style.left = `${editingElement.x * scale + 16}px`;
-      input.style.fontSize = `${(editingElement.fontSize ?? 18) * scale}px`;
+      input.style.fontSize = `${(editingElement.fontSize || 18) * scale}px`;
       input.style.transform = `scale(${1 / scale})`;
       input.style.transformOrigin = "top left";
       input.focus();
@@ -96,30 +78,28 @@ export default function EditorCanvas({ width, height }: Props) {
         <Stage width={width} height={height}>
           <Layer clip={{ x: 0, y: 0, width, height }}>
             {elements.map((el) =>
-              el.type === "text" &&
-              typeof el.x === "number" &&
-              typeof el.y === "number" ? (
+              el.type === "text" ? (
                 <Text
                   key={el.id}
                   x={el.x}
                   y={el.y}
-                  text={el.text ?? ""}
-                  fontSize={typeof el.fontSize === "number" ? el.fontSize : 18}
-                  fontFamily={el.fontFamily ?? "Arial"}
-                  fontStyle={el.fontStyle ?? "normal"}
-                  fontWeight={el.fontWeight ?? "normal"}
-                  fill={el.fill ?? "#000000"}
-                  align={el.align ?? "left"}
+                  text={el.text}
+                  fontSize={el.fontSize || 18}
+                  fontFamily={el.fontFamily || "Arial"}
+                  fontStyle={el.fontStyle || "normal"}
+                  fontWeight={el.fontWeight || "normal"}
+                  fill={el.fill || "#000000"}
+                  align={el.align || "left"}
                   draggable
                   ref={el.selected ? selectedShapeRef : undefined}
                   onClick={() => handleSelect(el.id)}
                   onDblClick={() => {
                     handleSelect(el.id);
-                    handleEditStart(el.id, el.text ?? "");
+                    handleEditStart(el.id, el.text || "");
                   }}
                   onTap={() => {
                     handleSelect(el.id);
-                    handleEditStart(el.id, el.text ?? "");
+                    handleEditStart(el.id, el.text || "");
                   }}
                   onDragEnd={(e) =>
                     updateElement(el.id, {
@@ -133,8 +113,8 @@ export default function EditorCanvas({ width, height }: Props) {
                   key={el.id}
                   id={el.id}
                   src={el.src}
-                  x={el.x ?? 100}
-                  y={el.y ?? 100}
+                  x={el.x}
+                  y={el.y}
                   width={el.width}
                   height={el.height}
                 />
