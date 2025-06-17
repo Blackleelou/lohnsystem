@@ -17,14 +17,16 @@ import { v4 as uuid } from "uuid";
 
 export default function EditorHeader() {
   const router = useRouter();
+
+  // Store-Hooks
   const clearElements = useEditorStore((s) => s.clearElements);
   const addElement = useEditorStore((s) => s.addElement);
   const setFormat = useEditorFormatStore((s) => s.setFormat);
 
-  // Drucken
+  // 1) Drucken
   const handlePrint = () => window.print();
 
-  // Bild einfügen
+  // 2) Bild einfügen
   const handleImageUpload = (e: React.ChangeEvent<HTMLInputElement>) => {
     const file = e.target.files?.[0];
     if (!file) return;
@@ -43,12 +45,12 @@ export default function EditorHeader() {
     reader.readAsDataURL(file);
   };
 
-  // Text einfügen
+  // 3) Text einfügen (jetzt ohne vorgegebenen Text)
   const handleInsertText = () => {
     addElement({
       id: uuid(),
       type: "text",
-      text: "Neuer Text",
+      text: "",          // leer starten
       x: 50,
       y: 50,
       fontSize: 18,
@@ -61,7 +63,7 @@ export default function EditorHeader() {
     });
   };
 
-  // Editor zurücksetzen
+  // 4) Editor zurücksetzen
   const handleReset = () => {
     localStorage.removeItem("editor-format");
     setFormat("a4");
