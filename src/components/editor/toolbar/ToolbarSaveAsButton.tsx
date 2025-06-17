@@ -1,5 +1,3 @@
-// src/components/editor/toolbar/ToolbarSaveAsButton.tsx
-
 import { useState } from "react";
 import { createPortal } from "react-dom";
 import { useEditorStore } from "../useEditorStore";
@@ -25,12 +23,19 @@ export default function ToolbarSaveAsButton() {
     }
     setSaving(true);
     try {
+      // 🧹 Leere Texte vor dem Speichern entfernen
+      const cleanedElements = elements.filter((el) => {
+        if (el.type === "image") return true;
+        if (el.type === "text") return (el.text?.trim() ?? "") !== "";
+        return false;
+      });
+
       const res = await fetch("/api/editor/save", {
         method: "POST",
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify({
           title,
-          content: elements,
+          content: cleanedElements,
           format,
           visibility,
           companyId: session?.user?.companyId ?? null,
