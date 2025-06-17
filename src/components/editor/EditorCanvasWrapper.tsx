@@ -1,11 +1,12 @@
-import { useEffect, useState } from "react";
+// src/components/editor/EditorCanvasWrapper.tsx
+
+import { useEffect } from "react";
 import { useRouter } from "next/router";
 import EditorCanvas from "./EditorCanvas";
 import EditorHeader from "./EditorHeader";
 import { useCanvasSize } from "./useCanvasSize";
 import { useEditorFormatStore } from "./useEditorFormat";
 import { useEditorStore } from "./useEditorStore";
-import DocumentExplorerOverlay from "./DocumentExplorerOverlay"; // ⬅️ WICHTIG
 
 // 🧠 Dokument von API laden
 async function loadEditorDocument(id: string, isShared = false) {
@@ -29,11 +30,6 @@ export default function EditorCanvasWrapper() {
   const setElements = useEditorStore((s) => s.setElements);
   const router = useRouter();
 
-  const [explorerOpen, setExplorerOpen] = useState(false); // ⬅️ Explorer sichtbar?
-  const handleSelectDocument = (docId: string) => {
-    router.push(`/editor?id=${docId}`);
-  };
-
   // 📦 Laden bei URL ?id=...
   useEffect(() => {
     const docId = router.query.id as string | undefined;
@@ -55,7 +51,7 @@ export default function EditorCanvasWrapper() {
           console.error("Ladefehler", err);
         });
     }
-  }, [router.query.id]);
+  }, [router.query.id, setFormat, setElements]);
 
   // 🧠 Format aus localStorage laden
   useEffect(() => {
@@ -70,25 +66,10 @@ export default function EditorCanvasWrapper() {
     localStorage.setItem("editor-format", format);
   }, [format]);
 
-  const handleReset = () => {
-    localStorage.removeItem("editor-format");
-    setFormat("a4");
-    clearElements();
-    window.location.reload();
-  };
-
   return (
     <div className="flex flex-col items-center min-h-screen bg-gray-50 overflow-hidden">
       {/* 🔝 Moderne Toolbar mit Dropdown-Auswahl */}
       <EditorHeader />
-
-      {/* 📂 Dokument öffnen */}
-      <button
-        onClick={() => setExplorerOpen(true)}
-        className="mt-4 px-4 py-2 bg-blue-600 text-white text-sm rounded"
-      >
-        📂 Dokument öffnen
-      </button>
 
       {/* 🖼 Zeichenfläche */}
       <div className="w-full flex justify-center px-2 py-6 overflow-auto">
@@ -104,13 +85,6 @@ export default function EditorCanvasWrapper() {
           <EditorCanvas width={width} height={height} />
         </div>
       </div>
-
-      {/* 🧭 Explorer-Overlay */}
-      <DocumentExplorerOverlay
-        isOpen={explorerOpen}
-        onClose={() => setExplorerOpen(false)}
-        onSelect={handleSelectDocument}
-      />
     </div>
   );
 }
