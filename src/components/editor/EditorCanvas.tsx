@@ -31,7 +31,7 @@ export default function EditorCanvas({ width, height }: Props) {
       const newTextEl = elements.find((el) => el.type === "text" && el.text === "");
       if (newTextEl) {
         updateElement(newTextEl.id, { selected: true });
-        // setEditingId(newTextEl.id);
+        setEditingId(newTextEl.id);
         // setEditText("");
       }
     }
