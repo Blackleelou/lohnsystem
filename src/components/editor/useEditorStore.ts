@@ -1,12 +1,15 @@
+// src/components/editor/useEditorStore.ts
+
 import { create } from "zustand";
+import { persist } from "zustand/middleware";
 
 export type EditorElement = {
   id: string;
-  type: "text" | "image"; // Elementtyp
-  text?: string;          // optional für Text
+  type: "text" | "image";
+  text?: string;
   x: number;
   y: number;
-  src?: string;           // optional für Bild
+  src?: string;
   width?: number;
   height?: number;
   fontSize?: number;
@@ -24,53 +27,64 @@ type State = {
   updateElement: (id: string, newProps: Partial<EditorElement>) => void;
   addText: () => void;
   clearElements: () => void;
-  setElements: (elements: EditorElement[]) => void; // ✅ NEU
+  setElements: (elements: EditorElement[]) => void;
 };
 
-export const useEditorStore = create<State>((set) => ({
-  elements: [
-    {
-      id: "1",
-      type: "text",
-      text: "Hier kannst du Texte bearbeiten",
-      x: 50,
-      y: 60,
-      fontSize: 18,
-      fontFamily: "Arial",
-      fontStyle: "normal",
-      fontWeight: "normal",
-      fill: "#000000",
-      align: "left",
-      selected: false,
-    },
-  ],
-  addElement: (el) =>
-    set((state) => ({ elements: [...state.elements, el] })),
-  updateElement: (id, newProps) =>
-    set((state) => ({
-      elements: state.elements.map((el) =>
-        el.id === id ? { ...el, ...newProps } : el
-      ),
-    })),
-  addText: () =>
-    set((state) => {
-      const newId = (state.elements.length + 1).toString();
-      const newText: EditorElement = {
-        id: newId,
-        type: "text",
-        text: "Neuer Text",
-        x: 100,
-        y: 100,
-        fontSize: 18,
-        fontFamily: "Arial",
-        fontStyle: "normal",
-        fontWeight: "normal",
-        fill: "#000000",
-        align: "left",
-        selected: false,
-      };
-      return { elements: [...state.elements, newText] };
+export const useEditorStore = create<State>()(
+  persist(
+    (set, get) => ({
+      elements: [
+        {
+          id: "1",
+          type: "text",
+          text: "Hier kannst du Texte bearbeiten",
+          x: 50,
+          y: 60,
+          fontSize: 18,
+          fontFamily: "Arial",
+          fontStyle: "normal",
+          fontWeight: "normal",
+          fill: "#000000",
+          align: "left",
+          selected: false,
+        },
+      ],
+      addElement: (el) => set({ elements: [...get().elements, el] }),
+      updateElement: (id, newProps) =>
+        set({
+          elements: get().elements.map((el) =>
+            el.id === id ? { ...el, ...newProps } : el
+          ),
+        }),
+      addText: () =>
+        set({
+          elements: [
+            ...get().elements,
+            {
+              id: (get().elements.length + 1).toString(),
+              type: "text",
+              text: "Neuer Text",
+              x: 100,
+              y: 100,
+              fontSize: 18,
+              fontFamily: "Arial",
+              fontStyle: "normal",
+              fontWeight: "normal",
+              fill: "#000000",
+              align: "left",
+              selected: false,
+            },
+          ],
+        }),
+      clearElements: () => set({ elements: [] }),
+      setElements: (elements) => set({ elements }),
     }),
-  clearElements: () => set({ elements: [] }),
-  setElements: (elements) => set({ elements }), // ✅ NEU
-}));
+    {
+      name: "editor-elements",            // key im localStorage
+      getStorage: () => localStorage,     // use localStorage
+      partialize: (state) => ({            // nur dieses Teil speichern
+        elements: state.elements,
+      }),
+    }
+  )
+);
