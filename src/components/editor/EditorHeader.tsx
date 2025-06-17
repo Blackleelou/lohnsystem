@@ -91,11 +91,11 @@ export default function EditorHeader() {
 
       {/* Overlay für "Öffnen" */}
       <DocumentExplorerOverlay
-        open={open}
+        isopen={open}
         onClose={() => setOpen(false)}
         onSelect={handleSelect}
       />
-
+      
       {/* — Format-Auswahl (A4/A5/A6) */}
       <ToolbarGroupFormat />
 
