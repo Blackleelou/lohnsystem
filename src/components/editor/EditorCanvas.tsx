@@ -25,11 +25,18 @@ export default function EditorCanvas({ width, height }: Props) {
   // automatische Skalierung
   const scale = Math.min(1, window.innerWidth / (width + 40));
 
-  // ─────────────────────────────────────────────────────────────
-  // ERSTE ÄNDERUNG ENTFERNT:
-  // Der `useEffect`, der automatisch ein leeres Textelement zum Editieren öffnet,
-  // ist hier komplett rausgenommen worden.
-  // ─────────────────────────────────────────────────────────────
+  // 🆕 Neu eingefügtes, leeres Textelement auto‐editieren
+  useEffect(() => {
+    // Nur wenn noch kein Editier-Feld offen ist
+    if (!editingElement) {
+      const newTextEl = elements.find((el) => el.type === "text" && el.text === "");
+      if (newTextEl) {
+        // updateElement(newTextEl.id, { selected: true });  // 👈 hier auskommentiert
+        setEditingId(newTextEl.id);
+        setEditText("");
+      }
+    }
+  }, [elements, editingElement, updateElement]);
 
   useEffect(() => {
     if (editingElement && inputRef.current) {
