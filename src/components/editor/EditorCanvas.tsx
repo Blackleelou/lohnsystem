@@ -11,15 +11,15 @@ type Props = {
   height: number;
 };
 
-export default function EditorCanvas({ width, height }: Props) {
-  // Auf dem Server nichts rendern
+export default function EditorCanvas({ width, height }: Props): JSX.Element | null {
+  // 🚫 SSR-Guard: Auf dem Server nichts rendern
   if (typeof window === "undefined") {
     return null;
   }
 
   const { elements, updateElement } = useEditorStore();
   const [editingId, setEditingId] = useState<string | null>(null);
-  const [editText, setEditText] = useState("");
+  const [editText, setEditText] = useState<string>("");
   const inputRef = useRef<HTMLInputElement>(null);
   const transformerRef = useRef<any>(null);
   const selectedShapeRef = useRef<any>(null);
@@ -30,7 +30,7 @@ export default function EditorCanvas({ width, height }: Props) {
   // Client-Side Skalierung
   const scale = Math.min(1, window.innerWidth / (width + 40));
 
-  // Auto-Edit für neues, leeres Textelement
+  // 🆕 Auto-Edit für neues, leeres Textelement
   useEffect(() => {
     if (!editingElement) {
       const newTextEl = elements.find((el) => el.type === "text" && el.text === "");
@@ -42,7 +42,7 @@ export default function EditorCanvas({ width, height }: Props) {
     }
   }, [elements, editingElement, updateElement]);
 
-  // Position und Styling des Input-Feldes
+  // Position & Style für das Input-Feld
   useEffect(() => {
     if (editingElement && inputRef.current) {
       const input = inputRef.current;
@@ -56,7 +56,7 @@ export default function EditorCanvas({ width, height }: Props) {
     }
   }, [editingElement, scale]);
 
-  // Transformer an selektiertes Shape binden
+  // Transformer auf das selektierte Shape anwenden
   useEffect(() => {
     if (transformerRef.current && selectedShapeRef.current) {
       transformerRef.current.nodes([selectedShapeRef.current]);
@@ -65,9 +65,9 @@ export default function EditorCanvas({ width, height }: Props) {
   }, [selectedElement]);
 
   const handleSelect = (id: string) => {
-    elements.forEach((el) =>
-      updateElement(el.id, { selected: el.id === id })
-    );
+    elements.forEach((el) => {
+      updateElement(el.id, { selected: el.id === id });
+    });
   };
 
   const handleEditStart = (elId: string, currentText: string) => {
@@ -168,7 +168,7 @@ export default function EditorCanvas({ width, height }: Props) {
   );
 }
 
-// URLImage bleibt unverändert
+// URLImage-Komponente
 function URLImage({
   id,
   src,
