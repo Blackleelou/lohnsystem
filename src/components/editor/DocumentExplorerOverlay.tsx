@@ -20,14 +20,23 @@ export default function DocumentExplorerOverlay({ isOpen, onClose, onSelect }: P
   const [search, setSearch] = useState("");
   const [filter, setFilter] = useState<"ALL" | "PRIVATE" | "TEAM" | "SHARED" | "PUBLIC">("ALL");
 
+  // 🔁 Immer neu laden wenn geöffnet
   useEffect(() => {
     if (!isOpen) return;
-    fetch("/api/editor/list")
-      .then(res => res.json())
-      .then(data => {
+
+    const loadDocuments = async () => {
+      try {
+        const res = await fetch("/api/editor/list");
+        const data = await res.json();
         setDocuments(data.documents || []);
-      });
-  }, [isOpen]);
+      } catch (error) {
+        console.error("Fehler beim Laden der Dokumente:", error);
+        setDocuments([]);
+      }
+    };
+
+    loadDocuments();
+  }, [isOpen]); // ← wichtig: trigger jedes Mal bei Öffnung
 
   const filtered = documents
     .filter(doc =>
@@ -82,9 +91,11 @@ export default function DocumentExplorerOverlay({ isOpen, onClose, onSelect }: P
           </div>
 
           {/* 📄 Liste */}
-          <div className="divide-y border-t">
+          <div className="divide-y border-t max-h-[300px] overflow-y-auto">
             {filtered.length === 0 && (
-              <div className="text-sm text-gray-400 py-4 text-center">Keine passenden Dokumente gefunden.</div>
+              <div className="text-sm text-gray-400 py-4 text-center">
+                Keine passenden Dokumente gefunden.
+              </div>
             )}
             {filtered.map((doc) => (
               <div
