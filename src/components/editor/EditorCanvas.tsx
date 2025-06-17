@@ -12,6 +12,11 @@ type Props = {
 };
 
 export default function EditorCanvas({ width, height }: Props) {
+  // ✋ Auf SSR einfach nichts rendern
+  if (typeof window === "undefined") {
+    return null;
+  }
+
   const { elements, updateElement } = useEditorStore();
   const [editingId, setEditingId] = useState<string | null>(null);
   const [editText, setEditText] = useState("");
@@ -22,21 +27,22 @@ export default function EditorCanvas({ width, height }: Props) {
   const editingElement = elements.find((el) => el.id === editingId);
   const selectedElement = elements.find((el) => el.selected);
 
-  // automatische Skalierung
+  // Client-Side Skalierung
   const scale = Math.min(1, window.innerWidth / (width + 40));
 
-  // 🆕 Neu eingefügtes, leeres Textelement auto‐editieren
+  // 🆕 Auto-Edit für neues, leeres Textelement (läuft nur einmal)
   useEffect(() => {
     if (!editingElement) {
       const newTextEl = elements.find((el) => el.type === "text" && el.text === "");
       if (newTextEl) {
         updateElement(newTextEl.id, { selected: true });
         setEditingId(newTextEl.id);
-        // setEditText("");
+        setEditText("");
       }
     }
   }, [elements, editingElement, updateElement]);
 
+  // Position und Style für das Input-Feld
   useEffect(() => {
     if (editingElement && inputRef.current) {
       const input = inputRef.current;
@@ -50,6 +56,7 @@ export default function EditorCanvas({ width, height }: Props) {
     }
   }, [editingElement, scale]);
 
+  // Transformer an das selektierte Shape hängen
   useEffect(() => {
     if (transformerRef.current && selectedShapeRef.current) {
       transformerRef.current.nodes([selectedShapeRef.current]);
@@ -58,9 +65,9 @@ export default function EditorCanvas({ width, height }: Props) {
   }, [selectedElement]);
 
   const handleSelect = (id: string) => {
-    elements.forEach((el) => {
-      updateElement(el.id, { selected: el.id === id });
-    });
+    elements.forEach((el) =>
+      updateElement(el.id, { selected: el.id === id })
+    );
   };
 
   const handleEditStart = (elId: string, currentText: string) => {
@@ -131,7 +138,7 @@ export default function EditorCanvas({ width, height }: Props) {
         </Stage>
       </div>
 
-      {/* Editierbares Textfeld mit Platzhalter */}
+      {/* Editierbares Textfeld */}
       {editingElement && (
         <input
           ref={inputRef}
@@ -153,10 +160,9 @@ export default function EditorCanvas({ width, height }: Props) {
         />
       )}
     </div>
-  );
 }
 
-// Vollständige URLImage-Komponente mit return
+// Vollständige URLImage-Komponente
 function URLImage({
   id,
   src,
