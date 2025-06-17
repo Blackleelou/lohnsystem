@@ -1,95 +1,46 @@
 // src/components/editor/toolbar/ToolbarGroupText.tsx
 
-import { useEditorStore } from "../useEditorStore";
+import { useEditorFormatStore } from "../useEditorFormat";
 
 export default function ToolbarGroupText() {
-  const { elements, updateElement } = useEditorStore();
-  const selected = elements.find(el => el.selected);
-
-  if (!selected) return null;
+  const fontFamily    = useEditorFormatStore((s) => s.fontFamily);
+  const setFontFamily = useEditorFormatStore((s) => s.setFontFamily);
+  const fontSize      = useEditorFormatStore((s) => s.fontSize);
+  const setFontSize   = useEditorFormatStore((s) => s.setFontSize);
+  const fontColor     = useEditorFormatStore((s) => s.fontColor);
+  const setFontColor  = useEditorFormatStore((s) => s.setFontColor);
 
   return (
-    <div className="flex items-center gap-2 flex-wrap">
-      <span className="text-sm font-semibold text-gray-600">Text:</span>
-
-      {/* Schriftart */}
-<select
-  className="border rounded px-1 py-0.5 text-sm"
-  value={selected.fontFamily || "Arial"}
-  onChange={(e) =>
-    updateElement(selected.id, { fontFamily: e.target.value })
-  }
->
-  {["Arial", "Georgia", "Times New Roman", "Verdana", "Courier New", "Tahoma"].map((font) => (
-    <option key={font} value={font}>
-      {font}
-    </option>
-  ))}
-</select>
-      
-      {/* Schriftgröße */}
+    <div className="flex items-center gap-2">
       <select
-        className="border rounded px-1 py-0.5 text-sm"
-        value={selected.fontSize || 18}
-        onChange={(e) =>
-          updateElement(selected.id, { fontSize: parseInt(e.target.value) })
-        }
+        value={fontFamily}
+        onChange={(e) => setFontFamily(e.target.value)}
+        className="text-sm px-2 py-1 border rounded hover:border-gray-400"
       >
-        {[12, 14, 16, 18, 20, 24, 28, 32, 40, 48].map((size) => (
-          <option key={size} value={size}>
-            {size}px
+        <option value="Arial">Arial</option>
+        <option value="Times New Roman">Times New Roman</option>
+        <option value="Calibri">Calibri</option>
+        <option value="Verdana">Verdana</option>
+      </select>
+
+      <select
+        value={fontSize}
+        onChange={(e) => setFontSize(Number(e.target.value))}
+        className="text-sm px-2 py-1 border rounded hover:border-gray-400"
+      >
+        {[8,10,12,14,16,18,24,32].map((s) => (
+          <option key={s} value={s}>
+            {s} pt
           </option>
         ))}
       </select>
 
-      {/* Farbe */}
       <input
         type="color"
-        value={selected.fill || "#000000"}
-        onChange={(e) => updateElement(selected.id, { fill: e.target.value })}
-        className="w-8 h-6"
+        value={fontColor}
+        onChange={(e) => setFontColor(e.target.value)}
+        className="w-8 h-8 p-0 border rounded"
       />
-
-      {/* Fett */}
-      <button
-        className={`px-2 py-1 border rounded text-sm font-bold ${
-          selected.fontWeight === "bold" ? "bg-gray-200" : ""
-        }`}
-        onClick={() =>
-          updateElement(selected.id, {
-            fontWeight: selected.fontWeight === "bold" ? "normal" : "bold",
-          })
-        }
-      >
-        B
-      </button>
-
-      {/* Kursiv */}
-      <button
-        className={`px-2 py-1 border rounded text-sm italic ${
-          selected.fontStyle === "italic" ? "bg-gray-200" : ""
-        }`}
-        onClick={() =>
-          updateElement(selected.id, {
-            fontStyle: selected.fontStyle === "italic" ? "normal" : "italic",
-          })
-        }
-      >
-        I
-      </button>
-
-      {/* Ausrichtung */}
-      <select
-        className="border rounded px-1 py-0.5 text-sm"
-        value={selected.align || "left"}
-        onChange={(e) =>
-          updateElement(selected.id, { align: e.target.value as any })
-        }
-      >
-        <option value="left">Links</option>
-        <option value="center">Zentriert</option>
-        <option value="right">Rechts</option>
-      </select>
     </div>
   );
 }
