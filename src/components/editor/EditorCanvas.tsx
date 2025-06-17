@@ -12,7 +12,7 @@ type Props = {
 };
 
 export default function EditorCanvas({ width, height }: Props) {
-  // ✋ Auf SSR einfach nichts rendern
+  // Auf dem Server nichts rendern
   if (typeof window === "undefined") {
     return null;
   }
@@ -30,7 +30,7 @@ export default function EditorCanvas({ width, height }: Props) {
   // Client-Side Skalierung
   const scale = Math.min(1, window.innerWidth / (width + 40));
 
-  // 🆕 Auto-Edit für neues, leeres Textelement (läuft nur einmal)
+  // Auto-Edit für neues, leeres Textelement
   useEffect(() => {
     if (!editingElement) {
       const newTextEl = elements.find((el) => el.type === "text" && el.text === "");
@@ -42,7 +42,7 @@ export default function EditorCanvas({ width, height }: Props) {
     }
   }, [elements, editingElement, updateElement]);
 
-  // Position und Style für das Input-Feld
+  // Position und Styling des Input-Feldes
   useEffect(() => {
     if (editingElement && inputRef.current) {
       const input = inputRef.current;
@@ -56,7 +56,7 @@ export default function EditorCanvas({ width, height }: Props) {
     }
   }, [editingElement, scale]);
 
-  // Transformer an das selektierte Shape hängen
+  // Transformer an selektiertes Shape binden
   useEffect(() => {
     if (transformerRef.current && selectedShapeRef.current) {
       transformerRef.current.nodes([selectedShapeRef.current]);
@@ -90,49 +90,54 @@ export default function EditorCanvas({ width, height }: Props) {
       >
         <Stage width={width} height={height}>
           <Layer clip={{ x: 0, y: 0, width, height }}>
-            {elements.map((el) =>
-              el.type === "text" ? (
-                <Text
-                  key={el.id}
-                  x={el.x}
-                  y={el.y}
-                  text={el.text}
-                  fontSize={el.fontSize || 18}
-                  fontFamily={el.fontFamily || "Arial"}
-                  fontStyle={el.fontStyle || "normal"}
-                  fontWeight={el.fontWeight || "normal"}
-                  fill={el.fill || "#000000"}
-                  align={el.align || "left"}
-                  draggable
-                  ref={el.selected ? selectedShapeRef : undefined}
-                  onClick={() => handleSelect(el.id)}
-                  onDblClick={() => {
-                    handleSelect(el.id);
-                    handleEditStart(el.id, el.text || "");
-                  }}
-                  onTap={() => {
-                    handleSelect(el.id);
-                    handleEditStart(el.id, el.text || "");
-                  }}
-                  onDragEnd={(e) =>
-                    updateElement(el.id, {
-                      x: e.target.x(),
-                      y: e.target.y(),
-                    })
-                  }
-                />
-              ) : el.type === "image" ? (
-                <URLImage
-                  key={el.id}
-                  id={el.id}
-                  src={el.src}
-                  x={el.x}
-                  y={el.y}
-                  width={el.width}
-                  height={el.height}
-                />
-              ) : null
-            )}
+            {elements.map((el) => {
+              if (el.type === "text") {
+                return (
+                  <Text
+                    key={el.id}
+                    x={el.x}
+                    y={el.y}
+                    text={el.text}
+                    fontSize={el.fontSize || 18}
+                    fontFamily={el.fontFamily || "Arial"}
+                    fontStyle={el.fontStyle || "normal"}
+                    fontWeight={el.fontWeight || "normal"}
+                    fill={el.fill || "#000000"}
+                    align={el.align || "left"}
+                    draggable
+                    ref={el.selected ? selectedShapeRef : undefined}
+                    onClick={() => handleSelect(el.id)}
+                    onDblClick={() => {
+                      handleSelect(el.id);
+                      handleEditStart(el.id, el.text || "");
+                    }}
+                    onTap={() => {
+                      handleSelect(el.id);
+                      handleEditStart(el.id, el.text || "");
+                    }}
+                    onDragEnd={(e) =>
+                      updateElement(el.id, {
+                        x: e.target.x(),
+                        y: e.target.y(),
+                      })
+                    }
+                  />
+                );
+              } else if (el.type === "image") {
+                return (
+                  <URLImage
+                    key={el.id}
+                    id={el.id}
+                    src={el.src}
+                    x={el.x}
+                    y={el.y}
+                    width={el.width}
+                    height={el.height}
+                  />
+                );
+              }
+              return null;
+            })}
             <Transformer ref={transformerRef} />
           </Layer>
         </Stage>
@@ -160,9 +165,10 @@ export default function EditorCanvas({ width, height }: Props) {
         />
       )}
     </div>
+  );
 }
 
-// Vollständige URLImage-Komponente
+// URLImage bleibt unverändert
 function URLImage({
   id,
   src,
