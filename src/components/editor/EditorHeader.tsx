@@ -3,7 +3,6 @@
 import { useState } from "react";
 import { useRouter } from "next/router";
 import {
-  HiOutlineSave,
   HiOutlineFolderOpen,
   HiOutlinePrinter,
   HiOutlineRefresh,
@@ -25,32 +24,16 @@ export default function EditorHeader() {
   const format = useEditorFormatStore((s) => s.format);
   const setFormat = useEditorFormatStore((s) => s.setFormat);
 
-  // 1) Speichern (Overwrite)
-  const handleSave = async () => {
-    try {
-      const res = await fetch("/api/editor/save", {
-        method: "POST",
-        headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ title: "Dokument", content: elements, format }),
-      });
-      const data = await res.json();
-      if (!res.ok) throw new Error(data.error || "Fehler beim Speichern");
-      console.log("Gespeichert:", data.document);
-    } catch (err: any) {
-      console.error(err);
-    }
-  };
-
-  // 2) Öffnen (Explorer-Overlay), jetzt passend: onSelect(docId: string)
+  // 1) Öffnen (Explorer-Overlay)
   const handleSelect = (docId: string) => {
     setOpen(false);
     router.push(`/editor?id=${docId}`);
   };
 
-  // 3) Drucken
+  // 2) Drucken
   const handlePrint = () => window.print();
 
-  // 4) Reset
+  // 3) Reset
   const handleReset = () => {
     localStorage.removeItem("editor-format");
     setFormat("a4");
@@ -62,14 +45,6 @@ export default function EditorHeader() {
     <div className="sticky top-0 z-30 w-full bg-white border-b shadow-sm px-4 py-2 flex flex-wrap items-center gap-4">
       {/* — Datei-Aktionen */}
       <div className="flex items-center gap-2">
-        <button
-          onClick={handleSave}
-          title="Speichern"
-          className="p-2 hover:bg-gray-100 rounded"
-        >
-          <HiOutlineSave size={20} />
-        </button>
-
         <button
           onClick={() => setOpen(true)}
           title="Öffnen"
@@ -95,7 +70,7 @@ export default function EditorHeader() {
         onClose={() => setOpen(false)}
         onSelect={handleSelect}
       />
-      
+
       {/* — Format-Auswahl (A4/A5/A6) */}
       <ToolbarGroupFormat />
 
