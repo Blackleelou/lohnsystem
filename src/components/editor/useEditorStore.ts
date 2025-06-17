@@ -33,22 +33,9 @@ type State = {
 export const useEditorStore = create<State>()(
   persist(
     (set, get) => ({
-      elements: [
-        {
-          id: "1",
-          type: "text",
-          text: "Hier kannst du Texte bearbeiten",
-          x: 50,
-          y: 60,
-          fontSize: 18,
-          fontFamily: "Arial",
-          fontStyle: "normal",
-          fontWeight: "normal",
-          fill: "#000000",
-          align: "left",
-          selected: false,
-        },
-      ],
+      // ✏️ jetzt komplett leer
+      elements: [],
+
       addElement: (el) => set({ elements: [...get().elements, el] }),
       updateElement: (id, newProps) =>
         set({
@@ -56,6 +43,7 @@ export const useEditorStore = create<State>()(
             el.id === id ? { ...el, ...newProps } : el
           ),
         }),
+
       addText: () =>
         set({
           elements: [
@@ -63,7 +51,8 @@ export const useEditorStore = create<State>()(
             {
               id: (get().elements.length + 1).toString(),
               type: "text",
-              text: "Neuer Text",
+              // ✏️ leerer Start-Text
+              text: "",
               x: 100,
               y: 100,
               fontSize: 18,
@@ -76,15 +65,14 @@ export const useEditorStore = create<State>()(
             },
           ],
         }),
+
       clearElements: () => set({ elements: [] }),
       setElements: (elements) => set({ elements }),
     }),
     {
-      name: "editor-elements",            // key im localStorage
-      getStorage: () => localStorage,     // use localStorage
-      partialize: (state) => ({            // nur dieses Teil speichern
-        elements: state.elements,
-      }),
+      name: "editor-elements",
+      getStorage: () => localStorage,
+      partialize: (state) => ({ elements: state.elements }),
     }
   )
 );
