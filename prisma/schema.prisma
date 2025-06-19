@@ -243,11 +243,11 @@ enum Visibility {
 
 model SalaryCategory {
   id              String   @id @default(cuid())
-  companyId       String?               // null = Solo-Modus
+  companyId       String?
   name            String
   description     String?
   inputType       String                // "amount" | "percent" | "fixed" | "formula"
-  calculationMode String?
+  calculationMode String?               // "perHour" | "percentOfBase" | "formula" | "fixed"
   formula         String?
   defaultValue    Float?
   userSelectable  Boolean @default(true)
@@ -312,11 +312,12 @@ model ShiftTypeDefinition {
   companyId    String?
   name         String
   code         String?
-  startTime    String              // Uhrzeit als Text: "07:00"
+  startTime    String
   endTime      String
   nightStart   String?
   nightEnd     String?
   nightBonus   Float?
+  pauseIsPaid  Boolean @default(false) // 🆕 Pause bezahlt oder nicht?
   contextTag   String?
   createdAt    DateTime @default(now())
 
@@ -332,6 +333,7 @@ model ShiftEntry {
   date           DateTime
   start          DateTime
   end            DateTime
+  pauseMinutes   Int      @default(0)   // 🆕 Nutzer kann Pauzedauer angeben
   manualOverride Boolean @default(false)
   comment        String?
   createdAt      DateTime @default(now())
