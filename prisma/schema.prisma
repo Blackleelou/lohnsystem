@@ -240,3 +240,103 @@ enum Visibility {
   SHARED    // explizit freigegeben
   PUBLIC    // pulic halt
 }
+
+model SalaryCategory {
+  id              String   @id @default(cuid())
+  companyId       String?               // null = Solo-Modus
+  name            String
+  description     String?
+  inputType       String                // "amount" | "percent" | "fixed" | "formula"
+  calculationMode String?
+  formula         String?
+  defaultValue    Float?
+  userSelectable  Boolean @default(true)
+  required        Boolean @default(false)
+  hidden          Boolean @default(false)
+  multiContext    Boolean @default(false)
+  validFrom       DateTime
+  validTo         DateTime?
+  createdAt       DateTime @default(now())
+
+  company         Company? @relation(fields: [companyId], references: [id])
+  entries         UserSalaryEntry[]
+  shiftTypes      SalaryCategoryShiftType[]
+}
+
+model SalaryCategoryShiftType {
+  id          String   @id @default(cuid())
+  categoryId  String
+  companyId   String?
+  shiftType   String
+  contextTag  String?
+
+  category    SalaryCategory @relation(fields: [categoryId], references: [id])
+  company     Company?       @relation(fields: [companyId], references: [id])
+
+  @@unique([categoryId, shiftType])
+}
+
+model UserSalaryEntry {
+  id          String   @id @default(cuid())
+  userId      String
+  companyId   String?
+  categoryId  String
+  amount      Float
+  validFrom   DateTime
+  validTo     DateTime?
+  note        String?
+  createdAt   DateTime @default(now())
+
+  user        User     @relation(fields: [userId], references: [id])
+  company     Company? @relation(fields: [companyId], references: [id])
+  category    SalaryCategory @relation(fields: [categoryId], references: [id])
+
+  @@index([userId, companyId, categoryId, validFrom])
+}
+
+model WeeklyWorkingTime {
+  id            String   @id @default(cuid())
+  userId        String
+  companyId     String?
+  hoursPerWeek  Float
+  validFrom     DateTime
+  validTo       DateTime?
+  createdAt     DateTime @default(now())
+
+  user          User     @relation(fields: [userId], references: [id])
+  company       Company? @relation(fields: [companyId], references: [id])
+}
+
+model ShiftTypeDefinition {
+  id           String   @id @default(cuid())
+  companyId    String?
+  name         String
+  code         String?
+  startTime    String              // Uhrzeit als Text: "07:00"
+  endTime      String
+  nightStart   String?
+  nightEnd     String?
+  nightBonus   Float?
+  contextTag   String?
+  createdAt    DateTime @default(now())
+
+  company      Company? @relation(fields: [companyId], references: [id])
+  shifts       ShiftEntry[]
+}
+
+model ShiftEntry {
+  id             String   @id @default(cuid())
+  userId         String
+  companyId      String?
+  shiftTypeId    String
+  date           DateTime
+  start          DateTime
+  end            DateTime
+  manualOverride Boolean @default(false)
+  comment        String?
+  createdAt      DateTime @default(now())
+
+  user           User     @relation(fields: [userId], references: [id])
+  company        Company? @relation(fields: [companyId], references: [id])
+  shiftType      ShiftTypeDefinition @relation(fields: [shiftTypeId], references: [id])
+}
