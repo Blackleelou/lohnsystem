@@ -1,14 +1,11 @@
-// src/components/editor/EditorCanvasWrapper.tsx
-
 import { useEffect } from "react";
 import { useRouter } from "next/router";
 import EditorCanvas from "./EditorCanvas";
 import EditorHeader from "./EditorHeader";
-import { useCanvasSize } from "./useCanvasSize";
 import { useEditorFormatStore } from "./useEditorFormat";
 import { useEditorStore } from "./useEditorStore";
 
-// 🧠 Dokument von API laden (jetzt mit GET statt POST!)
+// 📦 Dokument laden
 async function loadEditorDocument(id: string, isShared = false) {
   const res = await fetch(`/api/editor/load?id=${id}&shared=${isShared}`, {
     method: "GET",
@@ -21,14 +18,11 @@ async function loadEditorDocument(id: string, isShared = false) {
 }
 
 export default function EditorCanvasWrapper() {
-  const { width, height } = useCanvasSize();
   const format = useEditorFormatStore((s) => s.format);
   const setFormat = useEditorFormatStore((s) => s.setFormat);
-  const clearElements = useEditorStore((s) => s.clearElements);
   const setElements = useEditorStore((s) => s.setElements);
   const router = useRouter();
 
-  // 📦 Laden bei URL ?id=...
   useEffect(() => {
     const docId = router.query.id as string | undefined;
     const isShared = router.query.shared === "true";
@@ -51,31 +45,30 @@ export default function EditorCanvasWrapper() {
     }
   }, [router.query.id, setFormat, setElements]);
 
-  // 🧠 Format aus localStorage laden
-  useEffect(() => {
-    const saved = localStorage.getItem("editor-format");
-    if (saved === "a4" || saved === "a5" || saved === "a6") {
-      setFormat(saved);
-    }
-  }, [setFormat]);
-
-  // 💾 Format im localStorage speichern
   useEffect(() => {
     localStorage.setItem("editor-format", format);
   }, [format]);
 
+  // 🧮 Exakte Größen (96 dpi → px)
+  const sizes = {
+    a4: { width: 794, height: 1123 },
+    a5: { width: 561, height: 794 },
+    a6: { width: 398, height: 561 },
+  };
+
+  const { width, height } = sizes[format as keyof typeof sizes] || sizes.a4;
+
   return (
     <div className="flex flex-col items-center min-h-screen bg-gray-50 overflow-hidden">
-      {/* 🔝 Moderne Toolbar mit Dropdown-Auswahl */}
       <EditorHeader />
 
-      {/* 🖼 Zeichenfläche */}
-      <div className="w-full flex justify-center px-2 py-6 overflow-auto">
+      {/* 👁️ Sichtbare Bearbeitungsfläche */}
+      <div className="editor-visible w-full flex justify-center px-2 py-6 overflow-auto">
         <div
           className="border border-gray-300 rounded shadow bg-white"
           style={{
-            width: `${width}px`,
-            height: `${height}px`,
+            width,
+            height,
             transform: `scale(${Math.min(1, window.innerWidth / (width + 40))})`,
             transformOrigin: "top center",
           }}
@@ -83,6 +76,44 @@ export default function EditorCanvasWrapper() {
           <EditorCanvas width={width} height={height} />
         </div>
       </div>
+
+      {/* 🖨️ Unsichtbarer Druckbereich */}
+      {format === "a4" && (
+        <div id="print-area" className="hidden print:block">
+          <EditorCanvas width={794} height={1123} />
+        </div>
+      )}
+
+      {format === "a5" && (
+        <div id="print-area" className="print-a5-double hidden print:flex print:flex-col">
+          {[1, 2].map((i) => (
+            <div
+              key={i}
+              style={{
+                width: 561,
+                height: 794,
+                transform: "rotate(90deg)",
+                transformOrigin: "top left",
+              }}
+            >
+              <EditorCanvas width={561} height={794} />
+            </div>
+          ))}
+        </div>
+      )}
+
+      {format === "a6" && (
+        <div
+          id="print-area"
+          className="print-a6-quad hidden print:grid print:grid-cols-2 print:grid-rows-2"
+        >
+          {[1, 2, 3, 4].map((_, i) => (
+            <div key={i} style={{ width: 398, height: 561 }}>
+              <EditorCanvas width={398} height={561} />
+            </div>
+          ))}
+        </div>
+      )}
     </div>
   );
 }

@@ -99,3 +99,86 @@
     @apply text-gray-400;
   }
 }
+@media screen {
+  /* Unsichtbar im Editor – nur beim Druck sichtbar */
+  #print-area {
+    display: none !important;
+  }
+}
+
+@media screen {
+  #print-area {
+    display: none !important;
+  }
+}
+
+@media screen {
+  #print-area {
+    display: none !important;
+  }
+}
+
+@media print {
+  .editor-visible {
+    display: none !important;
+  }
+
+  body * {
+    visibility: hidden !important;
+  }
+
+  #print-area,
+  #print-area * {
+    visibility: visible !important;
+  }
+
+  #print-area {
+    position: absolute;
+    left: 0;
+    top: 0;
+    width: 210mm;
+    height: 297mm;
+    padding: 0;
+    margin: 0;
+    z-index: 9999;
+    background: white;
+    box-shadow: none !important;
+    border: none !important;
+    overflow: hidden;
+  }
+
+  @media print {
+  #print-area.print-a5-double {
+    flex-direction: column !important; /* Falls Rotation Layout bricht */
+    align-items: flex-start;
+  }
+
+  #print-area.print-a5-double > div {
+    transform: rotate(90deg);
+    transform-origin: top left;
+    margin-bottom: 0;
+  }
+}
+
+
+  #print-area.print-a6-quad {
+    display: grid !important;
+    grid-template-columns: 1fr 1fr;
+    grid-template-rows: 1fr 1fr;
+    gap: 0;
+  }
+
+  #print-area canvas {
+    width: 100% !important;
+    height: 100% !important;
+  }
+
+  #print-area input,
+  #print-area button,
+  #print-area .transformer,
+  #print-area .debug-ui,
+  #print-area .rotate-handle {
+    display: none !important;
+  }
+}
+

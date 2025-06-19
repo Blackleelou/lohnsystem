@@ -1,7 +1,7 @@
 // src/components/editor/useEditorFormat.ts
 
 import { create } from "zustand";
-import { persist } from "zustand/middleware";
+import { persist, createJSONStorage } from "zustand/middleware";
 
 type EditorFormat = "a4" | "a5" | "a6" | "letter";
 
@@ -30,9 +30,9 @@ export const useEditorFormatStore = create<EditorFormatStore>()(
       setFontColor: (fontColor) => set({ fontColor }),
     }),
     {
-      name: "editor-format",             // key im localStorage
-      getStorage: () => localStorage,
-      partialize: (state) => ({           // nur diese Felder speichern
+      name: "editor-format", // key im localStorage
+      storage: createJSONStorage(() => localStorage), // ✅ neue empfohlene Methode
+      partialize: (state) => ({
         format: state.format,
         fontFamily: state.fontFamily,
         fontSize: state.fontSize,

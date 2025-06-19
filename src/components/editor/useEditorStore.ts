@@ -1,7 +1,7 @@
 // src/components/editor/useEditorStore.ts
 
 import { create } from "zustand";
-import { persist } from "zustand/middleware";
+import { persist, createJSONStorage } from "zustand/middleware";   // ⬅️ neu
 
 export type EditorElement = {
   id: string;
@@ -49,7 +49,7 @@ export const useEditorStore = create<State>()(
           elements: [
             ...get().elements,
             {
-              id: (get().elements.length + 1).toString(),
+              id: crypto.randomUUID(),
               type: "text",
               // ✏️ leerer Start-Text
               text: "",
@@ -71,7 +71,7 @@ export const useEditorStore = create<State>()(
     }),
     {
       name: "editor-elements",
-      getStorage: () => localStorage,
+      storage: createJSONStorage(() => localStorage),// ✅ neu
       partialize: (state) => ({ elements: state.elements }),
     }
   )

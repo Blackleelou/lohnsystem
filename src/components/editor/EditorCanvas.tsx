@@ -7,16 +7,15 @@ import {
 } from "react-konva";
 import { useEditorStore } from "./useEditorStore";
 import { useEffect, useRef, useState } from "react";
-import EditorToolbar from "./EditorToolbar";
 import useImage from "use-image";
 
+// 🧠 Props für Zeichenfläche
 type Props = {
   width: number;
   height: number;
 };
 
 export default function EditorCanvas({ width, height }: Props) {
-  /* ───────── lokaler & Store-State ───────── */
   const { elements, updateElement } = useEditorStore();
   const [editingId, setEditingId] = useState<string | null>(null);
   const [editText, setEditText] = useState("");
@@ -24,31 +23,32 @@ export default function EditorCanvas({ width, height }: Props) {
   const inputRef = useRef<HTMLInputElement>(null);
   const transformerRef = useRef<any>(null);
   const selectedShapeRef = useRef<any>(null);
+  const autoHandledIds = useRef<Set<string>>(new Set());
 
   const editingElement = elements.find((el) => el.id === editingId);
   const selectedElement = elements.find((el) => el.selected);
-
-  /* ───────── Canvas skalieren ───────── */
   const scale = Math.min(1, window.innerWidth / (width + 40));
 
-  /* ───────── Auto-Edit für leeres Textelement ───────── */
-  const autoOpened = useRef(false);
-
+  // ✅ Leeres Textelement automatisch auswählen
   useEffect(() => {
-    if (!autoOpened.current) {
-      const empty = elements.find(
-        (el) => el.type === "text" && (el.text ?? "") === ""
+    const empty = elements.find(
+      (el) =>
+        el.type === "text" &&
+        (el.text ?? "") === "" &&
+        !autoHandledIds.current.has(el.id)
+    );
+
+    if (empty) {
+      elements.forEach((el) =>
+        updateElement(el.id, { selected: el.id === empty.id })
       );
-      if (empty) {
-        updateElement(empty.id, { selected: true });
-        setEditingId(empty.id);
-        setEditText("");
-        autoOpened.current = true; // verhindert weitere Durchläufe
-      }
+      setEditingId(empty.id);
+      setEditText("");
+      autoHandledIds.current.add(empty.id);
     }
   }, [elements, updateElement]);
 
-  /* ───────── Input-Feld über Canvas positionieren ───────── */
+  // ✅ Positionierung des Text-Inputs
   useEffect(() => {
     if (editingElement && inputRef.current) {
       const input = inputRef.current;
@@ -62,7 +62,7 @@ export default function EditorCanvas({ width, height }: Props) {
     }
   }, [editingElement, scale]);
 
-  /* ───────── Transformer an selektiertes Element binden ───────── */
+  // ✅ Transformer mit selektiertem Element verbinden
   useEffect(() => {
     if (transformerRef.current && selectedShapeRef.current) {
       transformerRef.current.nodes([selectedShapeRef.current]);
@@ -70,7 +70,17 @@ export default function EditorCanvas({ width, height }: Props) {
     }
   }, [selectedElement]);
 
-  /* ───────── Hilfs-Handler ───────── */
+  // ✅ Transformer und Textfeld vor dem Drucken deaktivieren
+  useEffect(() => {
+    const handleBeforePrint = () => {
+      setEditingId(null); // Textfeld schließen
+      transformerRef.current?.nodes([]); // Transformer deaktivieren
+    };
+
+    window.addEventListener("beforeprint", handleBeforePrint);
+    return () => window.removeEventListener("beforeprint", handleBeforePrint);
+  }, []);
+
   const handleSelect = (id: string) => {
     elements.forEach((el) => updateElement(el.id, { selected: el.id === id }));
   };
@@ -80,12 +90,8 @@ export default function EditorCanvas({ width, height }: Props) {
     setEditText(currentText);
   };
 
-  /* ───────── JSX ───────── */
   return (
     <div className="relative border border-gray-300 rounded shadow bg-white flex justify-center">
-      {selectedElement && <EditorToolbar />}
-
-      {/* skaliertes Canvas */}
       <div
         style={{
           transform: `scale(${scale})`,
@@ -144,7 +150,6 @@ export default function EditorCanvas({ width, height }: Props) {
         </Stage>
       </div>
 
-      {/* Input-Feld für Textediting */}
       {editingElement && (
         <input
           ref={inputRef}
@@ -169,7 +174,6 @@ export default function EditorCanvas({ width, height }: Props) {
   );
 }
 
-/* ───────── Bild-Komponente ───────── */
 function URLImage({
   id,
   src,

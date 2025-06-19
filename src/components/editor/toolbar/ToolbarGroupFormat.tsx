@@ -13,9 +13,14 @@ export default function EditorToolbarFormat() {
       <button
         onClick={() => setOpen(!open)}
         className="flex items-center gap-2 px-3 py-1 border rounded border-gray-300 bg-white hover:bg-gray-100"
+        aria-label="Format auswählen"
       >
-        <span className="text-gray-800 font-medium">Format: {format.toUpperCase()}</span>
-        <span className="text-gray-500">▼</span>
+        <span className="text-gray-800 font-medium" aria-hidden="true">
+          Format: {format.toUpperCase()}
+        </span>
+        <span className="text-gray-500" aria-hidden="true">
+          ▼
+        </span>
       </button>
 
       {open && (
@@ -28,7 +33,9 @@ export default function EditorToolbarFormat() {
                 setOpen(false);
               }}
               className={`w-full text-left px-3 py-1 hover:bg-gray-100 ${
-                format === opt ? "bg-blue-50 text-blue-600 font-semibold" : "text-gray-800"
+                format === opt
+                  ? "bg-blue-50 text-blue-600 font-semibold"
+                  : "text-gray-800"
               }`}
             >
               {opt.toUpperCase()}
