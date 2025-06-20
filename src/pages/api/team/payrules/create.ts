@@ -11,7 +11,7 @@ export default async function handler(req: NextApiRequest, res: NextApiResponse)
     return res.status(401).json({ error: 'Nicht eingeloggt oder keine Firma zugeordnet' });
   }
 
-  const { title, rate, type } = req.body;
+  const { title, rate, type, group } = req.body;
 
   // Titel prüfen
   if (!title || typeof title !== 'string' || title.trim().length < 2) {
@@ -38,10 +38,11 @@ export default async function handler(req: NextApiRequest, res: NextApiResponse)
         title: title.trim(),
         rate: parsedRate,
         type,
+        group: group?.trim() || null, // ✅ optionales Gruppenfeld
       },
     });
 
-    return res.status(200).json(payrule); // Frontend erwartet direkt das Objekt
+    return res.status(200).json(payrule);
   } catch (error) {
     console.error('Fehler beim Speichern der Lohnregel:', error);
     return res.status(500).json({ error: 'Interner Serverfehler' });
