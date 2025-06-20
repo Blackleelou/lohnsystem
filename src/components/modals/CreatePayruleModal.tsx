@@ -14,6 +14,12 @@ export interface PayRule {
   ruleKind: 'PAY' | 'BONUS' | 'SPECIAL';
   percent?: number | null;
   fixedAmount?: number | null;
+  onlyDecember?: boolean;
+  onlyAdmins?: boolean;
+  oncePerYear?: boolean;
+  referenceType?: 'BASE_SALARY' | 'ACTUAL_HOURS' | 'FIXED_AMOUNT';
+  validFrom?: string | null;
+  validUntil?: string | null;
 }
 
 interface Props {
@@ -29,6 +35,12 @@ export default function CreatePayruleModal({ onClose, onCreate }: Props) {
   const [ruleKind, setRuleKind] = useState<'PAY' | 'BONUS' | 'SPECIAL'>('PAY');
   const [percent, setPercent] = useState('');
   const [fixedAmount, setFixedAmount] = useState('');
+  const [onlyDecember, setOnlyDecember] = useState(false);
+  const [onlyAdmins, setOnlyAdmins] = useState(false);
+  const [oncePerYear, setOncePerYear] = useState(false);
+  const [referenceType, setReferenceType] = useState<'BASE_SALARY' | 'ACTUAL_HOURS' | 'FIXED_AMOUNT'>('FIXED_AMOUNT');
+  const [validFrom, setValidFrom] = useState('');
+  const [validUntil, setValidUntil] = useState('');
   const [saving, setSaving] = useState(false);
 
   const handleSave = async () => {
@@ -69,6 +81,12 @@ export default function CreatePayruleModal({ onClose, onCreate }: Props) {
           ruleKind,
           percent: ruleKind === 'BONUS' ? parsedPercent : null,
           fixedAmount: ruleKind === 'SPECIAL' ? parsedFixed : null,
+          onlyDecember: ruleKind === 'SPECIAL' ? onlyDecember : undefined,
+          onlyAdmins: ruleKind === 'SPECIAL' ? onlyAdmins : undefined,
+          oncePerYear: ruleKind === 'SPECIAL' ? oncePerYear : undefined,
+          referenceType: ruleKind === 'SPECIAL' ? referenceType : undefined,
+          validFrom: ruleKind === 'SPECIAL' ? validFrom || null : undefined,
+          validUntil: ruleKind === 'SPECIAL' ? validUntil || null : undefined,
         }),
       });
 
@@ -88,7 +106,7 @@ export default function CreatePayruleModal({ onClose, onCreate }: Props) {
       <Dialog.Panel className="bg-white dark:bg-gray-900 rounded-lg shadow-lg w-full max-w-md p-6">
         <Dialog.Title className="text-lg font-bold mb-4">Neue Lohneinstellung</Dialog.Title>
 
-        {/* Art der Regel */}
+        {/* Regeltyp */}
         <div className="mb-4">
           <label className="block mb-1 text-sm font-medium">Regeltyp</label>
           <select
@@ -109,7 +127,6 @@ export default function CreatePayruleModal({ onClose, onCreate }: Props) {
             value={title}
             onChange={(e) => setTitle(e.target.value)}
             className="w-full rounded border px-3 py-2 text-sm dark:bg-gray-800"
-            placeholder="z. B. Nachtschicht"
           />
         </div>
 
@@ -121,11 +138,10 @@ export default function CreatePayruleModal({ onClose, onCreate }: Props) {
             value={group}
             onChange={(e) => setGroup(e.target.value)}
             className="w-full rounded border px-3 py-2 text-sm dark:bg-gray-800"
-            placeholder="z. B. E1 oder Zuschläge"
           />
         </div>
 
-        {/* Dynamische Felder */}
+        {/* PAY Felder */}
         {ruleKind === 'PAY' && (
           <>
             <div className="mb-4">
@@ -153,7 +169,6 @@ export default function CreatePayruleModal({ onClose, onCreate }: Props) {
                 </label>
               </div>
             </div>
-
             <div className="mb-6">
               <label className="block mb-1 text-sm font-medium">
                 {type === 'HOURLY' ? 'Stundensatz (€)' : 'Monatsgehalt (€)'}
@@ -163,12 +178,12 @@ export default function CreatePayruleModal({ onClose, onCreate }: Props) {
                 value={rate}
                 onChange={(e) => setRate(e.target.value)}
                 className="w-full rounded border px-3 py-2 text-sm dark:bg-gray-800"
-                placeholder={type === 'HOURLY' ? 'z. B. 17,50' : 'z. B. 2800'}
               />
             </div>
           </>
         )}
 
+        {/* BONUS Feld */}
         {ruleKind === 'BONUS' && (
           <div className="mb-6">
             <label className="block mb-1 text-sm font-medium">Zuschlag (%)</label>
@@ -177,22 +192,86 @@ export default function CreatePayruleModal({ onClose, onCreate }: Props) {
               value={percent}
               onChange={(e) => setPercent(e.target.value)}
               className="w-full rounded border px-3 py-2 text-sm dark:bg-gray-800"
-              placeholder="z. B. 25"
             />
           </div>
         )}
 
+        {/* SPECIAL Felder */}
         {ruleKind === 'SPECIAL' && (
-          <div className="mb-6">
-            <label className="block mb-1 text-sm font-medium">Festbetrag (€)</label>
-            <input
-              type="text"
-              value={fixedAmount}
-              onChange={(e) => setFixedAmount(e.target.value)}
-              className="w-full rounded border px-3 py-2 text-sm dark:bg-gray-800"
-              placeholder="z. B. 300"
-            />
-          </div>
+          <>
+            <div className="mb-4">
+              <label className="block mb-1 text-sm font-medium">Festbetrag (€)</label>
+              <input
+                type="text"
+                value={fixedAmount}
+                onChange={(e) => setFixedAmount(e.target.value)}
+                className="w-full rounded border px-3 py-2 text-sm dark:bg-gray-800"
+              />
+            </div>
+
+            <div className="mb-4">
+              <label className="block mb-1 text-sm font-medium">Bezug</label>
+              <select
+                value={referenceType}
+                onChange={(e) =>
+                  setReferenceType(e.target.value as any)
+                }
+                className="w-full rounded border px-3 py-2 text-sm dark:bg-gray-800"
+              >
+                <option value="BASE_SALARY">Grundgehalt</option>
+                <option value="ACTUAL_HOURS">Tatsächliche Stunden</option>
+                <option value="FIXED_AMOUNT">Fester Betrag</option>
+              </select>
+            </div>
+
+            <div className="mb-4 flex flex-col gap-2">
+              <label className="block text-sm font-medium">Gültigkeitszeitraum</label>
+              <div className="flex gap-2">
+                <input
+                  type="date"
+                  value={validFrom}
+                  onChange={(e) => setValidFrom(e.target.value)}
+                  className="flex-1 rounded border px-3 py-2 text-sm dark:bg-gray-800"
+                  placeholder="Von"
+                />
+                <input
+                  type="date"
+                  value={validUntil}
+                  onChange={(e) => setValidUntil(e.target.value)}
+                  className="flex-1 rounded border px-3 py-2 text-sm dark:bg-gray-800"
+                  placeholder="Bis"
+                />
+              </div>
+            </div>
+
+            <div className="mb-6 flex flex-col gap-2">
+              <label className="block text-sm font-medium">Optionen</label>
+              <label className="flex items-center gap-2">
+                <input
+                  type="checkbox"
+                  checked={onlyDecember}
+                  onChange={() => setOnlyDecember(!onlyDecember)}
+                />
+                Nur im Dezember auszahlen
+              </label>
+              <label className="flex items-center gap-2">
+                <input
+                  type="checkbox"
+                  checked={onlyAdmins}
+                  onChange={() => setOnlyAdmins(!onlyAdmins)}
+                />
+                Nur für Admins sichtbar
+              </label>
+              <label className="flex items-center gap-2">
+                <input
+                  type="checkbox"
+                  checked={oncePerYear}
+                  onChange={() => setOncePerYear(!oncePerYear)}
+                />
+                Max. 1× pro Jahr
+              </label>
+            </div>
+          </>
         )}
 
         {/* Aktionen */}
