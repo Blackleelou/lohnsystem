@@ -158,6 +158,7 @@ model PayRule {
   title     String
   rate      Float
   type      PayRuleType @default(HOURLY)
+  group      String?
   createdAt DateTime    @default(now())
 
   @@index([companyId])
