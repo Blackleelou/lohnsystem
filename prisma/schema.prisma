@@ -148,19 +148,23 @@ model CompanySettings {
 }
 
 model PayRule {
-  id          String       @id @default(cuid())
-  companyId   String
-  company     Company      @relation("CompanyPayRules", fields: [companyId], references: [id])
-  title       String
-  rate        Float        @default(0) // Nur für PAY verwendet
-  type        PayRuleType  @default(HOURLY) // Nur bei PAY relevant
-  ruleKind    RuleKind     @default(PAY) // PAY | BONUS | SPECIAL
-  percent     Float?       // Für BONUS: z. B. 25 (%)
-  fixedAmount Float?       // Für SPECIAL: z. B. 300 €
-  group       String?
-  createdAt   DateTime     @default(now())
-
-  @@index([companyId])
+  id             String   @id @default(cuid())
+  companyId      String
+  company        Company  @relation(fields: [companyId], references: [id])
+  title          String
+  group          String? 
+  ruleKind       RuleKind
+  type           PayRuleType?
+  rate           Float?
+  percent        Float?
+  fixedAmount    Float?
+  validFrom      DateTime?   
+  validUntil     DateTime?   
+  onlyDecember   Boolean?    
+  onlyForAdmins  Boolean?    
+  perYear        Boolean?    
+  referenceType  ReferenceType? 
+  createdAt      DateTime  @default(now())
 }
 
 enum RuleKind {
@@ -172,6 +176,12 @@ enum RuleKind {
 enum PayRuleType {
   HOURLY
   MONTHLY
+}
+
+enum ReferenceType {
+  BASE_SALARY
+  ACTUAL_HOURS
+  FIXED_AMOUNT
 }
 
 model SpecialPaymentRule {
