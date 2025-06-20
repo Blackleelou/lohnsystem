@@ -5,6 +5,7 @@ import toast from 'react-hot-toast';
 import { useRouter } from 'next/router';
 import EditPayruleModal from '@/components/modals/EditPayruleModal';
 import CreatePayruleModal from '@/components/modals/CreatePayruleModal';
+import { Info, Plus } from 'lucide-react';
 
 export type PayRule = {
   id: string;
@@ -14,6 +15,17 @@ export type PayRule = {
   group?: string;
   createdAt: string;
 };
+
+function Tooltip({ children }: { children: React.ReactNode }) {
+  return (
+    <span className="group relative cursor-pointer text-gray-400">
+      <Info className="w-4 h-4" />
+      <span className="absolute z-50 hidden group-hover:block bg-white border rounded px-3 py-2 text-xs text-gray-700 shadow-lg w-64 top-6 left-1/2 -translate-x-1/2">
+        {children}
+      </span>
+    </span>
+  );
+}
 
 export default function PayrulesPage() {
   const { data: session, status } = useSession();
@@ -89,13 +101,15 @@ export default function PayrulesPage() {
       <div className="max-w-6xl mx-auto mt-10 px-4">
         {/* Titel + Info */}
         <div className="flex items-center justify-between mb-2">
-          <h1 className="text-2xl font-bold">Lohneinstellungen</h1>
-          <button
-            onClick={() => setShowInfo(!showInfo)}
-            className="text-blue-600 hover:underline text-sm"
-          >
-            ❓
-          </button>
+          <h1 className="text-2xl font-bold flex items-center gap-2">
+            Lohneinstellungen
+            <span onClick={() => setShowInfo(!showInfo)} className="cursor-pointer">
+              <Tooltip>
+                In den Lohneinstellungen kannst du individuelle Stunden- oder Monatslöhne,<br />
+                Zuschläge und Gruppen festlegen. Klicke auf „+“, um neue Regeln hinzuzufügen.
+              </Tooltip>
+            </span>
+          </h1>
         </div>
 
         {showInfo && (
@@ -114,9 +128,12 @@ export default function PayrulesPage() {
         <div className="flex flex-wrap items-center gap-3 mb-6">
           <button
             onClick={() => setShowCreateModal(true)}
-            className="bg-blue-600 text-white px-4 py-2 rounded hover:bg-blue-700 text-sm"
+            className="group relative text-blue-600 hover:text-blue-800 transition"
           >
-            ➕ Neue Lohneinstellung
+            <Plus className="w-5 h-5" />
+            <span className="absolute z-50 hidden group-hover:block bg-white border rounded px-3 py-2 text-xs text-gray-700 shadow-lg top-6 left-1/2 -translate-x-1/2 whitespace-nowrap">
+              Neue Lohneinstellung erstellen
+            </span>
           </button>
 
           {groups.map((group) => (
