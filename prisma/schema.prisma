@@ -120,7 +120,7 @@ model Company {
   users                 User[]
   invitations           Invitation[]
   accessCodes           AccessCode[]
-  payRules              PayRule[]                 @relation("CompanyPayRules")
+  payRules              PayRule[]                 @relation("CompanyToPayRules")
   settings              CompanySettings?
   shifts                Shift[]
   salaryCategories      SalaryCategory[]
@@ -150,7 +150,7 @@ model CompanySettings {
 model PayRule {
   id             String   @id @default(cuid())
   companyId      String
-  company        Company  @relation(fields: [companyId], references: [id])
+  company        Company  @relation("CompanyToPayRules", fields: [companyId], references: [id])
   title          String
   group          String? 
   ruleKind       RuleKind
