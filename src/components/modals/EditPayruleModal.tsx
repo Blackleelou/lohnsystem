@@ -7,6 +7,7 @@ export type PayRule = {
   title: string;
   rate: number;
   type: 'HOURLY' | 'MONTHLY';
+  group?: string;
   createdAt: string;
 };
 
@@ -20,6 +21,7 @@ export default function EditPayruleModal({ rule, onClose, onSave }: Props) {
   const [title, setTitle] = useState('');
   const [rate, setRate] = useState('');
   const [type, setType] = useState<'HOURLY' | 'MONTHLY'>('HOURLY');
+  const [group, setGroup] = useState('');
   const [saving, setSaving] = useState(false);
 
   useEffect(() => {
@@ -27,6 +29,7 @@ export default function EditPayruleModal({ rule, onClose, onSave }: Props) {
       setTitle(rule.title);
       setRate(rule.rate.toString().replace('.', ','));
       setType(rule.type);
+      setGroup(rule.group || '');
     }
   }, [rule]);
 
@@ -48,6 +51,7 @@ export default function EditPayruleModal({ rule, onClose, onSave }: Props) {
           title: title.trim(),
           rate: parsedRate,
           type,
+          group: group.trim() || null, // ✅ Gruppe mitsenden
         }),
       });
 
@@ -66,7 +70,7 @@ export default function EditPayruleModal({ rule, onClose, onSave }: Props) {
   return (
     <Dialog open onClose={onClose} className="fixed inset-0 z-50 flex items-center justify-center bg-black/30">
       <Dialog.Panel className="bg-white dark:bg-gray-800 rounded-lg p-6 w-full max-w-md shadow-xl">
-        <Dialog.Title className="text-lg font-bold mb-4">Lohnregel bearbeiten</Dialog.Title>
+        <Dialog.Title className="text-lg font-bold mb-4">Lohneinstellung bearbeiten</Dialog.Title>
 
         <div className="space-y-4">
           <div>
@@ -97,6 +101,16 @@ export default function EditPayruleModal({ rule, onClose, onSave }: Props) {
               <option value="HOURLY">Stundenlohn</option>
               <option value="MONTHLY">Monatsgehalt</option>
             </select>
+          </div>
+
+          <div>
+            <label className="block mb-1 text-sm">Gruppe (optional)</label>
+            <input
+              className="w-full px-3 py-2 border rounded text-sm dark:bg-gray-900"
+              value={group}
+              onChange={e => setGroup(e.target.value)}
+              placeholder="z. B. E1 oder Zuschläge"
+            />
           </div>
 
           <div className="flex justify-end gap-2 pt-2">
