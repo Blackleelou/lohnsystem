@@ -1,3 +1,5 @@
+// src/pages/api/team/payrules/create.ts
+
 import type { NextApiRequest, NextApiResponse } from 'next';
 import { getServerSession } from 'next-auth';
 import { authOptions } from '@/lib/authOptions';
@@ -11,7 +13,21 @@ export default async function handler(req: NextApiRequest, res: NextApiResponse)
     return res.status(401).json({ error: 'Nicht eingeloggt oder keine Firma zugeordnet' });
   }
 
-  const { title, rate, type, group, ruleKind, percent, fixedAmount } = req.body;
+  const {
+    title,
+    rate,
+    type,
+    group,
+    ruleKind,
+    percent,
+    fixedAmount,
+    onlyDecember,
+    onlyAdmins,
+    oncePerYear,
+    referenceType,
+    validFrom,
+    validUntil,
+  } = req.body;
 
   // Titel prüfen
   if (!title || typeof title !== 'string' || title.trim().length < 2) {
@@ -23,7 +39,7 @@ export default async function handler(req: NextApiRequest, res: NextApiResponse)
     return res.status(400).json({ error: 'Ungültiger Regeltyp' });
   }
 
-  // Betrag prüfen je nach Regeltyp
+  // Beträge parsen je nach Regeltyp
   let parsedRate: number | null = null;
   let parsedPercent: number | null = null;
   let parsedFixed: number | null = null;
@@ -63,6 +79,12 @@ export default async function handler(req: NextApiRequest, res: NextApiResponse)
         rate: parsedRate,
         percent: parsedPercent,
         fixedAmount: parsedFixed,
+        onlyDecember: ruleKind === 'SPECIAL' ? onlyDecember ?? false : undefined,
+        onlyAdmins: ruleKind === 'SPECIAL' ? onlyAdmins ?? false : undefined,
+        oncePerYear: ruleKind === 'SPECIAL' ? oncePerYear ?? false : undefined,
+        referenceType: ruleKind === 'SPECIAL' ? referenceType ?? 'FIXED_AMOUNT' : undefined,
+        validFrom: ruleKind === 'SPECIAL' && validFrom ? new Date(validFrom) : undefined,
+        validUntil: ruleKind === 'SPECIAL' && validUntil ? new Date(validUntil) : undefined,
       },
     });
 
