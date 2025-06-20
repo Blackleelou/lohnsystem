@@ -1,3 +1,5 @@
+// src/pages/api/team/payrules/update.ts
+
 import { NextApiRequest, NextApiResponse } from 'next';
 import { getServerSession } from 'next-auth';
 import { authOptions } from '@/lib/authOptions';
@@ -11,21 +13,59 @@ export default async function handler(req: NextApiRequest, res: NextApiResponse)
   if (!session?.user?.companyId)
     return res.status(401).json({ error: 'Nicht autorisiert' });
 
-  // --- Body validieren -----------------------------
-  const { id, title, rate, type, group } = req.body;
+  const {
+    id,
+    title,
+    rate,
+    type,
+    group,
+    ruleKind,
+    percent,
+    fixedAmount,
+    onlyDecember,
+    onlyAdmins,
+    oncePerYear,
+    referenceType,
+    validFrom,
+    validUntil,
+  } = req.body;
 
-  const parsedRate = typeof rate === 'string'
-    ? parseFloat(rate.replace(',', '.'))
-    : rate;
-
-  if (!id || !title || isNaN(parsedRate)) {
-    return res.status(400).json({ error: 'Ungültige Eingabedaten' });
+  // Validierung
+  if (!id || typeof title !== 'string' || title.trim().length < 2) {
+    return res.status(400).json({ error: 'Ungültiger Titel oder ID' });
   }
 
-  if (type !== 'HOURLY' && type !== 'MONTHLY') {
-    return res.status(400).json({ error: 'Ungültiger Lohntyp' });
+  if (!['PAY', 'BONUS', 'SPECIAL'].includes(ruleKind)) {
+    return res.status(400).json({ error: 'Ungültiger Regeltyp' });
   }
-  // -------------------------------------------------
+
+  let parsedRate: number | null = null;
+  let parsedPercent: number | null = null;
+  let parsedFixed: number | null = null;
+
+  if (ruleKind === 'PAY') {
+    if (type !== 'HOURLY' && type !== 'MONTHLY') {
+      return res.status(400).json({ error: 'Ungültiger Lohntyp' });
+    }
+    parsedRate = parseFloat(typeof rate === 'string' ? rate.replace(',', '.') : rate);
+    if (isNaN(parsedRate) || parsedRate <= 0) {
+      return res.status(400).json({ error: 'Ungültiger Betrag' });
+    }
+  }
+
+  if (ruleKind === 'BONUS') {
+    parsedPercent = parseFloat(typeof percent === 'string' ? percent.replace(',', '.') : percent);
+    if (isNaN(parsedPercent) || parsedPercent <= 0) {
+      return res.status(400).json({ error: 'Ungültiger Prozentwert' });
+    }
+  }
+
+  if (ruleKind === 'SPECIAL') {
+    parsedFixed = parseFloat(typeof fixedAmount === 'string' ? fixedAmount.replace(',', '.') : fixedAmount);
+    if (isNaN(parsedFixed) || parsedFixed <= 0) {
+      return res.status(400).json({ error: 'Ungültiger Festbetrag' });
+    }
+  }
 
   try {
     const payrule = await prisma.payRule.findUnique({ where: { id } });
@@ -38,9 +78,18 @@ export default async function handler(req: NextApiRequest, res: NextApiResponse)
       where: { id },
       data: {
         title: title.trim(),
+        group: group?.trim() || null,
+        ruleKind,
+        type: ruleKind === 'PAY' ? type : null,
         rate: parsedRate,
-        type,
-        group: group?.trim() || null, // ✅ Gruppe mit aktualisieren
+        percent: parsedPercent,
+        fixedAmount: parsedFixed,
+        onlyDecember: ruleKind === 'SPECIAL' ? onlyDecember ?? false : undefined,
+        onlyAdmins: ruleKind === 'SPECIAL' ? onlyAdmins ?? false : undefined,
+        oncePerYear: ruleKind === 'SPECIAL' ? oncePerYear ?? false : undefined,
+        referenceType: ruleKind === 'SPECIAL' ? referenceType ?? 'FIXED_AMOUNT' : undefined,
+        validFrom: ruleKind === 'SPECIAL' && validFrom ? new Date(validFrom) : undefined,
+        validUntil: ruleKind === 'SPECIAL' && validUntil ? new Date(validUntil) : undefined,
       },
     });
 
