@@ -10,59 +10,55 @@ async function loadEditorDocument(id: string, isShared = false) {
   const res = await fetch(`/api/editor/load?id=${id}&shared=${isShared}`, {
     method: "GET",
   });
-
   if (!res.ok) throw new Error("Fehler beim Laden");
-
-  const data = await res.json();
-  return data.document;
+  return (await res.json()).document;
 }
 
+/**
+ * Wrapper zeigt Editor‑Canvas (interaktiv) und denselben Canvas im #print-area.
+ * Für die Druckansicht wird `printMode` an EditorCanvas übergeben, damit
+ * keine UI‑Elemente (Input, Transformer) gerendert werden und autoScale = 1 bleibt.
+ * Wir drucken in 96 dpi, um lange Renderzeiten zu vermeiden.
+ */
 export default function EditorCanvasWrapper() {
-  const format = useEditorFormatStore((s) => s.format);
-  const setFormat = useEditorFormatStore((s) => s.setFormat);
+  /* ------------------------- Stores / Router ------------------------- */
+  const format      = useEditorFormatStore((s) => s.format);
+  const setFormat   = useEditorFormatStore((s) => s.setFormat);
   const setElements = useEditorStore((s) => s.setElements);
-  const router = useRouter();
+  const router      = useRouter();
 
+  /* ---------------------- Dokument bei Load --------------------------- */
   useEffect(() => {
-    const docId = router.query.id as string | undefined;
+    const docId    = router.query.id as string | undefined;
     const isShared = router.query.shared === "true";
+    if (!docId) return;
 
-    if (docId) {
-      loadEditorDocument(docId, isShared)
-        .then((doc) => {
-          if (doc.format) {
-            const lowerFormat = doc.format.toLowerCase();
-            setFormat(lowerFormat);
-            localStorage.setItem("editor-format", lowerFormat);
-          }
-          if (doc.content) {
-            setElements(doc.content);
-          }
-        })
-        .catch((err) => {
-          console.error("Ladefehler", err);
-        });
-    }
+    loadEditorDocument(docId, isShared)
+      .then((doc) => {
+        if (doc.format) {
+          const lower = doc.format.toLowerCase();
+          setFormat(lower);
+          localStorage.setItem("editor-format", lower);
+        }
+        if (doc.content) setElements(doc.content);
+      })
+      .catch((err) => console.error("Ladefehler", err));
   }, [router.query.id, setFormat, setElements]);
 
-  useEffect(() => {
-    localStorage.setItem("editor-format", format);
-  }, [format]);
-
-  // 🧮 Exakte Größen (96 dpi → px)
+  /* -------------------------- Maße 96 dpi ----------------------------- */
   const sizes = {
     a4: { width: 794, height: 1123 },
-    a5: { width: 561, height: 794 },
-    a6: { width: 398, height: 561 },
-  };
-
+    a5: { width: 561, height: 794  },
+    a6: { width: 398, height: 561  },
+  } as const;
   const { width, height } = sizes[format as keyof typeof sizes] || sizes.a4;
 
+  /* ----------------------------- JSX --------------------------------- */
   return (
     <div className="flex flex-col items-center min-h-screen bg-gray-50 overflow-hidden">
       <EditorHeader />
 
-      {/* 👁️ Sichtbare Bearbeitungsfläche */}
+      {/* 👁️ Editor‑Canvas (interaktiv) */}
       <div className="editor-visible w-full flex justify-center px-2 py-6 overflow-auto">
         <div
           className="border border-gray-300 rounded shadow bg-white"
@@ -77,10 +73,10 @@ export default function EditorCanvasWrapper() {
         </div>
       </div>
 
-      {/* 🖨️ Unsichtbarer Druckbereich */}
+      {/* 🖨️ Print‑Canvas (statisch, keine UI) */}
       {format === "a4" && (
-        <div id="print-area" className="hidden print:block">
-          <EditorCanvas width={794} height={1123} />
+        <div id="print-area" className="print-a4 hidden print:block">
+          <EditorCanvas width={width} height={height} printMode />
         </div>
       )}
 
@@ -90,26 +86,23 @@ export default function EditorCanvasWrapper() {
             <div
               key={i}
               style={{
-                width: 561,
-                height: 794,
+                width,
+                height,
                 transform: "rotate(90deg)",
                 transformOrigin: "top left",
               }}
             >
-              <EditorCanvas width={561} height={794} />
+              <EditorCanvas width={width} height={height} printMode />
             </div>
           ))}
         </div>
       )}
 
       {format === "a6" && (
-        <div
-          id="print-area"
-          className="print-a6-quad hidden print:grid print:grid-cols-2 print:grid-rows-2"
-        >
+        <div id="print-area" className="print-a6-quad hidden print:grid print:grid-cols-2 print:grid-rows-2">
           {[1, 2, 3, 4].map((_, i) => (
-            <div key={i} style={{ width: 398, height: 561 }}>
-              <EditorCanvas width={398} height={561} />
+            <div key={i} style={{ width, height }}>
+              <EditorCanvas width={width} height={height} printMode />
             </div>
           ))}
         </div>

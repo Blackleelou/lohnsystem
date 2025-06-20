@@ -15,16 +15,28 @@ beforeAll(async () => {
   server = http.createServer((req, res) => handle(req, res));
 
   // 0 ⇒ Node wählt freien Port; Supertest greift direkt auf server-Objekt zu
-  await new Promise<void>((res) => server!.listen(0, res));
+  await new Promise<void>((res, rej) => {
+    server!.listen(0, (err) => {
+      if (err) return rej(err);
+      res();
+    });
+  });
 }, 120_000);                                 // Build/Boot kann dauern
 
-/** Nach allen Tests: sauber herunterfahren – nur wenn gestarted */
+/** Nach allen Tests: sauber herunterfahren – nur wenn gestartet */
 afterAll(async () => {
   if (server) {
-    await new Promise<void>((res) => server.close(() => res()));
+    await new Promise<void>((res, rej) => {
+      server!.close((err) => {
+        if (err) return rej(err);
+        res();
+      });
+    });
+    server = undefined;
   }
   if (app) {
     await app.close();
+    app = undefined;
   }
 });
 
@@ -35,7 +47,6 @@ test('GET / liefert 200 (nach Redirect)', async () => {
     .redirects(5);           // folgt bis 5 Weiterleitungen
   expect(res.status).toBe(200);
 });
-
 
 /** 2) Auth-Status-Endpoint antwortet */
 test('GET /api/auth/status liefert 200', async () => {
