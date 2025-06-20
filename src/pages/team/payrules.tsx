@@ -1,3 +1,4 @@
+// src/pages/team/payrules.tsx
 import { useEffect, useState } from 'react';
 import TeamLayout from '@/components/team/TeamLayout';
 import { useSession } from 'next-auth/react';
@@ -5,7 +6,7 @@ import toast from 'react-hot-toast';
 import { useRouter } from 'next/router';
 import EditPayruleModal from '@/components/modals/EditPayruleModal';
 import CreatePayruleModal from '@/components/modals/CreatePayruleModal';
-import { Info, Plus } from 'lucide-react';
+import { Info, Plus, Pencil, Trash2 } from 'lucide-react';
 
 export type PayRule = {
   id: string;
@@ -34,7 +35,6 @@ export default function PayrulesPage() {
   const [payrules, setPayrules] = useState<PayRule[]>([]);
   const [editingRule, setEditingRule] = useState<PayRule | null>(null);
   const [showCreateModal, setShowCreateModal] = useState(false);
-  const [showInfo, setShowInfo] = useState(false);
   const [selectedGroup, setSelectedGroup] = useState<string | null>(null);
 
   useEffect(() => {
@@ -100,42 +100,26 @@ export default function PayrulesPage() {
     <TeamLayout>
       <div className="max-w-6xl mx-auto mt-10 px-4">
         {/* Titel + Info */}
-        <div className="flex items-center justify-between mb-2">
+        <div className="flex items-center justify-between mb-6">
           <h1 className="text-2xl font-bold flex items-center gap-2">
             Lohneinstellungen
-            <span onClick={() => setShowInfo(!showInfo)} className="cursor-pointer">
-              <Tooltip>
-                In den Lohneinstellungen kannst du individuelle Stunden- oder Monatslöhne,<br />
-                Zuschläge und Gruppen festlegen. Klicke auf „+“, um neue Regeln hinzuzufügen.
-              </Tooltip>
-            </span>
+            <Tooltip>
+              Hier kannst du Lohnarten (Stunde oder Monat), Zuschläge, Feiertagszuschläge
+              und weitere Besonderheiten deiner Firma festlegen.
+            </Tooltip>
           </h1>
-        </div>
 
-        {showInfo && (
-          <div className="bg-blue-50 border border-blue-200 p-4 rounded text-sm mb-4">
-            In den Lohneinstellungen kannst du:
-            <ul className="list-disc list-inside mt-2">
-              <li>Stunden- oder Monatslöhne anlegen</li>
-              <li>Zuschläge wie Nacht- oder Feiertagszuschläge definieren</li>
-              <li>Firmenspezifische Besonderheiten erfassen</li>
-              <li>Einträge in Gruppen sortieren – z. B. „E1“, „Zuschläge“ usw.</li>
-            </ul>
-          </div>
-        )}
-
-        {/* Plus + Gruppen */}
-        <div className="flex flex-wrap items-center gap-3 mb-6">
           <button
             onClick={() => setShowCreateModal(true)}
-            className="group relative text-blue-600 hover:text-blue-800 transition"
+            className="text-blue-600 hover:text-blue-800"
+            title="Neue Lohneinstellung"
           >
-            <Plus className="w-5 h-5" />
-            <span className="absolute z-50 hidden group-hover:block bg-white border rounded px-3 py-2 text-xs text-gray-700 shadow-lg top-6 left-1/2 -translate-x-1/2 whitespace-nowrap">
-              Neue Lohneinstellung erstellen
-            </span>
+            <Plus className="w-6 h-6" />
           </button>
+        </div>
 
+        {/* Gruppenleiste */}
+        <div className="flex flex-wrap items-center gap-3 mb-6">
           {groups.map((group) => (
             <button
               key={group}
@@ -167,8 +151,6 @@ export default function PayrulesPage() {
                 <th className="p-2">Bezeichnung</th>
                 <th className="p-2">Typ</th>
                 <th className="p-2">Satz</th>
-                <th className="p-2">Gruppe</th>
-                <th className="p-2">Erstellt am</th>
                 <th className="p-2">Aktionen</th>
               </tr>
             </thead>
@@ -183,23 +165,13 @@ export default function PayrulesPage() {
                   <tr key={rule.id} className="border-t hover:bg-gray-50 dark:hover:bg-gray-700">
                     <td className="p-2">{rule.title}</td>
                     <td className="p-2">{rule.type === 'HOURLY' ? 'Stunde' : 'Monat'}</td>
-                    <td className="p-2">
-                      {rule.rate.toFixed(2).replace('.', ',')} €
-                    </td>
-                    <td className="p-2">{rule.group || '–'}</td>
-                    <td className="p-2">{new Date(rule.createdAt).toLocaleDateString()}</td>
-                    <td className="p-2 flex gap-4">
-                      <button
-                        onClick={() => setEditingRule(rule)}
-                        className="text-blue-600 hover:underline"
-                      >
-                        Bearbeiten
+                    <td className="p-2">{rule.rate.toFixed(2).replace('.', ',')} €</td>
+                    <td className="p-2 flex gap-3">
+                      <button onClick={() => setEditingRule(rule)} title="Bearbeiten">
+                        <Pencil className="w-4 h-4 text-blue-600 hover:text-blue-800" />
                       </button>
-                      <button
-                        onClick={() => handleDelete(rule.id)}
-                        className="text-red-600 hover:underline"
-                      >
-                        Löschen
+                      <button onClick={() => handleDelete(rule.id)} title="Löschen">
+                        <Trash2 className="w-4 h-4 text-red-600 hover:text-red-800" />
                       </button>
                     </td>
                   </tr>
