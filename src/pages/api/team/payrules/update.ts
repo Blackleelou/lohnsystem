@@ -12,7 +12,7 @@ export default async function handler(req: NextApiRequest, res: NextApiResponse)
     return res.status(401).json({ error: 'Nicht autorisiert' });
 
   // --- Body validieren -----------------------------
-  const { id, title, rate, type } = req.body;
+  const { id, title, rate, type, group } = req.body;
 
   const parsedRate = typeof rate === 'string'
     ? parseFloat(rate.replace(',', '.'))
@@ -40,10 +40,11 @@ export default async function handler(req: NextApiRequest, res: NextApiResponse)
         title: title.trim(),
         rate: parsedRate,
         type,
+        group: group?.trim() || null, // ✅ Gruppe mit aktualisieren
       },
     });
 
-    return res.status(200).json(updated);   // ⬅ Frontend erhält fertiges Objekt
+    return res.status(200).json(updated);
   } catch (err) {
     console.error('Fehler beim Update der Lohnregel:', err);
     return res.status(500).json({ error: 'Speichern fehlgeschlagen' });
