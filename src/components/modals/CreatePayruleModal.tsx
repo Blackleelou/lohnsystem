@@ -7,6 +7,7 @@ export interface PayRule {
   title: string;
   rate: number;
   type: 'HOURLY' | 'MONTHLY';
+  group?: string;
   createdAt: string;
 }
 
@@ -19,6 +20,7 @@ export default function CreatePayruleModal({ onClose, onCreate }: Props) {
   const [title, setTitle] = useState('');
   const [rate, setRate] = useState('');
   const [type, setType] = useState<'HOURLY' | 'MONTHLY'>('HOURLY');
+  const [group, setGroup] = useState('');
   const [saving, setSaving] = useState(false);
 
   const handleSave = async () => {
@@ -37,12 +39,13 @@ export default function CreatePayruleModal({ onClose, onCreate }: Props) {
           title: title.trim(),
           rate: parsedRate,
           type,
+          group: group.trim() || null, // leere Gruppe als null senden
         }),
       });
 
       if (!res.ok) throw new Error();
       const data = await res.json();
-      onCreate(data); // ← weil das gesamte Objekt schon die Lohnregel ist
+      onCreate(data);
       onClose();
     } catch {
       toast.error('Erstellen fehlgeschlagen', { position: 'top-center' });
@@ -54,8 +57,9 @@ export default function CreatePayruleModal({ onClose, onCreate }: Props) {
   return (
     <Dialog open onClose={onClose} className="fixed inset-0 z-50 flex items-center justify-center bg-black/30">
       <Dialog.Panel className="bg-white dark:bg-gray-900 rounded-lg shadow-lg w-full max-w-md p-6">
-        <Dialog.Title className="text-lg font-bold mb-4">Neue Lohnregel</Dialog.Title>
+        <Dialog.Title className="text-lg font-bold mb-4">Neue Lohneinstellung</Dialog.Title>
 
+        {/* Bezeichnung */}
         <div className="mb-4">
           <label className="block mb-1 text-sm font-medium">Bezeichnung</label>
           <input
@@ -67,6 +71,19 @@ export default function CreatePayruleModal({ onClose, onCreate }: Props) {
           />
         </div>
 
+        {/* Gruppe */}
+        <div className="mb-4">
+          <label className="block mb-1 text-sm font-medium">Gruppe (optional)</label>
+          <input
+            type="text"
+            value={group}
+            onChange={(e) => setGroup(e.target.value)}
+            className="w-full rounded border px-3 py-2 text-sm dark:bg-gray-800"
+            placeholder="z. B. E1 oder Zuschläge"
+          />
+        </div>
+
+        {/* Typ */}
         <div className="mb-4">
           <label className="block mb-1 text-sm font-medium">Typ</label>
           <div className="flex gap-4">
@@ -93,6 +110,7 @@ export default function CreatePayruleModal({ onClose, onCreate }: Props) {
           </div>
         </div>
 
+        {/* Betrag */}
         <div className="mb-6">
           <label className="block mb-1 text-sm font-medium">
             {type === 'HOURLY' ? 'Stundensatz (€)' : 'Monatsgehalt (€)'}
@@ -106,6 +124,7 @@ export default function CreatePayruleModal({ onClose, onCreate }: Props) {
           />
         </div>
 
+        {/* Aktionen */}
         <div className="flex justify-end gap-2">
           <button
             onClick={onClose}
