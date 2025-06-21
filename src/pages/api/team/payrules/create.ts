@@ -7,6 +7,7 @@ import { prisma } from '@/lib/prisma'
 export default async function handler(req: NextApiRequest, res: NextApiResponse) {
   if (req.method !== 'POST') return res.status(405).end()
 
+  /* ---------- Auth ---------- */
   const session = await getServerSession(req, res, authOptions)
   if (!session?.user?.companyId)
     return res.status(401).json({ error: 'Nicht eingeloggt oder keine Firma zugeordnet' })
@@ -21,9 +22,8 @@ export default async function handler(req: NextApiRequest, res: NextApiResponse)
     percent,
     fixedAmount,
     onlyDecember,
-    onlyForAdmins,   // ◀︎ statt onlyAdmins
-    oncePerYear,     // ◀︎ statt perYear
-    referenceType,
+    onlyForAdmins,   // ◀︎ neu
+    oncePerYear,
     validFrom,
     validUntil,
   } = req.body
@@ -31,6 +31,7 @@ export default async function handler(req: NextApiRequest, res: NextApiResponse)
   /* ---------- Validation ---------- */
   if (!title || typeof title !== 'string' || title.trim().length < 2)
     return res.status(400).json({ error: 'Ungültiger Titel' })
+
   if (!['PAY', 'BONUS', 'SPECIAL'].includes(ruleKind))
     return res.status(400).json({ error: 'Ungültiger Regeltyp' })
 
@@ -63,26 +64,25 @@ export default async function handler(req: NextApiRequest, res: NextApiResponse)
   try {
     const payrule = await prisma.payRule.create({
       data: {
-        companyId: session.user.companyId,
-        title:  title.trim(),
-        group:  group?.trim() || null,
+        companyId:     session.user.companyId,
+        title:         title.trim(),
+        group:         group?.trim() || null,
         ruleKind,
 
         /* PAY */
-        type:        ruleKind === 'PAY' ? type : undefined,
-        rate:        parsedRate,
+        type:          ruleKind === 'PAY' ? type : undefined,
+        rate:          parsedRate,
 
         /* BONUS */
-        percent:     parsedPercent,
+        percent:       parsedPercent,
 
         /* SPECIAL */
-        fixedAmount: parsedFixed,
+        fixedAmount:   parsedFixed,
         onlyDecember:  ruleKind === 'SPECIAL' ? onlyDecember  ?? false : undefined,
         onlyForAdmins: ruleKind === 'SPECIAL' ? onlyForAdmins ?? false : undefined,
         oncePerYear:   ruleKind === 'SPECIAL' ? oncePerYear   ?? false : undefined,
-        referenceType: ruleKind === 'SPECIAL' ? referenceType ?? 'FIXED_AMOUNT' : undefined,
-        validFrom:  ruleKind === 'SPECIAL' && validFrom  ? new Date(validFrom)  : undefined,
-        validUntil: ruleKind === 'SPECIAL' && validUntil ? new Date(validUntil) : undefined,
+        validFrom:     ruleKind === 'SPECIAL' && validFrom  ? new Date(validFrom)  : undefined,
+        validUntil:    ruleKind === 'SPECIAL' && validUntil ? new Date(validUntil) : undefined,
       },
     })
 
