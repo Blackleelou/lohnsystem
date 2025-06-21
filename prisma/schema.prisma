@@ -162,8 +162,6 @@ model PayRule {
   validUntil    DateTime?
   onlyDecember  Boolean?
   onlyForAdmins Boolean?
-  perYear       Boolean?
-  referenceType ReferenceType?
   oncePerYear   Boolean?       @default(false)
   createdAt     DateTime       @default(now())
 }
