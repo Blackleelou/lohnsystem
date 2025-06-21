@@ -32,7 +32,8 @@ export default function EditPayruleModal({ rule, onClose, onSave }: Props) {
   const [percent, setPercent] = useState(rule.percent?.toString() ?? '')
   const [fixedAmount, setFixedAmount] = useState(rule.fixedAmount?.toString() ?? '')
   const [onlyDecember, setOnlyDecember] = useState(!!rule.onlyDecember)
-  const [onlyAdmins, setOnlyAdmins] = useState(!!rule.onlyAdmins)
+  const [onlyForAdmins, setOnlyForAdmins] = useState(!!rule.onlyForAdmins)
+
   const [oncePerYear, setOncePerYear] = useState(!!rule.oncePerYear)
   const [referenceType, setReferenceType] = useState<
     'BASE_SALARY' | 'ACTUAL_HOURS' | 'FIXED_AMOUNT'
@@ -202,7 +203,7 @@ export default function EditPayruleModal({ rule, onClose, onSave }: Props) {
                   </div>
                   <div className="flex items-center justify-between">
                     <span>Nur für Admins sichtbar</span>
-                    <Switch checked={onlyAdmins} onCheckedChange={setOnlyAdmins} />
+                    <Switch checked={onlyForAdmins} onCheckedChange={setOnlyForAdmins} />
                   </div>
                   <div className="flex items-center justify-between">
                     <span>Max. 1× pro Jahr</span>
