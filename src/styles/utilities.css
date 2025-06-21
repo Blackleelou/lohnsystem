@@ -1,0 +1,26 @@
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+/*** Buttons ***/
+.btn-primary {
+  @apply inline-flex items-center gap-2 justify-center
+         rounded-lg px-4 py-2
+         bg-lohn-primary text-white
+         hover:bg-lohn-primary-hover
+         focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-lohn-primary-hover/50
+         font-semibold transition;
+}
+.btn-secondary {
+  @apply rounded-lg px-4 py-2
+         bg-lohn-borderLight dark:bg-lohn-borderDark
+         hover:bg-lohn-borderLight/80 dark:hover:bg-lohn-borderDark/80
+         text-lohn-textLight dark:text-lohn-textDark;
+}
+
+/*** Form Layout ***/
+.input-box   { @apply flex items-center gap-2 bg-lohn-cardLight dark:bg-lohn-cardDark rounded-lg px-3 py-2; }
+.input-field { @apply flex-1 bg-transparent outline-none text-sm placeholder:text-gray-400; }
+
+.form-label  { @apply text-sm font-medium text-lohn-textLight dark:text-lohn-textDark; }
+.form-error  { @apply text-sm text-red-600; }
