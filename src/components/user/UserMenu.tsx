@@ -1,6 +1,6 @@
 // src/components/user/UserMenu.tsx
 
-import { useEffect, useState } from 'react'; // 👈 useEffect importieren
+import { useRef, useEffect, useState } from 'react'; // 👈 useEffect importieren
 import { signOut, useSession } from 'next-auth/react';
 import LanguageSwitcher from '@/components/common/LanguageSwitcher';
 import ThemeSwitch from '@/components/common/ThemeSwitch';
@@ -13,14 +13,23 @@ export default function UserMenu() {
 
   const isSuperadmin = session?.user?.email === 'jantzen.chris@gmail.com';
   const companyId = session?.user?.companyId;
-  const role = session?.user?.role; // hier erwarten wir "admin" | "editor" | "viewer" etc.
 
-    // Session-Update wenn Menü geöffnet wird
-  useEffect(() => {
-    if (isOpen) {
-      update(); // 👈 aktuelles session.user.role laden
-    }
-  }, [isOpen, update]);
+const role = session?.user?.role; // hier erwarten wir "admin" | "editor" | "viewer" etc.
+
+// Session-Update wenn Menü geöffnet wird (aber nur 1x pro Öffnen)
+const hasUpdated = useRef(false);
+
+useEffect(() => {
+  if (isOpen && !hasUpdated.current) {
+    update(); // 👉 aktuelles session.user.role laden
+    hasUpdated.current = true;
+  }
+
+  if (!isOpen) {
+    hasUpdated.current = false; // zurücksetzen, wenn Menü geschlossen wird
+  }
+}, [isOpen, update]);
+
   
   return (
     <div className="relative">

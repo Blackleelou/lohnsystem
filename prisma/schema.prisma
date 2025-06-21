@@ -1,386 +1,710 @@
+// ===========================
+// 🧩 GENERATOR & DATENQUELLE
+// ===========================
+// Der Generator legt fest, welches Prisma-Client-Tool erzeugt wird.
+// „prisma-client-js“ ist die Standard-Bibliothek für JavaScript/TypeScript-Projekte.
+// Der Client wird automatisch beim „prisma generate“-Befehl erstellt.
 generator client {
   provider = "prisma-client-js"
 }
 
+/// Die Datenquelle definiert, mit welcher Datenbank Prisma verbunden ist.
+/// Der Provider `postgresql` bedeutet, dass eine PostgreSQL-Datenbank verwendet wird.
+/// Die Verbindung erfolgt über die Umgebungsvariable `DATABASE_URL` aus der `.env`-Datei.
 datasource db {
   provider = "postgresql"
   url      = env("DATABASE_URL")
 }
 
+// ===========================
+// 🏷️ ENUMS
+// ===========================
+// Enums (Kurzform für „Enumerationen“) sind vordefinierte Listen möglicher Werte.
+// Sie helfen dabei, bestimmte Felder auf festgelegte Optionen zu beschränken.
+// Beispiel: Währungen, Zeitintervalle, Regelarten, Sichtbarkeiten etc.
+// Enums verbessern die Datenintegrität und erleichtern die Validierung im Code.
+
+/// Währungen für spätere Internationalisierung
+/// Diese Enum wird in der Regel-Logik verwendet, z. B. für Bonuszahlungen
+/// Du kannst diese Liste bei Bedarf später erweitern (z. B. CHF, PLN, …)
+enum Currency {
+  EUR  /// Euro
+  USD  /// US-Dollar
+  GBP  /// Britisches Pfund
+}
+
+/// Wie oft eine Regel maximal angewendet werden darf
+/// Z. B. "nur einmal pro Monat" oder "täglich maximal 2×"
+enum FrequencyUnit {
+  NONE     /// unbegrenzt oft anwendbar
+  DAILY    /// maximal einmal pro Tag
+  WEEKLY   /// maximal einmal pro Woche
+  MONTHLY  /// maximal einmal pro Monat
+  YEARLY   /// maximal einmal pro Jahr
+}
+
+/// Art des Effekts, der bei einer Regel angewendet wird
+/// Z. B. ein fixer Betrag, ein prozentualer Zuschlag oder ein Satz pro Einheit
+enum EffectKind {
+  FIXED    /// fixer Betrag, z. B. 150 € Bonus
+  PERCENT  /// prozentual, z. B. 25 % Zuschlag
+  RATE     /// fester Betrag pro Einheit, z. B. 2 € pro Stunde
+}
+
+/// Bezug für Berechnungen innerhalb von Regeln oder Effekten.
+/// Gibt an, worauf sich ein Wert bezieht – z. B. auf das Grundgehalt oder auf gearbeitete Stunden.
+enum ReferenceType {
+  BASE_SALARY     /// Bezug auf das vertragliche Grundgehalt
+  ACTUAL_HOURS    /// Bezug auf tatsächlich geleistete Stunden
+  FIXED_AMOUNT     /// Fest definierter Betrag (z. B. 100 €)
+  WEEKLY_HOURS    /// Bezug auf vertragliche Wochenarbeitszeit
+  SALES_VOLUME    /// Bezug auf Umsatzvolumen (z. B. für Provisionen)
+  OVERTIME_HOURS  /// Bezug auf Überstunden
+  SHIFT_COUNT     /// Anzahl geleisteter Schichten
+}
+
+/// Vergleichsoperatoren für Bedingungen innerhalb von Regeln.
+/// Wird verwendet, um z. B. „monatlich = Dezember“ oder „Stunden > 10“ auszudrücken.
+enum Operator {
+  EQ       /// Gleich ( = )
+  NEQ      /// Ungleich ( ≠ )
+  GT       /// Größer als ( > )
+  GTE      /// Größer oder gleich ( ≥ )
+  LT       /// Kleiner als ( < )
+  LTE      /// Kleiner oder gleich ( ≤ )
+  IN       /// Wert befindet sich in einer Liste
+  NOT_IN   /// Wert befindet sich nicht in einer Liste
+  BETWEEN  /// Wert liegt zwischen zwei Grenzen (inklusive oder exklusiv)
+}
+
+/// Regel-Typen für klassische Lohn- oder Vergütungsregeln.
+/// Wird in `PayRule` verwendet, um die Art der Regel zu unterscheiden.
+enum RuleKind {
+  PAY     /// Standardzahlung – z. B. Stundenlohn oder Monatsgehalt
+  BONUS   /// Bonusregel – z. B. Zuschläge für Nachtarbeit oder Feiertage
+  SPECIAL /// Sonderzahlung – z. B. Weihnachtsgeld, Jubiläumsprämien
+}
+
+/// Art der klassischen Lohnregel – legt fest, ob eine Regel auf Stundenbasis
+/// oder als monatliche Pauschale angewendet wird.
+enum PayRuleType {
+  HOURLY   /// Regel gilt pro Stunde (z. B. 15 €/h)
+  MONTHLY  /// Regel gilt als Monatsbetrag (z. B. 2.500 €/Monat)
+}
+
+/// Sichtbarkeit von Dokumenten, z. B. im Editor-System oder bei Freigaben.
+/// Gibt an, wer auf ein Dokument zugreifen darf.
+enum Visibility {
+  PRIVATE /// Nur für den Ersteller sichtbar
+  TEAM    /// Sichtbar für das eigene Team oder Unternehmen
+  SHARED  /// Freigegeben für bestimmte Personen oder Gruppen
+  PUBLIC  /// Öffentlich sichtbar (z. B. über Link)
+}
+
+// ===========================
+// 👥 USER, AUTH, SESSION
+// ===========================
+// In diesem Abschnitt werden alle Modelle rund um Benutzer, Logins, Sessions
+// und Authentifizierung definiert. Dazu gehören:
+// - User: zentrale Nutzerinformationen
+// - Account: OAuth-/Login-Verknüpfungen (Google, GitHub etc.)
+// - Session: gespeicherte Login-Sitzungen
+// - PasswordResetToken, VerificationCode, VerificationToken:
+//   für Passwort-Zurücksetzen, Verifizierung und Login-Schutz
+
+
+/// Nutzerprofil mit allen relevanten Informationen zum Benutzer.
+/// Beinhaltet Login-Daten, Teamzugehörigkeit, Sichtbarkeitseinstellungen und Historie.
 model User {
-  id              String               @id @default(cuid())
-  email           String               @unique
-  emailVerified   DateTime?
-  password        String?
-  name            String?
-  nickname        String?
-  image           String?
-  verified        Boolean              @default(false)
-  isAdmin         Boolean              @default(false)
-  createdAt       DateTime             @default(now())
-  resetTokens     PasswordResetToken[]
-  hasChosenMode   Boolean              @default(false)
-  promotedToAdmin Boolean              @default(false)
-  lastLogin       DateTime?
+  id              String   @id @default(cuid()) /// Interne ID des Nutzers
+  email           String   @unique              /// E-Mail-Adresse (Login-Identifikation)
+  emailVerified   DateTime?                    /// Zeitpunkt der Verifizierung (wenn vorhanden)
+  password        String?                       /// Optional: Passwort (nur bei E-Mail-Login)
+  name            String?                       /// Anzeigename (z. B. Max Mustermann)
+  nickname        String?                       /// Optionaler Spitzname für Teamansicht
+  image           String?                       /// Avatar oder Profilbild-URL
+  verified        Boolean  @default(false)      /// Interne Verifizierung (nicht gleich E-Mail)
+  isAdmin         Boolean  @default(false)      /// Systemweiter Admin-Status
+  createdAt       DateTime @default(now())      /// Erstellungszeitpunkt
+  lastLogin       DateTime?                     /// Letzter Login (zur Analyse)
+  hasChosenMode   Boolean  @default(false)      /// Onboarding abgeschlossen?
+  promotedToAdmin Boolean  @default(false)      /// Durch System automatisch befördert?
 
-  companyId String?
-  company   Company? @relation(fields: [companyId], references: [id])
-  role      String?
-  invited   Boolean  @default(false)
-  accepted  Boolean  @default(true)
+  companyId       String?                       /// Fremdschlüssel zur Firma (optional)
+  company         Company? @relation(fields: [companyId], references: [id])
+  role            String?                       /// Teamrolle (VIEWER, EDITOR, ADMIN etc.)
+  invited         Boolean  @default(false)      /// Wurde über Einladung hinzugefügt?
+  accepted        Boolean  @default(true)       /// Hat die Einladung angenommen?
 
-  showName     Boolean @default(true)
-  showNickname Boolean @default(false)
-  showEmail    Boolean @default(false)
+  showName        Boolean  @default(true)       /// Anzeigename im Team sichtbar?
+  showNickname    Boolean  @default(false)      /// Spitzname sichtbar?
+  showEmail       Boolean  @default(false)      /// E-Mail-Adresse sichtbar?
 
-  accounts              Account[]
-  sessions              Session[]
-  shifts                Shift[]
-  createdInvitations    Invitation[]        @relation("UserToInvitations")
-  editorDocuments       EditorDocument[]    @relation("UserDocuments")
-  sharedEditorDocuments EditorShare[]       @relation("UserSharedDocuments")
-  salaryEntries         UserSalaryEntry[]
-  weeklyTimes           WeeklyWorkingTime[]
-  shiftEntries          ShiftEntry[]
+  // 🔐 Sicherheits- und Auth-Beziehungen
+  resetTokens            PasswordResetToken[]         /// Passwort-Zurücksetz-Tokens
+  accounts               Account[]                    /// OAuth-Accounts (Google, GitHub etc.)
+  sessions               Session[]                    /// Aktive Logins/Sessions
+
+  // 📅 Zeit- und Schichteinträge
+  shifts                 Shift[]                      /// Klassische Schichteinträge
+  shiftEntries           ShiftEntry[]                 /// Erweiterte Schichtdefinitionen
+  weeklyTimes            WeeklyWorkingTime[]          /// Vertraglich vereinbarte Wochenstunden
+
+  // 💰 Lohn-Einträge
+  salaryEntries          UserSalaryEntry[]            /// Individuelle Lohnzuschläge o.ä.
+
+  // 📩 Einladungen und Dokumente
+  createdInvitations     Invitation[]     @relation("UserToInvitations")      /// Vom Nutzer erstellte Einladungen
+  editorDocuments        EditorDocument[] @relation("UserDocuments")          /// Eigene Editor-Dokumente
+  sharedEditorDocuments  EditorShare[]    @relation("UserSharedDocuments")    /// Freigegebene Dokumente
 }
 
+/// Einmal-Code zur E-Mail-Verifizierung (z. B. für Login ohne Passwort oder Registrierung)
 model VerificationCode {
-  id        String   @id @default(cuid())
-  email     String   @unique
-  code      String
-  expiresAt DateTime
+  id        String   @id @default(cuid()) /// Interne ID des Verifizierungseintrags
+  email     String   @unique              /// Ziel-E-Mail, für die der Code gilt
+  code      String                        /// Der generierte Verifizierungscode
+  expiresAt DateTime                     /// Ablaufzeitpunkt des Codes
 }
 
+/// Temporärer Token zum Zurücksetzen des Passworts.
+/// Wird generiert, wenn ein Nutzer „Passwort vergessen“ nutzt.
 model PasswordResetToken {
-  id        String   @id @default(cuid())
-  userId    String   @unique
-  token     String   @unique
-  expiresAt DateTime
-  user      User     @relation(fields: [userId], references: [id], onDelete: Cascade)
+  id        String   @id @default(cuid()) /// Interne ID des Tokens
+  userId    String   @unique              /// Eindeutiger Bezug auf einen Nutzer
+  token     String   @unique              /// Der generierte Reset-Token (z. B. UUID)
+  expiresAt DateTime                     /// Ablaufzeitpunkt des Tokens
+  user      User     @relation(fields: [userId], references: [id], onDelete: Cascade) /// Beziehung zum betroffenen Nutzer
 }
 
-model AuditLog {
-  id        String   @id @default(cuid())
-  userId    String
-  action    String
-  ip        String
-  timestamp DateTime
-}
-
-model SuperadminBoardEntry {
-  id              String    @id @default(cuid())
-  title           String
-  status          String
-  category        String[]
-  notes           String?
-  createdAt       DateTime  @default(now())
-  completedAt     DateTime?
-  updatedByImport Boolean   @default(false)
-}
-
+/// OAuth-Konten für externe Anbieter wie Google, GitHub, Apple etc.
+/// Wird von NextAuth verwendet, um externe Logins zu verwalten.
 model Account {
-  id                String  @id @default(cuid())
-  userId            String
-  type              String
-  provider          String
-  providerAccountId String
-  refresh_token     String?
-  access_token      String?
-  expires_at        Int?
-  token_type        String?
-  scope             String?
-  id_token          String?
-  session_state     String?
-  user              User    @relation(fields: [userId], references: [id], onDelete: Cascade)
+  id                String   @id @default(cuid()) /// Interne ID
+  userId            String                         /// Bezug zum zugehörigen Nutzer
+  type              String                         /// Typ des Kontos (z. B. „oauth“)
+  provider          String                         /// Anbietername (z. B. „google“)
+  providerAccountId String                         /// Vom Anbieter vergebene Benutzer-ID
 
-  @@unique([provider, providerAccountId])
+  refresh_token     String?                        /// Token zur Erneuerung des Zugriffs
+  access_token      String?                        /// Aktiver Zugriffstoken
+  expires_at        Int?                           /// Ablaufzeitpunkt (als UNIX-Timestamp)
+  token_type        String?                        /// z. B. „Bearer“
+  scope             String?                        /// Angeforderte OAuth-Scopes
+  id_token          String?                        /// Optionaler JWT-Token (z. B. für Google)
+  session_state     String?                        /// Zustand der OAuth-Sitzung (z. B. Azure AD)
+
+  user              User     @relation(fields: [userId], references: [id], onDelete: Cascade)
+
+  @@unique([provider, providerAccountId])          /// Kombination aus Anbieter und Anbieter-ID muss eindeutig sein
 }
 
+/// Aktive Benutzersitzungen – wird von NextAuth genutzt.
+/// Dient dazu, eingeloggte Nutzer zu authentifizieren (z. B. per Cookie).
 model Session {
-  id           String   @id @default(cuid())
-  sessionToken String   @unique
-  userId       String
-  expires      DateTime
+  id           String   @id @default(cuid()) /// Interne ID der Sitzung
+  sessionToken String   @unique              /// Sicherer Token für den Login
+  userId       String                         /// Zugehöriger Nutzer
+  expires      DateTime                      /// Ablaufzeitpunkt der Sitzung
   user         User     @relation(fields: [userId], references: [id], onDelete: Cascade)
 }
 
+/// Token für Magic-Link-Login oder Verifizierungen.
+/// Wird z. B. bei passwortlosen Logins oder Bestätigungs-E-Mails verwendet.
 model VerificationToken {
-  identifier String
-  token      String   @unique
-  expires    DateTime
+  identifier String                          /// E-Mail oder Login-Identifier
+  token      String   @unique                /// Sicherer Token (z. B. einmaliger Link)
+  expires    DateTime                        /// Ablaufdatum des Tokens
 
-  @@unique([identifier, token])
+  @@unique([identifier, token])              /// Kombination muss eindeutig sein
 }
 
+// ===========================
+// 🏢 COMPANY & EINSTELLUNGEN
+// ===========================
+// In diesem Abschnitt werden Firmen (Teams) und deren Konfigurationen definiert.
+// - Company: Zentrale Organisationseinheit, der Benutzer, Einladungen und Regeln zugeordnet sind
+// - CompanySettings: Visuelle und farbliche Einstellungen (z. B. Theme, CI-Farben)
+// Jede Firma kann eigene Schichten, Lohnregeln, Dokumente, Benutzer und Zeitmodelle haben.
+
+
+/// Repräsentiert eine Firma, ein Team oder eine Organisation.
+/// Jeder Nutzer kann optional einer Firma zugeordnet sein.
+/// Firmen enthalten u. a. Nutzer, Einladungen, Lohnregeln, Zeitmodelle und Dokumente.
 model Company {
-  id                  String                    @id @default(cuid())
-  name                String
-  description         String?
-  createdAt           DateTime                  @default(now())
-  users               User[]
-  invitations         Invitation[]
-  accessCodes         AccessCode[]
-  payRules            PayRule[]                 @relation("CompanyToPayRules")
-  settings            CompanySettings?
-  shifts              Shift[]
-  salaryCategories    SalaryCategory[]
-  salaryEntries       UserSalaryEntry[]
-  shiftDefinitions    ShiftTypeDefinition[]
-  shiftEntries        ShiftEntry[]
-  weeklyTimes         WeeklyWorkingTime[]
-  documents           EditorDocument[]          @relation("CompanyDocuments")
-  sharedDocuments     EditorShare[]             @relation("CompanySharedDocuments")
-  salaryShiftTypes    SalaryCategoryShiftType[]
-  specialPaymentRules SpecialPaymentRule[]
+  id                  String   @id @default(cuid()) /// Interne ID der Firma
+  name                String                          /// Name der Firma / des Teams
+  description         String?                         /// Optional: Beschreibung oder Notiz zur Firma
+  createdAt           DateTime @default(now())        /// Erstellungsdatum
+
+  users               User[]                          /// Alle Nutzer, die der Firma zugeordnet sind
+  invitations         Invitation[]                    /// Alle Einladungen, die zur Firma gehören
+  accessCodes         AccessCode[]                    /// Zugangscodes (z. B. für QR-Login)
+  payRules            PayRule[]     @relation("CompanyToPayRules") /// Klassische Lohnregeln
+  rules               Rule[]                          /// Zentrale Regel-Logik (Effekte, Bedingungen)
+  settings            CompanySettings?                /// Visuelle Einstellungen (Farben, Theme)
+
+  shifts              Shift[]                         /// Klassische Schichtmodelle
+  salaryCategories    SalaryCategory[]                /// Benutzerdefinierte Lohnarten/Kategorien
+  salaryEntries       UserSalaryEntry[]               /// Individuelle Lohnwerte pro Nutzer
+  shiftDefinitions    ShiftTypeDefinition[]           /// Definition von Früh-/Spät-/Nachtarten etc.
+  shiftEntries        ShiftEntry[]                    /// Erweiterte Schichteinträge pro Nutzer
+  weeklyTimes         WeeklyWorkingTime[]             /// Vertraglich vereinbarte Wochenstunden
+  documents           EditorDocument[]  @relation("CompanyDocuments") /// Eigene Editor-Dokumente
+  sharedDocuments     EditorShare[]     @relation("CompanySharedDocuments") /// Freigegebene Dokumente
+  salaryShiftTypes    SalaryCategoryShiftType[]       /// Zuordnung von Lohnarten zu Schichtarten
+  specialPaymentRules SpecialPaymentRule[]            /// Sonderzahlungen wie Weihnachtsgeld etc.
 }
 
+/// Visuelle Einstellungen und Designoptionen für eine Firma.
+/// Wird verwendet, um individuelle Farben, Themes und Hintergründe zu speichern.
 model CompanySettings {
-  id              String  @id @default(cuid())
-  companyId       String  @unique
-  themeName       String  @default("Classic Duo")
-  useCustomColors Boolean @default(false)
-  primaryColor    String?
-  accentColor     String?
-  bgLight         String?
-  bgDark          String?
-  textColor       String?
+  id              String  @id @default(cuid())       /// Interne ID des Einstellungsblocks
+  companyId       String  @unique                    /// Fremdschlüssel zur zugehörigen Firma
+
+  themeName       String  @default("Classic Duo")    /// Name des ausgewählten Themes
+  useCustomColors Boolean @default(false)            /// Schalter: Eigene Farben aktiv?
+
+  primaryColor    String?                            /// Hauptfarbe der Firma (z. B. Buttons)
+  accentColor     String?                            /// Sekundärfarbe für Akzente
+  bgLight         String?                            /// Hintergrundfarbe für helle Bereiche
+  bgDark          String?                            /// Hintergrundfarbe für dunkle Bereiche
+  textColor       String?                            /// Standardtextfarbe
+
   company         Company @relation(fields: [companyId], references: [id], onDelete: Cascade)
 }
 
+// ===========================
+// 💸 KLASSISCHE LOHNREGELN
+// ===========================
+// Dieser Bereich enthält klassische, direkt auswertbare Lohnregeln.
+// - PayRule: Stellt einfache Regeln dar wie Stundenlohn, Zuschläge, Monatsgehalt
+// - SpecialPaymentRule: Regeln für Sonderzahlungen (z. B. Weihnachtsgeld, Schichtmix-Bonus)
+// Diese Regeln können direkt pro Firma definiert und ausgewertet werden – ohne Bedingungen.
+// Komplexere Regeln mit Bedingungen/Effekten findest du unter „🧠 ZENTRALE REGEL-LOGIK“.
+
+/// Klassische Lohnregel – z. B. Stundenlohn, Bonus oder Pauschale.
+/// Wird direkt einer Firma zugeordnet und bei der Lohnberechnung ausgewertet.
 model PayRule {
-  id            String         @id @default(cuid())
-  companyId     String
-  company       Company        @relation("CompanyToPayRules", fields: [companyId], references: [id])
-  title         String
-  group         String?
-  ruleKind      RuleKind
-  type          PayRuleType?
-  rate          Float?
-  percent       Float?
-  fixedAmount   Float?
-  validFrom     DateTime?
-  validUntil    DateTime?
-  onlyDecember  Boolean?
-  onlyForAdmins Boolean?
-  oncePerYear   Boolean?       @default(false)
-  createdAt     DateTime       @default(now())
+  id            String     @id @default(cuid()) /// Interne ID der Regel
+  companyId     String                          /// Zugehörige Firma
+  company       Company    @relation("CompanyToPayRules", fields: [companyId], references: [id])
+
+  title         String                          /// Name der Regel (z. B. „Nachtzuschlag“)
+  group         String?                         /// Optional: Gruppierung für die UI
+
+  ruleKind      RuleKind                        /// PAY, BONUS oder SPECIAL
+  type          PayRuleType?                    /// HOURLY oder MONTHLY (nur bei PAY)
+
+  rate          Float?                          /// z. B. 12,50 €/h (bei HOURLY)
+  percent       Float?                          /// z. B. 25 % (bei BONUS)
+  fixedAmount   Float?                          /// z. B. 150 € (bei SPECIAL)
+
+  validFrom     DateTime?                       /// Regel gilt ab diesem Zeitpunkt
+  validUntil    DateTime?                       /// Optionales Enddatum
+
+  onlyDecember  Boolean?                        /// Gilt nur im Dezember (z. B. Weihnachtsgeld)
+  onlyForAdmins Boolean?                        /// Gilt nur für Admins im Team
+  oncePerYear   Boolean? @default(false)        /// Nur einmal jährlich anwendbar?
+
+  createdAt     DateTime   @default(now())      /// Erstellungsdatum der Regel
 }
 
-enum RuleKind {
-  PAY
-  BONUS
-  SPECIAL
-}
-
-enum PayRuleType {
-  HOURLY
-  MONTHLY
-}
-
-enum ReferenceType {
-  BASE_SALARY
-  ACTUAL_HOURS
-  FIXED_AMOUNT
-}
-
+/// Sonderregel für einmalige oder jährliche Zahlungen.
+/// Beispiele: Weihnachtsgeld, Schichtmix-Bonus, Jubiläumsprämien.
+/// Die Regel kann an bestimmte Bedingungen geknüpft sein (z. B. Dauer im Unternehmen, bestimmte Schichten).
 model SpecialPaymentRule {
-  id                        String    @id @default(cuid())
-  companyId                 String
-  title                     String // z. B. Weihnachtsgeld, Schichtmix-Bonus
-  type                      String // 'FIXED' oder 'PERCENT'
-  amount                    Float // Betrag oder Prozentwert (je nach type)
-  shiftMixBonus             Boolean   @default(false) // Nur wenn unterschiedliche Schichten vorkommen
-  minShiftTypesPerMonth     Int? // z. B. mindestens 2 Schichtarten im Monat
-  requiredShiftTypeCodes    String[] // z. B. ['Früh', 'Spät', 'Nacht']
-  minYearsInCompany         Int? // z. B. für 10-Jahres-Bonus
-  appliesInMonth            Int? // Nur in bestimmten Monaten (z. B. 12 = Dezember)
-  appliesOncePerYear        Boolean   @default(false) // z. B. für jährliche Boni
-  onlyForRoles              String[] // z. B. ['ADMIN', 'MITARBEITER']
-  proportionalToWeeklyHours Boolean   @default(false) // Auszahlung anteilig zur Wochenarbeitszeit
-  calculationReference      String? // 'BASE_SALARY', 'ACTUAL_HOURS', etc.
-  note                      String? // Freitext-Hinweis oder Info
-  active                    Boolean   @default(true)
-  validFrom                 DateTime // Gültigkeitsbeginn
-  validTo                   DateTime? // Optionales Enddatum
+  id                        String   @id @default(cuid()) /// Interne ID der Sonderregel
+  companyId                 String                           /// Zugehörige Firma
+  title                     String                           /// Name der Regel (z. B. „Weihnachtsgeld“)
+  type                      String                           /// FIXED oder PERCENT
+  amount                    Float                            /// Betrag (fest oder prozentual)
 
-  company Company @relation(fields: [companyId], references: [id], onDelete: Cascade)
+  shiftMixBonus             Boolean  @default(false)         /// Nur gültig bei Schichtmix (z. B. Früh/Spät/Nacht)
+  minShiftTypesPerMonth     Int?                             /// Mindestanzahl verschiedener Schichten im Monat
+  requiredShiftTypeCodes    String[]                         /// Bestimmte Schichtarten, die vorkommen müssen (z. B. ["FRÜH", "NACHT"])
 
-  @@index([companyId])
+  minYearsInCompany         Int?                             /// Mindestdauer in Jahren (z. B. 10 Jahre für Jubiläumsprämie)
+  appliesInMonth            Int?                             /// Gilt nur in bestimmtem Monat (z. B. 12 = Dezember)
+  appliesOncePerYear        Boolean  @default(false)         /// Nur einmal jährlich gültig?
+
+  onlyForRoles              String[]                         /// Gilt nur für bestimmte Rollen (z. B. ["ADMIN", "MITARBEITER"])
+  proportionalToWeeklyHours Boolean  @default(false)         /// Auszahlung anteilig je nach Wochenarbeitszeit
+
+  calculationReference      String?                          /// Bezug zur Berechnung (z. B. BASE_SALARY)
+  note                      String?                          /// Optionaler Freitext (z. B. Hinweis im UI)
+
+  active                    Boolean  @default(true)          /// Ob die Regel aktiv ist
+  validFrom                 DateTime                         /// Gültigkeitsbeginn
+  validTo                   DateTime?                        /// Optionales Enddatum
+
+  company                   Company  @relation(fields: [companyId], references: [id], onDelete: Cascade)
+
+  @@index([companyId])                                       /// Index für schnelleren Firmenzugriff
 }
 
-model Shift {
-  id           String   @id @default(cuid())
-  userId       String
-  companyId    String
-  startTime    DateTime
-  endTime      DateTime
-  breakMinutes Int      @default(0)
-  createdAt    DateTime @default(now())
-  user         User     @relation(fields: [userId], references: [id], onDelete: Cascade)
-  company      Company  @relation(fields: [companyId], references: [id], onDelete: Cascade)
+// ===========================
+// 🧠 ZENTRALE REGEL-LOGIK
+// ===========================
+// Dieser Abschnitt bildet das Herzstück eines flexiblen und skalierbaren Regelwerks.
+// Anders als klassische PayRules bestehen diese Regeln aus mehreren Bausteinen:
+// - Rule: Die eigentliche Regeldefinition mit Zeitraum, Priorität etc.
+// - Effect: Was passiert, wenn die Regel greift (z. B. Bonus, Abzug)
+// - Condition: Wann die Regel greift (z. B. nur im Dezember, nur bei Nachtschicht)
+// - Target: Für wen die Regel gilt (z. B. bestimmte Nutzer, Rollen, Abteilungen)
+//
+// Dieses System ermöglicht komplexe, kombinierbare und bedingte Lohn- oder Bonusregeln.
+// Ideal für zukunftssichere Lohnlogik mit vielen Parametern und Filtermöglichkeiten.
+
+/// Zentrale Regeldefinition für komplexe, dynamische Lohn- oder Bonuslogik.
+/// Eine Rule besteht aus Bedingungen (conditions), Effekten (effects)
+/// und Zielgruppen (targets) und kann mehrfach anwendbar, zeitlich begrenzt und priorisiert sein.
+model Rule {
+  id               String        @id @default(cuid())    /// Interne ID der Regel
+  companyId        String                                   /// Zugehörige Firma
+  company          Company       @relation(fields: [companyId], references: [id], onDelete: Cascade)
+
+  title            String                                   /// Titel der Regel (z. B. „Nachtbonus Dezember“)
+  description      String?                                  /// Optionaler Infotext oder Hilfetext fürs UI
+
+  active           Boolean       @default(true)             /// Nur aktive Regeln werden ausgewertet
+  currency         Currency      @default(EUR)              /// Auszahlung in EUR, USD, etc.
+  frequencyUnit    FrequencyUnit @default(NONE)             /// Wie oft darf die Regel greifen (z. B. monatlich)?
+  occurrenceLimit  Int?                                      /// Max. Anzahl Anwendungen pro Periode
+
+  priority         Int           @default(0)                /// Wichtigkeit bei mehreren gültigen Regeln (höher = vorrangig)
+
+  validFrom        DateTime                                 /// Startdatum der Gültigkeit
+  validTo          DateTime?                                /// Optional: Enddatum
+
+  effects          Effect[]                                 /// Was passiert, wenn Regel greift? (z. B. Bonuszahlung)
+  conditions       Condition[]                              /// Unter welchen Bedingungen gilt die Regel?
+  targets          Target[]                                 /// Für wen gilt die Regel? (z. B. bestimmte Rollen oder Nutzer)
+
+  createdAt        DateTime      @default(now())            /// Erstellungszeitpunkt
+  updatedAt        DateTime      @updatedAt                 /// Automatischer Zeitstempel bei Änderungen
+
+  @@index([companyId, active])                              /// Index für schnelle Filterung aktiver Regeln pro Firma
 }
 
-model Invitation {
-  id            String   @id @default(cuid())
-  token         String   @unique
-  companyId     String
-  role          String
-  createdAt     DateTime @default(now())
-  expiresAt     DateTime
-  used          Boolean  @default(false)
-  createdBy     String?
-  note          String?
-  type          String
-  password      String?
-  createdById   String?
-  printTitle    String?
-  printText     String?
-  printLogo     String?
-  company       Company  @relation(fields: [companyId], references: [id], onDelete: Cascade)
-  createdByUser User?    @relation("UserToInvitations", fields: [createdById], references: [id])
+/// Effekt einer Regel – also das, was passiert, wenn die Regel greift.
+/// Ein Effekt kann z. B. ein fixer Betrag, ein Prozentsatz oder ein Wert pro Einheit sein.
+/// Eine Regel kann mehrere Effekte haben (z. B. Bonus + Provision).
+model Effect {
+  id        String       @id @default(cuid())    /// Interne ID des Effekts
+  ruleId    String                                    /// Zugehörige Regel-ID
+  rule      Rule         @relation(fields: [ruleId], references: [id], onDelete: Cascade)
+
+  kind      EffectKind                              /// FIXED, PERCENT oder RATE
+  value     Float                                    /// Höhe des Effekts (z. B. 150.0 oder 25.0)
+  reference ReferenceType                           /// Worauf sich der Effekt bezieht (z. B. Stunden, Umsatz)
+
+  note      String?                                 /// Optional: Freitext für UI (z. B. „Nachtzuschlag“)
+  createdAt DateTime     @default(now())            /// Zeitstempel der Erstellung
 }
 
+/// Bedingung, die erfüllt sein muss, damit eine Regel greift.
+/// Eine Regel kann mehrere Conditions haben (UND-Verknüpfung).
+/// Beispiel: „month = 12“ ODER „shiftType IN [‘NACHT’, ‘SPÄT’]“.
+model Condition {
+  id        String   @id @default(cuid())         /// Interne ID der Bedingung
+  ruleId    String                                  /// Zugehörige Regel-ID
+  rule      Rule     @relation(fields: [ruleId], references: [id], onDelete: Cascade)
+
+  attribute String                                 /// Zu prüfendes Attribut (z. B. „month“, „shiftType“, „yearsInCompany“)
+  operator  Operator                               /// Vergleichsoperator (z. B. EQ, IN, BETWEEN)
+  jsonValue Json                                   /// Vergleichswert(e) im JSON-Format
+                                                   /// z. B. 12 für Dezember, ["FRÜH", "SPÄT"], { "min": 10, "max": 20 }
+
+  createdAt DateTime @default(now())              /// Zeitstempel der Erstellung
+}
+
+/// Zieldefinition einer Regel – legt fest, für wen die Regel gilt.
+/// Eine Regel kann mehrere Targets haben.
+/// Beispiel: Nur für Rolle „MITARBEITER“ oder Nutzer-ID „u123“.
+model Target {
+  id        String   @id @default(cuid())         /// Interne ID des Targets
+  ruleId    String                                  /// Zugehörige Regel-ID
+  rule      Rule     @relation(fields: [ruleId], references: [id], onDelete: Cascade)
+
+  type      String                                 /// Zieltyp (z. B. "USER", "ROLE", "DEPARTMENT")
+  value     String                                 /// Konkreter Wert (z. B. Nutzer-ID, Rollencode etc.)
+
+  createdAt DateTime @default(now())              /// Zeitstempel der Erstellung
+}
+
+/// Zugangscode für Teams – z. B. zum Beitritt per QR-Code oder Zugangsliste.
+/// Kann optional mit Passwortschutz versehen und zeitlich begrenzt werden.
 model AccessCode {
-  id              String   @id @default(cuid())
-  code            String
-  companyId       String
-  role            String
-  validFrom       DateTime
-  validUntil      DateTime
-  requirePassword Boolean  @default(true)
-  password        String?
-  createdAt       DateTime @default(now())
+  id              String   @id @default(cuid())             /// Interne ID des Zugangscodes
+  code            String                                    /// Der eigentliche Zugangscode (z. B. für QR)
+  companyId       String                                    /// Zugehörige Firma
+  role            String                                    /// Rolle, die der Nutzer nach Beitritt erhält
+  validFrom       DateTime                                  /// Gültig ab
+  validUntil      DateTime                                  /// Gültig bis
+  requirePassword Boolean  @default(true)                   /// Ist ein zusätzliches Passwort nötig?
+  password        String?                                   /// Optionales Passwort (wenn aktiviert)
+  createdAt       DateTime @default(now())                  /// Erstellungszeitpunkt
+
   company         Company  @relation(fields: [companyId], references: [id], onDelete: Cascade)
 
-  @@unique([code, companyId], name: "code_companyId")
+  @@unique([code, companyId], name: "code_companyId")       /// Kombination aus Code und Firma muss eindeutig sein
 }
 
+/// Protokollierung sicherheitsrelevanter oder administrativer Aktionen.
+/// Dient zur Nachvollziehbarkeit von Änderungen (z. B. Rollenwechsel, Löschungen).
+model AuditLog {
+  id        String   @id @default(cuid()) /// Interne ID des Logeintrags
+  userId    String                         /// ID des Nutzers, der die Aktion ausgelöst hat
+  action    String                         /// Beschreibung der Aktion (z. B. "TEAM_DELETED", "INVITE_SENT")
+  ip        String                         /// IP-Adresse, von der die Aktion ausging
+  timestamp DateTime                      /// Zeitpunkt der Aktion
+}
+
+/// Nutzerdefiniertes Dokument im Editor-System.
+/// Kann Text, Layout, QR-Codes oder Bilder enthalten und ist im A4-/A5-/A6-Format speicherbar.
+/// Dokumente können privat, teamintern oder öffentlich freigegeben werden.
 model EditorDocument {
-  id         String        @id @default(cuid())
-  title      String
-  content    Json
-  format     String        @default("a4")
-  ownerId    String?
-  companyId  String?
-  visibility Visibility    @default(PRIVATE)
-  createdAt  DateTime      @default(now())
-  updatedAt  DateTime      @updatedAt
-  owner      User?         @relation("UserDocuments", fields: [ownerId], references: [id])
-  company    Company?      @relation("CompanyDocuments", fields: [companyId], references: [id])
-  shares     EditorShare[]
+  id         String     @id @default(cuid())       /// Interne ID des Dokuments
+  title      String                                 /// Titel/Name des Dokuments
+  content    Json                                   /// Inhalt im JSON-Format (z. B. Konva-Canvas)
+  format     String     @default("a4")              /// Format: "a4", "a5", "a6" etc.
+
+  ownerId    String?                                /// Optional: Ersteller des Dokuments
+  companyId  String?                                /// Optional: Zugehörige Firma (bei Teamdokumenten)
+
+  visibility Visibility @default(PRIVATE)           /// Sichtbarkeit (PRIVATE, TEAM, SHARED, PUBLIC)
+
+  createdAt  DateTime   @default(now())             /// Erstellungszeitpunkt
+  updatedAt  DateTime   @updatedAt                  /// Letzte Bearbeitung
+
+  owner      User?      @relation("UserDocuments", fields: [ownerId], references: [id])
+  company    Company?   @relation("CompanyDocuments", fields: [companyId], references: [id])
+  shares     EditorShare[]                          /// Liste von Freigaben für andere Nutzer oder Firmen
 }
 
+/// Freigabe eines Editor-Dokuments für andere Nutzer oder Firmen.
+/// Ermöglicht gezieltes Teilen von Inhalten (z. B. „sichtbar, aber nicht bearbeitbar“).
 model EditorShare {
-  id                  String         @id @default(cuid())
-  documentId          String
-  sharedWithUserId    String?
-  sharedWithCompanyId String?
-  canEdit             Boolean        @default(false)
-  createdAt           DateTime       @default(now())
+  id                  String         @id @default(cuid()) /// Interne ID der Freigabe
+
+  documentId          String                          /// Verweis auf das freigegebene Dokument
+  sharedWithUserId    String?                         /// Optional: Nutzer, der Zugriff erhält
+  sharedWithCompanyId String?                         /// Optional: ganze Firma mit Zugriff
+
+  canEdit             Boolean        @default(false)   /// Darf das Dokument bearbeitet werden?
+
+  createdAt           DateTime       @default(now())   /// Zeitstempel der Freigabe
+
   document            EditorDocument @relation(fields: [documentId], references: [id])
   sharedWithUser      User?          @relation("UserSharedDocuments", fields: [sharedWithUserId], references: [id])
   sharedWithCompany   Company?       @relation("CompanySharedDocuments", fields: [sharedWithCompanyId], references: [id])
 }
 
-enum Visibility {
-  PRIVATE
-  TEAM
-  SHARED
-  PUBLIC
+/// Einladung zum Team – z. B. via QR-Code, Link oder E-Mail.
+/// Kann einmalig, zeitlich begrenzt oder passwortgeschützt sein.
+/// Unterstützt Druckoptionen (z. B. für Aushang mit Überschrift, Text und Logo).
+model Invitation {
+  id            String   @id @default(cuid())   /// Interne ID der Einladung
+  token         String   @unique                /// Einmaliger Einladungstoken (für Link oder QR-Code)
+  companyId     String                          /// Zugehörige Firma
+  role          String                          /// Rolle, die beim Beitritt vergeben wird
+
+  createdAt     DateTime @default(now())        /// Erstellungszeitpunkt
+  expiresAt     DateTime                        /// Ablaufdatum (z. B. nach 30 Tagen)
+
+  used          Boolean  @default(false)        /// Wurde die Einladung bereits verwendet?
+
+  createdBy     String?                         /// (Veraltet?) ggf. Name oder ID des Erstellers
+  createdById   String?                         /// Verweis auf den Nutzer, der die Einladung erstellt hat
+  createdByUser User?    @relation("UserToInvitations", fields: [createdById], references: [id])
+
+  note          String?                         /// Interne Notiz zur Einladung
+  type          String                          /// Einladungs-Typ (z. B. "qr_simple", "single_use")
+
+  password      String?                         /// Optionales Passwort (nur bei geschützten Einladungen)
+
+  printTitle    String?                         /// Überschrift für den Ausdruck („Willkommen bei XYZ“)
+  printText     String?                         /// Beschreibungstext für den Ausdruck
+  printLogo     String?                         /// Pfad oder URL zum Logo (für Ausdruck)
+
+  company       Company  @relation(fields: [companyId], references: [id], onDelete: Cascade)
 }
 
+/// 💰 Lohnart bzw. Gehaltskomponente.
+/// Beispiel: Stundenlohn, Nachtschicht-Zuschlag, Fahrgeld.
+/// Kann sowohl feste Werte, Prozentwerte, als auch formelbasierte Berechnungen enthalten.
+/// Optional einschränkbar auf bestimmte Schichtarten.
 model SalaryCategory {
-  id              String                    @id @default(cuid())
-  companyId       String?
-  name            String
-  description     String?
-  inputType       String
-  calculationMode String?
-  formula         String?
-  defaultValue    Float?
-  userSelectable  Boolean                   @default(true)
-  required        Boolean                   @default(false)
-  hidden          Boolean                   @default(false)
-  multiContext    Boolean                   @default(false)
-  validFrom       DateTime
-  validTo         DateTime?
-  createdAt       DateTime                  @default(now())
-  company         Company?                  @relation(fields: [companyId], references: [id])
-  entries         UserSalaryEntry[]
-  shiftTypes      SalaryCategoryShiftType[]
+  id              String   @id @default(cuid())      /// Interne ID
+
+  // === Firmenbezug ===
+  companyId       String?                             /// Firma, der diese Kategorie gehört (Solo-User = optional)
+  company         Company? @relation(fields: [companyId], references: [id])
+
+  // === Bezeichnung & Beschreibung ===
+  name            String                              /// Name der Lohnart (z. B. „Zuschlag Nachtarbeit“)
+  description     String?                             /// Erklärung oder Tooltip im UI
+
+  // === Technische Konfiguration ===
+  inputType       String                              /// Eingabetyp: z. B. „number“, „boolean“, „select“ (für UI)
+  calculationMode String?                             /// Optional: „sum“, „avg“, „custom“, „formula“
+  formula         String?                             /// Optional: Formel wie „BASE * 0.25“ für dynamische Berechnung
+  defaultValue    Float?                              /// Vorgabewert, wenn Benutzer nichts einträgt
+
+  // === Verhalten im UI ===
+  userSelectable  Boolean   @default(true)            /// Darf der Nutzer sie selbst zuweisen?
+  required        Boolean   @default(false)           /// Muss zwingend gesetzt werden (z. B. bei Grundlohn)?
+  hidden          Boolean   @default(false)           /// Wird im UI ausgeblendet?
+  multiContext    Boolean   @default(false)           /// Kann mehrfach pro Schicht-Kontext verwendet werden?
+
+  // === Gültigkeit & Zeitbereich ===
+  validFrom       DateTime                            /// Ab wann ist die Lohnart gültig?
+  validTo         DateTime?                           /// Bis wann (optional, offen = dauerhaft gültig)
+
+  createdAt       DateTime   @default(now())          /// Wann wurde die Lohnart erstellt?
+
+  // === Relationen ===
+  entries         UserSalaryEntry[]                   /// Konkrete Zuweisungen pro Nutzer
+  shiftTypes      SalaryCategoryShiftType[]           /// Einschränkbar auf bestimmte Schichtarten (optional)
 }
 
+/// Verknüpft eine Lohnart (SalaryCategory) mit einer bestimmten Schichtart.
+/// Beispiel: „Nachtschicht-Zuschlag“ gilt nur bei Schichttyp = „NACHT“.
 model SalaryCategoryShiftType {
-  id         String         @id @default(cuid())
-  categoryId String
-  companyId  String?
-  shiftType  String
-  contextTag String?
+  id         String         @id @default(cuid())  /// Interne ID
+
+  categoryId String                               /// Verweis auf die zugehörige Lohnkategorie
   category   SalaryCategory @relation(fields: [categoryId], references: [id])
+
+  companyId  String?                              /// Firma, optional (für teambasierte Einschränkung)
   company    Company?       @relation(fields: [companyId], references: [id])
 
-  @@unique([categoryId, shiftType])
+  shiftType  String                               /// Technischer Code des Schichttyps (z. B. "NACHT", "FRÜH")
+  contextTag String?                              /// Optionaler Kontextfilter (z. B. "Feiertag", "Samstag")
+
+  @@unique([categoryId, shiftType])               /// Eine Kombination aus Lohnkategorie + Schichttyp darf nur einmal vorkommen
 }
 
+/// Klassische Schichteinträge – einfache Start-/Endzeit + Pause.
+/// Wird hauptsächlich für die manuelle Erfassung verwendet.
+model Shift {
+  id           String   @id @default(cuid())   /// Interne ID der Schicht
+
+  userId       String                         /// Verweis auf den Nutzer
+  user         User     @relation(fields: [userId], references: [id], onDelete: Cascade)
+
+  companyId    String                         /// Verweis auf die Firma
+  company      Company  @relation(fields: [companyId], references: [id], onDelete: Cascade)
+
+  startTime    DateTime                       /// Beginn der Schicht
+  endTime      DateTime                       /// Ende der Schicht
+
+  breakMinutes Int      @default(0)           /// Pausenzeit in Minuten (unbezahlt)
+  createdAt    DateTime @default(now())       /// Zeitpunkt der Erfassung (z. B. für Sortierung)
+}
+
+/// Moderne Schichtstruktur mit Zuordnung zu Schicht-Typen.
+/// Unterstützt Nachtschichten, Sonderformen, Pausenlogik, manuelle Anpassungen usw.
+model ShiftEntry {
+  id             String              @id @default(cuid())   /// Interne ID der Schicht
+
+  userId         String                                     /// Nutzer-ID
+  user           User                @relation(fields: [userId], references: [id])
+
+  companyId      String?                                    /// Firma (optional für Solo-Nutzer)
+  company        Company?            @relation(fields: [companyId], references: [id])
+
+  shiftTypeId    String                                     /// Referenz auf Schichtdefinition (z. B. "Früh", "Spät", "Nacht")
+  shiftType      ShiftTypeDefinition @relation(fields: [shiftTypeId], references: [id])
+
+  date           DateTime                                   /// Datum der Schicht (nur Kalendertag, ohne Uhrzeit)
+  start          DateTime                                   /// Startzeit der Schicht
+  end            DateTime                                   /// Endzeit der Schicht
+
+  pauseMinutes   Int                 @default(0)            /// Pausenzeit in Minuten (ggf. unbezahlt, siehe Schichttyp)
+  manualOverride Boolean             @default(false)        /// Manuell angepasst (überschreibt Automatik)
+  comment        String?                                    /// Freitext für Bemerkungen
+  createdAt      DateTime            @default(now())        /// Zeitstempel zur Dokumentation
+}
+
+/// Definition einer Schichtart (z. B. Früh, Spät, Nacht)
+/// Legt Start-/Endzeiten, Nachtzuschläge und Logik für Pausen fest.
+model ShiftTypeDefinition {
+  id          String       @id @default(cuid())   /// Interne ID der Schichtdefinition
+
+  companyId   String?                                /// Firma (optional – auch für private Nutzung)
+  company     Company?     @relation(fields: [companyId], references: [id])
+
+  name        String                                /// Anzeigename (z. B. "Frühschicht")
+  code        String?                               /// Kurzcode (z. B. "FS" oder "NACHT")
+
+  startTime   String                                /// Schichtbeginn (als Uhrzeit-String, z. B. "06:00")
+  endTime     String                                /// Schichtende (z. B. "14:30")
+
+  nightStart  String?                               /// Beginn des Nachtzeitraums (z. B. "22:00"), optional
+  nightEnd    String?                               /// Ende des Nachtzeitraums (z. B. "06:00"), optional
+  nightBonus  Float?                                /// Nachtzuschlag in Prozent (z. B. 25.0 für 25 %)
+
+  pauseIsPaid Boolean      @default(false)          /// Gibt an, ob die Pausen bezahlt sind
+  contextTag  String?                               /// Optionaler Kontext-Tag für spezielle Regeln/Zuordnungen
+
+  createdAt   DateTime     @default(now())          /// Erstellungszeitpunkt
+  shifts      ShiftEntry[]                          /// Verknüpfte Schicht-Einträge
+}
+
+/// Interner Superadmin-Eintrag (z. B. für ToDos, Ideen, Statusverfolgung)
+model SuperadminBoardEntry {
+  id              String    @id @default(cuid())    /// Eindeutige ID
+
+  title           String                          /// Kurzer Titel (z. B. "Export-Feature fertigstellen")
+  status          String                          /// Status (z. B. "offen", "in Arbeit", "erledigt")
+  category        String[]                         /// Eine oder mehrere Kategorien (z. B. ["Editor", "Backend"])
+  notes           String?                          /// Optionale Zusatzinfos oder Kommentare
+
+  createdAt       DateTime  @default(now())        /// Zeitpunkt der Erstellung
+  completedAt     DateTime?                        /// Wann wurde es abgeschlossen?
+  updatedByImport Boolean   @default(false)        /// Wurde der Eintrag automatisch erzeugt?
+}
+
+/// Einzelner Gehaltswert eines Users – z. B. Stundenlohn, Monatsgehalt, Zuschläge etc.
+/// Diese Einträge basieren auf frei definierbaren Kategorien (SalaryCategory)
 model UserSalaryEntry {
-  id         String         @id @default(cuid())
-  userId     String
-  companyId  String?
-  categoryId String
-  amount     Float
-  validFrom  DateTime
-  validTo    DateTime?
-  note       String?
-  createdAt  DateTime       @default(now())
+  id         String         @id @default(cuid())    /// Eindeutige ID
+
+  userId     String                                    /// Referenz auf den betroffenen Nutzer
+  companyId  String?                                   /// Optional: Firma, zu der der Eintrag gehört (für Teamkontext)
+  categoryId String                                    /// Gehaltskategorie (z. B. "Grundgehalt", "Wechselschicht-Zuschlag")
+
+  amount     Float                                     /// Eingetragener Wert (z. B. 17.5 = 17,50 € / h oder %)
+  validFrom  DateTime                                  /// Beginn der Gültigkeit
+  validTo    DateTime?                                 /// Optionales Enddatum (z. B. bei befristeten Löhnen)
+
+  note       String?                                   /// Optionale Notiz zum Eintrag (z. B. "Tarifvertrag 2025")
+  createdAt  DateTime       @default(now())            /// Wann wurde der Eintrag erstellt?
+
   user       User           @relation(fields: [userId], references: [id])
   company    Company?       @relation(fields: [companyId], references: [id])
   category   SalaryCategory @relation(fields: [categoryId], references: [id])
 
+  /// Index für schnelle Suche nach Einträgen eines Nutzers in einer Kategorie
   @@index([userId, companyId, categoryId, validFrom])
 }
 
+/// Wöchentliche Soll-Arbeitszeit eines Nutzers.
+/// Grundlage für Überstundenberechnung, Zeitkonten oder anteilige Zahlungen.
 model WeeklyWorkingTime {
-  id           String    @id @default(cuid())
-  userId       String
-  companyId    String?
-  hoursPerWeek Float
-  validFrom    DateTime
-  validTo      DateTime?
-  createdAt    DateTime  @default(now())
+  id           String    @id @default(cuid())     /// Eindeutige ID
+
+  userId       String                              /// Referenz auf den Nutzer
+  companyId    String?                             /// Optional: Firma (für Teamkontext)
+  hoursPerWeek Float                               /// Sollstunden pro Woche (z. B. 40.0, 30.5)
+
+  validFrom    DateTime                            /// Ab wann gilt diese Regelung?
+  validTo      DateTime?                           /// Bis wann? (optional, offen = aktuell gültig)
+
+  createdAt    DateTime  @default(now())           /// Wann wurde der Eintrag erstellt?
+
   user         User      @relation(fields: [userId], references: [id])
   company      Company?  @relation(fields: [companyId], references: [id])
-}
-
-model ShiftTypeDefinition {
-  id          String       @id @default(cuid())
-  companyId   String?
-  name        String
-  code        String?
-  startTime   String
-  endTime     String
-  nightStart  String?
-  nightEnd    String?
-  nightBonus  Float?
-  pauseIsPaid Boolean      @default(false)
-  contextTag  String?
-  createdAt   DateTime     @default(now())
-  company     Company?     @relation(fields: [companyId], references: [id])
-  shifts      ShiftEntry[]
-}
-
-model ShiftEntry {
-  id             String              @id @default(cuid())
-  userId         String
-  companyId      String?
-  shiftTypeId    String
-  date           DateTime
-  start          DateTime
-  end            DateTime
-  pauseMinutes   Int                 @default(0)
-  manualOverride Boolean             @default(false)
-  comment        String?
-  createdAt      DateTime            @default(now())
-  user           User                @relation(fields: [userId], references: [id])
-  company        Company?            @relation(fields: [companyId], references: [id])
-  shiftType      ShiftTypeDefinition @relation(fields: [shiftTypeId], references: [id])
 }

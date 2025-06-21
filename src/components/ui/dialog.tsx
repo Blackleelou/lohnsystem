@@ -1,84 +1,79 @@
-// src/components/ui/dialog.tsx
 import * as React from 'react'
 import { Dialog as HIDialog, Transition } from '@headlessui/react'
 import { X } from 'lucide-react'
 import clsx from 'clsx'
 
-/* ---------- Root ---------- */
 interface DialogProps {
   open: boolean
   onOpenChange: (open: boolean) => void
   children: React.ReactNode
 }
 
-export function Dialog({ open, onOpenChange, children }: DialogProps) {
-  return (
-    <Transition show={open} as={React.Fragment}>
-      <HIDialog
-        as="div"
-        className="fixed inset-0 z-50 flex items-center justify-center"
-        onClose={onOpenChange}
+export const Dialog = ({ open, onOpenChange, children }: DialogProps) => (
+  <Transition show={open} as={React.Fragment}>
+    <HIDialog onClose={onOpenChange} className="relative z-50">
+      <Transition.Child
+        as={React.Fragment}
+        enter="ease-out duration-200"
+        enterFrom="opacity-0"
+        enterTo="opacity-100"
+        leave="ease-in duration-150"
+        leaveFrom="opacity-100"
+        leaveTo="opacity-0"
       >
-        {/* Overlay */}
-        <Transition.Child
-          as={React.Fragment}
-          enter="duration-200 ease-out"
-          enterFrom="opacity-0"
-          enterTo="opacity-100"
-          leave="duration-150 ease-in"
-          leaveFrom="opacity-100"
-          leaveTo="opacity-0"
-        >
-          <div className="fixed inset-0 bg-black/40" />
-        </Transition.Child>
+        <div className="fixed inset-0 bg-black/40" />
+      </Transition.Child>
 
-        {/* Panel */}
+      <div className="fixed inset-0 flex items-center justify-center p-4">
         <Transition.Child
           as={React.Fragment}
-          enter="duration-200 ease-out"
+          enter="ease-out duration-200"
           enterFrom="opacity-0 scale-95"
           enterTo="opacity-100 scale-100"
-          leave="duration-150 ease-in"
+          leave="ease-in duration-150"
           leaveFrom="opacity-100 scale-100"
           leaveTo="opacity-0 scale-95"
         >
-          {children}
+          <HIDialog.Panel className="w-full max-w-md rounded-2xl bg-lohn-cardLight dark:bg-lohn-cardDark p-6 shadow-lg">
+            {children}
+          </HIDialog.Panel>
         </Transition.Child>
-      </HIDialog>
-    </Transition>
-  )
-}
-
-/* ---------- Content ---------- */
+      </div>
+    </HIDialog>
+  </Transition>
+)
 interface ContentProps {
   children: React.ReactNode
   className?: string
+  onOpenChange: (open: boolean) => void
 }
 
-export function DialogContent({ children, className }: ContentProps) {
-  return (
-    <div
-      className={clsx(
-        'w-full max-w-md rounded-2xl bg-lohn-cardLight dark:bg-lohn-cardDark p-8 shadow-lg',
-        className
-      )}
-    >
-      {/* Close btn */}
-      <button
-        onClick={() => {
-          /* wird von Eltern-Komponente gesteuert */
-        }}
-        className="absolute top-4 right-4 rounded-full p-2 hover:bg-black/10 dark:hover:bg-white/10"
+export const DialogContent = React.forwardRef<HTMLDivElement, ContentProps>(
+  function DialogContent(props, ref) {
+    const { children, className, onOpenChange } = props
+    return (
+      <div
+        ref={ref}
+        className={clsx(
+          'relative w-full max-w-md rounded-2xl bg-lohn-cardLight dark:bg-lohn-cardDark p-8 shadow-lg',
+          className
+        )}
       >
-        <X className="h-4 w-4" />
-      </button>
+        <button
+          onClick={() => onOpenChange(false)}
+          className="absolute top-4 right-4 rounded-full p-2 hover:bg-black/10 dark:hover:bg-white/10"
+        >
+          <X className="h-4 w-4" />
+        </button>
+        {children}
+      </div>
+    )
+  }
+)
 
-      {children}
-    </div>
-  )
-}
+DialogContent.displayName = 'DialogContent'
 
-/* ---------- Header & Title ---------- */
+
 interface HeaderProps {
   children: React.ReactNode
   className?: string

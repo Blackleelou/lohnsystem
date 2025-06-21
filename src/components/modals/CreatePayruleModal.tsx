@@ -1,61 +1,50 @@
-// src/components/modals/CreatePayruleModal.tsx
-
-import { useState } from 'react';
-import { Dialog } from '@headlessui/react';
-import toast from 'react-hot-toast';
-import type { PayRule } from '@/types/PayRule';
-
+import { useState } from 'react'
+import { Dialog, DialogContent, DialogHeader, DialogTitle } from '@/components/ui/dialog'
+import toast from 'react-hot-toast'
+import type { PayRule } from '@/types/PayRule'
+import { Loader2 } from 'lucide-react'
+import { Select, SelectContent, SelectItem, SelectTrigger } from '@/components/ui/select'
+import { RadioGroup, RadioGroupItem } from '@/components/ui/radio-group'
+import FormField from '@/components/ui/FormField'
+import { Switch } from '@/components/ui/switch'
 
 interface Props {
-  onClose: () => void;
-  onCreate: (newRule: PayRule) => void;
-  prefillGroup?: string | null;
-  existingGroups: string[];
+  onClose: () => void
+  onCreate: (newRule: PayRule) => void
+  prefillGroup?: string | null
+  existingGroups: string[]
 }
 
 export default function CreatePayruleModal({ onClose, onCreate, prefillGroup, existingGroups }: Props) {
-  const [title, setTitle] = useState('');
-  const [rate, setRate] = useState('');
-  const [type, setType] = useState<'HOURLY' | 'MONTHLY'>('HOURLY');
-  const [ruleKind, setRuleKind] = useState<'PAY' | 'BONUS' | 'SPECIAL'>('PAY');
-  const [percent, setPercent] = useState('');
-  const [fixedAmount, setFixedAmount] = useState('');
-  const [onlyDecember, setOnlyDecember] = useState(false);
-  const [onlyAdmins, setOnlyAdmins] = useState(false);
-  const [oncePerYear, setOncePerYear] = useState(false);
-  const [referenceType, setReferenceType] = useState<'BASE_SALARY' | 'ACTUAL_HOURS' | 'FIXED_AMOUNT'>('FIXED_AMOUNT');
-  const [validFrom, setValidFrom] = useState('');
-  const [validUntil, setValidUntil] = useState('');
-  const [saving, setSaving] = useState(false);
-  const [group, setGroup] = useState(prefillGroup || '');
-
+  const [title, setTitle] = useState('')
+  const [rate, setRate] = useState('')
+  const [type, setType] = useState<'HOURLY' | 'MONTHLY'>('HOURLY')
+  const [ruleKind, setRuleKind] = useState<'PAY' | 'BONUS' | 'SPECIAL'>('PAY')
+  const [percent, setPercent] = useState('')
+  const [fixedAmount, setFixedAmount] = useState('')
+  const [onlyDecember, setOnlyDecember] = useState(false)
+  const [onlyForAdmins, setOnlyForAdmins] = useState(false)
+  const [oncePerYear, setOncePerYear] = useState(false)
+  const [referenceType, setReferenceType] = useState<'BASE_SALARY' | 'ACTUAL_HOURS' | 'FIXED_AMOUNT'>('FIXED_AMOUNT')
+  const [validFrom, setValidFrom] = useState('')
+  const [validUntil, setValidUntil] = useState('')
+  const [saving, setSaving] = useState(false)
+  const [group, setGroup] = useState(prefillGroup || '')
 
   const handleSave = async () => {
-    const parsedRate = parseFloat(rate.replace(',', '.'));
-    const parsedPercent = parseFloat(percent.replace(',', '.'));
-    const parsedFixed = parseFloat(fixedAmount.replace(',', '.'));
+    const parsedRate = parseFloat(rate.replace(',', '.'))
+    const parsedPercent = parseFloat(percent.replace(',', '.'))
+    const parsedFixed = parseFloat(fixedAmount.replace(',', '.'))
 
-    if (!title.trim()) {
-      toast.error('Bezeichnung fehlt', { position: 'top-center' });
-      return;
-    }
+    if (!title.trim()) return toast.error('Bezeichnung fehlt')
+    if (ruleKind === 'PAY' && (isNaN(parsedRate) || parsedRate <= 0))
+      return toast.error('Gültiger Betrag erforderlich')
+    if (ruleKind === 'BONUS' && (isNaN(parsedPercent) || parsedPercent <= 0))
+      return toast.error('Gültiger Prozentsatz erforderlich')
+    if (ruleKind === 'SPECIAL' && (isNaN(parsedFixed) || parsedFixed <= 0))
+      return toast.error('Gültiger Festbetrag erforderlich')
 
-    if (ruleKind === 'PAY' && (isNaN(parsedRate) || parsedRate <= 0)) {
-      toast.error('Gültiger Betrag erforderlich', { position: 'top-center' });
-      return;
-    }
-
-    if (ruleKind === 'BONUS' && (isNaN(parsedPercent) || parsedPercent <= 0)) {
-      toast.error('Gültiger Prozentsatz erforderlich', { position: 'top-center' });
-      return;
-    }
-
-    if (ruleKind === 'SPECIAL' && (isNaN(parsedFixed) || parsedFixed <= 0)) {
-      toast.error('Gültiger Festbetrag erforderlich', { position: 'top-center' });
-      return;
-    }
-
-    setSaving(true);
+    setSaving(true)
     try {
       const res = await fetch('/api/team/payrules/create', {
         method: 'POST',
@@ -69,213 +58,185 @@ export default function CreatePayruleModal({ onClose, onCreate, prefillGroup, ex
           percent: ruleKind === 'BONUS' ? parsedPercent : null,
           fixedAmount: ruleKind === 'SPECIAL' ? parsedFixed : null,
           onlyDecember: ruleKind === 'SPECIAL' ? onlyDecember : undefined,
-          onlyAdmins: ruleKind === 'SPECIAL' ? onlyAdmins : undefined,
+          onlyForAdmins: ruleKind === 'SPECIAL' ? onlyForAdmins : undefined,
           oncePerYear: ruleKind === 'SPECIAL' ? oncePerYear : undefined,
           referenceType: ruleKind === 'SPECIAL' ? referenceType : undefined,
           validFrom: ruleKind === 'SPECIAL' ? validFrom || null : undefined,
           validUntil: ruleKind === 'SPECIAL' ? validUntil || null : undefined,
         }),
-      });
+      })
 
-      if (!res.ok) throw new Error();
-      const data = await res.json();
-      onCreate(data);
-      onClose();
+      if (!res.ok) throw new Error()
+      const newRule = await res.json()
+      onCreate(newRule)
+      onClose()
     } catch {
-      toast.error('Erstellen fehlgeschlagen', { position: 'top-center' });
+      toast.error('Erstellen fehlgeschlagen')
     } finally {
-      setSaving(false);
+      setSaving(false)
     }
-  };
+  }
 
   return (
-    <Dialog open onClose={onClose} className="fixed inset-0 z-50 flex items-center justify-center bg-black/30">
-      <Dialog.Panel className="bg-white dark:bg-gray-900 rounded-lg shadow-lg w-full max-w-md p-6">
-        <Dialog.Title className="text-lg font-bold mb-4">Neue Lohneinstellung</Dialog.Title>
+    <Dialog open onOpenChange={onClose}>
+      <DialogContent className="rounded-2xl p-8 space-y-8" onOpenChange={onClose}>
+        <DialogHeader>
+          <DialogTitle className="text-2xl font-semibold">Neue Lohneinstellung</DialogTitle>
+        </DialogHeader>
 
-        {/* Regeltyp */}
-        <div className="mb-4">
-          <label className="block mb-1 text-sm font-medium">Regeltyp</label>
-          <select
-            value={ruleKind}
-            onChange={(e) => setRuleKind(e.target.value as any)}
-            className="w-full rounded border px-3 py-2 text-sm dark:bg-gray-800">
-            <option value="PAY">Grundlohn (Stunde / Monat)</option>
-            <option value="BONUS">Zuschlag (z. B. Nachtschicht)</option>
-            <option value="SPECIAL">Sonderzahlung (z. B. Urlaubsgeld)</option>
-          </select>
-        </div>
-
-        {/* Bezeichnung */}
-        <div className="mb-4">
-          <label className="block mb-1 text-sm font-medium">Bezeichnung</label>
-          <input
-            type="text"
-            value={title}
-            onChange={(e) => setTitle(e.target.value)}
-            className="w-full rounded border px-3 py-2 text-sm dark:bg-gray-800"
-          />
-        </div>
-
-        {/* Gruppe */}
-        <div className="mb-4">
-          <label className="block mb-1 text-sm font-medium">Gruppe (optional)</label>
-          <input
-            type="text"
-            value={group}
-            onChange={(e) => setGroup(e.target.value)}
-            className="w-full rounded border px-3 py-2 text-sm dark:bg-gray-800"
-          />
-        </div>
-
-        {/* PAY Felder */}
-        {ruleKind === 'PAY' && (
-          <>
-            <div className="mb-4">
-              <label className="block mb-1 text-sm font-medium">Typ</label>
-              <div className="flex gap-4">
-                <label className="flex items-center gap-2">
-                  <input
-                    type="radio"
-                    name="type"
-                    value="HOURLY"
-                    checked={type === 'HOURLY'}
-                    onChange={() => setType('HOURLY')}
-                  />
-                  Stundenlohn
-                </label>
-                <label className="flex items-center gap-2">
-                  <input
-                    type="radio"
-                    name="type"
-                    value="MONTHLY"
-                    checked={type === 'MONTHLY'}
-                    onChange={() => setType('MONTHLY')}
-                  />
-                  Monatsgehalt
-                </label>
+        <div className="grid gap-5">
+          <FormField label="Regeltyp">
+            <RadioGroup value={ruleKind} onValueChange={(v) => setRuleKind(v as any)} className="flex gap-6">
+              <div className="flex items-center gap-2">
+                <RadioGroupItem value="PAY" id="pay" />
+                <label htmlFor="pay">Grundlohn</label>
               </div>
-            </div>
-            <div className="mb-6">
-              <label className="block mb-1 text-sm font-medium">
-                {type === 'HOURLY' ? 'Stundensatz (€)' : 'Monatsgehalt (€)'}
-              </label>
-              <input
-                type="text"
-                value={rate}
-                onChange={(e) => setRate(e.target.value)}
-                className="w-full rounded border px-3 py-2 text-sm dark:bg-gray-800"
-              />
-            </div>
-          </>
-        )}
+              <div className="flex items-center gap-2">
+                <RadioGroupItem value="BONUS" id="bonus" />
+                <label htmlFor="bonus">Zuschlag</label>
+              </div>
+              <div className="flex items-center gap-2">
+                <RadioGroupItem value="SPECIAL" id="special" />
+                <label htmlFor="special">Sonderzahlung</label>
+              </div>
+            </RadioGroup>
+          </FormField>
 
-        {/* BONUS Feld */}
-        {ruleKind === 'BONUS' && (
-          <div className="mb-6">
-            <label className="block mb-1 text-sm font-medium">Zuschlag (%)</label>
+          <FormField label="Bezeichnung" htmlFor="title">
             <input
+              id="title"
               type="text"
-              value={percent}
-              onChange={(e) => setPercent(e.target.value)}
-              className="w-full rounded border px-3 py-2 text-sm dark:bg-gray-800"
+              value={title}
+              onChange={(e) => setTitle(e.target.value)}
+              className="input-field w-full"
             />
-          </div>
-        )}
+          </FormField>
 
-        {/* SPECIAL Felder */}
-        {ruleKind === 'SPECIAL' && (
-          <>
-            <div className="mb-4">
-              <label className="block mb-1 text-sm font-medium">Festbetrag (€)</label>
+          <FormField label="Gruppe (optional)" htmlFor="group">
+            <input
+              id="group"
+              type="text"
+              value={group}
+              onChange={(e) => setGroup(e.target.value)}
+              className="input-field w-full"
+            />
+          </FormField>
+
+          {/* PAY Felder */}
+          {ruleKind === 'PAY' && (
+            <>
+              <FormField label="Typ">
+                <RadioGroup value={type} onValueChange={(v) => setType(v as any)} className="flex gap-6">
+                  <div className="flex items-center gap-2">
+                    <RadioGroupItem value="HOURLY" id="hourly" />
+                    <label htmlFor="hourly">Stundenlohn</label>
+                  </div>
+                  <div className="flex items-center gap-2">
+                    <RadioGroupItem value="MONTHLY" id="monthly" />
+                    <label htmlFor="monthly">Monatsgehalt</label>
+                  </div>
+                </RadioGroup>
+              </FormField>
+
+              <FormField label={type === 'HOURLY' ? 'Stundensatz (€)' : 'Monatsgehalt (€)'} htmlFor="rate">
+                <input
+                  id="rate"
+                  type="text"
+                  value={rate}
+                  onChange={(e) => setRate(e.target.value)}
+                  className="input-field w-full"
+                />
+              </FormField>
+            </>
+          )}
+
+          {/* BONUS */}
+          {ruleKind === 'BONUS' && (
+            <FormField label="Zuschlag (%)" htmlFor="percent">
               <input
+                id="percent"
                 type="text"
-                value={fixedAmount}
-                onChange={(e) => setFixedAmount(e.target.value)}
-                className="w-full rounded border px-3 py-2 text-sm dark:bg-gray-800"
+                value={percent}
+                onChange={(e) => setPercent(e.target.value)}
+                className="input-field w-full"
               />
-            </div>
+            </FormField>
+          )}
 
-            <div className="mb-4">
-              <label className="block mb-1 text-sm font-medium">Bezug</label>
-              <select
-                value={referenceType}
-                onChange={(e) =>
-                  setReferenceType(e.target.value as any)
-                }
-                className="w-full rounded border px-3 py-2 text-sm dark:bg-gray-800"
-              >
-                <option value="BASE_SALARY">Grundgehalt</option>
-                <option value="ACTUAL_HOURS">Tatsächliche Stunden</option>
-                <option value="FIXED_AMOUNT">Fester Betrag</option>
-              </select>
-            </div>
+          {/* SPECIAL */}
+          {ruleKind === 'SPECIAL' && (
+            <>
+              <FormField label="Festbetrag (€)" htmlFor="fixed">
+                <input
+                  id="fixed"
+                  type="text"
+                  value={fixedAmount}
+                  onChange={(e) => setFixedAmount(e.target.value)}
+                  className="input-field w-full"
+                />
+              </FormField>
 
-            <div className="mb-4 flex flex-col gap-2">
-              <label className="block text-sm font-medium">Gültigkeitszeitraum</label>
-              <div className="flex gap-2">
-                <input
-                  type="date"
-                  value={validFrom}
-                  onChange={(e) => setValidFrom(e.target.value)}
-                  className="flex-1 rounded border px-3 py-2 text-sm dark:bg-gray-800"
-                  placeholder="Von"
-                />
-                <input
-                  type="date"
-                  value={validUntil}
-                  onChange={(e) => setValidUntil(e.target.value)}
-                  className="flex-1 rounded border px-3 py-2 text-sm dark:bg-gray-800"
-                  placeholder="Bis"
-                />
-              </div>
-            </div>
+              <FormField label="Bezug">
+                <Select value={referenceType} onValueChange={(v) => setReferenceType(v as any)}>
+                  <SelectTrigger className="w-full input-field" />
+                  <SelectContent>
+                    <SelectItem value="BASE_SALARY">Grundgehalt</SelectItem>
+                    <SelectItem value="ACTUAL_HOURS">Tatsächliche Stunden</SelectItem>
+                    <SelectItem value="FIXED_AMOUNT">Fester Betrag</SelectItem>
+                  </SelectContent>
+                </Select>
+              </FormField>
 
-            <div className="mb-6 flex flex-col gap-2">
-              <label className="block text-sm font-medium">Optionen</label>
-              <label className="flex items-center gap-2">
-                <input
-                  type="checkbox"
-                  checked={onlyDecember}
-                  onChange={() => setOnlyDecember(!onlyDecember)}
-                />
-                Nur im Dezember auszahlen
-              </label>
-              <label className="flex items-center gap-2">
-                <input
-                  type="checkbox"
-                  checked={onlyAdmins}
-                  onChange={() => setOnlyAdmins(!onlyAdmins)}
-                />
-                Nur für Admins sichtbar
-              </label>
-              <label className="flex items-center gap-2">
-                <input
-                  type="checkbox"
-                  checked={oncePerYear}
-                  onChange={() => setOncePerYear(!oncePerYear)}
-                />
-                Max. 1× pro Jahr
-              </label>
-            </div>
-          </>
-        )}
+              <FormField label="Gültigkeitszeitraum">
+                <div className="flex gap-2">
+                  <input
+                    type="date"
+                    value={validFrom}
+                    onChange={(e) => setValidFrom(e.target.value)}
+                    className="input-field flex-1"
+                  />
+                  <input
+                    type="date"
+                    value={validUntil}
+                    onChange={(e) => setValidUntil(e.target.value)}
+                    className="input-field flex-1"
+                  />
+                </div>
+              </FormField>
 
-        {/* Aktionen */}
-        <div className="flex justify-end gap-2">
-          <button
-            onClick={onClose}
-            className="px-4 py-2 text-sm rounded bg-gray-200 hover:bg-gray-300 dark:bg-gray-700 dark:text-white">
+              <FormField label="Optionen">
+                <div className="space-y-2">
+                  <div className="flex items-center justify-between">
+                    <span>Nur im Dezember auszahlen</span>
+                    <Switch checked={onlyDecember} onCheckedChange={setOnlyDecember} />
+                  </div>
+                  <div className="flex items-center justify-between">
+                    <span>Nur für Admins sichtbar</span>
+                    <Switch checked={onlyForAdmins} onCheckedChange={setOnlyForAdmins} />
+                  </div>
+                  <div className="flex items-center justify-between">
+                    <span>Max. 1× pro Jahr</span>
+                    <Switch checked={oncePerYear} onCheckedChange={setOncePerYear} />
+                  </div>
+                </div>
+              </FormField>
+            </>
+          )}
+        </div>
+
+        <div className="flex justify-end gap-3">
+          <button onClick={onClose} className="btn-secondary">
             Abbrechen
           </button>
           <button
             onClick={handleSave}
             disabled={saving}
-            className="px-4 py-2 text-sm rounded bg-green-600 text-white hover:bg-green-700">
-            {saving ? 'Speichern…' : 'Erstellen'}
+            className="btn-primary disabled:opacity-50 disabled:pointer-events-none"
+          >
+            {saving ? <Loader2 className="animate-spin w-4 h-4" /> : 'Erstellen'}
           </button>
         </div>
-      </Dialog.Panel>
+      </DialogContent>
     </Dialog>
-  );
+  )
 }

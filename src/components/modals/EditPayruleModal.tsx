@@ -1,11 +1,6 @@
 // src/components/modals/EditPayruleModal.tsx
 import { useState } from 'react'
-import {
-  Dialog,
-  DialogContent,
-  DialogHeader,
-  DialogTitle,
-} from '@/components/ui/dialog'
+import { Dialog, DialogContent, DialogHeader, DialogTitle } from '@/components/ui/dialog'
 import { RadioGroup, RadioGroupItem } from '@/components/ui/radio-group'
 import { Select, SelectTrigger, SelectContent, SelectItem } from '@/components/ui/select'
 import { Switch } from '@/components/ui/switch'
@@ -13,6 +8,7 @@ import { Loader2 } from 'lucide-react'
 import FormField from '@/components/ui/FormField'
 import toast from 'react-hot-toast'
 import type { PayRule } from '@/types/PayRule'
+
 
 interface Props {
   /** Datensatz, der bearbeitet wird */
@@ -66,6 +62,7 @@ export default function EditPayruleModal({ rule, onClose, onSave }: Props) {
           title: title.trim(),
           rate: parsedRate,
           type,
+          ruleKind, 
           percent: ruleKind === 'BONUS' ? parsedPercent : null,
           fixedAmount: ruleKind === 'SPECIAL' ? parsedFixed : null,
           onlyDecember: ruleKind === 'SPECIAL' ? onlyDecember : undefined,
@@ -90,7 +87,7 @@ export default function EditPayruleModal({ rule, onClose, onSave }: Props) {
   /* ---------- UI ---------- */
   return (
     <Dialog open onOpenChange={onClose}>
-      <DialogContent className="rounded-2xl p-8 space-y-8">
+      <DialogContent className="rounded-2xl p-8 space-y-8" onOpenChange={onClose}>
         <DialogHeader>
           <DialogTitle className="text-2xl font-semibold">Lohneinstellung bearbeiten</DialogTitle>
         </DialogHeader>
