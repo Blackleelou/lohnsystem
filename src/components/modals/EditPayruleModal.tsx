@@ -69,7 +69,7 @@ export default function EditPayruleModal({ rule, onClose, onSave }: Props) {
           percent: ruleKind === 'BONUS' ? parsedPercent : null,
           fixedAmount: ruleKind === 'SPECIAL' ? parsedFixed : null,
           onlyDecember: ruleKind === 'SPECIAL' ? onlyDecember : undefined,
-          onlyAdmins: ruleKind === 'SPECIAL' ? onlyAdmins : undefined,
+          onlyForAdmins: ruleKind === 'SPECIAL' ? onlyForAdmins : undefined,
           oncePerYear: ruleKind === 'SPECIAL' ? oncePerYear : undefined,
           referenceType: ruleKind === 'SPECIAL' ? referenceType : undefined,
           validFrom: ruleKind === 'SPECIAL' ? validFrom || null : undefined,
