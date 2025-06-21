@@ -1,264 +1,255 @@
-// src/components/modals/EditPayruleModal.tsx
-
-import { useEffect, useState } from 'react';
-import { Dialog } from '@headlessui/react';
+import { useState } from 'react';
+import { Dialog, DialogContent, DialogHeader, DialogTitle } from '@/components/ui/dialog';
+import { Switch } from '@/components/ui/switch';
+import { RadioGroup, RadioGroupItem } from '@/components/ui/radio-group';
+import { Select, SelectTrigger, SelectContent, SelectItem } from '@/components/ui/select';
+import { Loader2 } from 'lucide-react';
 import toast from 'react-hot-toast';
+import FormField from '@/components/ui/FormField';
 import type { PayRule } from '@/types/PayRule';
 
-
 interface Props {
-  rule: PayRule | null;
   onClose: () => void;
-  onSave: (updated: PayRule) => void;
+  onCreate: (newRule: PayRule) => void;
+  prefillGroup?: string | null;
+  existingGroups: string[];
 }
 
-export default function EditPayruleModal({ rule, onClose, onSave }: Props) {
+export default function CreatePayruleModal({
+  onClose,
+  onCreate,
+  prefillGroup,
+  existingGroups
+}: Props) {
+  /* ---------- State ---------- */
   const [title, setTitle] = useState('');
   const [rate, setRate] = useState('');
+  const [type, setType] = useState<'HOURLY' | 'MONTHLY'>('HOURLY');
+  const [ruleKind, setRuleKind] = useState<'PAY' | 'BONUS' | 'SPECIAL'>('PAY');
   const [percent, setPercent] = useState('');
   const [fixedAmount, setFixedAmount] = useState('');
-  const [type, setType] = useState<'HOURLY' | 'MONTHLY'>('HOURLY');
-  const [group, setGroup] = useState('');
-  const [ruleKind, setRuleKind] = useState<'PAY' | 'BONUS' | 'SPECIAL'>('PAY');
+  const [onlyDecember, setOnlyDecember] = useState(false);
+  const [onlyAdmins, setOnlyAdmins] = useState(false);
+  const [oncePerYear, setOncePerYear] = useState(false);
+  const [referenceType, setReferenceType] = useState<'BASE_SALARY' | 'ACTUAL_HOURS' | 'FIXED_AMOUNT'>('FIXED_AMOUNT');
   const [validFrom, setValidFrom] = useState('');
   const [validUntil, setValidUntil] = useState('');
-  const [onlyDecember, setOnlyDecember] = useState(false);
-  const [onlyForAdmins, setOnlyForAdmins] = useState(false);
-  const [perYear, setPerYear] = useState(false);
-  const [referenceType, setReferenceType] = useState<'BASE_SALARY' | 'ACTUAL_HOURS' | 'FIXED_AMOUNT'>('BASE_SALARY');
   const [saving, setSaving] = useState(false);
+  const [group, setGroup] = useState(prefillGroup || '');
 
-  useEffect(() => {
-    if (rule) {
-      setTitle(rule.title);
-      setGroup(rule.group || '');
-      setRate(rule.rate?.toString().replace('.', ',') || '');
-      setPercent(rule.percent?.toString().replace('.', ',') || '');
-      setFixedAmount(rule.fixedAmount?.toString().replace('.', ',') || '');
-      setType(rule.type || 'HOURLY');
-      setRuleKind(rule.ruleKind);
-      setValidFrom(rule.validFrom?.slice(0, 10) || '');
-      setValidUntil(rule.validUntil?.slice(0, 10) || '');
-      setOnlyDecember(!!rule.onlyDecember);
-      setOnlyForAdmins(!!rule.onlyForAdmins);
-      setPerYear(!!rule.perYear);
-      setReferenceType(rule.referenceType || 'BASE_SALARY');
-    }
-  }, [rule]);
-
+  /* ---------- Save ---------- */
   const handleSave = async () => {
     const parsedRate = parseFloat(rate.replace(',', '.'));
     const parsedPercent = parseFloat(percent.replace(',', '.'));
     const parsedFixed = parseFloat(fixedAmount.replace(',', '.'));
 
-    if (!title.trim()) {
-      toast.error('Bitte gültige Bezeichnung eingeben', { position: 'top-center' });
-      return;
-    }
-
-    if (ruleKind === 'PAY' && (isNaN(parsedRate) || parsedRate <= 0)) {
-      toast.error('Bitte gültigen Stundensatz eingeben', { position: 'top-center' });
-      return;
-    }
-
-    if (ruleKind === 'BONUS' && (isNaN(parsedPercent) || parsedPercent <= 0)) {
-      toast.error('Bitte gültigen Prozentwert eingeben', { position: 'top-center' });
-      return;
-    }
-
-    if (ruleKind === 'SPECIAL' && (isNaN(parsedFixed) || parsedFixed <= 0)) {
-      toast.error('Bitte gültigen Festbetrag eingeben', { position: 'top-center' });
-      return;
-    }
+    if (!title.trim()) return toast.error('Bezeichnung fehlt', { position: 'top-center' });
+    if (ruleKind === 'PAY' && (isNaN(parsedRate) || parsedRate <= 0))
+      return toast.error('Gültiger Betrag erforderlich', { position: 'top-center' });
+    if (ruleKind === 'BONUS' && (isNaN(parsedPercent) || parsedPercent <= 0))
+      return toast.error('Gültiger Prozentsatz erforderlich', { position: 'top-center' });
+    if (ruleKind === 'SPECIAL' && (isNaN(parsedFixed) || parsedFixed <= 0))
+      return toast.error('Gültiger Festbetrag erforderlich', { position: 'top-center' });
 
     setSaving(true);
     try {
-      const res = await fetch('/api/team/payrules/update', {
+      const res = await fetch('/api/team/payrules/create', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({
-          id: rule?.id,
           title: title.trim(),
-          rate: ruleKind === 'PAY' ? parsedRate : null,
-          percent: ruleKind === 'BONUS' ? parsedPercent : null,
-          fixedAmount: ruleKind === 'SPECIAL' ? parsedFixed : null,
-          type: ruleKind === 'PAY' ? type : null,
+          rate: parsedRate,
+          type,
           group: group.trim() || null,
           ruleKind,
-          validFrom: ruleKind === 'SPECIAL' ? validFrom || null : null,
-          validUntil: ruleKind === 'SPECIAL' ? validUntil || null : null,
-          onlyDecember: ruleKind === 'SPECIAL' ? onlyDecember : false,
-          onlyForAdmins: ruleKind === 'SPECIAL' ? onlyForAdmins : false,
-          perYear: ruleKind === 'SPECIAL' ? perYear : false,
-          referenceType: ruleKind === 'SPECIAL' ? referenceType : null,
-        }),
+          percent: ruleKind === 'BONUS' ? parsedPercent : null,
+          fixedAmount: ruleKind === 'SPECIAL' ? parsedFixed : null,
+          onlyDecember: ruleKind === 'SPECIAL' ? onlyDecember : undefined,
+          onlyAdmins: ruleKind === 'SPECIAL' ? onlyAdmins : undefined,
+          oncePerYear: ruleKind === 'SPECIAL' ? oncePerYear : undefined,
+          referenceType: ruleKind === 'SPECIAL' ? referenceType : undefined,
+          validFrom: ruleKind === 'SPECIAL' ? validFrom || null : undefined,
+          validUntil: ruleKind === 'SPECIAL' ? validUntil || null : undefined
+        })
       });
-
       if (!res.ok) throw new Error();
-      const updated: PayRule = await res.json();
-      onSave(updated);
+      const data = await res.json();
+      onCreate(data);
       onClose();
     } catch {
-      toast.error('Fehler beim Speichern', { position: 'top-center' });
+      toast.error('Erstellen fehlgeschlagen', { position: 'top-center' });
     } finally {
       setSaving(false);
     }
   };
 
-  if (!rule) return null;
-
+  /* ---------- UI ---------- */
   return (
-    <Dialog open onClose={onClose} className="fixed inset-0 z-50 flex items-center justify-center bg-black/30">
-      <Dialog.Panel className="bg-white dark:bg-gray-800 rounded-lg p-6 w-full max-w-md shadow-xl">
-        <Dialog.Title className="text-lg font-bold mb-4">Lohneinstellung bearbeiten</Dialog.Title>
+    <Dialog open onOpenChange={onClose}>
+      <DialogContent className="rounded-2xl p-8 space-y-8">
+        <DialogHeader>
+          <DialogTitle className="text-2xl font-semibold">Neue Lohneinstellung</DialogTitle>
+        </DialogHeader>
 
-        <div className="space-y-4">
+        {/* Grid-Layout */}
+        <div className="grid gap-5">
           {/* Regeltyp */}
-          <div>
-            <label className="block mb-1 text-sm">Regeltyp</label>
-            <select
-              value={ruleKind}
-              onChange={(e) => setRuleKind(e.target.value as any)}
-              className="w-full px-3 py-2 border rounded text-sm dark:bg-gray-900"
-            >
-              <option value="PAY">Grundlohn</option>
-              <option value="BONUS">Zuschlag (%)</option>
-              <option value="SPECIAL">Sonderzahlung</option>
-            </select>
-          </div>
+          <FormField label="Regeltyp">
+            <Select value={ruleKind} onValueChange={(v) => setRuleKind(v as any)}>
+              <SelectTrigger className="w-full input-field" />
+              <SelectContent>
+                <SelectItem value="PAY">Grundlohn (Std./Monat)</SelectItem>
+                <SelectItem value="BONUS">Zuschlag (z. B. Nacht)</SelectItem>
+                <SelectItem value="SPECIAL">Sonderzahlung (Urlaub)</SelectItem>
+              </SelectContent>
+            </Select>
+          </FormField>
 
-          <div>
-            <label className="block mb-1 text-sm">Bezeichnung</label>
+          {/* Bezeichnung */}
+          <FormField label="Bezeichnung" htmlFor="title">
             <input
-              className="w-full px-3 py-2 border rounded text-sm dark:bg-gray-900"
+              id="title"
+              type="text"
               value={title}
-              onChange={e => setTitle(e.target.value)}
+              onChange={(e) => setTitle(e.target.value)}
+              className="input-field w-full"
             />
-          </div>
+          </FormField>
 
-          <div>
-            <label className="block mb-1 text-sm">Gruppe (optional)</label>
+          {/* Gruppe */}
+          <FormField label="Gruppe (optional)" htmlFor="group">
             <input
-              className="w-full px-3 py-2 border rounded text-sm dark:bg-gray-900"
+              id="group"
+              type="text"
               value={group}
-              onChange={e => setGroup(e.target.value)}
-              placeholder="z. B. Zuschläge"
+              onChange={(e) => setGroup(e.target.value)}
+              list="group-list"
+              className="input-field w-full"
             />
-          </div>
+            <datalist id="group-list">
+              {existingGroups.map((g) => (
+                <option key={g} value={g} />
+              ))}
+            </datalist>
+          </FormField>
 
-          {/* Dynamisch je nach Regeltyp */}
+          {/* PAY */}
           {ruleKind === 'PAY' && (
             <>
-              <div>
-                <label className="block mb-1 text-sm">Typ</label>
-                <select
-                  value={type}
-                  onChange={(e) => setType(e.target.value as any)}
-                  className="w-full px-3 py-2 border rounded text-sm dark:bg-gray-900"
-                >
-                  <option value="HOURLY">Stundenlohn</option>
-                  <option value="MONTHLY">Monatsgehalt</option>
-                </select>
-              </div>
+              <FormField label="Typ">
+                <RadioGroup value={type} onValueChange={(v) => setType(v as any)} className="flex gap-6">
+                  <div className="flex items-center gap-2">
+                    <RadioGroupItem value="HOURLY" id="hourly" /> <label htmlFor="hourly">Stundenlohn</label>
+                  </div>
+                  <div className="flex items-center gap-2">
+                    <RadioGroupItem value="MONTHLY" id="monthly" /> <label htmlFor="monthly">Monatsgehalt</label>
+                  </div>
+                </RadioGroup>
+              </FormField>
 
-              <div>
-                <label className="block mb-1 text-sm">Betrag (€)</label>
+              <FormField label={type === 'HOURLY' ? 'Stundensatz (€)' : 'Monatsgehalt (€)'} htmlFor="rate">
                 <input
-                  className="w-full px-3 py-2 border rounded text-sm dark:bg-gray-900"
+                  id="rate"
+                  type="text"
                   value={rate}
-                  onChange={e => setRate(e.target.value)}
+                  onChange={(e) => setRate(e.target.value)}
+                  className="input-field w-full"
                 />
-              </div>
+              </FormField>
             </>
           )}
 
+          {/* BONUS */}
           {ruleKind === 'BONUS' && (
-            <div>
-              <label className="block mb-1 text-sm">Zuschlag (%)</label>
+            <FormField label="Zuschlag (%)" htmlFor="percent">
               <input
-                className="w-full px-3 py-2 border rounded text-sm dark:bg-gray-900"
+                id="percent"
+                type="text"
                 value={percent}
-                onChange={e => setPercent(e.target.value)}
+                onChange={(e) => setPercent(e.target.value)}
+                className="input-field w-full"
               />
-            </div>
+            </FormField>
           )}
 
+          {/* SPECIAL */}
           {ruleKind === 'SPECIAL' && (
             <>
-              <div>
-                <label className="block mb-1 text-sm">Festbetrag (€)</label>
+              <FormField label="Festbetrag (€)" htmlFor="fixed">
                 <input
-                  className="w-full px-3 py-2 border rounded text-sm dark:bg-gray-900"
+                  id="fixed"
+                  type="text"
                   value={fixedAmount}
-                  onChange={e => setFixedAmount(e.target.value)}
+                  onChange={(e) => setFixedAmount(e.target.value)}
+                  className="input-field w-full"
                 />
-              </div>
+              </FormField>
 
-              <div className="flex gap-2">
-                <div className="flex items-center gap-2">
-                  <input type="checkbox" checked={onlyDecember} onChange={e => setOnlyDecember(e.target.checked)} />
-                  <label className="text-sm">Nur im Dezember</label>
-                </div>
-                <div className="flex items-center gap-2">
-                  <input type="checkbox" checked={onlyForAdmins} onChange={e => setOnlyForAdmins(e.target.checked)} />
-                  <label className="text-sm">Nur für Admins</label>
-                </div>
-                <div className="flex items-center gap-2">
-                  <input type="checkbox" checked={perYear} onChange={e => setPerYear(e.target.checked)} />
-                  <label className="text-sm">Nur 1× pro Jahr</label>
-                </div>
-              </div>
+              <FormField label="Bezug">
+                <Select value={referenceType} onValueChange={(v) => setReferenceType(v as any)}>
+                  <SelectTrigger className="w-full input-field" />
+                  <SelectContent>
+                    <SelectItem value="BASE_SALARY">Grundgehalt</SelectItem>
+                    <SelectItem value="ACTUAL_HOURS">Tatsächliche Stunden</SelectItem>
+                    <SelectItem value="FIXED_AMOUNT">Fester Betrag</SelectItem>
+                  </SelectContent>
+                </Select>
+              </FormField>
 
-              <div>
-                <label className="block mb-1 text-sm">Bezugsart</label>
-                <select
-                  value={referenceType}
-                  onChange={(e) => setReferenceType(e.target.value as any)}
-                  className="w-full px-3 py-2 border rounded text-sm dark:bg-gray-900"
-                >
-                  <option value="BASE_SALARY">Grundgehalt</option>
-                  <option value="ACTUAL_HOURS">Gearbeitete Stunden</option>
-                  <option value="FIXED_AMOUNT">Fester Betrag</option>
-                </select>
-              </div>
-
-              <div className="flex gap-2">
-                <div className="flex-1">
-                  <label className="block mb-1 text-sm">Gültig ab</label>
+              {/* Gültigkeit */}
+              <FormField label="Gültigkeitszeitraum">
+                <div className="flex gap-2">
                   <input
                     type="date"
                     value={validFrom}
-                    onChange={e => setValidFrom(e.target.value)}
-                    className="w-full px-3 py-2 border rounded text-sm dark:bg-gray-900"
+                    onChange={(e) => setValidFrom(e.target.value)}
+                    className="input-field flex-1"
                   />
-                </div>
-                <div className="flex-1">
-                  <label className="block mb-1 text-sm">Gültig bis</label>
                   <input
                     type="date"
                     value={validUntil}
-                    onChange={e => setValidUntil(e.target.value)}
-                    className="w-full px-3 py-2 border rounded text-sm dark:bg-gray-900"
+                    onChange={(e) => setValidUntil(e.target.value)}
+                    className="input-field flex-1"
                   />
                 </div>
-              </div>
+              </FormField>
+
+              {/* Optionen */}
+              <FormField label="Optionen">
+                <div className="space-y-2">
+                  <div className="flex items-center justify-between">
+                    <span>Nur im Dezember auszahlen</span>
+                    <Switch checked={onlyDecember} onCheckedChange={setOnlyDecember} />
+                  </div>
+                  <div className="flex items-center justify-between">
+                    <span>Nur für Admins sichtbar</span>
+                    <Switch checked={onlyAdmins} onCheckedChange={setOnlyAdmins} />
+                  </div>
+                  <div className="flex items-center justify-between">
+                    <span>Max. 1× pro Jahr</span>
+                    <Switch checked={oncePerYear} onCheckedChange={setOncePerYear} />
+                  </div>
+                </div>
+              </FormField>
             </>
           )}
-
-          <div className="flex justify-end gap-2 pt-2">
-            <button onClick={onClose} className="px-4 py-2 text-sm text-gray-600 hover:underline">
-              Abbrechen
-            </button>
-            <button
-              onClick={handleSave}
-              disabled={saving}
-              className="px-4 py-2 text-sm rounded bg-blue-600 text-white hover:bg-blue-700"
-            >
-              {saving ? 'Speichern…' : 'Speichern'}
-            </button>
-          </div>
         </div>
-      </Dialog.Panel>
+
+        {/* Buttons */}
+        <div className="flex justify-end gap-3">
+          <button onClick={onClose} className="btn-secondary">
+            Abbrechen
+          </button>
+          <button
+            onClick={handleSave}
+            disabled={saving}
+            className="btn-primary disabled:opacity-50 disabled:pointer-events-none"
+          >
+            {saving && <Loader2 className="animate-spin w-4 h-4" />}
+            {!saving && 'Erstellen'}
+          </button>
+        </div>
+      </DialogContent>
     </Dialog>
   );
 }
