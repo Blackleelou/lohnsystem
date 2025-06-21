@@ -164,6 +164,7 @@ model PayRule {
   onlyForAdmins Boolean?
   perYear       Boolean?
   referenceType ReferenceType?
+  oncePerYear   Boolean?       @default(false)
   createdAt     DateTime       @default(now())
 }
 
