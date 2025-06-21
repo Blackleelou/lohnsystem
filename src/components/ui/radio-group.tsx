@@ -29,7 +29,7 @@ export function RadioGroup<T extends string = string>({
 interface RadioGroupItemProps {
   value: string
   id?: string
-  children: React.ReactNode
+  children?: React.ReactNode
   className?: string
 }
 
