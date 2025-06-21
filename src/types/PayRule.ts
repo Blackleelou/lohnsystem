@@ -10,6 +10,7 @@ export type PayRule = {
   percent?: number | null;
   fixedAmount?: number | null;
   onlyForAdmins?: boolean;
+  oncePerYear?: boolean           // ➜ NEU
   onlyDecember?: boolean;
   perYear?: boolean;
   referenceType?: 'BASE_SALARY' | 'ACTUAL_HOURS' | 'FIXED_AMOUNT';
