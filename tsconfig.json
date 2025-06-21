@@ -18,7 +18,7 @@
     "paths": {
       "@/*": ["./*"]
     },
-    "types": ["next-auth"]
+    "types": ["next-auth", "jest", "node"]
   },
   "include": ["next-env.d.ts", "**/*.ts", "**/*.tsx", "src/types/**/*.d.ts"],
   "exclude": ["node_modules"]

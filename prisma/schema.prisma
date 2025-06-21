@@ -113,25 +113,25 @@ model VerificationToken {
 }
 
 model Company {
-  id                    String                    @id @default(cuid())
-  name                  String
-  description           String?
-  createdAt             DateTime                  @default(now())
-  users                 User[]
-  invitations           Invitation[]
-  accessCodes           AccessCode[]
-  payRules              PayRule[]                 @relation("CompanyToPayRules")
-  settings              CompanySettings?
-  shifts                Shift[]
-  salaryCategories      SalaryCategory[]
-  salaryEntries         UserSalaryEntry[]
-  shiftDefinitions      ShiftTypeDefinition[]
-  shiftEntries          ShiftEntry[]
-  weeklyTimes           WeeklyWorkingTime[]
-  documents             EditorDocument[]          @relation("CompanyDocuments")
-  sharedDocuments       EditorShare[]             @relation("CompanySharedDocuments")
-  salaryShiftTypes      SalaryCategoryShiftType[]
-  specialPaymentRules   SpecialPaymentRule[]
+  id                  String                    @id @default(cuid())
+  name                String
+  description         String?
+  createdAt           DateTime                  @default(now())
+  users               User[]
+  invitations         Invitation[]
+  accessCodes         AccessCode[]
+  payRules            PayRule[]                 @relation("CompanyToPayRules")
+  settings            CompanySettings?
+  shifts              Shift[]
+  salaryCategories    SalaryCategory[]
+  salaryEntries       UserSalaryEntry[]
+  shiftDefinitions    ShiftTypeDefinition[]
+  shiftEntries        ShiftEntry[]
+  weeklyTimes         WeeklyWorkingTime[]
+  documents           EditorDocument[]          @relation("CompanyDocuments")
+  sharedDocuments     EditorShare[]             @relation("CompanySharedDocuments")
+  salaryShiftTypes    SalaryCategoryShiftType[]
+  specialPaymentRules SpecialPaymentRule[]
 }
 
 model CompanySettings {
@@ -148,23 +148,23 @@ model CompanySettings {
 }
 
 model PayRule {
-  id             String   @id @default(cuid())
-  companyId      String
-  company        Company  @relation("CompanyToPayRules", fields: [companyId], references: [id])
-  title          String
-  group          String? 
-  ruleKind       RuleKind
-  type           PayRuleType?
-  rate           Float?
-  percent        Float?
-  fixedAmount    Float?
-  validFrom      DateTime?   
-  validUntil     DateTime?   
-  onlyDecember   Boolean?    
-  onlyForAdmins  Boolean?    
-  perYear        Boolean?    
-  referenceType  ReferenceType? 
-  createdAt      DateTime  @default(now())
+  id            String         @id @default(cuid())
+  companyId     String
+  company       Company        @relation("CompanyToPayRules", fields: [companyId], references: [id])
+  title         String
+  group         String?
+  ruleKind      RuleKind
+  type          PayRuleType?
+  rate          Float?
+  percent       Float?
+  fixedAmount   Float?
+  validFrom     DateTime?
+  validUntil    DateTime?
+  onlyDecember  Boolean?
+  onlyForAdmins Boolean?
+  perYear       Boolean?
+  referenceType ReferenceType?
+  createdAt     DateTime       @default(now())
 }
 
 enum RuleKind {
@@ -185,24 +185,24 @@ enum ReferenceType {
 }
 
 model SpecialPaymentRule {
-  id                         String   @id @default(cuid())
-  companyId                  String
-  title                      String              // z. B. Weihnachtsgeld, Schichtmix-Bonus
-  type                       String              // 'FIXED' oder 'PERCENT'
-  amount                     Float               // Betrag oder Prozentwert (je nach type)
-  shiftMixBonus              Boolean  @default(false) // Nur wenn unterschiedliche Schichten vorkommen
-  minShiftTypesPerMonth      Int?                // z. B. mindestens 2 Schichtarten im Monat
-  requiredShiftTypeCodes     String[]            // z. B. ['Früh', 'Spät', 'Nacht']
-  minYearsInCompany          Int?                // z. B. für 10-Jahres-Bonus
-  appliesInMonth             Int?                // Nur in bestimmten Monaten (z. B. 12 = Dezember)
-  appliesOncePerYear         Boolean  @default(false) // z. B. für jährliche Boni
-  onlyForRoles               String[]            // z. B. ['ADMIN', 'MITARBEITER']
-  proportionalToWeeklyHours  Boolean  @default(false) // Auszahlung anteilig zur Wochenarbeitszeit
-  calculationReference       String?             // 'BASE_SALARY', 'ACTUAL_HOURS', etc.
-  note                       String?             // Freitext-Hinweis oder Info
-  active                     Boolean  @default(true)
-  validFrom                  DateTime            // Gültigkeitsbeginn
-  validTo                    DateTime?           // Optionales Enddatum
+  id                        String    @id @default(cuid())
+  companyId                 String
+  title                     String // z. B. Weihnachtsgeld, Schichtmix-Bonus
+  type                      String // 'FIXED' oder 'PERCENT'
+  amount                    Float // Betrag oder Prozentwert (je nach type)
+  shiftMixBonus             Boolean   @default(false) // Nur wenn unterschiedliche Schichten vorkommen
+  minShiftTypesPerMonth     Int? // z. B. mindestens 2 Schichtarten im Monat
+  requiredShiftTypeCodes    String[] // z. B. ['Früh', 'Spät', 'Nacht']
+  minYearsInCompany         Int? // z. B. für 10-Jahres-Bonus
+  appliesInMonth            Int? // Nur in bestimmten Monaten (z. B. 12 = Dezember)
+  appliesOncePerYear        Boolean   @default(false) // z. B. für jährliche Boni
+  onlyForRoles              String[] // z. B. ['ADMIN', 'MITARBEITER']
+  proportionalToWeeklyHours Boolean   @default(false) // Auszahlung anteilig zur Wochenarbeitszeit
+  calculationReference      String? // 'BASE_SALARY', 'ACTUAL_HOURS', etc.
+  note                      String? // Freitext-Hinweis oder Info
+  active                    Boolean   @default(true)
+  validFrom                 DateTime // Gültigkeitsbeginn
+  validTo                   DateTime? // Optionales Enddatum
 
   company Company @relation(fields: [companyId], references: [id], onDelete: Cascade)
 
@@ -222,23 +222,23 @@ model Shift {
 }
 
 model Invitation {
-  id          String   @id @default(cuid())
-  token       String   @unique
-  companyId   String
-  role        String
-  createdAt   DateTime @default(now())
-  expiresAt   DateTime
-  used        Boolean  @default(false)
-  createdBy   String?
-  note        String?
-  type        String
-  password    String?
-  createdById String?
-  printTitle  String?
-  printText   String?
-  printLogo   String?
-  company     Company  @relation(fields: [companyId], references: [id], onDelete: Cascade)
-  createdByUser User?  @relation("UserToInvitations", fields: [createdById], references: [id])
+  id            String   @id @default(cuid())
+  token         String   @unique
+  companyId     String
+  role          String
+  createdAt     DateTime @default(now())
+  expiresAt     DateTime
+  used          Boolean  @default(false)
+  createdBy     String?
+  note          String?
+  type          String
+  password      String?
+  createdById   String?
+  printTitle    String?
+  printText     String?
+  printLogo     String?
+  company       Company  @relation(fields: [companyId], references: [id], onDelete: Cascade)
+  createdByUser User?    @relation("UserToInvitations", fields: [createdById], references: [id])
 }
 
 model AccessCode {
@@ -257,27 +257,27 @@ model AccessCode {
 }
 
 model EditorDocument {
-  id         String     @id @default(cuid())
+  id         String        @id @default(cuid())
   title      String
   content    Json
-  format     String     @default("a4")
+  format     String        @default("a4")
   ownerId    String?
   companyId  String?
-  visibility Visibility @default(PRIVATE)
-  createdAt  DateTime   @default(now())
-  updatedAt  DateTime   @updatedAt
-  owner      User?      @relation("UserDocuments", fields: [ownerId], references: [id])
-  company    Company?   @relation("CompanyDocuments", fields: [companyId], references: [id])
+  visibility Visibility    @default(PRIVATE)
+  createdAt  DateTime      @default(now())
+  updatedAt  DateTime      @updatedAt
+  owner      User?         @relation("UserDocuments", fields: [ownerId], references: [id])
+  company    Company?      @relation("CompanyDocuments", fields: [companyId], references: [id])
   shares     EditorShare[]
 }
 
 model EditorShare {
-  id                  String   @id @default(cuid())
+  id                  String         @id @default(cuid())
   documentId          String
   sharedWithUserId    String?
   sharedWithCompanyId String?
-  canEdit             Boolean  @default(false)
-  createdAt           DateTime @default(now())
+  canEdit             Boolean        @default(false)
+  createdAt           DateTime       @default(now())
   document            EditorDocument @relation(fields: [documentId], references: [id])
   sharedWithUser      User?          @relation("UserSharedDocuments", fields: [sharedWithUserId], references: [id])
   sharedWithCompany   Company?       @relation("CompanySharedDocuments", fields: [sharedWithCompanyId], references: [id])
@@ -291,7 +291,7 @@ enum Visibility {
 }
 
 model SalaryCategory {
-  id              String    @id @default(cuid())
+  id              String                    @id @default(cuid())
   companyId       String?
   name            String
   description     String?
@@ -299,20 +299,20 @@ model SalaryCategory {
   calculationMode String?
   formula         String?
   defaultValue    Float?
-  userSelectable  Boolean   @default(true)
-  required        Boolean   @default(false)
-  hidden          Boolean   @default(false)
-  multiContext    Boolean   @default(false)
+  userSelectable  Boolean                   @default(true)
+  required        Boolean                   @default(false)
+  hidden          Boolean                   @default(false)
+  multiContext    Boolean                   @default(false)
   validFrom       DateTime
   validTo         DateTime?
-  createdAt       DateTime  @default(now())
-  company         Company?  @relation(fields: [companyId], references: [id])
+  createdAt       DateTime                  @default(now())
+  company         Company?                  @relation(fields: [companyId], references: [id])
   entries         UserSalaryEntry[]
   shiftTypes      SalaryCategoryShiftType[]
 }
 
 model SalaryCategoryShiftType {
-  id         String  @id @default(cuid())
+  id         String         @id @default(cuid())
   categoryId String
   companyId  String?
   shiftType  String
@@ -324,7 +324,7 @@ model SalaryCategoryShiftType {
 }
 
 model UserSalaryEntry {
-  id         String    @id @default(cuid())
+  id         String         @id @default(cuid())
   userId     String
   companyId  String?
   categoryId String
@@ -332,7 +332,7 @@ model UserSalaryEntry {
   validFrom  DateTime
   validTo    DateTime?
   note       String?
-  createdAt  DateTime  @default(now())
+  createdAt  DateTime       @default(now())
   user       User           @relation(fields: [userId], references: [id])
   company    Company?       @relation(fields: [companyId], references: [id])
   category   SalaryCategory @relation(fields: [categoryId], references: [id])
@@ -353,7 +353,7 @@ model WeeklyWorkingTime {
 }
 
 model ShiftTypeDefinition {
-  id          String   @id @default(cuid())
+  id          String       @id @default(cuid())
   companyId   String?
   name        String
   code        String?
@@ -362,25 +362,25 @@ model ShiftTypeDefinition {
   nightStart  String?
   nightEnd    String?
   nightBonus  Float?
-  pauseIsPaid Boolean  @default(false)
+  pauseIsPaid Boolean      @default(false)
   contextTag  String?
-  createdAt   DateTime @default(now())
-  company     Company? @relation(fields: [companyId], references: [id])
+  createdAt   DateTime     @default(now())
+  company     Company?     @relation(fields: [companyId], references: [id])
   shifts      ShiftEntry[]
 }
 
 model ShiftEntry {
-  id             String   @id @default(cuid())
+  id             String              @id @default(cuid())
   userId         String
   companyId      String?
   shiftTypeId    String
   date           DateTime
   start          DateTime
   end            DateTime
-  pauseMinutes   Int      @default(0)
-  manualOverride Boolean  @default(false)
+  pauseMinutes   Int                 @default(0)
+  manualOverride Boolean             @default(false)
   comment        String?
-  createdAt      DateTime @default(now())
+  createdAt      DateTime            @default(now())
   user           User                @relation(fields: [userId], references: [id])
   company        Company?            @relation(fields: [companyId], references: [id])
   shiftType      ShiftTypeDefinition @relation(fields: [shiftTypeId], references: [id])

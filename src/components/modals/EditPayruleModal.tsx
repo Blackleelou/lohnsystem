@@ -3,24 +3,8 @@
 import { useEffect, useState } from 'react';
 import { Dialog } from '@headlessui/react';
 import toast from 'react-hot-toast';
+import type { PayRule } from '@/types/PayRule';
 
-export type PayRule = {
-  id: string;
-  title: string;
-  rate: number | null;
-  percent?: number | null;
-  fixedAmount?: number | null;
-  type?: 'HOURLY' | 'MONTHLY';
-  ruleKind: 'PAY' | 'BONUS' | 'SPECIAL';
-  group?: string;
-  createdAt: string;
-  validFrom?: string | null;
-  validUntil?: string | null;
-  onlyDecember?: boolean;
-  onlyForAdmins?: boolean;
-  perYear?: boolean;
-  referenceType?: 'BASE_SALARY' | 'ACTUAL_HOURS' | 'FIXED_AMOUNT';
-};
 
 interface Props {
   rule: PayRule | null;

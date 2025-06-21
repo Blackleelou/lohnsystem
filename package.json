@@ -2,17 +2,19 @@
   "name": "lohnsystem",
   "version": "0.0.50",
   "scripts": {
-    "dev": "next dev",
-    "build": "npx prisma generate && next build",
-    "start": "next start",
-    "lint": "eslint .",
-    "lint:fix": "eslint . --fix",
-    "db:push": "prisma db push",
-    "seed": "ts-node prisma/seed.ts",
-    "pretest:smoke": "prisma generate",
-    "test:smoke": "cross-env NODE_OPTIONS=--experimental-vm-modules jest",
-    "postinstall": "prisma db push --accept-data-loss && prisma generate"
-  },
+  "dev": "next dev",
+  "build": "npx prisma generate && next build",
+  "start": "next start",
+  "lint": "eslint .",
+  "lint:fix": "eslint . --fix",
+  "db:push": "prisma db push",
+  "seed": "ts-node prisma/seed.ts",
+  "pretest": "prisma generate",
+  "test": "cross-env NODE_OPTIONS=--experimental-vm-modules jest --forceExit --detectOpenHandles",
+  "test:smoke": "npm run test -- tests/smoke/app.test.ts",
+  "postinstall": "prisma db push --accept-data-loss && prisma generate"
+  }
+,
   "dependencies": {
     "@auth/prisma-adapter": "^2.9.1",
     "@headlessui/react": "^2.2.4",
@@ -61,6 +63,7 @@
     "@types/nodemailer": "^6.4.7",
     "@types/react": "^18.2.0",
     "@types/react-dom": "^18.0.14",
+    "@types/supertest": "^6.0.3",
     "@types/uuid": "^9.0.2",
     "@typescript-eslint/eslint-plugin": "^8.33.1",
     "@typescript-eslint/parser": "^8.33.1",

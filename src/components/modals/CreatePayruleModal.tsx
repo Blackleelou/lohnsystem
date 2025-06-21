@@ -3,35 +3,20 @@
 import { useState } from 'react';
 import { Dialog } from '@headlessui/react';
 import toast from 'react-hot-toast';
+import type { PayRule } from '@/types/PayRule';
 
-export interface PayRule {
-  id: string;
-  title: string;
-  rate: number;
-  type: 'HOURLY' | 'MONTHLY';
-  group?: string;
-  createdAt: string;
-  ruleKind: 'PAY' | 'BONUS' | 'SPECIAL';
-  percent?: number | null;
-  fixedAmount?: number | null;
-  onlyDecember?: boolean;
-  onlyAdmins?: boolean;
-  oncePerYear?: boolean;
-  referenceType?: 'BASE_SALARY' | 'ACTUAL_HOURS' | 'FIXED_AMOUNT';
-  validFrom?: string | null;
-  validUntil?: string | null;
-}
 
 interface Props {
   onClose: () => void;
   onCreate: (newRule: PayRule) => void;
+  prefillGroup?: string | null;
+  existingGroups: string[];
 }
 
-export default function CreatePayruleModal({ onClose, onCreate }: Props) {
+export default function CreatePayruleModal({ onClose, onCreate, prefillGroup, existingGroups }: Props) {
   const [title, setTitle] = useState('');
   const [rate, setRate] = useState('');
   const [type, setType] = useState<'HOURLY' | 'MONTHLY'>('HOURLY');
-  const [group, setGroup] = useState('');
   const [ruleKind, setRuleKind] = useState<'PAY' | 'BONUS' | 'SPECIAL'>('PAY');
   const [percent, setPercent] = useState('');
   const [fixedAmount, setFixedAmount] = useState('');
@@ -42,6 +27,8 @@ export default function CreatePayruleModal({ onClose, onCreate }: Props) {
   const [validFrom, setValidFrom] = useState('');
   const [validUntil, setValidUntil] = useState('');
   const [saving, setSaving] = useState(false);
+  const [group, setGroup] = useState(prefillGroup || '');
+
 
   const handleSave = async () => {
     const parsedRate = parseFloat(rate.replace(',', '.'));

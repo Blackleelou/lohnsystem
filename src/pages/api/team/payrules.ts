@@ -17,6 +17,7 @@ export default async function handler(req: NextApiRequest, res: NextApiResponse)
       where: { companyId: session.user.companyId },
       orderBy: { createdAt: 'desc' },
     });
+  console.log('📦 payrules gefunden:', payrules);
 
     return res.status(200).json(payrules);
   } catch (error) {
