@@ -1,101 +1,93 @@
-/* @/styles/globals.css" */
+/* src/styles/globals.css */
 
 @tailwind base;
 @tailwind components;
 @tailwind utilities;
 
+/* ---------- Base Layer ---------- */
 @layer base {
   body {
-    @apply m-0 font-sans bg-lohn-bgLight text-lohn-textLight dark:bg-lohn-bgDark dark:text-lohn-textDark;
+    @apply m-0 font-sans bg-lohn-bgLight text-lohn-textLight
+           dark:bg-lohn-bgDark dark:text-lohn-textDark;
   }
 }
 
+/* ---------- Component Layer ---------- */
 @layer components {
-  /* Globale Card, Button, Input usw. */
+
+  /* --- Card / Container --- */
   .card {
-    @apply p-6 rounded-xl border shadow-md;
-    @apply bg-lohn-cardLight text-lohn-textLight border-lohn-borderLight;
-    @apply dark:bg-lohn-cardDark dark:text-lohn-textDark dark:border-lohn-borderDark;
+    @apply p-6 rounded-xl border shadow-md
+           bg-lohn-cardLight text-lohn-textLight border-lohn-borderLight
+           dark:bg-lohn-cardDark dark:text-lohn-textDark dark:border-lohn-borderDark;
   }
 
+  /* --- Buttons --- */
   .btn-primary {
-    @apply flex items-center justify-center gap-2 px-4 py-1.5 text-sm font-semibold rounded-md text-white bg-lohn-primary hover:bg-lohn-primaryHover;
+    /* Hover-Farbe muss in tailwind.config.js als `primary-hover` definiert sein! */
+    @apply flex items-center justify-center gap-2 px-4 py-1.5 text-sm font-semibold
+           rounded-md text-white bg-lohn-primary hover:bg-lohn-primary-hover;
   }
 
+  /* --- Form Layout --- */
   .input-box {
-    @apply border border-lohn-borderLight rounded-md bg-white dark:border-lohn-borderDark dark:bg-lohn-cardDark;
+    @apply flex items-center rounded-lg bg-blue-50 px-3 py-2
+           border border-lohn-borderLight
+           dark:bg-gray-800 dark:border-lohn-borderDark;
   }
 
   .input-field {
-    @apply w-full bg-transparent text-base border-none outline-none text-lohn-textLight dark:text-lohn-textDark;
-  }
-
-  .form-title {
-    @apply text-xl font-bold text-lohn-primary text-center mb-2;
-  }
-
-  /* Login-spezifisch */
-  .login-wrapper {
-    @apply min-h-screen flex items-center justify-center bg-lohn-bgLight dark:bg-lohn-bgDark;
-  }
-
-  .form-box {
-    @apply w-full max-w-sm p-8 flex flex-col gap-6 bg-white dark:bg-gray-900 rounded-2xl shadow-2xl border border-gray-100 dark:border-gray-800;
-  }
-
-  .form-title {
-    @apply text-2xl font-bold text-lohn-primary text-center mb-2;
+    @apply w-full bg-transparent outline-none border-none text-base
+           text-gray-900 placeholder-gray-400
+           dark:text-white;
   }
 
   .form-label {
     @apply block text-xs font-semibold text-gray-500 mb-1;
   }
 
-  .input-box {
-    @apply flex items-center rounded-lg bg-blue-50 dark:bg-gray-800 px-3 py-2;
-  }
-
-  .input-icon {
-    @apply w-4 h-4 mr-2 text-blue-400 dark:text-gray-500;
-  }
-
-  .input-field {
-    @apply w-full bg-transparent outline-none text-gray-900 dark:text-white placeholder-gray-400;
-  }
-
-  .eye-btn {
-    @apply ml-2 text-blue-400 dark:text-gray-400 focus:outline-none;
-  }
-
   .form-error {
     @apply text-red-600 text-sm text-center mb-4;
   }
 
+  /* --- Modal / Form-Titels --- */
+  .form-title {
+    @apply text-2xl font-bold text-lohn-primary text-center mb-2;
+  }
+
+  /* --- Divider (z. B. Login) --- */
   .form-divider {
     @apply relative flex items-center my-2;
   }
+  .divider-line  { @apply flex-1 border-t border-gray-200 dark:border-gray-800; }
+  .divider-text  { @apply mx-3 text-xs text-gray-400; }
 
-  .divider-line {
-    @apply flex-1 border-t border-gray-200 dark:border-gray-800;
+  /* --- Login-Seite spezifisch --- */
+  .login-wrapper {
+    @apply min-h-screen flex items-center justify-center
+           bg-lohn-bgLight dark:bg-lohn-bgDark;
   }
 
-  .divider-text {
-    @apply mx-3 text-xs text-gray-400;
+  .form-box {
+    @apply w-full max-w-sm p-8 flex flex-col gap-6
+           bg-white dark:bg-gray-900 rounded-2xl shadow-2xl
+           border border-gray-100 dark:border-gray-800;
   }
 
+  .input-icon { @apply w-4 h-4 mr-2 text-blue-400 dark:text-gray-500; }
+  .eye-btn    { @apply ml-2 text-blue-400 dark:text-gray-400 focus:outline-none; }
+
+  /* --- Google-Button --- */
   .google-btn {
-    @apply w-full flex items-center justify-center gap-2 py-2 rounded-xl bg-white hover:bg-blue-50 dark:bg-gray-800 dark:hover:bg-gray-700 border border-gray-200 dark:border-gray-700 transition font-semibold shadow-sm;
+    @apply w-full flex items-center justify-center gap-2 py-2 rounded-xl
+           bg-white hover:bg-blue-50
+           dark:bg-gray-800 dark:hover:bg-gray-700
+           border border-gray-200 dark:border-gray-700
+           transition font-semibold shadow-sm;
   }
 
-  .form-links {
-    @apply flex flex-col gap-1 text-xs mt-2 text-center;
-  }
-
-  .link-blue {
-    @apply text-blue-600 hover:underline;
-  }
-
-  .link-hint {
-    @apply text-gray-400;
-  }
+  /* --- Links unter Formular --- */
+  .form-links { @apply flex flex-col gap-1 text-xs mt-2 text-center; }
+  .link-blue  { @apply text-blue-600 hover:underline; }
+  .link-hint  { @apply text-gray-400; }
 }
