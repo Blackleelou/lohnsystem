@@ -1,67 +1,70 @@
-import { useState } from 'react';
-import { Dialog, DialogContent, DialogHeader, DialogTitle } from '@/components/ui/dialog';
-import { Switch } from '@/components/ui/switch';
-import { RadioGroup, RadioGroupItem } from '@/components/ui/radio-group';
-import { Select, SelectTrigger, SelectContent, SelectItem } from '@/components/ui/select';
-import { Loader2 } from 'lucide-react';
-import toast from 'react-hot-toast';
-import FormField from '@/components/ui/FormField';
-import type { PayRule } from '@/types/PayRule';
+// src/components/modals/EditPayruleModal.tsx
+import { useState } from 'react'
+import {
+  Dialog,
+  DialogContent,
+  DialogHeader,
+  DialogTitle,
+} from '@/components/ui/dialog'
+import { RadioGroup, RadioGroupItem } from '@/components/ui/radio-group'
+import { Select, SelectTrigger, SelectContent, SelectItem } from '@/components/ui/select'
+import { Switch } from '@/components/ui/switch'
+import { Loader2 } from 'lucide-react'
+import FormField from '@/components/ui/FormField'
+import toast from 'react-hot-toast'
+import type { PayRule } from '@/types/PayRule'
 
 interface Props {
-  onClose: () => void;
-  onCreate: (newRule: PayRule) => void;
-  prefillGroup?: string | null;
-  existingGroups: string[];
+  /** Datensatz, der bearbeitet wird */
+  rule: PayRule
+  /** Modal schließen (ohne Speichern) */
+  onClose: () => void
+  /** Callback mit aktualisiertem Datensatz */
+  onSave: (updated: PayRule) => void
 }
 
-export default function CreatePayruleModal({
-  onClose,
-  onCreate,
-  prefillGroup,
-  existingGroups
-}: Props) {
-  /* ---------- State ---------- */
-  const [title, setTitle] = useState('');
-  const [rate, setRate] = useState('');
-  const [type, setType] = useState<'HOURLY' | 'MONTHLY'>('HOURLY');
-  const [ruleKind, setRuleKind] = useState<'PAY' | 'BONUS' | 'SPECIAL'>('PAY');
-  const [percent, setPercent] = useState('');
-  const [fixedAmount, setFixedAmount] = useState('');
-  const [onlyDecember, setOnlyDecember] = useState(false);
-  const [onlyAdmins, setOnlyAdmins] = useState(false);
-  const [oncePerYear, setOncePerYear] = useState(false);
-  const [referenceType, setReferenceType] = useState<'BASE_SALARY' | 'ACTUAL_HOURS' | 'FIXED_AMOUNT'>('FIXED_AMOUNT');
-  const [validFrom, setValidFrom] = useState('');
-  const [validUntil, setValidUntil] = useState('');
-  const [saving, setSaving] = useState(false);
-  const [group, setGroup] = useState(prefillGroup || '');
+export default function EditPayruleModal({ rule, onClose, onSave }: Props) {
+  /* ---------- State aus bestehender Rule ---------- */
+  const [title, setTitle] = useState(rule.title)
+  const [rate, setRate] = useState(rule.rate?.toString() ?? '')
+  const [type, setType] = useState<'HOURLY' | 'MONTHLY'>(rule.type)
+  const [ruleKind] = useState<'PAY' | 'BONUS' | 'SPECIAL'>(rule.ruleKind)
+  const [percent, setPercent] = useState(rule.percent?.toString() ?? '')
+  const [fixedAmount, setFixedAmount] = useState(rule.fixedAmount?.toString() ?? '')
+  const [onlyDecember, setOnlyDecember] = useState(!!rule.onlyDecember)
+  const [onlyAdmins, setOnlyAdmins] = useState(!!rule.onlyAdmins)
+  const [oncePerYear, setOncePerYear] = useState(!!rule.oncePerYear)
+  const [referenceType, setReferenceType] = useState<
+    'BASE_SALARY' | 'ACTUAL_HOURS' | 'FIXED_AMOUNT'
+  >(rule.referenceType ?? 'FIXED_AMOUNT')
+  const [validFrom, setValidFrom] = useState(rule.validFrom ?? '')
+  const [validUntil, setValidUntil] = useState(rule.validUntil ?? '')
+  const [saving, setSaving] = useState(false)
 
   /* ---------- Save ---------- */
-  const handleSave = async () => {
-    const parsedRate = parseFloat(rate.replace(',', '.'));
-    const parsedPercent = parseFloat(percent.replace(',', '.'));
-    const parsedFixed = parseFloat(fixedAmount.replace(',', '.'));
+  async function handleSave() {
+    const parsedRate = parseFloat(rate.replace(',', '.'))
+    const parsedPercent = parseFloat(percent.replace(',', '.'))
+    const parsedFixed = parseFloat(fixedAmount.replace(',', '.'))
 
-    if (!title.trim()) return toast.error('Bezeichnung fehlt', { position: 'top-center' });
+    if (!title.trim()) return toast.error('Bezeichnung fehlt')
     if (ruleKind === 'PAY' && (isNaN(parsedRate) || parsedRate <= 0))
-      return toast.error('Gültiger Betrag erforderlich', { position: 'top-center' });
+      return toast.error('Gültiger Betrag erforderlich')
     if (ruleKind === 'BONUS' && (isNaN(parsedPercent) || parsedPercent <= 0))
-      return toast.error('Gültiger Prozentsatz erforderlich', { position: 'top-center' });
+      return toast.error('Gültiger Prozentsatz erforderlich')
     if (ruleKind === 'SPECIAL' && (isNaN(parsedFixed) || parsedFixed <= 0))
-      return toast.error('Gültiger Festbetrag erforderlich', { position: 'top-center' });
+      return toast.error('Gültiger Festbetrag erforderlich')
 
-    setSaving(true);
+    setSaving(true)
     try {
-      const res = await fetch('/api/team/payrules/create', {
+      const res = await fetch('/api/team/payrules/update', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({
+          id: rule.id,
           title: title.trim(),
           rate: parsedRate,
           type,
-          group: group.trim() || null,
-          ruleKind,
           percent: ruleKind === 'BONUS' ? parsedPercent : null,
           fixedAmount: ruleKind === 'SPECIAL' ? parsedFixed : null,
           onlyDecember: ruleKind === 'SPECIAL' ? onlyDecember : undefined,
@@ -69,42 +72,29 @@ export default function CreatePayruleModal({
           oncePerYear: ruleKind === 'SPECIAL' ? oncePerYear : undefined,
           referenceType: ruleKind === 'SPECIAL' ? referenceType : undefined,
           validFrom: ruleKind === 'SPECIAL' ? validFrom || null : undefined,
-          validUntil: ruleKind === 'SPECIAL' ? validUntil || null : undefined
-        })
-      });
-      if (!res.ok) throw new Error();
-      const data = await res.json();
-      onCreate(data);
-      onClose();
+          validUntil: ruleKind === 'SPECIAL' ? validUntil || null : undefined,
+        }),
+      })
+      if (!res.ok) throw new Error()
+      const updated = (await res.json()) as PayRule
+      onSave(updated)
+      onClose()
     } catch {
-      toast.error('Erstellen fehlgeschlagen', { position: 'top-center' });
+      toast.error('Speichern fehlgeschlagen')
     } finally {
-      setSaving(false);
+      setSaving(false)
     }
-  };
+  }
 
   /* ---------- UI ---------- */
   return (
     <Dialog open onOpenChange={onClose}>
       <DialogContent className="rounded-2xl p-8 space-y-8">
         <DialogHeader>
-          <DialogTitle className="text-2xl font-semibold">Neue Lohneinstellung</DialogTitle>
+          <DialogTitle className="text-2xl font-semibold">Lohneinstellung bearbeiten</DialogTitle>
         </DialogHeader>
 
-        {/* Grid-Layout */}
         <div className="grid gap-5">
-          {/* Regeltyp */}
-          <FormField label="Regeltyp">
-            <Select value={ruleKind} onValueChange={(v) => setRuleKind(v as any)}>
-              <SelectTrigger className="w-full input-field" />
-              <SelectContent>
-                <SelectItem value="PAY">Grundlohn (Std./Monat)</SelectItem>
-                <SelectItem value="BONUS">Zuschlag (z. B. Nacht)</SelectItem>
-                <SelectItem value="SPECIAL">Sonderzahlung (Urlaub)</SelectItem>
-              </SelectContent>
-            </Select>
-          </FormField>
-
           {/* Bezeichnung */}
           <FormField label="Bezeichnung" htmlFor="title">
             <input
@@ -116,33 +106,22 @@ export default function CreatePayruleModal({
             />
           </FormField>
 
-          {/* Gruppe */}
-          <FormField label="Gruppe (optional)" htmlFor="group">
-            <input
-              id="group"
-              type="text"
-              value={group}
-              onChange={(e) => setGroup(e.target.value)}
-              list="group-list"
-              className="input-field w-full"
-            />
-            <datalist id="group-list">
-              {existingGroups.map((g) => (
-                <option key={g} value={g} />
-              ))}
-            </datalist>
-          </FormField>
-
-          {/* PAY */}
+          {/* PAY Felder */}
           {ruleKind === 'PAY' && (
             <>
               <FormField label="Typ">
-                <RadioGroup value={type} onValueChange={(v) => setType(v as any)} className="flex gap-6">
+                <RadioGroup
+                  value={type}
+                  onValueChange={(v) => setType(v as any)}
+                  className="flex gap-6"
+                >
                   <div className="flex items-center gap-2">
-                    <RadioGroupItem value="HOURLY" id="hourly" /> <label htmlFor="hourly">Stundenlohn</label>
+                    <RadioGroupItem value="HOURLY" id="hourly" />
+                    <label htmlFor="hourly">Stundenlohn</label>
                   </div>
                   <div className="flex items-center gap-2">
-                    <RadioGroupItem value="MONTHLY" id="monthly" /> <label htmlFor="monthly">Monatsgehalt</label>
+                    <RadioGroupItem value="MONTHLY" id="monthly" />
+                    <label htmlFor="monthly">Monatsgehalt</label>
                   </div>
                 </RadioGroup>
               </FormField>
@@ -159,7 +138,7 @@ export default function CreatePayruleModal({
             </>
           )}
 
-          {/* BONUS */}
+          {/* BONUS Feld */}
           {ruleKind === 'BONUS' && (
             <FormField label="Zuschlag (%)" htmlFor="percent">
               <input
@@ -172,7 +151,7 @@ export default function CreatePayruleModal({
             </FormField>
           )}
 
-          {/* SPECIAL */}
+          {/* SPECIAL Felder */}
           {ruleKind === 'SPECIAL' && (
             <>
               <FormField label="Festbetrag (€)" htmlFor="fixed">
@@ -201,13 +180,13 @@ export default function CreatePayruleModal({
                 <div className="flex gap-2">
                   <input
                     type="date"
-                    value={validFrom}
+                    value={validFrom ?? ''}
                     onChange={(e) => setValidFrom(e.target.value)}
                     className="input-field flex-1"
                   />
                   <input
                     type="date"
-                    value={validUntil}
+                    value={validUntil ?? ''}
                     onChange={(e) => setValidUntil(e.target.value)}
                     className="input-field flex-1"
                   />
@@ -245,11 +224,10 @@ export default function CreatePayruleModal({
             disabled={saving}
             className="btn-primary disabled:opacity-50 disabled:pointer-events-none"
           >
-            {saving && <Loader2 className="animate-spin w-4 h-4" />}
-            {!saving && 'Erstellen'}
+            {saving ? <Loader2 className="animate-spin w-4 h-4" /> : 'Speichern'}
           </button>
         </div>
       </DialogContent>
     </Dialog>
-  );
+  )
 }
