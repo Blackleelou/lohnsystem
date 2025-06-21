@@ -12,7 +12,7 @@ export default async function handler(req: NextApiRequest, res: NextApiResponse)
   if (!session?.user?.companyId)
     return res.status(401).json({ error: 'Nicht autorisiert' })
 
-  /* ---------- Body-Destructuring ---------- */
+  /* ---------- Body ---------- */
   const {
     id,
     title,
@@ -23,9 +23,8 @@ export default async function handler(req: NextApiRequest, res: NextApiResponse)
     percent,
     fixedAmount,
     onlyDecember,
-    onlyForAdmins,   // ◀︎ neu (statt onlyAdmins)
-    oncePerYear,     // ◀︎ neu (statt perYear)
-    referenceType,
+    onlyForAdmins,
+    oncePerYear,
     validFrom,
     validUntil,
   } = req.body
@@ -65,7 +64,6 @@ export default async function handler(req: NextApiRequest, res: NextApiResponse)
   /* ---------- Update ---------- */
   try {
     const payrule = await prisma.payRule.findUnique({ where: { id } })
-
     if (!payrule || payrule.companyId !== session.user.companyId)
       return res.status(404).json({ error: 'Nicht gefunden oder keine Berechtigung' })
 
@@ -77,18 +75,19 @@ export default async function handler(req: NextApiRequest, res: NextApiResponse)
         ruleKind,
 
         /* PAY */
-        type:        ruleKind === 'PAY'    ? type         : null,
-        rate:        parsedRate,
+        type:         ruleKind === 'PAY' ? type : null,
+        rate:         parsedRate,
+
         /* BONUS */
-        percent:     parsedPercent,
+        percent:      parsedPercent,
+
         /* SPECIAL */
-        fixedAmount: parsedFixed,
-        onlyDecember: ruleKind === 'SPECIAL' ? onlyDecember  ?? false : undefined,
+        fixedAmount:   parsedFixed,
+        onlyDecember:  ruleKind === 'SPECIAL' ? onlyDecember  ?? false : undefined,
         onlyForAdmins: ruleKind === 'SPECIAL' ? onlyForAdmins ?? false : undefined,
         oncePerYear:   ruleKind === 'SPECIAL' ? oncePerYear   ?? false : undefined,
-        referenceType: ruleKind === 'SPECIAL' ? referenceType ?? 'FIXED_AMOUNT' : undefined,
-        validFrom:  ruleKind === 'SPECIAL' && validFrom  ? new Date(validFrom)  : undefined,
-        validUntil: ruleKind === 'SPECIAL' && validUntil ? new Date(validUntil) : undefined,
+        validFrom:     ruleKind === 'SPECIAL' && validFrom  ? new Date(validFrom)  : undefined,
+        validUntil:    ruleKind === 'SPECIAL' && validUntil ? new Date(validUntil) : undefined,
       },
     })
 
