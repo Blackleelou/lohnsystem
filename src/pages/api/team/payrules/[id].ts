@@ -31,7 +31,6 @@ export default async function handler(req: NextApiRequest, res: NextApiResponse)
       onlyDecember:  payrule.onlyDecember,
       onlyForAdmins: payrule.onlyForAdmins,
       oncePerYear:   payrule.oncePerYear,   // ◀︎ neu
-      referenceType: payrule.referenceType,
       validFrom:     payrule.validFrom,
       validUntil:    payrule.validUntil,
       createdAt:     payrule.createdAt,
