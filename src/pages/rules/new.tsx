@@ -87,7 +87,7 @@ export default function NewRulePage() {
       {/* 1. RuleKind */}
       <RuleKindSelector
         value={ruleKind}
-        onChange={v => control.setValue('ruleKind', v)}
+        onChange={v => setValue('ruleKind', v)}
       />
 
       {/* 2. Gemeinsame Felder */}
@@ -99,9 +99,9 @@ export default function NewRulePage() {
           payType={payType}
           rate={watch('rate')}
           monthlyAmount={watch('monthlyAmount')}
-          onChangeType={v => control.setValue('payType', v)}
-          onChangeRate={v => control.setValue('rate', v)}
-          onChangeMonthly={v => control.setValue('monthlyAmount', v)}
+          onChangeType={v => setValue('payType', v)}
+          onChangeRate={v => setValue('rate', v)}
+          onChangeMonthly={v => setValue('monthlyAmount', v)}
         />
       )}
 
