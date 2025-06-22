@@ -19,11 +19,11 @@ export const RuleKindSelector: FC<Props> = ({ value, onChange }) => (
           onChange={() => onChange(kind)}
           className="mr-2"
         />
-        {{
-          PAY:     'Standard-Lohn',
-          BONUS:   'Zuschlag/Boni',
-          SPECIAL: 'Sonderzahlung'
-        }[kind]}
+        {kind === RuleKind.PAY
+          ? 'Grundlohn'
+          : kind === RuleKind.BONUS
+          ? 'Zuschlag'
+          : 'Sonderzahlung'}
       </label>
     ))}
   </div>
