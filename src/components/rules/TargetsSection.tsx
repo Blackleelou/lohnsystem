@@ -1,6 +1,7 @@
 // src/components/rules/TargetsSection.tsx
 import { FC } from 'react'
 import { useFieldArray } from 'react-hook-form'
+import { ExtrasSection } from '@/components/rules/ExtrasSection'
 
 interface Props {
   control: any
