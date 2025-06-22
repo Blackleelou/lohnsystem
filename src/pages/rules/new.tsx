@@ -8,7 +8,6 @@ import { RuleKindSelector } from '@/components/rules/RuleKindSelector'
 import { CommonFields }     from '@/components/rules/CommonFields'
 import { PayTypeSection }   from '@/components/rules/PayTypeSection'
 import { ExtrasSection }    from '@/components/rules/ExtrasSection'
-import { ExtrasSection }    from '@/components/rules/ExtrasSection'
 
 export default function NewRulePage() {
   const {
