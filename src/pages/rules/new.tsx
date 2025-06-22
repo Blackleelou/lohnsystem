@@ -13,6 +13,7 @@ export default function NewRulePage() {
   const {
     register,
     control,
+    setValue,
     handleSubmit,
     watch,
     formState: { errors }
