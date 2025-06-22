@@ -8,7 +8,7 @@ export default function TestApiPage() {
   async function callTestRule() {
     setError('')
     try {
-      const res = await fetch('/api/test-rule', { method: 'POST' })
+      const res = await fetch('/api/rules/test-rule', { method: 'POST' })
       if (!res.ok) throw new Error(`Status ${res.status}`)
       const json = await res.json()
       setResult(json)
