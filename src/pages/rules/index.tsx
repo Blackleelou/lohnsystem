@@ -5,7 +5,7 @@ import Link from 'next/link'
 const fetcher = (url: string) => fetch(url).then(res => res.json())
 
 export default function RulesListPage() {
-  const { data: rules, error, isLoading } = useSWR('/api/rules', fetcher)
+  const { data: rules, error, isLoading } = useSWR('/api/rules/rules', fetcher)
 
   if (error) return <p>Fehler beim Laden der Regeln.</p>
   if (isLoading) return <p>Lade Regeln…</p>
