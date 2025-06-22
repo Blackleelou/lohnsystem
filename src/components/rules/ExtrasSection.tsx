@@ -57,7 +57,7 @@ export const ExtrasSection: FC<Props> = ({ control, register }) => {
 
   return (
     <section className="pt-4 border-t space-y-6">
-      <h2 className="font-medium mb-2">Extras & Bedingungen</h2>
+      <h2 className="font-medium mb-2">Extras &amp; Bedingungen</h2>
 
       {/* Gültigkeits-Intervall */}
       <label className="block mb-4">
@@ -191,4 +191,5 @@ export const ExtrasSection: FC<Props> = ({ control, register }) => {
         </button>
       </div>
     </section>
-)
+  )
+}
