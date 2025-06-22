@@ -94,16 +94,16 @@ export default function NewRulePage() {
       <CommonFields register={register} errors={errors} />
 
       {/* 3. PAY-Sektion */}
-      {ruleKind === RuleKind.PAY && (
-        <PayTypeSection
-          payType={payType}
-          rate={watch('rate')}
-          monthlyAmount={watch('monthlyAmount')}
-          onChangeType={v => setValue('payType', v)}
-          onChangeRate={v => setValue('rate', v)}
-          onChangeMonthly={v => setValue('monthlyAmount', v)}
-        />
-      )}
+      {ruleKind === RuleKind.PAY && payType && (
+  <PayTypeSection
+    payType={payType}
+    rate={watch('rate')}
+    monthlyAmount={watch('monthlyAmount')}
+    onChangeType={v => setValue('payType', v)}
+    onChangeRate={v => setValue('rate', v)}
+    onChangeMonthly={v => setValue('monthlyAmount', v)}
+  />
+)}
 
       {/* 4. Extras */}
       <ExtrasSection control={control} register={register} />
