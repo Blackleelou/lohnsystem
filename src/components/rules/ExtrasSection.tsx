@@ -13,7 +13,7 @@ interface Props {
   register: any
 }
 
-// Deutsch-Mapping für die Enums
+// Deutsch-Beschriftungen für Enums
 const frequencyLabels: Record<FrequencyUnit, string> = {
   NONE:    'Unbegrenzt',
   DAILY:   'Einmal pro Tag',
@@ -29,25 +29,25 @@ const effectKindLabels: Record<EffectKind, string> = {
 }
 
 const referenceLabels: Record<ReferenceType, string> = {
-  BASE_SALARY:     'Grundgehalt',
-  ACTUAL_HOURS:    'Gearbeitete Stunden',
-  FIXED_AMOUNT:    'Fester Betrag',
-  WEEKLY_HOURS:    'Wochenarbeitszeit',
-  SALES_VOLUME:    'Umsatzvolumen',
-  OVERTIME_HOURS:  'Überstunden',
-  SHIFT_COUNT:     'Anzahl Schichten'
+  BASE_SALARY:    'Grundgehalt',
+  ACTUAL_HOURS:   'Gearbeitete Stunden',
+  FIXED_AMOUNT:   'Fester Betrag',
+  WEEKLY_HOURS:   'Wochenarbeitszeit',
+  SALES_VOLUME:   'Umsatzvolumen',
+  OVERTIME_HOURS: 'Überstunden',
+  SHIFT_COUNT:    'Anzahl Schichten'
 }
 
 const operatorLabels: Record<Operator, string> = {
-  EQ:     'Gleich (=)',
-  NEQ:    'Ungleich (≠)',
-  GT:     'Größer als (>)',
-  GTE:    'Größer oder gleich (≥)',
-  LT:     'Kleiner als (<)',
-  LTE:    'Kleiner oder gleich (≤)',
-  IN:     'In Liste',
-  NOT_IN: 'Nicht in Liste',
-  BETWEEN:'Zwischen'
+  EQ:      'Gleich (=)',
+  NEQ:     'Ungleich (≠)',
+  GT:      'Größer als (>)',
+  GTE:     'Größer oder gleich (≥)',
+  LT:      'Kleiner als (<)',
+  LTE:     'Kleiner oder gleich (≤)',
+  IN:      'In Liste',
+  NOT_IN:  'Nicht in Liste',
+  BETWEEN: 'Zwischen'
 }
 
 export const ExtrasSection: FC<Props> = ({ control, register }) => {
@@ -56,11 +56,11 @@ export const ExtrasSection: FC<Props> = ({ control, register }) => {
   const targets    = useFieldArray({ control, name: 'targets' })
 
   return (
-    <section className="pt-4 border-t space-y-4">
+    <section className="pt-4 border-t space-y-6">
       <h2 className="font-medium mb-2">Extras & Bedingungen</h2>
 
-      {/* Häufigkeit */}
-      <label className="block mb-2">
+      {/* Gültigkeits-Intervall */}
+      <label className="block mb-4">
         <span className="font-medium">Gültigkeits-Intervall</span>
         <select {...register('frequencyUnit')} className="mt-1 w-full border rounded p-2">
           {Object.values(FrequencyUnit).map(f => (
@@ -71,7 +71,7 @@ export const ExtrasSection: FC<Props> = ({ control, register }) => {
         </select>
       </label>
 
-      {/* Effekte (Zuschläge/Boni) */}
+      {/* Zuschläge / Boni */}
       <div>
         <span className="font-medium">Zuschläge / Boni</span>
         {effects.fields.map((f, i) => (
@@ -97,11 +97,7 @@ export const ExtrasSection: FC<Props> = ({ control, register }) => {
                 </option>
               ))}
             </select>
-            <button
-              type="button"
-              onClick={() => effects.remove(i)}
-              className="text-red-600"
-            >
+            <button type="button" onClick={() => effects.remove(i)} className="text-red-600">
               Entfernen
             </button>
           </div>
@@ -152,11 +148,7 @@ export const ExtrasSection: FC<Props> = ({ control, register }) => {
                 />
               )}
             />
-            <button
-              type="button"
-              onClick={() => conditions.remove(i)}
-              className="text-red-600"
-            >
+            <button type="button" onClick={() => conditions.remove(i)} className="text-red-600">
               Entfernen
             </button>
           </div>
@@ -170,9 +162,9 @@ export const ExtrasSection: FC<Props> = ({ control, register }) => {
         </button>
       </div>
 
-      {/* Ziele */}
+      {/* Empfänger */}
       <div>
-        <span className="font-medium">Wer soll davon profitieren?</span>
+        <span className="font-medium">Wer profitiert?</span>
         {targets.fields.map((f, i) => (
           <div key={f.id} className="grid grid-cols-3 gap-2 items-end my-2">
             <input
@@ -185,11 +177,7 @@ export const ExtrasSection: FC<Props> = ({ control, register }) => {
               placeholder="Wert (z.B. MITARBEITER)"
               className="border rounded p-1"
             />
-            <button
-              type="button"
-              onClick={() => targets.remove(i)}
-              className="text-red-600"
-            >
+            <button type="button" onClick={() => targets.remove(i)} className="text-red-600">
               Entfernen
             </button>
           </div>
@@ -203,5 +191,4 @@ export const ExtrasSection: FC<Props> = ({ control, register }) => {
         </button>
       </div>
     </section>
-  )
-}
+)
