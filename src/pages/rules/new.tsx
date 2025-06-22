@@ -52,7 +52,7 @@ export default function NewRulePage() {
   const targets = useFieldArray({ control, name: 'targets' })
 
   const onSubmit = async (data: RuleForm) => {
-    const res = await fetch('/api/rules', {
+    const res = await fetch('/api/rules/rules', {
       method: 'POST',
       headers: {'Content-Type': 'application/json'},
       body: JSON.stringify(data)
