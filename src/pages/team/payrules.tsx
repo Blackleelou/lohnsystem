@@ -313,8 +313,19 @@ const handleRenameGroup = async () => {
         )}
 
         {showCreateModal && (
-          <CreatePayruleModal onClose={()=>{setShowCreateModal(false);setPreselectedGroup(null)}} onCreate={handleCreate} prefillGroup={preselectedGroup} existingGroups={groups} />
+          <div className="fixed inset-0 z-[999]">
+          <CreatePayruleModal
+            onClose={() => {
+            setShowCreateModal(false)
+            setPreselectedGroup(null)
+          }}
+          onCreate={handleCreate}
+          prefillGroup={preselectedGroup}
+          existingGroups={groups}
+         />
+        </div>
         )}
+
 
         <ConfirmModal visible={showConfirmModal} onConfirm={handleDeleteGroup} onCancel={()=>setShowConfirmModal(false)} groupName={selectedGroup||''}/>
       </div>
