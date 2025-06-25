@@ -1,8 +1,12 @@
 import { useState } from 'react'
 import { Dialog, DialogContent, DialogHeader, DialogTitle } from '@/components/ui/dialog'
+import type { PayRule } from '@/types/PayRule'
 
 interface Props {
   onClose: () => void
+  onCreate: (newRule: PayRule) => void
+  prefillGroup?: string | null
+  existingGroups: string[]
 }
 
 export default function CreatePayruleModal({ onClose }: Props) {
