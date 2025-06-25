@@ -85,4 +85,13 @@ export default function CreatePayruleModal({ onClose }: Props) {
           {/* Rechte Seite – Dummy-Feld */}
           <div className="flex-1 bg-gray-50 border rounded-xl shadow-inner p-6 text-gray-600 text-sm space-y-2">
             <div className="font-semibold text-gray-800">🧪 Vorschau (Dummy-Bereich)</div>
-            <div>
+            <div>Regeltyp: <code>{ruleKind}</code></div>
+            {ruleKind === 'PAY' && <div>Typ: <code>{type}</code></div>}
+            <div>Gruppe: <code>{group || '–'}</code></div>
+            <div className="mt-4 italic text-gray-400">Hier erscheinen später die passenden Eingabefelder.</div>
+          </div>
+        </div>
+      </DialogContent>
+    </Dialog>
+  )
+}
