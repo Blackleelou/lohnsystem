@@ -9,25 +9,28 @@ interface Props {
   existingGroups: string[]
 }
 
-export default function CreatePayruleModal({ onClose }: Props) {
+export default function CreatePayruleModal({ onClose, onCreate, prefillGroup, existingGroups }: Props) {
   const [ruleKind, setRuleKind] = useState<'PAY' | 'BONUS' | 'SPECIAL'>('PAY')
   const [type, setType] = useState<'HOURLY' | 'MONTHLY'>('HOURLY')
-  const [group, setGroup] = useState('')
+  const [group, setGroup] = useState(prefillGroup || '')
 
   return (
     <Dialog open onOpenChange={onClose}>
-      <DialogContent onOpenChange={onClose} className="rounded-2xl p-6 md:p-10 max-w-5xl">
+      <DialogContent
+        onOpenChange={onClose}
+        className="w-full max-w-5xl rounded-2xl p-10"
+      >
         <DialogHeader>
-          <DialogTitle className="text-2xl font-semibold">Neue Lohneinstellung</DialogTitle>
+          <DialogTitle className="text-3xl font-bold">Neue Lohneinstellung</DialogTitle>
         </DialogHeader>
 
-        <div className="mt-6 flex flex-col md:flex-row gap-8">
-          {/* Linke Seite – Menü */}
-          <div className="md:w-1/3 space-y-6">
+        <div className="mt-8 flex flex-col md:flex-row gap-10 min-h-[400px]">
+          {/* Linke Auswahlspalte */}
+          <div className="md:w-[320px] space-y-8">
             {/* Regeltyp */}
             <div>
-              <div className="text-sm font-semibold mb-2 text-gray-700">Regeltyp</div>
-              <div className="grid grid-cols-3 gap-3">
+              <div className="text-sm font-semibold mb-3 text-gray-700">Regeltyp</div>
+              <div className="grid grid-cols-1 sm:grid-cols-3 md:grid-cols-1 gap-4">
                 {[
                   { value: 'PAY', label: 'Grundlohn' },
                   { value: 'BONUS', label: 'Zuschlag' },
@@ -36,11 +39,10 @@ export default function CreatePayruleModal({ onClose }: Props) {
                   <button
                     key={item.value}
                     onClick={() => setRuleKind(item.value as any)}
-                    className={`rounded-xl border px-3 py-4 text-sm shadow text-center transition ${
-                      ruleKind === item.value
-                        ? 'border-blue-600 bg-blue-50 text-blue-600'
-                        : 'hover:bg-gray-100'
-                    }`}
+                    className={`rounded-xl border px-6 py-4 text-base font-medium text-center transition-all
+                      ${ruleKind === item.value
+                        ? 'border-blue-600 bg-blue-50 text-blue-700'
+                        : 'hover:bg-gray-100 text-gray-700'}`}
                   >
                     {item.label}
                   </button>
@@ -48,11 +50,11 @@ export default function CreatePayruleModal({ onClose }: Props) {
               </div>
             </div>
 
-            {/* PAY-spezifisch: Typ */}
+            {/* Typ (nur bei PAY) */}
             {ruleKind === 'PAY' && (
               <div>
-                <div className="text-sm font-semibold mb-2 text-gray-700">Typ</div>
-                <div className="grid grid-cols-2 gap-3">
+                <div className="text-sm font-semibold mb-3 text-gray-700">Typ</div>
+                <div className="grid grid-cols-2 gap-4">
                   {[
                     { value: 'HOURLY', label: 'Stundenlohn' },
                     { value: 'MONTHLY', label: 'Monatsgehalt' },
@@ -60,11 +62,10 @@ export default function CreatePayruleModal({ onClose }: Props) {
                     <button
                       key={item.value}
                       onClick={() => setType(item.value as any)}
-                      className={`rounded-xl border px-3 py-3 text-sm shadow transition ${
-                        type === item.value
-                          ? 'border-blue-600 bg-blue-50 text-blue-600'
-                          : 'hover:bg-gray-100'
-                      }`}
+                      className={`rounded-xl border px-6 py-4 text-base font-medium text-center transition-all
+                        ${type === item.value
+                          ? 'border-blue-600 bg-blue-50 text-blue-700'
+                          : 'hover:bg-gray-100 text-gray-700'}`}
                     >
                       {item.label}
                     </button>
@@ -75,24 +76,24 @@ export default function CreatePayruleModal({ onClose }: Props) {
 
             {/* Gruppe */}
             <div>
-              <div className="text-sm font-semibold mb-2 text-gray-700">Gruppe (optional)</div>
+              <div className="text-sm font-semibold mb-3 text-gray-700">Gruppe (optional)</div>
               <input
                 type="text"
                 placeholder="z. B. Tarif A"
                 value={group}
                 onChange={(e) => setGroup(e.target.value)}
-                className="w-full rounded-xl border border-gray-300 px-4 py-2 text-sm shadow-sm focus:ring-2 focus:ring-blue-500"
+                className="w-full rounded-xl border border-gray-300 px-4 py-3 text-base shadow-sm focus:ring-2 focus:ring-blue-500"
               />
             </div>
           </div>
 
-          {/* Rechte Seite – Dummy-Feld */}
-          <div className="flex-1 bg-gray-50 border rounded-xl shadow-inner p-6 text-gray-600 text-sm space-y-2">
-            <div className="font-semibold text-gray-800">🧪 Vorschau (Dummy-Bereich)</div>
+          {/* Rechte Dummy-Vorschau */}
+          <div className="flex-1 bg-gray-50 border rounded-xl shadow-inner p-8 text-gray-700 text-base space-y-3">
+            <div className="font-semibold text-gray-800 text-lg">🧪 Vorschau (Dummy-Bereich)</div>
             <div>Regeltyp: <code>{ruleKind}</code></div>
             {ruleKind === 'PAY' && <div>Typ: <code>{type}</code></div>}
             <div>Gruppe: <code>{group || '–'}</code></div>
-            <div className="mt-4 italic text-gray-400">Hier erscheinen später die passenden Eingabefelder.</div>
+            <div className="pt-4 italic text-gray-400">Hier erscheinen später die passenden Eingabefelder.</div>
           </div>
         </div>
       </DialogContent>
