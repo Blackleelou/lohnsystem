@@ -18,15 +18,15 @@ export default function CreatePayruleModal({ onClose, onCreate, prefillGroup, ex
     <Dialog open onOpenChange={onClose}>
       <DialogContent
         onOpenChange={onClose}
-        className="w-full max-w-5xl rounded-2xl p-10"
+        className="w-full max-w-[1000px] md:min-w-[900px] mt-10 p-10 rounded-2xl"
       >
         <DialogHeader>
           <DialogTitle className="text-3xl font-bold">Neue Lohneinstellung</DialogTitle>
         </DialogHeader>
 
-        <div className="mt-8 flex flex-col md:flex-row gap-10 min-h-[400px]">
-          {/* Linke Auswahlspalte */}
-          <div className="md:w-[320px] space-y-8">
+        <div className="mt-10 flex flex-col md:flex-row gap-12">
+          {/* Linke Spalte: Auswahl */}
+          <div className="md:w-2/5 space-y-8">
             {/* Regeltyp */}
             <div>
               <div className="text-sm font-semibold mb-3 text-gray-700">Regeltyp</div>
@@ -87,8 +87,8 @@ export default function CreatePayruleModal({ onClose, onCreate, prefillGroup, ex
             </div>
           </div>
 
-          {/* Rechte Dummy-Vorschau */}
-          <div className="flex-1 bg-gray-50 border rounded-xl shadow-inner p-8 text-gray-700 text-base space-y-3">
+          {/* Rechte Spalte: Dummy-Vorschau */}
+          <div className="md:w-3/5 bg-gray-50 border rounded-xl shadow-inner p-8 text-gray-700 text-base space-y-3">
             <div className="font-semibold text-gray-800 text-lg">🧪 Vorschau (Dummy-Bereich)</div>
             <div>Regeltyp: <code>{ruleKind}</code></div>
             {ruleKind === 'PAY' && <div>Typ: <code>{type}</code></div>}
