@@ -12,7 +12,7 @@ export default function CreatePayruleModal({ onClose }: Props) {
 
   return (
     <Dialog open onOpenChange={onClose}>
-      <DialogContent className="rounded-2xl p-6 md:p-10 max-w-5xl">
+      <DialogContent onOpenChange={onClose} className="rounded-2xl p-6 md:p-10 max-w-5xl">
         <DialogHeader>
           <DialogTitle className="text-2xl font-semibold">Neue Lohneinstellung</DialogTitle>
         </DialogHeader>
