@@ -34,7 +34,8 @@ export const Dialog = ({ open, onOpenChange, children }: DialogProps) => (
           leaveFrom="opacity-100 scale-100"
           leaveTo="opacity-0 scale-95"
         >
-          <HIDialog.Panel className="w-full max-w-md rounded-2xl bg-lohn-cardLight dark:bg-lohn-cardDark p-6 shadow-lg">
+          {/* Kein max-w-md mehr hier */}
+          <HIDialog.Panel className="w-full flex justify-center">
             {children}
           </HIDialog.Panel>
         </Transition.Child>
@@ -42,6 +43,7 @@ export const Dialog = ({ open, onOpenChange, children }: DialogProps) => (
     </HIDialog>
   </Transition>
 )
+
 interface ContentProps {
   children: React.ReactNode
   className?: string
@@ -54,11 +56,10 @@ export const DialogContent = React.forwardRef<HTMLDivElement, ContentProps>(
     return (
       <div
         ref={ref}
-          className={clsx(
-          'relative rounded-2xl bg-lohn-cardLight dark:bg-lohn-cardDark shadow-lg',
+        className={clsx(
+          'relative bg-lohn-cardLight dark:bg-lohn-cardDark shadow-lg',
           className
-          )}
-
+        )}
       >
         <button
           onClick={() => onOpenChange(false)}
@@ -73,7 +74,6 @@ export const DialogContent = React.forwardRef<HTMLDivElement, ContentProps>(
 )
 
 DialogContent.displayName = 'DialogContent'
-
 
 interface HeaderProps {
   children: React.ReactNode
