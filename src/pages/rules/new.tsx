@@ -7,11 +7,14 @@ import { RuleKind, PayRuleType } from '@prisma/client'
 import { useRouter } from 'next/router'
 import toast from 'react-hot-toast'
 import { Loader2 } from 'lucide-react'
+import { useState } from 'react'
 
 import { RuleKindSelector } from '@/components/rules/RuleKindSelector'
 import { CommonFields } from '@/components/rules/CommonFields'
 import { PayTypeSection } from '@/components/rules/PayTypeSection'
 import { ExtrasSection } from '@/components/rules/ExtrasSection'
+import { Select, SelectContent, SelectItem, SelectTrigger } from '@/components/ui/select'
+import FormField from '@/components/ui/FormField'
 
 export default function NewPayrulePage() {
   const router = useRouter()
@@ -38,6 +41,10 @@ export default function NewPayrulePage() {
   const ruleKind = watch('ruleKind')
   const payType = watch('payType')
 
+  const [groupMode, setGroupMode] = useState<'select' | 'custom'>('select')
+  const [groupValue, setGroupValue] = useState('')
+  const existingGroups = ['Tarif A', 'Tarif B', 'Sonderregelung']
+
   const onSubmit = async (data: RuleForm) => {
     const payload: any = {
       ruleKind: data.ruleKind,
@@ -45,7 +52,8 @@ export default function NewPayrulePage() {
       description: data.description || null,
       currency: data.currency,
       validFrom: data.validFrom,
-      validTo: data.validTo || null
+      validTo: data.validTo || null,
+      group: groupValue?.trim() || null
     }
 
     if (data.ruleKind === 'PAY') {
@@ -88,6 +96,37 @@ export default function NewPayrulePage() {
 
       <form onSubmit={handleSubmit(onSubmit)} className="space-y-6">
         <RuleKindSelector value={ruleKind} onChange={(v) => setValue('ruleKind', v)} />
+
+        <FormField label="Gruppe (optional)">
+          {groupMode === 'select' ? (
+            <div className="space-y-2">
+              <Select value={groupValue} onValueChange={(v) => {
+                if (v === '__new__') {
+                  setGroupMode('custom')
+                  setGroupValue('')
+                } else {
+                  setGroupValue(v)
+                }
+              }}>
+                <SelectTrigger className="input-field" />
+                <SelectContent>
+                  {existingGroups.map((g) => (
+                    <SelectItem key={g} value={g}>{g}</SelectItem>
+                  ))}
+                  <SelectItem value="__new__">+ Neue Gruppe anlegen</SelectItem>
+                </SelectContent>
+              </Select>
+            </div>
+          ) : (
+            <input
+              type="text"
+              value={groupValue}
+              onChange={(e) => setGroupValue(e.target.value)}
+              placeholder="Neue Gruppe eingeben"
+              className="input-field"
+            />
+          )}
+        </FormField>
 
         <CommonFields register={register} errors={errors} />
 
