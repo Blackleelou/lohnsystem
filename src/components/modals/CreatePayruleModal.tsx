@@ -18,33 +18,35 @@ export default function CreatePayruleModal({ onClose, onCreate, prefillGroup, ex
     <Dialog open onOpenChange={onClose}>
       <DialogContent
         onOpenChange={onClose}
-        className="w-full max-w-[1000px] md:min-w-[900px] mt-10 p-10 rounded-2xl"
+        className="w-full max-w-[90vw] max-h-[90vh] p-0 overflow-hidden rounded-xl"
       >
-        <DialogHeader>
-          <DialogTitle className="text-3xl font-bold">Neue Lohneinstellung</DialogTitle>
-        </DialogHeader>
+        {/* Header */}
+        <div className="flex items-center justify-between border-b px-6 py-4">
+          <DialogTitle className="text-2xl font-semibold">Neue Lohneinstellung</DialogTitle>
+          <button onClick={onClose} className="text-sm text-gray-500 hover:text-gray-700">✕</button>
+        </div>
 
-        <div className="mt-10 flex flex-col md:flex-row gap-12">
-          {/* Linke Spalte: Auswahl */}
-          <div className="md:w-2/5 space-y-8">
+        {/* Split View Layout */}
+        <div className="flex h-[calc(90vh-64px)]"> {/* 64px = Headerhöhe */}
+          {/* Linke Seitenleiste */}
+          <aside className="w-[240px] border-r p-6 space-y-8 bg-gray-50">
             {/* Regeltyp */}
             <div>
-              <div className="text-sm font-semibold mb-3 text-gray-700">Regeltyp</div>
-              <div className="grid grid-cols-1 sm:grid-cols-3 md:grid-cols-1 gap-4">
-                {[
-                  { value: 'PAY', label: 'Grundlohn' },
-                  { value: 'BONUS', label: 'Zuschlag' },
-                  { value: 'SPECIAL', label: 'Sonderzahlung' },
-                ].map((item) => (
+              <div className="text-sm font-semibold mb-2 text-gray-700">Regeltyp</div>
+              <div className="flex flex-col gap-2">
+                {['PAY', 'BONUS', 'SPECIAL'].map((value) => (
                   <button
-                    key={item.value}
-                    onClick={() => setRuleKind(item.value as any)}
-                    className={`rounded-xl border px-6 py-4 text-base font-medium text-center transition-all
-                      ${ruleKind === item.value
-                        ? 'border-blue-600 bg-blue-50 text-blue-700'
-                        : 'hover:bg-gray-100 text-gray-700'}`}
+                    key={value}
+                    onClick={() => setRuleKind(value as any)}
+                    className={`text-left rounded-md px-4 py-2 text-sm font-medium transition ${
+                      ruleKind === value
+                        ? 'bg-blue-100 text-blue-700'
+                        : 'hover:bg-gray-100 text-gray-700'
+                    }`}
                   >
-                    {item.label}
+                    {value === 'PAY' && 'Grundlohn'}
+                    {value === 'BONUS' && 'Zuschlag'}
+                    {value === 'SPECIAL' && 'Sonderzahlung'}
                   </button>
                 ))}
               </div>
@@ -53,21 +55,20 @@ export default function CreatePayruleModal({ onClose, onCreate, prefillGroup, ex
             {/* Typ (nur bei PAY) */}
             {ruleKind === 'PAY' && (
               <div>
-                <div className="text-sm font-semibold mb-3 text-gray-700">Typ</div>
-                <div className="grid grid-cols-2 gap-4">
-                  {[
-                    { value: 'HOURLY', label: 'Stundenlohn' },
-                    { value: 'MONTHLY', label: 'Monatsgehalt' },
-                  ].map((item) => (
+                <div className="text-sm font-semibold mb-2 text-gray-700">Typ</div>
+                <div className="flex flex-col gap-2">
+                  {['HOURLY', 'MONTHLY'].map((value) => (
                     <button
-                      key={item.value}
-                      onClick={() => setType(item.value as any)}
-                      className={`rounded-xl border px-6 py-4 text-base font-medium text-center transition-all
-                        ${type === item.value
-                          ? 'border-blue-600 bg-blue-50 text-blue-700'
-                          : 'hover:bg-gray-100 text-gray-700'}`}
+                      key={value}
+                      onClick={() => setType(value as any)}
+                      className={`text-left rounded-md px-4 py-2 text-sm font-medium transition ${
+                        type === value
+                          ? 'bg-blue-100 text-blue-700'
+                          : 'hover:bg-gray-100 text-gray-700'
+                      }`}
                     >
-                      {item.label}
+                      {value === 'HOURLY' && 'Stundenlohn'}
+                      {value === 'MONTHLY' && 'Monatsgehalt'}
                     </button>
                   ))}
                 </div>
@@ -76,25 +77,27 @@ export default function CreatePayruleModal({ onClose, onCreate, prefillGroup, ex
 
             {/* Gruppe */}
             <div>
-              <div className="text-sm font-semibold mb-3 text-gray-700">Gruppe (optional)</div>
+              <div className="text-sm font-semibold mb-2 text-gray-700">Gruppe (optional)</div>
               <input
                 type="text"
                 placeholder="z. B. Tarif A"
                 value={group}
                 onChange={(e) => setGroup(e.target.value)}
-                className="w-full rounded-xl border border-gray-300 px-4 py-3 text-base shadow-sm focus:ring-2 focus:ring-blue-500"
+                className="w-full rounded-md border border-gray-300 px-3 py-2 text-sm shadow-sm focus:ring-2 focus:ring-blue-500"
               />
             </div>
-          </div>
+          </aside>
 
-          {/* Rechte Spalte: Dummy-Vorschau */}
-          <div className="md:w-3/5 bg-gray-50 border rounded-xl shadow-inner p-8 text-gray-700 text-base space-y-3">
-            <div className="font-semibold text-gray-800 text-lg">🧪 Vorschau (Dummy-Bereich)</div>
-            <div>Regeltyp: <code>{ruleKind}</code></div>
-            {ruleKind === 'PAY' && <div>Typ: <code>{type}</code></div>}
-            <div>Gruppe: <code>{group || '–'}</code></div>
-            <div className="pt-4 italic text-gray-400">Hier erscheinen später die passenden Eingabefelder.</div>
-          </div>
+          {/* Rechter Inhaltsbereich */}
+          <main className="flex-1 p-10 overflow-auto">
+            <div className="text-lg font-semibold mb-6 text-gray-800">🧪 Vorschau (Dummy-Bereich)</div>
+            <div className="space-y-2 text-gray-700">
+              <div>Regeltyp: <code>{ruleKind}</code></div>
+              {ruleKind === 'PAY' && <div>Typ: <code>{type}</code></div>}
+              <div>Gruppe: <code>{group || '–'}</code></div>
+              <p className="text-gray-400 italic mt-4">Hier erscheinen später die passenden Eingabefelder und Einstellungen.</p>
+            </div>
+          </main>
         </div>
       </DialogContent>
     </Dialog>
