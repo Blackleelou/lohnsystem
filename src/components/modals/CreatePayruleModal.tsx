@@ -18,7 +18,7 @@ export default function CreatePayruleModal({ onClose, onCreate, prefillGroup, ex
     <Dialog open onOpenChange={onClose}>
       <DialogContent
         onOpenChange={onClose}
-        className="w-full max-w-[90vw] max-h-[90vh] p-0 overflow-hidden rounded-xl"
+        className="w-[90vw] h-[90vh] max-w-none p-0 overflow-hidden rounded-xl"
       >
         {/* Header */}
         <div className="flex items-center justify-between border-b px-6 py-4">
@@ -26,10 +26,10 @@ export default function CreatePayruleModal({ onClose, onCreate, prefillGroup, ex
           <button onClick={onClose} className="text-sm text-gray-500 hover:text-gray-700">✕</button>
         </div>
 
-        {/* Split View Layout */}
-        <div className="flex h-[calc(90vh-64px)]"> {/* 64px = Headerhöhe */}
-          {/* Linke Seitenleiste */}
-          <aside className="w-[240px] border-r p-6 space-y-8 bg-gray-50">
+        {/* Split View: 25% / 75% */}
+        <div className="flex h-[calc(90vh-64px)] w-full">
+          {/* Linke Seite – Menü (25%) */}
+          <aside className="w-1/4 min-w-[220px] max-w-[300px] border-r bg-gray-50 p-6 space-y-8">
             {/* Regeltyp */}
             <div>
               <div className="text-sm font-semibold mb-2 text-gray-700">Regeltyp</div>
@@ -88,8 +88,8 @@ export default function CreatePayruleModal({ onClose, onCreate, prefillGroup, ex
             </div>
           </aside>
 
-          {/* Rechter Inhaltsbereich */}
-          <main className="flex-1 p-10 overflow-auto">
+          {/* Rechte Seite – Inhalt (75%) */}
+          <main className="w-3/4 p-10 overflow-auto">
             <div className="text-lg font-semibold mb-6 text-gray-800">🧪 Vorschau (Dummy-Bereich)</div>
             <div className="space-y-2 text-gray-700">
               <div>Regeltyp: <code>{ruleKind}</code></div>
