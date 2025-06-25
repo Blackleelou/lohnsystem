@@ -54,10 +54,11 @@ export const DialogContent = React.forwardRef<HTMLDivElement, ContentProps>(
     return (
       <div
         ref={ref}
-        className={clsx(
-          'relative w-full max-w-md rounded-2xl bg-lohn-cardLight dark:bg-lohn-cardDark p-8 shadow-lg',
+          className={clsx(
+          'relative rounded-2xl bg-lohn-cardLight dark:bg-lohn-cardDark shadow-lg',
           className
-        )}
+          )}
+
       >
         <button
           onClick={() => onOpenChange(false)}
