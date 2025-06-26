@@ -32,13 +32,13 @@ export default function CreatePayruleModal({ onClose, onCreate, prefillGroup, ex
 
         {/* Split View */}
         <div className="flex h-[calc(90vh-64px)] w-full relative">
-          {/* Einklappbarer Button seitlich */}
+          {/* Einklappbarer Button über dem linken Menü */}
           <button
             onClick={() => setMenuOpen(!menuOpen)}
-            className="absolute top-1/2 left-0 transform -translate-y-1/2 z-20 bg-white border border-gray-300 rounded-r px-2 py-1 text-gray-600 shadow hover:bg-gray-100"
+            className="absolute top-2 left-[12px] z-20 bg-white border border-gray-300 rounded-full p-1 text-black shadow hover:bg-gray-100"
             title={menuOpen ? 'Menü einklappen' : 'Menü anzeigen'}
           >
-            {menuOpen ? '◀' : '▶'}
+            {menuOpen ? '▲' : '▼'}
           </button>
 
           {/* Linkes Menü */}
