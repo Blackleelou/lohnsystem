@@ -3,6 +3,7 @@ import { Dialog, DialogContent, DialogTitle } from '@/components/ui/dialog'
 import type { PayRule } from '@/types/PayRule'
 import RightPanelPreview from './RightPanelPreview'
 import LeftAccordionMenu from './LeftAccordionMenu'
+import InfoOverlay from './InfoOverlay'
 
 interface Props {
   onClose: () => void
@@ -35,7 +36,7 @@ export default function CreatePayruleModal({ onClose, onCreate, prefillGroup, ex
           {/* Einklappbarer Button über dem linken Menü */}
           <button
             onClick={() => setMenuOpen(!menuOpen)}
-            className="absolute top-2 left-[12px] z-20 bg-white border border-gray-300 rounded-full p-1 text-black shadow hover:bg-gray-100"
+            className="absolute top-[6px] left-[10px] z-20 bg-white border border-gray-300 rounded-full p-1 text-black shadow hover:bg-gray-100"
             title={menuOpen ? 'Menü einklappen' : 'Menü anzeigen'}
           >
             {menuOpen ? '▲' : '▼'}
@@ -57,6 +58,9 @@ export default function CreatePayruleModal({ onClose, onCreate, prefillGroup, ex
           <div className="flex-1 relative overflow-y-auto">
             <RightPanelPreview ruleKind={ruleKind} type={type} group={group} />
           </div>
+
+          {/* Info Overlays */}
+          <InfoOverlay />
         </div>
       </DialogContent>
     </Dialog>
