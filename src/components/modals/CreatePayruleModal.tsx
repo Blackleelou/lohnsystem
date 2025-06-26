@@ -4,6 +4,17 @@ import type { PayRule } from '@/types/PayRule'
 import RightPanelPreview from './RightPanelPreview'
 import { Info } from 'lucide-react'
 
+function Tooltip({ children }: { children: React.ReactNode }) {
+  return (
+    <span className="group relative cursor-pointer text-gray-400">
+      <Info className="w-4 h-4" />
+      <span className="absolute z-50 hidden group-hover:block bg-white border rounded px-3 py-2 text-xs text-gray-700 shadow-lg w-64 top-6 left-1/2 -translate-x-1/2">
+        {children}
+      </span>
+    </span>
+  )
+}
+
 interface Props {
   onClose: () => void
   onCreate: (newRule: PayRule) => void
@@ -30,16 +41,16 @@ export default function CreatePayruleModal({ onClose, onCreate, prefillGroup, ex
           </DialogTitle>
         </div>
 
-        {/* Split View */}
-        <div className="flex h-[calc(90vh-64px)] w-full">
+        {/* Layout: Seitenansicht für Desktop, Spaltenansicht für Mobile */}
+        <div className="flex flex-col md:flex-row h-[calc(90vh-64px)] w-full">
           {/* Linkes Menü */}
           {menuOpen && (
-            <aside className="w-full max-w-xs border-r bg-gray-50 p-6 space-y-8">
-              {/* Basisdaten */}
+            <aside className="w-full md:max-w-xs border-r bg-gray-50 p-6 space-y-8">
+              {/* Art der Regel */}
               <div>
                 <div className="flex items-center justify-between text-sm font-semibold mb-2 text-gray-700">
                   <span>💡 Art der Regel</span>
-                  <Info className="h-4 w-4 text-gray-400" title="Wähle, ob es sich um Lohn, Zuschlag oder Sonderzahlung handelt." />
+                  <Tooltip>Wähle, ob es sich um Grundlohn, Zuschlag oder Sonderzahlung handelt.</Tooltip>
                 </div>
                 <div className="flex flex-col gap-2">
                   {['PAY', 'BONUS', 'SPECIAL'].map((value) => (
@@ -60,12 +71,12 @@ export default function CreatePayruleModal({ onClose, onCreate, prefillGroup, ex
                 </div>
               </div>
 
-              {/* Vergütungstyp */}
+              {/* Vergütungstyp (nur bei PAY) */}
               {ruleKind === 'PAY' && (
                 <div>
                   <div className="flex items-center justify-between text-sm font-semibold mb-2 text-gray-700">
                     <span>⏱️ Vergütungstyp</span>
-                    <Info className="h-4 w-4 text-gray-400" title="Lege fest, ob Stundenlohn oder Monatsgehalt verwendet wird." />
+                    <Tooltip>Lege fest, ob Stundenlohn oder Monatsgehalt verwendet wird.</Tooltip>
                   </div>
                   <div className="flex flex-col gap-2">
                     {['HOURLY', 'MONTHLY'].map((value) => (
@@ -90,7 +101,7 @@ export default function CreatePayruleModal({ onClose, onCreate, prefillGroup, ex
               <div>
                 <div className="flex items-center justify-between text-sm font-semibold mb-2 text-gray-700">
                   <span>🏷️ Gruppe (optional)</span>
-                  <Info className="h-4 w-4 text-gray-400" title="Optional: z. B. Tarif A oder Gruppe 1 zur Einordnung." />
+                  <Tooltip>Optional: z. B. Tarif A oder Gruppe 1 zur Einordnung.</Tooltip>
                 </div>
                 <input
                   type="text"
@@ -105,7 +116,7 @@ export default function CreatePayruleModal({ onClose, onCreate, prefillGroup, ex
               <div>
                 <div className="flex items-center justify-between text-sm font-semibold mb-2 text-gray-700">
                   <span>➕ Zusätzliche Optionen</span>
-                  <Info className="h-4 w-4 text-gray-400" title="Hier kannst du erweiterte Einstellungen wie Zeiträume oder Bedingungen hinzufügen." />
+                  <Tooltip>Hier kannst du später Zeiträume, Bedingungen oder Sonderregeln hinzufügen.</Tooltip>
                 </div>
                 <div className="flex flex-col gap-2">
                   <button className="text-left text-sm text-blue-600 hover:underline">+ Zeitraum hinzufügen</button>
