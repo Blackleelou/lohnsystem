@@ -1,8 +1,7 @@
 import { useState } from 'react'
 import { Dialog, DialogContent, DialogTitle } from '@/components/ui/dialog'
 import type { PayRule } from '@/types/PayRule'
-import RightPanelPreview from './RightPanelPreview' // ausgelagertes rechtes Panel
-import { ChevronLeft, ChevronRight } from 'lucide-react'
+import RightPanelPreview from './RightPanelPreview'
 
 interface Props {
   onClose: () => void
@@ -30,15 +29,19 @@ export default function CreatePayruleModal({ onClose, onCreate, prefillGroup, ex
           </DialogTitle>
         </div>
 
-        {/* Split View */}
         <div className="flex h-[calc(90vh-64px)] w-full">
-          {/* Linke Seite – Menü */}
-          <div className={`relative transition-all duration-300 ${menuOpen ? 'w-[25%] max-w-xs' : 'w-6'} bg-gray-50 border-r`}> 
-            {menuOpen && (
-              <div className="p-6 space-y-8">
-                {/* Regeltyp */}
+          {/* Linkes Menü */}
+          {menuOpen && (
+            <aside className="w-full max-w-xs border-r bg-gray-50 p-6 space-y-10">
+              {/* Basisdaten */}
+              <div className="space-y-6">
+                <div className="text-xs font-semibold uppercase tracking-wide text-gray-400">
+                  Basisdaten
+                </div>
+
+                {/* Art der Regel */}
                 <div>
-                  <div className="text-sm font-semibold mb-2 text-gray-700">Regeltyp</div>
+                  <div className="text-sm font-medium mb-2 text-gray-700">💡 Art der Regel</div>
                   <div className="flex flex-col gap-2">
                     {['PAY', 'BONUS', 'SPECIAL'].map((value) => (
                       <button
@@ -58,10 +61,10 @@ export default function CreatePayruleModal({ onClose, onCreate, prefillGroup, ex
                   </div>
                 </div>
 
-                {/* Typ (nur bei PAY) */}
+                {/* Vergütungstyp */}
                 {ruleKind === 'PAY' && (
                   <div>
-                    <div className="text-sm font-semibold mb-2 text-gray-700">Typ</div>
+                    <div className="text-sm font-medium mb-2 text-gray-700">⏱️ Vergütungstyp</div>
                     <div className="flex flex-col gap-2">
                       {['HOURLY', 'MONTHLY'].map((value) => (
                         <button
@@ -83,7 +86,7 @@ export default function CreatePayruleModal({ onClose, onCreate, prefillGroup, ex
 
                 {/* Gruppe */}
                 <div>
-                  <div className="text-sm font-semibold mb-2 text-gray-700">Gruppe (optional)</div>
+                  <div className="text-sm font-medium mb-2 text-gray-700">🏷️ Gruppe (optional)</div>
                   <input
                     type="text"
                     placeholder="z. B. Tarif A"
@@ -93,19 +96,28 @@ export default function CreatePayruleModal({ onClose, onCreate, prefillGroup, ex
                   />
                 </div>
               </div>
-            )}
 
-            {/* Toggle Button */}
-            <button
-              onClick={() => setMenuOpen(!menuOpen)}
-              className="absolute top-4 right-[-16px] z-10 rounded-full bg-white border border-gray-300 p-1 shadow hover:bg-gray-100"
-              title={menuOpen ? 'Menü einklappen' : 'Menü ausklappen'}
-            >
-              {menuOpen ? <ChevronLeft className="w-4 h-4" /> : <ChevronRight className="w-4 h-4" />}
-            </button>
-          </div>
+              {/* Erweiterungen */}
+              <div className="pt-8 border-t">
+                <div className="text-xs font-semibold uppercase tracking-wide text-gray-400 mb-3">
+                  Zusätzliche Optionen
+                </div>
+                <div className="flex flex-col gap-3">
+                  <button className="text-left text-sm text-blue-600 hover:underline">
+                    + Zeitraum hinzufügen
+                  </button>
+                  <button className="text-left text-sm text-blue-600 hover:underline">
+                    + Bonusregel anlegen
+                  </button>
+                  <button className="text-left text-sm text-blue-600 hover:underline">
+                    + Bedingungen definieren
+                  </button>
+                </div>
+              </div>
+            </aside>
+          )}
 
-          {/* Rechte Seite – ausgelagert */}
+          {/* Rechte Seite */}
           <RightPanelPreview ruleKind={ruleKind} type={type} group={group} />
         </div>
       </DialogContent>
