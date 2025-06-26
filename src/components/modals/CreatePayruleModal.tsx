@@ -1,6 +1,8 @@
 import { useState } from 'react'
 import { Dialog, DialogContent, DialogTitle } from '@/components/ui/dialog'
 import type { PayRule } from '@/types/PayRule'
+import RightPanelPreview from './RightPanelPreview' // ausgelagertes rechtes Panel
+import { ChevronLeft, ChevronRight } from 'lucide-react'
 
 interface Props {
   onClose: () => void
@@ -26,94 +28,85 @@ export default function CreatePayruleModal({ onClose, onCreate, prefillGroup, ex
           <DialogTitle className="text-2xl font-semibold text-gray-800">
             Neue Lohneinstellung
           </DialogTitle>
-          <button onClick={onClose} className="text-gray-500 hover:text-gray-700 text-lg">
-            ✕
-          </button>
         </div>
 
-        {/* Split View: 25% / 75% */}
+        {/* Split View */}
         <div className="flex h-[calc(90vh-64px)] w-full">
-          {/* Linke Seite – Menü (max 25%) */}
-          {menuOpen && (
-            <aside className="w-full max-w-xs border-r bg-gray-50 p-6 space-y-8">
-              {/* Regeltyp */}
-              <div>
-                <div className="text-sm font-semibold mb-2 text-gray-700">Regeltyp</div>
-                <div className="flex flex-col gap-2">
-                  {['PAY', 'BONUS', 'SPECIAL'].map((value) => (
-                    <button
-                      key={value}
-                      onClick={() => setRuleKind(value as any)}
-                      className={`text-left rounded-md px-4 py-2 text-sm font-medium transition ${
-                        ruleKind === value
-                          ? 'bg-blue-100 text-blue-700'
-                          : 'hover:bg-gray-100 text-gray-700'
-                      }`}
-                    >
-                      {value === 'PAY' && 'Grundlohn'}
-                      {value === 'BONUS' && 'Zuschlag'}
-                      {value === 'SPECIAL' && 'Sonderzahlung'}
-                    </button>
-                  ))}
-                </div>
-              </div>
-
-              {/* Typ (nur bei PAY) */}
-              {ruleKind === 'PAY' && (
+          {/* Linke Seite – Menü */}
+          <div className={`relative transition-all duration-300 ${menuOpen ? 'w-[25%] max-w-xs' : 'w-6'} bg-gray-50 border-r`}> 
+            {menuOpen && (
+              <div className="p-6 space-y-8">
+                {/* Regeltyp */}
                 <div>
-                  <div className="text-sm font-semibold mb-2 text-gray-700">Typ</div>
+                  <div className="text-sm font-semibold mb-2 text-gray-700">Regeltyp</div>
                   <div className="flex flex-col gap-2">
-                    {['HOURLY', 'MONTHLY'].map((value) => (
+                    {['PAY', 'BONUS', 'SPECIAL'].map((value) => (
                       <button
                         key={value}
-                        onClick={() => setType(value as any)}
+                        onClick={() => setRuleKind(value as any)}
                         className={`text-left rounded-md px-4 py-2 text-sm font-medium transition ${
-                          type === value
+                          ruleKind === value
                             ? 'bg-blue-100 text-blue-700'
                             : 'hover:bg-gray-100 text-gray-700'
                         }`}
                       >
-                        {value === 'HOURLY' && 'Stundenlohn'}
-                        {value === 'MONTHLY' && 'Monatsgehalt'}
+                        {value === 'PAY' && 'Grundlohn'}
+                        {value === 'BONUS' && 'Zuschlag'}
+                        {value === 'SPECIAL' && 'Sonderzahlung'}
                       </button>
                     ))}
                   </div>
                 </div>
-              )}
 
-              {/* Gruppe */}
-              <div>
-                <div className="text-sm font-semibold mb-2 text-gray-700">Gruppe (optional)</div>
-                <input
-                  type="text"
-                  placeholder="z. B. Tarif A"
-                  value={group}
-                  onChange={(e) => setGroup(e.target.value)}
-                  className="w-full rounded-md border border-gray-300 px-3 py-2 text-sm shadow-sm focus:ring-2 focus:ring-blue-500"
-                />
+                {/* Typ (nur bei PAY) */}
+                {ruleKind === 'PAY' && (
+                  <div>
+                    <div className="text-sm font-semibold mb-2 text-gray-700">Typ</div>
+                    <div className="flex flex-col gap-2">
+                      {['HOURLY', 'MONTHLY'].map((value) => (
+                        <button
+                          key={value}
+                          onClick={() => setType(value as any)}
+                          className={`text-left rounded-md px-4 py-2 text-sm font-medium transition ${
+                            type === value
+                              ? 'bg-blue-100 text-blue-700'
+                              : 'hover:bg-gray-100 text-gray-700'
+                          }`}
+                        >
+                          {value === 'HOURLY' && 'Stundenlohn'}
+                          {value === 'MONTHLY' && 'Monatsgehalt'}
+                        </button>
+                      ))}
+                    </div>
+                  </div>
+                )}
+
+                {/* Gruppe */}
+                <div>
+                  <div className="text-sm font-semibold mb-2 text-gray-700">Gruppe (optional)</div>
+                  <input
+                    type="text"
+                    placeholder="z. B. Tarif A"
+                    value={group}
+                    onChange={(e) => setGroup(e.target.value)}
+                    className="w-full rounded-md border border-gray-300 px-3 py-2 text-sm shadow-sm focus:ring-2 focus:ring-blue-500"
+                  />
+                </div>
               </div>
-            </aside>
-          )}
+            )}
 
-          {/* Rechter Inhalt */}
-          <main className="flex-1 p-10 overflow-auto">
+            {/* Toggle Button */}
             <button
               onClick={() => setMenuOpen(!menuOpen)}
-              className="mb-4 rounded px-3 py-1 text-sm text-gray-600 border border-gray-300 hover:bg-gray-100"
+              className="absolute top-4 right-[-16px] z-10 rounded-full bg-white border border-gray-300 p-1 shadow hover:bg-gray-100"
+              title={menuOpen ? 'Menü einklappen' : 'Menü ausklappen'}
             >
-              {menuOpen ? 'Menü ausblenden' : 'Menü einblenden'}
+              {menuOpen ? <ChevronLeft className="w-4 h-4" /> : <ChevronRight className="w-4 h-4" />}
             </button>
+          </div>
 
-            <div className="text-lg font-semibold mb-6 text-gray-800">🧪 Vorschau (Dummy-Bereich)</div>
-            <div className="space-y-2 text-gray-700">
-              <div>Regeltyp: <code>{ruleKind}</code></div>
-              {ruleKind === 'PAY' && <div>Typ: <code>{type}</code></div>}
-              <div>Gruppe: <code>{group || '–'}</code></div>
-              <p className="text-gray-400 italic mt-4">
-                Hier erscheinen später die passenden Eingabefelder und Einstellungen.
-              </p>
-            </div>
-          </main>
+          {/* Rechte Seite – ausgelagert */}
+          <RightPanelPreview ruleKind={ruleKind} type={type} group={group} />
         </div>
       </DialogContent>
     </Dialog>
