@@ -1,39 +1,55 @@
-import { useState } from 'react';
 import { Info } from 'lucide-react';
-import Tooltip from '@/components/ui/Tooltip';
+import { useState } from 'react';
 
 interface LeftAccordionMenuProps {
   ruleKind: 'PAY' | 'BONUS' | 'SPECIAL';
-  setRuleKind: (val: 'PAY' | 'BONUS' | 'SPECIAL') => void;
   type: 'HOURLY' | 'MONTHLY';
-  setType: (val: 'HOURLY' | 'MONTHLY') => void;
   group: string;
+  setRuleKind: (val: 'PAY' | 'BONUS' | 'SPECIAL') => void;
+  setType: (val: 'HOURLY' | 'MONTHLY') => void;
   setGroup: (val: string) => void;
 }
 
-export default function LeftAccordionMenu({ ruleKind, setRuleKind, type, setType, group, setGroup }: LeftAccordionMenuProps) {
-  const [openSection, setOpenSection] = useState<string | null>('kind');
+export default function LeftAccordionMenu({
+  ruleKind,
+  type,
+  group,
+  setRuleKind,
+  setType,
+  setGroup,
+}: LeftAccordionMenuProps) {
+  const [openSections, setOpenSections] = useState<Record<string, boolean>>({
+    rule: true,
+    type: true,
+    group: true,
+    extra: true,
+  });
 
   const toggleSection = (key: string) => {
-    setOpenSection((prev) => (prev === key ? null : key));
+    setOpenSections(prev => ({ ...prev, [key]: !prev[key] }));
   };
 
   return (
-    <aside className="w-full max-w-xs border-r bg-gray-50 p-6 space-y-6 overflow-y-auto">
+    <aside className="w-full max-w-xs border-r bg-gray-50 p-4 space-y-6 overflow-y-auto">
       {/* Art der Regel */}
       <div>
-        <button onClick={() => toggleSection('kind')} className="w-full text-left font-semibold text-sm text-gray-700 mb-2 flex justify-between items-center">
+        <button
+          className="flex w-full items-center justify-between text-left text-sm font-semibold text-gray-700 mb-1"
+          onClick={() => toggleSection('rule')}
+        >
           <span>💡 Art der Regel</span>
-          <Tooltip>Wähle, ob es sich um Lohn, Zuschlag oder Sonderzahlung handelt.</Tooltip>
+          <Info className="h-4 w-4 text-gray-400" title="Wähle, ob es sich um Lohn, Zuschlag oder Sonderzahlung handelt." />
         </button>
-        {openSection === 'kind' && (
-          <div className="flex flex-col gap-2">
+        {openSections.rule && (
+          <div className="flex flex-col gap-2 mt-1">
             {['PAY', 'BONUS', 'SPECIAL'].map((value) => (
               <button
                 key={value}
                 onClick={() => setRuleKind(value as any)}
                 className={`text-left rounded-md px-4 py-2 text-sm font-medium transition ${
-                  ruleKind === value ? 'bg-blue-100 text-blue-700' : 'hover:bg-gray-100 text-gray-700'
+                  ruleKind === value
+                    ? 'bg-blue-100 text-blue-700'
+                    : 'hover:bg-gray-100 text-gray-700'
                 }`}
               >
                 {value === 'PAY' && 'Grundlohn'}
@@ -48,18 +64,23 @@ export default function LeftAccordionMenu({ ruleKind, setRuleKind, type, setType
       {/* Vergütungstyp */}
       {ruleKind === 'PAY' && (
         <div>
-          <button onClick={() => toggleSection('type')} className="w-full text-left font-semibold text-sm text-gray-700 mb-2 flex justify-between items-center">
+          <button
+            className="flex w-full items-center justify-between text-left text-sm font-semibold text-gray-700 mb-1"
+            onClick={() => toggleSection('type')}
+          >
             <span>⏱️ Vergütungstyp</span>
-            <Tooltip>Lege fest, ob Stundenlohn oder Monatsgehalt verwendet wird.</Tooltip>
+            <Info className="h-4 w-4 text-gray-400" title="Lege fest, ob Stundenlohn oder Monatsgehalt verwendet wird." />
           </button>
-          {openSection === 'type' && (
-            <div className="flex flex-col gap-2">
+          {openSections.type && (
+            <div className="flex flex-col gap-2 mt-1">
               {['HOURLY', 'MONTHLY'].map((value) => (
                 <button
                   key={value}
                   onClick={() => setType(value as any)}
                   className={`text-left rounded-md px-4 py-2 text-sm font-medium transition ${
-                    type === value ? 'bg-blue-100 text-blue-700' : 'hover:bg-gray-100 text-gray-700'
+                    type === value
+                      ? 'bg-blue-100 text-blue-700'
+                      : 'hover:bg-gray-100 text-gray-700'
                   }`}
                 >
                   {value === 'HOURLY' && 'Stundenlohn'}
@@ -73,11 +94,14 @@ export default function LeftAccordionMenu({ ruleKind, setRuleKind, type, setType
 
       {/* Gruppe */}
       <div>
-        <button onClick={() => toggleSection('group')} className="w-full text-left font-semibold text-sm text-gray-700 mb-2 flex justify-between items-center">
+        <button
+          className="flex w-full items-center justify-between text-left text-sm font-semibold text-gray-700 mb-1"
+          onClick={() => toggleSection('group')}
+        >
           <span>🏷️ Gruppe (optional)</span>
-          <Tooltip>Optional: z. B. Tarif A oder Gruppe 1 zur Einordnung.</Tooltip>
+          <Info className="h-4 w-4 text-gray-400" title="Optional: z. B. Tarif A oder Gruppe 1 zur Einordnung." />
         </button>
-        {openSection === 'group' && (
+        {openSections.group && (
           <input
             type="text"
             placeholder="z. B. Tarif A"
@@ -90,12 +114,15 @@ export default function LeftAccordionMenu({ ruleKind, setRuleKind, type, setType
 
       {/* Zusätzliche Optionen */}
       <div>
-        <button onClick={() => toggleSection('extras')} className="w-full text-left font-semibold text-sm text-gray-700 mb-2 flex justify-between items-center">
+        <button
+          className="flex w-full items-center justify-between text-left text-sm font-semibold text-gray-700 mb-1"
+          onClick={() => toggleSection('extra')}
+        >
           <span>➕ Zusätzliche Optionen</span>
-          <Tooltip>Hier kannst du z. B. Zeiträume oder Bedingungen hinzufügen.</Tooltip>
+          <Info className="h-4 w-4 text-gray-400" title="Hier kannst du erweiterte Einstellungen wie Zeiträume oder Bedingungen hinzufügen." />
         </button>
-        {openSection === 'extras' && (
-          <div className="flex flex-col gap-2">
+        {openSections.extra && (
+          <div className="flex flex-col gap-2 mt-1">
             <button className="text-left text-sm text-blue-600 hover:underline">+ Zeitraum hinzufügen</button>
             <button className="text-left text-sm text-blue-600 hover:underline">+ Bonusregel</button>
             <button className="text-left text-sm text-blue-600 hover:underline">+ Bedingung</button>
