@@ -31,29 +31,30 @@ export default function CreatePayruleModal({ onClose, onCreate, prefillGroup, ex
         </div>
 
         {/* Split View */}
-        <div className="flex h-[calc(90vh-64px)] w-full">
-          {/* Linkes Menü (Accordion) */}
+        <div className="flex h-[calc(90vh-64px)] w-full relative">
+          {/* Einklappbarer Button seitlich */}
+          <button
+            onClick={() => setMenuOpen(!menuOpen)}
+            className="absolute top-1/2 left-0 transform -translate-y-1/2 z-20 bg-white border border-gray-300 rounded-r px-2 py-1 text-gray-600 shadow hover:bg-gray-100"
+            title={menuOpen ? 'Menü einklappen' : 'Menü anzeigen'}
+          >
+            {menuOpen ? '◀' : '▶'}
+          </button>
+
+          {/* Linkes Menü */}
           {menuOpen && (
-            <aside className="w-full max-w-xs border-r bg-gray-50 p-4 overflow-y-auto">
-              <LeftAccordionMenu
-                ruleKind={ruleKind}
-                setRuleKind={setRuleKind}
-                type={type}
-                setType={setType}
-                group={group}
-                setGroup={setGroup}
-              />
-            </aside>
+            <LeftAccordionMenu
+              ruleKind={ruleKind}
+              type={type}
+              group={group}
+              setRuleKind={setRuleKind}
+              setType={setType}
+              setGroup={setGroup}
+            />
           )}
 
           {/* Rechte Seite */}
-          <div className="flex-1 relative">
-            <button
-              onClick={() => setMenuOpen(!menuOpen)}
-              className="absolute left-2 top-2 z-10 rounded px-2 py-1 text-sm text-gray-600 border border-gray-300 bg-white hover:bg-gray-100 shadow"
-            >
-              {menuOpen ? '◀ Menü' : '▶ Menü'}
-            </button>
+          <div className="flex-1 relative overflow-y-auto">
             <RightPanelPreview ruleKind={ruleKind} type={type} group={group} />
           </div>
         </div>
