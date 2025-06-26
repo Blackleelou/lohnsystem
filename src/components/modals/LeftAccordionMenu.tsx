@@ -29,6 +29,15 @@ export default function LeftAccordionMenu({
     setOpenSections(prev => ({ ...prev, [key]: !prev[key] }));
   };
 
+  const TooltipIcon = ({ text }: { text: string }) => (
+    <div className="relative group">
+      <Info className="h-4 w-4 text-gray-400 cursor-help" />
+      <div className="absolute z-10 hidden w-48 rounded-md bg-black px-2 py-1 text-xs text-white group-hover:block left-6 top-1">
+        {text}
+      </div>
+    </div>
+  );
+
   return (
     <aside className="w-full max-w-xs border-r bg-gray-50 p-4 space-y-6 overflow-y-auto">
       {/* Art der Regel */}
@@ -38,7 +47,7 @@ export default function LeftAccordionMenu({
           onClick={() => toggleSection('rule')}
         >
           <span>💡 Art der Regel</span>
-          <Info className="h-4 w-4 text-gray-400" title="Wähle, ob es sich um Lohn, Zuschlag oder Sonderzahlung handelt." />
+          <TooltipIcon text="Wähle, ob es sich um Lohn, Zuschlag oder Sonderzahlung handelt." />
         </button>
         {openSections.rule && (
           <div className="flex flex-col gap-2 mt-1">
@@ -69,7 +78,7 @@ export default function LeftAccordionMenu({
             onClick={() => toggleSection('type')}
           >
             <span>⏱️ Vergütungstyp</span>
-            <Info className="h-4 w-4 text-gray-400" title="Lege fest, ob Stundenlohn oder Monatsgehalt verwendet wird." />
+            <TooltipIcon text="Lege fest, ob Stundenlohn oder Monatsgehalt verwendet wird." />
           </button>
           {openSections.type && (
             <div className="flex flex-col gap-2 mt-1">
@@ -99,7 +108,7 @@ export default function LeftAccordionMenu({
           onClick={() => toggleSection('group')}
         >
           <span>🏷️ Gruppe (optional)</span>
-          <Info className="h-4 w-4 text-gray-400" title="Optional: z. B. Tarif A oder Gruppe 1 zur Einordnung." />
+          <TooltipIcon text="Optional: z. B. Tarif A oder Gruppe 1 zur Einordnung." />
         </button>
         {openSections.group && (
           <input
@@ -119,7 +128,7 @@ export default function LeftAccordionMenu({
           onClick={() => toggleSection('extra')}
         >
           <span>➕ Zusätzliche Optionen</span>
-          <Info className="h-4 w-4 text-gray-400" title="Hier kannst du erweiterte Einstellungen wie Zeiträume oder Bedingungen hinzufügen." />
+          <TooltipIcon text="Hier kannst du erweiterte Einstellungen wie Zeiträume oder Bedingungen hinzufügen." />
         </button>
         {openSections.extra && (
           <div className="flex flex-col gap-2 mt-1">
