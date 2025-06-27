@@ -1,22 +1,23 @@
-import { useState } from 'react'
-import { Dialog, DialogContent, DialogTitle } from '@/components/ui/dialog'
-import type { PayRule } from '@/types/PayRule'
-import RightPanelPreview from './RightPanelPreview'
-import LeftAccordionMenu from './LeftAccordionMenu'
-import InfoOverlay from './InfoOverlay'
+// src/components/modals/CreatePayruleModal.tsx
+import React from 'react';
+import { Dialog, DialogContent, DialogTitle } from '@/components/ui/dialog';
+import type { PayRule } from '@/types/PayRule';
+import RightPanelPreview from './RightPanelPreview';
+import LeftAccordionMenu from './LeftAccordionMenu';
+import InfoOverlay from './InfoOverlay';
 
 interface Props {
-  onClose: () => void
-  onCreate: (newRule: PayRule) => void
-  prefillGroup?: string | null
-  existingGroups: string[]
+  onClose: () => void;
+  onCreate: (newRule: PayRule) => void;
+  prefillGroup?: string | null;
+  existingGroups: string[];
 }
 
 export default function CreatePayruleModal({ onClose, onCreate, prefillGroup, existingGroups }: Props) {
-  const [ruleKind, setRuleKind] = useState<'PAY' | 'BONUS' | 'SPECIAL'>('PAY')
-  const [type, setType] = useState<'HOURLY' | 'MONTHLY'>('HOURLY')
-  const [group, setGroup] = useState(prefillGroup || '')
-  const [menuOpen, setMenuOpen] = useState(true)
+  const [ruleKind, setRuleKind] = React.useState<'PAY' | 'BONUS' | 'SPECIAL'>('PAY');
+  const [type, setType] = React.useState<'HOURLY' | 'MONTHLY'>('HOURLY');
+  const [group, setGroup] = React.useState(prefillGroup || '');
+  const [menuOpen, setMenuOpen] = React.useState(true);
 
   return (
     <Dialog open onOpenChange={onClose}>
@@ -64,5 +65,5 @@ export default function CreatePayruleModal({ onClose, onCreate, prefillGroup, ex
         </div>
       </DialogContent>
     </Dialog>
-  )
+  );
 }
