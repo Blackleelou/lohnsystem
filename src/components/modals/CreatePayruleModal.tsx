@@ -23,11 +23,14 @@ export default function CreatePayruleModal({ onClose, onCreate, prefillGroup, ex
         onOpenChange={onClose}
         className="w-[90vw] h-[90vh] max-w-none max-h-none p-0 overflow-hidden rounded-2xl shadow-xl bg-white"
       >
-        {/* Header */}
+        {/* Header mit Tooltip rechts */}
         <div className="flex items-center justify-between border-b px-6 py-4">
           <DialogTitle className="text-2xl font-semibold text-gray-800">
             Neue Lohneinstellung
           </DialogTitle>
+          <Tooltip>
+            Hier legst du neue Lohnarten, Zuschläge oder Sonderzahlungen für dein Team fest.
+          </Tooltip>
         </div>
 
         {/* Top-Bottom View */}
@@ -49,9 +52,6 @@ export default function CreatePayruleModal({ onClose, onCreate, prefillGroup, ex
           <div className="flex-[3_3_0%] overflow-y-auto">
             <BelowPanelPreview ruleKind={ruleKind} type={type} group={group} />
           </div>
-
-          {/* Info Tooltip */}
-          <Tooltip />
         </div>
       </DialogContent>
     </Dialog>
