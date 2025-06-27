@@ -12,6 +12,9 @@ import {
   RefreshCcw,
   Megaphone,
 } from 'lucide-react';
+import Tooltip from '@/components/ui/Tooltip';
+
+// Typdefinition
 
 type HealthStatus = {
   db: {
@@ -49,19 +52,6 @@ function StatusSymbol({ status }: { status: 'ok' | 'warn' | 'error' }) {
   if (status === 'ok') return <CheckCircle className="w-5 h-5 text-green-500" />;
   if (status === 'warn') return <AlertTriangle className="w-5 h-5 text-yellow-400" />;
   return <XCircle className="w-5 h-5 text-red-500" />;
-}
-
-function Tooltip({ children }: { children: React.ReactNode }) {
-  return (
-    <span className="group relative cursor-pointer text-gray-400">
-      <svg className="h-4 w-4" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-        <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M13 16h-1v-4h-1m1-4h.01M12 20a8 8 0 100-16 8 8 0 000 16z" />
-      </svg>
-      <span className="absolute z-50 hidden group-hover:block bg-white border rounded px-3 py-2 text-xs text-gray-700 shadow-lg w-64 top-6 left-1/2 -translate-x-1/2">
-        {children}
-      </span>
-    </span>
-  );
 }
 
 export default function SystemStatusPage() {
@@ -148,7 +138,6 @@ export default function SystemStatusPage() {
                     </span>
                   </div>
 
-                  {/* DB-Details */}
                   {isDb && status.db.sizePretty && (
                     <div className="text-xs text-gray-500 ml-12">
                       Speicherverbrauch: <span className="font-medium">{status.db.sizePretty}</span>
@@ -194,8 +183,7 @@ export default function SystemStatusPage() {
                 <div className="flex items-center gap-2">
                   <span className="font-semibold">Google Analytics</span>
                   <Tooltip>
-                    Analytics wird nur bei aktivem Cookie-Consent für „Statistik“ geladen.
-                    Die IP-Adresse wird dabei anonymisiert.
+                    Analytics wird nur bei aktivem Cookie-Consent für „Statistik“ geladen. Die IP-Adresse wird dabei anonymisiert.
                   </Tooltip>
                 </div>
                 {gaStatus === 'ok' && (
