@@ -3,7 +3,7 @@ import { Dialog, DialogContent, DialogTitle } from '@/components/ui/dialog';
 import type { PayRule } from '@/types/PayRule';
 import TopAccordionMenu from './TopAccordionMenu';
 import BelowPanelPreview from './BelowPanelPreview';
-import InfoOverlay from './InfoOverlay';
+import Tooltip from '@/components/ui/Tooltip';
 
 interface Props {
   onClose: () => void;
