@@ -50,8 +50,8 @@ export default function CreatePayruleModal({ onClose, onCreate, prefillGroup, ex
             <BelowPanelPreview ruleKind={ruleKind} type={type} group={group} />
           </div>
 
-          {/* Info Overlays */}
-          <InfoOverlay />
+          {/* Info Tooltip */}
+          <Tooltip />
         </div>
       </DialogContent>
     </Dialog>
