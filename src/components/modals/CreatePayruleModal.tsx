@@ -1,9 +1,8 @@
-// src/components/modals/CreatePayruleModal.tsx
 import React from 'react';
 import { Dialog, DialogContent, DialogTitle } from '@/components/ui/dialog';
 import type { PayRule } from '@/types/PayRule';
-import RightPanelPreview from './TopPanelPreview';
-import LeftAccordionMenu from './BelowAccordionMenu';
+import TopPanelPreview from './TopPanelPreview';
+import BelowAccordionMenu from './BelowAccordionMenu';
 import InfoOverlay from './InfoOverlay';
 
 interface Props {
@@ -17,7 +16,6 @@ export default function CreatePayruleModal({ onClose, onCreate, prefillGroup, ex
   const [ruleKind, setRuleKind] = React.useState<'PAY' | 'BONUS' | 'SPECIAL'>('PAY');
   const [type, setType] = React.useState<'HOURLY' | 'MONTHLY'>('HOURLY');
   const [group, setGroup] = React.useState(prefillGroup || '');
-  const [menuOpen, setMenuOpen] = React.useState(true);
 
   return (
     <Dialog open onOpenChange={onClose}>
@@ -32,20 +30,17 @@ export default function CreatePayruleModal({ onClose, onCreate, prefillGroup, ex
           </DialogTitle>
         </div>
 
-        {/* Split View */}
+        {/* Top-Bottom View */}
         <div className="flex flex-col h-[calc(90vh-64px)] w-full">
-          {/* Einklappbarer Button über dem linken Menü */}
-          <button
-            onClick={() => setMenuOpen(!menuOpen)}
-            className="absolute top-[6px] left-[10px] z-20 bg-white border border-gray-300 rounded-full p-1 text-black shadow hover:bg-gray-100"
-            title={menuOpen ? 'Menü einklappen' : 'Menü anzeigen'}
-          >
-            {menuOpen ? '▲' : '▼'}
-          </button>
 
-          {/* Menü oben */}
-          {menuOpen && (
-            <LeftAccordionMenu
+          {/* Obere Vorschau (75%) */}
+          <div className="flex-[3_3_0%] overflow-y-auto border-b">
+            <TopPanelPreview ruleKind={ruleKind} type={type} group={group} />
+          </div>
+
+          {/* Unteres Menü (25%) */}
+          <div className="flex-[1_1_0%] overflow-y-auto">
+            <BelowAccordionMenu
               ruleKind={ruleKind}
               type={type}
               group={group}
@@ -53,11 +48,6 @@ export default function CreatePayruleModal({ onClose, onCreate, prefillGroup, ex
               setType={setType}
               setGroup={setGroup}
             />
-          )}
-
-          {/* Menü unten */}
-          <div className="flex-1 relative overflow-y-auto">
-            <RightPanelPreview ruleKind={ruleKind} type={type} group={group} />
           </div>
 
           {/* Info Overlays */}
