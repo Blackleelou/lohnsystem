@@ -1,10 +1,10 @@
-interface RightPanelPreviewProps {
+interface BelowPanelPreviewProps {
   ruleKind: 'PAY' | 'BONUS' | 'SPECIAL';
   type: 'HOURLY' | 'MONTHLY';
   group: string;
 }
 
-export default function RightPanelPreview({ ruleKind, type, group }: RightPanelPreviewProps) {
+export default function BelowPanelPreview({ ruleKind, type, group }: BelowPanelPreviewProps) {
   return (
     <main className="h-full w-full p-6 overflow-y-auto">
       <div className="text-lg font-semibold mb-6 text-gray-800">🧪 Vorschau (Dummy-Bereich)</div>
