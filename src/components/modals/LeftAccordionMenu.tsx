@@ -1,5 +1,5 @@
-import { Info } from 'lucide-react';
 import { useState } from 'react';
+import { Info } from 'lucide-react';
 
 interface LeftAccordionMenuProps {
   ruleKind: 'PAY' | 'BONUS' | 'SPECIAL';
@@ -18,7 +18,7 @@ export default function LeftAccordionMenu({
   setType,
   setGroup,
 }: LeftAccordionMenuProps) {
-  const [openSections, setOpenSections] = useState<Record<string, boolean>>({
+  const [openSections, setOpenSections] = useState({
     rule: true,
     type: true,
     group: true,
@@ -26,7 +26,7 @@ export default function LeftAccordionMenu({
   });
 
   const toggleSection = (key: string) => {
-    setOpenSections(prev => ({ ...prev, [key]: !prev[key] }));
+    setOpenSections((prev) => ({ ...prev, [key]: !prev[key] }));
   };
 
   const TooltipIcon = ({ text }: { text: string }) => (
@@ -40,32 +40,44 @@ export default function LeftAccordionMenu({
 
   return (
     <aside className="w-full max-w-xs border-r bg-gray-50 p-4 space-y-6 overflow-y-auto">
-      {/* Art der Regel */}
+      {/* Regelart */}
       <div>
         <button
-          className="flex w-full items-center justify-between text-left text-sm font-semibold text-gray-700 mb-1"
+          className="flex items-center justify-between w-full text-left text-sm font-semibold text-gray-700 mb-1"
           onClick={() => toggleSection('rule')}
         >
-          <span>💡 Art der Regel</span>
+          <span className="flex items-center gap-2">
+            <span className="text-blue-500">💡</span>
+            Art der Regel
+          </span>
           <TooltipIcon text="Wähle, ob es sich um Lohn, Zuschlag oder Sonderzahlung handelt." />
         </button>
         {openSections.rule && (
-          <div className="flex flex-col gap-2 mt-1">
-            {['PAY', 'BONUS', 'SPECIAL'].map((value) => (
-              <button
-                key={value}
-                onClick={() => setRuleKind(value as any)}
-                className={`text-left rounded-md px-4 py-2 text-sm font-medium transition ${
-                  ruleKind === value
-                    ? 'bg-blue-100 text-blue-700'
-                    : 'hover:bg-gray-100 text-gray-700'
-                }`}
-              >
-                {value === 'PAY' && 'Grundlohn'}
-                {value === 'BONUS' && 'Zuschlag'}
-                {value === 'SPECIAL' && 'Sonderzahlung'}
-              </button>
-            ))}
+          <div className="mt-2 space-y-1">
+            <button
+              onClick={() => setRuleKind('PAY')}
+              className={`w-full px-4 py-2 text-left text-sm rounded-md hover:bg-gray-100 ${
+                ruleKind === 'PAY' ? 'bg-blue-100 text-blue-700' : 'text-gray-700'
+              }`}
+            >
+              Grundlohn
+            </button>
+            <button
+              onClick={() => setRuleKind('BONUS')}
+              className={`w-full px-4 py-2 text-left text-sm rounded-md hover:bg-gray-100 ${
+                ruleKind === 'BONUS' ? 'bg-blue-100 text-blue-700' : 'text-gray-700'
+              }`}
+            >
+              Zuschlag
+            </button>
+            <button
+              onClick={() => setRuleKind('SPECIAL')}
+              className={`w-full px-4 py-2 text-left text-sm rounded-md hover:bg-gray-100 ${
+                ruleKind === 'SPECIAL' ? 'bg-blue-100 text-blue-700' : 'text-gray-700'
+              }`}
+            >
+              Sonderzahlung
+            </button>
           </div>
         )}
       </div>
@@ -74,28 +86,33 @@ export default function LeftAccordionMenu({
       {ruleKind === 'PAY' && (
         <div>
           <button
-            className="flex w-full items-center justify-between text-left text-sm font-semibold text-gray-700 mb-1"
+            className="flex items-center justify-between w-full text-left text-sm font-semibold text-gray-700 mb-1"
             onClick={() => toggleSection('type')}
           >
-            <span>⏱️ Vergütungstyp</span>
+            <span className="flex items-center gap-2">
+              <span className="text-blue-500">⏱️</span>
+              Vergütungstyp
+            </span>
             <TooltipIcon text="Lege fest, ob Stundenlohn oder Monatsgehalt verwendet wird." />
           </button>
           {openSections.type && (
-            <div className="flex flex-col gap-2 mt-1">
-              {['HOURLY', 'MONTHLY'].map((value) => (
-                <button
-                  key={value}
-                  onClick={() => setType(value as any)}
-                  className={`text-left rounded-md px-4 py-2 text-sm font-medium transition ${
-                    type === value
-                      ? 'bg-blue-100 text-blue-700'
-                      : 'hover:bg-gray-100 text-gray-700'
-                  }`}
-                >
-                  {value === 'HOURLY' && 'Stundenlohn'}
-                  {value === 'MONTHLY' && 'Monatsgehalt'}
-                </button>
-              ))}
+            <div className="mt-2 space-y-1">
+              <button
+                onClick={() => setType('HOURLY')}
+                className={`w-full px-4 py-2 text-left text-sm rounded-md hover:bg-gray-100 ${
+                  type === 'HOURLY' ? 'bg-blue-100 text-blue-700' : 'text-gray-700'
+                }`}
+              >
+                Stundenlohn
+              </button>
+              <button
+                onClick={() => setType('MONTHLY')}
+                className={`w-full px-4 py-2 text-left text-sm rounded-md hover:bg-gray-100 ${
+                  type === 'MONTHLY' ? 'bg-blue-100 text-blue-700' : 'text-gray-700'
+                }`}
+              >
+                Monatsgehalt
+              </button>
             </div>
           )}
         </div>
@@ -104,19 +121,22 @@ export default function LeftAccordionMenu({
       {/* Gruppe */}
       <div>
         <button
-          className="flex w-full items-center justify-between text-left text-sm font-semibold text-gray-700 mb-1"
+          className="flex items-center justify-between w-full text-left text-sm font-semibold text-gray-700 mb-1"
           onClick={() => toggleSection('group')}
         >
-          <span>🏷️ Gruppe (optional)</span>
+          <span className="flex items-center gap-2">
+            <span className="text-blue-500">🏷️</span>
+            Gruppe (optional)
+          </span>
           <TooltipIcon text="Optional: z. B. Tarif A oder Gruppe 1 zur Einordnung." />
         </button>
         {openSections.group && (
           <input
             type="text"
-            placeholder="z. B. Tarif A"
+            placeholder="z. B. Tarif A"
             value={group}
             onChange={(e) => setGroup(e.target.value)}
-            className="w-full rounded-md border border-gray-300 px-3 py-2 text-sm shadow-sm focus:ring-2 focus:ring-blue-500"
+            className="w-full px-3 py-2 text-sm border border-gray-300 rounded-md"
           />
         )}
       </div>
@@ -124,17 +144,26 @@ export default function LeftAccordionMenu({
       {/* Zusätzliche Optionen */}
       <div>
         <button
-          className="flex w-full items-center justify-between text-left text-sm font-semibold text-gray-700 mb-1"
+          className="flex items-center justify-between w-full text-left text-sm font-semibold text-gray-700 mb-1"
           onClick={() => toggleSection('extra')}
         >
-          <span>➕ Zusätzliche Optionen</span>
+          <span className="flex items-center gap-2">
+            <span className="text-blue-500">➕</span>
+            Zusätzliche Optionen
+          </span>
           <TooltipIcon text="Hier kannst du erweiterte Einstellungen wie Zeiträume oder Bedingungen hinzufügen." />
         </button>
         {openSections.extra && (
-          <div className="flex flex-col gap-2 mt-1">
-            <button className="text-left text-sm text-blue-600 hover:underline">+ Zeitraum hinzufügen</button>
-            <button className="text-left text-sm text-blue-600 hover:underline">+ Bonusregel</button>
-            <button className="text-left text-sm text-blue-600 hover:underline">+ Bedingung</button>
+          <div className="mt-2 space-y-1">
+            <button className="w-full px-4 py-2 text-left text-sm text-blue-600 hover:underline rounded-md">
+              + Zeitraum hinzufügen
+            </button>
+            <button className="w-full px-4 py-2 text-left text-sm text-blue-600 hover:underline rounded-md">
+              + Bonusregel
+            </button>
+            <button className="w-full px-4 py-2 text-left text-sm text-blue-600 hover:underline rounded-md">
+              + Bedingung
+            </button>
           </div>
         )}
       </div>
