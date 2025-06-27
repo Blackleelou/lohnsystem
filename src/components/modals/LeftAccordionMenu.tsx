@@ -141,7 +141,7 @@ export default function LeftAccordionMenu({
         )}
       </div>
 
-      {/* Zusätzliche Optionen */}
+           {/* Zusätzliche Optionen */}
       <div>
         <button
           className="flex items-center justify-between w-full text-left text-sm font-semibold text-gray-700 mb-1"
@@ -158,4 +158,15 @@ export default function LeftAccordionMenu({
             <button className="w-full px-4 py-2 text-left text-sm text-blue-600 hover:underline rounded-md">
               + Zeitraum hinzufügen
             </button>
-           
+            <button className="w-full px-4 py-2 text-left text-sm text-blue-600 hover:underline rounded-md">
+              + Bonusregel
+            </button>
+            <button className="w-full px-4 py-2 text-left text-sm text-blue-600 hover:underline rounded-md">
+              + Bedingung
+            </button>
+          </div>
+        )}
+      </div>
+    </aside>
+  );
+}
