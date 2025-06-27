@@ -1,7 +1,7 @@
 import { useState } from 'react';
 import { Info } from 'lucide-react';
 
-interface LeftAccordionMenuProps {
+interface TopAccordionMenuProps {
   ruleKind: 'PAY' | 'BONUS' | 'SPECIAL';
   type: 'HOURLY' | 'MONTHLY';
   group: string;
@@ -10,14 +10,14 @@ interface LeftAccordionMenuProps {
   setGroup: (val: string) => void;
 }
 
-export default function LeftAccordionMenu({
+export default function TopAccordionMenu({
   ruleKind,
   type,
   group,
   setRuleKind,
   setType,
   setGroup,
-}: LeftAccordionMenuProps) {
+}: TopAccordionMenuProps) {
   const [openSections, setOpenSections] = useState<Record<string, boolean>>({
     rule: true,
     type: true,
@@ -39,7 +39,7 @@ export default function LeftAccordionMenu({
   );
 
   return (
-    <aside className="w-full max-w-xs border-r bg-gray-50 p-4 space-y-6 overflow-y-auto max-h-full">
+    <aside className="w-full bg-gray-50 p-4 space-y-6 overflow-y-auto max-h-full">
       {/* Regelart */}
       <div>
         <button
@@ -141,7 +141,7 @@ export default function LeftAccordionMenu({
         )}
       </div>
 
-           {/* Zusätzliche Optionen */}
+      {/* Zusätzliche Optionen */}
       <div>
         <button
           className="flex items-center justify-between w-full text-left text-sm font-semibold text-gray-700 mb-1"
