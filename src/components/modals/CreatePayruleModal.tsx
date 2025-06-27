@@ -1,8 +1,8 @@
 import React from 'react';
 import { Dialog, DialogContent, DialogTitle } from '@/components/ui/dialog';
 import type { PayRule } from '@/types/PayRule';
-import TopPanelPreview from './TopPanelPreview';
-import BelowAccordionMenu from './BelowAccordionMenu';
+import TopAccordionMenu from './TopAccordionMenu';
+import BelowPanelPreview from './BelowPanelPreview';
 import InfoOverlay from './InfoOverlay';
 
 interface Props {
@@ -33,14 +33,9 @@ export default function CreatePayruleModal({ onClose, onCreate, prefillGroup, ex
         {/* Top-Bottom View */}
         <div className="flex flex-col h-[calc(90vh-64px)] w-full">
 
-          {/* Obere Vorschau (75%) */}
-          <div className="flex-[3_3_0%] overflow-y-auto border-b">
-            <TopPanelPreview ruleKind={ruleKind} type={type} group={group} />
-          </div>
-
-          {/* Unteres Menü (25%) */}
-          <div className="flex-[1_1_0%] overflow-y-auto">
-            <BelowAccordionMenu
+          {/* Oberes Menü (25%) */}
+          <div className="flex-[1_1_0%] overflow-y-auto border-b">
+            <TopAccordionMenu
               ruleKind={ruleKind}
               type={type}
               group={group}
@@ -48,6 +43,11 @@ export default function CreatePayruleModal({ onClose, onCreate, prefillGroup, ex
               setType={setType}
               setGroup={setGroup}
             />
+          </div>
+
+          {/* Untere Vorschau (75%) */}
+          <div className="flex-[3_3_0%] overflow-y-auto">
+            <BelowPanelPreview ruleKind={ruleKind} type={type} group={group} />
           </div>
 
           {/* Info Overlays */}
