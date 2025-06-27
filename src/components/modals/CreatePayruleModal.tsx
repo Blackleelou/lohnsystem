@@ -2,8 +2,8 @@
 import React from 'react';
 import { Dialog, DialogContent, DialogTitle } from '@/components/ui/dialog';
 import type { PayRule } from '@/types/PayRule';
-import RightPanelPreview from './RightPanelPreview';
-import LeftAccordionMenu from './LeftAccordionMenu';
+import RightPanelPreview from './TopPanelPreview';
+import LeftAccordionMenu from './BelowAccordionMenu';
 import InfoOverlay from './InfoOverlay';
 
 interface Props {
@@ -33,7 +33,7 @@ export default function CreatePayruleModal({ onClose, onCreate, prefillGroup, ex
         </div>
 
         {/* Split View */}
-        <div className="flex h-[calc(90vh-64px)] w-full relative">
+        <div className="flex flex-col h-[calc(90vh-64px)] w-full">
           {/* Einklappbarer Button über dem linken Menü */}
           <button
             onClick={() => setMenuOpen(!menuOpen)}
@@ -43,7 +43,7 @@ export default function CreatePayruleModal({ onClose, onCreate, prefillGroup, ex
             {menuOpen ? '▲' : '▼'}
           </button>
 
-          {/* Linkes Menü */}
+          {/* Menü oben */}
           {menuOpen && (
             <LeftAccordionMenu
               ruleKind={ruleKind}
@@ -55,7 +55,7 @@ export default function CreatePayruleModal({ onClose, onCreate, prefillGroup, ex
             />
           )}
 
-          {/* Rechte Seite */}
+          {/* Menü unten */}
           <div className="flex-1 relative overflow-y-auto">
             <RightPanelPreview ruleKind={ruleKind} type={type} group={group} />
           </div>
