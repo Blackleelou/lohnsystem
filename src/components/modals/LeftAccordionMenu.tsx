@@ -18,14 +18,14 @@ export default function LeftAccordionMenu({
   setType,
   setGroup,
 }: LeftAccordionMenuProps) {
-  const [openSections, setOpenSections] = useState({
+  const [openSections, setOpenSections] = useState<Record<string, boolean>>({
     rule: true,
     type: true,
     group: true,
     extra: true,
   });
 
-  const toggleSection = (key: string) => {
+  const toggleSection = (key: keyof typeof openSections) => {
     setOpenSections((prev) => ({ ...prev, [key]: !prev[key] }));
   };
 
@@ -39,7 +39,7 @@ export default function LeftAccordionMenu({
   );
 
   return (
-    <aside className="w-full max-w-xs border-r bg-gray-50 p-4 space-y-6 overflow-y-auto">
+    <aside className="w-full max-w-xs border-r bg-gray-50 p-4 space-y-6 overflow-y-auto max-h-full">
       {/* Regelart */}
       <div>
         <button
@@ -158,15 +158,4 @@ export default function LeftAccordionMenu({
             <button className="w-full px-4 py-2 text-left text-sm text-blue-600 hover:underline rounded-md">
               + Zeitraum hinzufügen
             </button>
-            <button className="w-full px-4 py-2 text-left text-sm text-blue-600 hover:underline rounded-md">
-              + Bonusregel
-            </button>
-            <button className="w-full px-4 py-2 text-left text-sm text-blue-600 hover:underline rounded-md">
-              + Bedingung
-            </button>
-          </div>
-        )}
-      </div>
-    </aside>
-  );
-}
+           
